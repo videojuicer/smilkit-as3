@@ -2,7 +2,7 @@ package org.smilkit.dom
 {
 	import flash.events.EventDispatcher;
 	
-	import org.smilkit.utils.CloneHelper;
+	import org.smilkit.utils.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INamedNodeMap;
@@ -12,17 +12,29 @@ package org.smilkit.dom
 	/**
 	 * The base implementation class of any DOM tree, should never be accessed or created directly,
 	 * instead it should be extended by a sub-class to include complete methods.
+	 * <p>Node also implements INodeList so that it can be used as a list of nodes and be returned
+	 * in calls for the children.</p>
 	 * 
 	 * @see org.smilkit.w3c.dom.INode
 	 * @see org.smilkit.w3c.dom.INodeList
 	 */
 	public class Node extends EventDispatcher implements INode, INodeList
 	{
-		private var _ownerDocument:IDocument = null;
-		private var _parentNode:INode = null;
+		public static var ELEMENT_NODE:int = 1;
+		public static var ATTRIBUTE_NODE:int = 2;
+		public static var TEXT_NODE:int = 3;
+		public static var CDATA_SECTION_NODE:int = 4;
+		public static var ENTITY_REFERENCE_NODE:int = 5;
+		public static var ENTITY_NODE:int = 6;
+		public static var PROCESSING_INSTRUCTION_NODE:int = 7;
+		public static var COMMENT_NODE:int = 8;
+		public static var DOCUMENT_NODE:int = 9;
+		public static var DOCUMENT_TYPE_NODE:int = 10;
+		public static var DOCUMENT_FRAGMENT_NODE:int = 11;
+		public static var NOTATION_NODE:int = 12;
 		
-		private var _nextSibling:INode = null;
-		private var _previousSibling:INode = null;
+		protected var _ownerDocument:IDocument = null;
+		protected var _parentNode:INode = null;
 		
 		public function Node(owner:IDocument = null)
 		{
@@ -46,11 +58,12 @@ package org.smilkit.dom
 		
 		public function set nodeValue(nodeValue:String):void
 		{
+			// do nothing, must be sub-classed and extended
 		}
 		
-		public function get nodeType():String
+		public function get nodeType():int
 		{
-			return null;
+			return 0;
 		}
 		
 		public function get parentNode():INode
@@ -147,10 +160,18 @@ package org.smilkit.dom
 			return false;
 		}
 		
+		/**
+		 * Returns a duplicate of the current node instance. The returned 
+		 * <code>INode</code> will be a complete new object instance.
+		 * 
+		 * @param deep Specifies whether to copy all the children. This is ignored as
+		 * we don't deal with children in this class.
+		 * 
+		 * @return New <code>INode</code> copy of the current object instance.
+		 */
 		public function cloneNode(deep:Boolean):INode
 		{
-			var newNode:INode = CloneHelper.clone(this) as INode;
-			
+			var newNode:INode = ObjectManager.clone(this) as INode;
 			// should fire NODE_CLONED event
 			
 			return newNode;

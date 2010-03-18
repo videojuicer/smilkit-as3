@@ -9,7 +9,7 @@ package org.smilkit.dom
 	{
 		public static var DOM_DOMAIN:String = "http://www.w3.org/dom/DOMTR";
 		public static var XML_DOMAIN:String = "http://www.w3.org/TR/1998/REC-xml-19980210";
-		public static var SMIL_DOMAIN:String = "";
+		public static var SMIL3_DOMAIN:String = "http://www.w3.org/TR/2008/REC-SMIL3-20081201/";
 		
 		/**
 		 * Formats a DOM message with the specified arguments and information.

@@ -2,7 +2,7 @@ package org.smilkit.utils
 {
 	import flash.utils.ByteArray;
 
-	public class CloneHelper
+	public class ObjectManager
 	{
 		public static function clone(source:Object):Object
 		{

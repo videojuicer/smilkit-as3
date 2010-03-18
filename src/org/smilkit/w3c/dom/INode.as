@@ -1,11 +1,15 @@
 package org.smilkit.w3c.dom
 {
+	/**
+	 * @see org.smilkit.dom.Node
+	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
+	 */
 	public interface INode
 	{
 		function get nodeName():String;
 		function get nodeValue():String;
 		function set nodeValue(nodeValue:String):void;
-		function get nodeType():String;
+		function get nodeType():int;
 		function get parentNode():INode;
 		function get childNodes():INodeList;
 		function get firstChild():INode;

@@ -1,11 +1,11 @@
 package org.smilkit.w3c.dom.views
 {
 	/**
-	 * The <code>DocumentView</code> interface is implemented by <code>Document</code>
+	 * The <code>IDocumentView</code> interface is implemented by <code>IDocument</code>
 	 * objects in DOM implementations supporting DOM Views. It provides an attribute
 	 * to retrieve the default view of a document.
 	 * 
-	 * @see Document Object Model (DOM) Level 2 Views Specification (http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113)
+	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
 	 * @since DOM Level 2
 	 */
 	public interface IDocumentView

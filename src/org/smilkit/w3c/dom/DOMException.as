@@ -11,7 +11,7 @@ package org.smilkit.w3c.dom
 	 * For example, implementations should raise an implementation-dependent 
 	 * exception if a <code>null</code> argument is passed. 
 	 * 
-	 * @see Document Object Model (DOM) Level 2 Views Specification (http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113)
+	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
 	 */
 	public class DOMException extends Error
 	{

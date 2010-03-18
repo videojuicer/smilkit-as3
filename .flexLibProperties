@@ -51,10 +51,17 @@
     <classEntry path="org.smilkit.w3c.dom.smil.IElementTargetAttributes"/>
     <classEntry path="org.smilkit.w3c.dom.views.IAbstractView"/>
     <classEntry path="org.smilkit.w3c.dom.views.IDocumentView"/>
-    <classEntry path="org.smilkit.dom.NodeList"/>
     <classEntry path="org.smilkit.dom.Node"/>
     <classEntry path="org.smilkit.dom.DOMMessageFormatter"/>
-    <classEntry path="org.smilkit.utils.CloneHelper"/>
+    <classEntry path="org.smilkit.dom.ChildNode"/>
+    <classEntry path="org.smilkit.dom.ParentNode"/>
+    <classEntry path="org.smilkit.dom.CoreDocument"/>
+    <classEntry path="org.smilkit.dom.Document"/>
+    <classEntry path="org.smilkit.dom.Element"/>
+    <classEntry path="org.smilkit.dom.NamedNodeMap"/>
+    <classEntry path="org.smilkit.util.HashMap"/>
+    <classEntry path="org.smilkit.dom.AttributeMap"/>
+    <classEntry path="org.smilkit.dom.DocumentType"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
