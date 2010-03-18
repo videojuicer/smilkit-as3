@@ -1,8 +1,5 @@
 package org.smilkit.w3c.dom
-{
-	
-
-	public interface IDocument extends INode
+{	public interface IDocument extends INode
 	{
 		function get doctype():IDocumentType;
 		function get implementation():IDOMImplementation;

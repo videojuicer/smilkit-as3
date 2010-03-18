@@ -51,6 +51,10 @@
     <classEntry path="org.smilkit.w3c.dom.smil.IElementTargetAttributes"/>
     <classEntry path="org.smilkit.w3c.dom.views.IAbstractView"/>
     <classEntry path="org.smilkit.w3c.dom.views.IDocumentView"/>
+    <classEntry path="org.smilkit.dom.NodeList"/>
+    <classEntry path="org.smilkit.dom.Node"/>
+    <classEntry path="org.smilkit.dom.DOMMessageFormatter"/>
+    <classEntry path="org.smilkit.utils.CloneHelper"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
