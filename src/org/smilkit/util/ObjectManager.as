@@ -1,4 +1,4 @@
-package org.smilkit.utils
+package org.smilkit.util
 {
 	import flash.utils.ByteArray;
 

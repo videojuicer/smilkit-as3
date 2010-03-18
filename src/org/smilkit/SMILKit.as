@@ -5,7 +5,8 @@ package org.smilkit
 	import org.smilkit.w3c.dom.IDocument;
 
 	/**
-	 * SMILKit's main static API object, allows the creation of SMIL3.0 DOM documents from SMIL XML.
+	 * SMILKit's main static API object, allows the creation, manipulation and browsing of SMIL3.0 DOM documents.
+	 * 
 	 * Implements the W3C DOM Level 2 specification and SMIL 3.0 Boston DOM specification.
 	 * 
 	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
@@ -24,6 +25,7 @@ package org.smilkit
 		}
 		
 		/**
+		 * Create's a new SMIL 3.0 DOM <code>Document</code>.
 		 * 
 		 * @see org.smilkit.dom.Document
 		 * @see org.smilkit.w3c.dom.IDocument

@@ -71,9 +71,23 @@ package org.smilkit.dom
 			return this._documentElement;
 		}
 		
+		/**
+		 * NON-DOM: Creates a <code>DocumentType</code> instance from the specified arguements.
+		 * 
+		 * @param qualifiedName Qualified name of the document type.
+		 * @param publicId Public ID of the document type.
+		 * @param systemId System ID of the document type.
+		 * 
+		 * @return Returns the created <code>IDocumentType</code> instance.
+		 */
+		public function createDocumentType(qualifiedName:String, publicId:String, systemId:String):IDocumentType
+		{
+			return new DocumentType(this, qualifiedName, publicId, systemId);
+		}
+		
 		public function createElement(tagName:String):IElement
 		{
-			throw new IllegalOperationError("Method Not Implemented Yet!");
+			return new Element(this, tagName);
 		}
 		
 		public function createDocumentFragment():IDocumentFragment

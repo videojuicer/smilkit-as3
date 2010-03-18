@@ -2,7 +2,7 @@ package org.smilkit.dom
 {
 	import flash.events.EventDispatcher;
 	
-	import org.smilkit.utils.ObjectManager;
+	import org.smilkit.util.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INamedNodeMap;
@@ -103,7 +103,7 @@ package org.smilkit.dom
 		
 		public function get ownerDocument():IDocument
 		{
-			return null;
+			return this._ownerDocument;
 		}
 		
 		public function get localName():String

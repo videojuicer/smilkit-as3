@@ -62,6 +62,7 @@
     <classEntry path="org.smilkit.util.HashMap"/>
     <classEntry path="org.smilkit.dom.AttributeMap"/>
     <classEntry path="org.smilkit.dom.DocumentType"/>
+    <classEntry path="org.smilkit.spec.DOMSuite"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
