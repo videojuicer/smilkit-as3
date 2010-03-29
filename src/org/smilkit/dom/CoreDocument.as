@@ -117,7 +117,7 @@ package org.smilkit.dom
 		
 		public function createAttribute(name:String):IAttr
 		{
-			throw new IllegalOperationError("Method Not Implemented Yet!");
+			return new Attr(this, name);
 		}
 		
 		public function createEntityReference(tagname:String):IEntityReference
@@ -127,7 +127,7 @@ package org.smilkit.dom
 		
 		public function getElementsByTagName(tagname:String):INodeList
 		{
-			throw new IllegalOperationError("Method Not Implemented Yet!");
+			return new DeepNodeList(this, tagname);
 		}
 		
 		public function importNode(importedNode:INode, deep:Boolean):INode

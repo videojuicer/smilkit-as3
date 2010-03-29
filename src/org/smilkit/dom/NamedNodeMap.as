@@ -56,7 +56,7 @@ package org.smilkit.dom
 		 */
 		public function setNamedItem(arg:INode):INode
 		{
-			if (arg.ownerDocument != this._ownerNode) {
+			if (arg.ownerDocument != this._ownerNode.ownerDocument) {
 				var msg:String = DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "WRONG_DOCUMENT_ERR");
 				throw new DOMException(DOMException.WRONG_DOCUMENT_ERR, msg);
 			}
@@ -206,7 +206,7 @@ package org.smilkit.dom
 				while (first <= last) {
 					i = (first + last) / 2;
 					
-					var cur:Node = this._nodes[i] as Node;
+					var cur:Node = this._nodes.getItemAt(i) as Node;
 					
 					if (cur.nodeName == name) {
 						return i;

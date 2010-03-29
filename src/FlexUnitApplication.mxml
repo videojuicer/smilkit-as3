@@ -6,15 +6,12 @@
 	<![CDATA[
 
 		import org.flexunit.runner.Request;
-		import org.smilkit.spec.tests.ElementTestCase;
+		import org.smilkit.spec.DOMSuite;
 
 		public function currentRunTestSuite():Array
 		{
 			var testsToRun:Array = new Array();
-			testsToRun.push(Request.method( org.smilkit.spec.tests.ElementTestCase,"creation"));
-			testsToRun.push(Request.method( org.smilkit.spec.tests.ElementTestCase,"removingAttributes"));
-			testsToRun.push(Request.method( org.smilkit.spec.tests.ElementTestCase,"newAttributes"));
-			testsToRun.push(Request.method( org.smilkit.spec.tests.ElementTestCase,"updatingAttributes"));
+			testsToRun.push(org.smilkit.spec.DOMSuite);
 			return testsToRun;
 		}
 		private function onCreationComplete():void

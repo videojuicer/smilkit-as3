@@ -4,6 +4,7 @@ package org.smilkit.spec.tests
 	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	
@@ -21,6 +22,33 @@ package org.smilkit.spec.tests
 		{
 			var el:IElement = this._document.createElement("body");
 			Assert.assertNotNull(el);
+		}
+		
+		[Test(description="Tests that Element can only belong to the Documents they were created on")]
+		public function elementsMustBelongToDocument():void
+		{
+			var el:IElement = this._document.createElement("body");
+			
+			this._document.appendChild(el);
+			
+			Assert.assertTrue(this._document.hasChildNodes());
+			
+			Assert.assertEquals(1, this._document.childNodes.length);
+			
+			var document:Document = new Document(new DocumentType(null, "smil"));
+			var wrongChild:IElement = document.createElement("body");
+			
+			try
+			{
+				this._document.appendChild(wrongChild);
+				
+				// worked?!
+				Assert.fail("Should not be able to append a child from another document");
+			}
+			catch (ex:DOMException)
+			{
+				Assert.assertEquals(1, this._document.childNodes.length);
+			}			
 		}
 		
 		[Test(description="Tests the creation of new attributes")]

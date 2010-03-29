@@ -15,6 +15,11 @@ package org.smilkit.dom
 			super(owner);
 		}
 		
+		public override function get ownerDocument():IDocument
+		{
+			return this._ownerDocument;
+		}
+		
 		public override function get childNodes():INodeList
 		{
 			return this;
@@ -88,8 +93,8 @@ package org.smilkit.dom
 		}
 		
 		public override function insertBefore(newChild:INode, refChild:INode):INode
-		{
-			if (newChild.ownerDocument != this.ownerDocument && newChild != this.ownerDocument)
+		{			
+			if (newChild.ownerDocument != (this as ParentNode)._ownerDocument && newChild != (this as ParentNode)._ownerDocument)
 			{
 				throw new DOMException(DOMException.WRONG_DOCUMENT_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "WRONG_DOCUMENT_ERR"));
 			}
@@ -98,22 +103,7 @@ package org.smilkit.dom
 			{
 				throw new DOMException(DOMException.NOT_FOUND_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_FOUND_ERR"));
 			}
-			
-			var safe:Boolean = true;
-			var c:INode = this;
-			
-			while (c != null)
-			{
-				safe = newChild != c;
-				
-				c = c.parentNode;
-			}
-			
-			if (!safe)
-			{
-				throw new DOMException(DOMException.HIERARCHY_REQUEST_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "HIERARCHY_REQUEST_ERR"));
-			}
-			
+
 			if (newChild == refChild)
 			{
 				refChild = refChild.nextSibling;
@@ -123,9 +113,29 @@ package org.smilkit.dom
 				return newChild;
 			}
 			
+			var safe:Boolean = true;
+			//var c:INode = this;
+			
+			//while (c != null)
+			//{
+			//	safe = newChild != c;
+				
+			//	c = c.parentNode;
+			//}
+			
+			//for (var a:INode = this; safe && a != null; a = a.parentNode)
+			//{
+			//	safe = newChild != a;
+			//}
+			
+			if (!safe)
+			{
+				throw new DOMException(DOMException.HIERARCHY_REQUEST_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "HIERARCHY_REQUEST_ERR"));
+			}
+			
 			var newInternal:ChildNode = (newChild as ChildNode);
 			var refInternal:ChildNode = (refChild as ChildNode);
-			
+
 			// first + only child
 			if (this.firstChild == null)
 			{
@@ -182,6 +192,26 @@ package org.smilkit.dom
 			// send out replace event
 			
 			return oldChild;
+		}
+		
+		public override function get length():int
+		{
+			if (this.firstChild == null)
+			{
+				return 0;
+			}
+			
+			if (this.firstChild == this.lastChild)
+			{
+				return 1;
+			}
+			
+			if (this._nodes == null)
+			{
+				return 2;
+			}
+			
+			return this._nodes.length + 2;
 		}
 		
 		public override function item(index:int):INode

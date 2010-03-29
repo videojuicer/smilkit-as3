@@ -6,6 +6,11 @@ package org.smilkit.util
 		
 		public function HashMap(source:Array = null) {
 			this._source = source;
+			
+			if (this._source == null)
+			{
+				this._source = new Array();
+			}
 		}
 		
 		public function get source():Array {
