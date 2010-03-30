@@ -63,6 +63,9 @@
     <classEntry path="org.smilkit.dom.AttributeMap"/>
     <classEntry path="org.smilkit.dom.DocumentType"/>
     <classEntry path="org.smilkit.spec.DOMSuite"/>
+    <classEntry path="org.smilkit.dom.Attr"/>
+    <classEntry path="org.smilkit.dom.DeepNodeList"/>
+    <classEntry path="org.smilkit.spec.tests.DocumentTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

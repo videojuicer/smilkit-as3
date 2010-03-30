@@ -10,7 +10,7 @@ package org.smilkit.spec
 	[RunWith("org.flexunit.runners.Suite")]
 	public class DOMSuite
 	{
-		public var test1:DocumentTestCase;
-		public var test2:ElementTestCase;
+		public var documentTest:DocumentTestCase;
+		public var elementTest:ElementTestCase;
 	}
 }

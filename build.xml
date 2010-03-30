@@ -1,4 +1,131 @@
 <?xml version="1.0" encoding="utf-8"?>
 <project name="smilkit-as3" default="compileAll" basedir=".">
-
+	<property environment="env" />
+	
+	
+	<property name="instrument.metadata" value="flexunit-instrument.cvm" />
+   	<property name="instrument.report.flexcover" value="flexunit-instrument.cvr" />
+   	<property name="instrument.report.cobertura" value="coverage.xml" />
+	<property name="report.flexcover.loc" location="${basedir}/target/report/flexcover" />
+	
+	<property name="main.src.loc" location="${basedir}/src" />
+	<property name="test.src.loc" location="${basedir}/src/org/smilkit/spec" />
+	
+	<property name="lib.loc" location="${basedir}/libs" />
+	<property name="output.loc" location="${basedir}/target" />
+	
+	<property name="bin.loc" location="${output.loc}/bin" />
+	<property name="dist.loc" location="${output.loc}/dist" />
+	<property name="report.loc" location="${output.loc}/report" />
+	
+	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
+	<property name="FLEX_COVER_VIEWER" location="${env.FLEX_COVER_VIEWER}" />
+	
+	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
+	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
+	
+	<target name="clean">
+		<delete dir="${output.loc}" />
+	</target>
+	
+	<target name="init">
+		<mkdir dir="${output.loc}" />
+		<mkdir dir="${bin.loc}" />
+		<mkdir dir="${report.loc}" />
+		<mkdir dir="${report.flexcover.loc}" />
+		<mkdir dir="${dist.loc}" />
+	</target>
+	
+	<target name="compile" depends="init">
+		<fileset id="sources" dir="${main.src.loc}/org">
+			<include name="**/*.as" />
+			<exclude name="*.mxml" />
+			<exclude name="smilkit/spec/*.as" />
+			<exclude name="smilkit/spec/tests/*.as" />
+		</fileset>
+		<pathconvert property="classes" pathsep=" " refid="sources">
+			<chainedmapper>
+				<globmapper from="${main.src.loc}/*" to="*" />
+				<mapper type="package" from="*.as" to="*" />
+			</chainedmapper>
+		</pathconvert>
+		<echo message="classes is set to = ${classes}"/>
+		<compc output="${bin.loc}/smilkit-as3.swc"  include-classes="${classes}">
+			<source-path path-element="${main.src.loc}" />
+			<!--<include-sources dir="${main.src.loc}" includes="*" excludes="org/smilkit/spec/*" />-->
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</compc>
+	</target>
+	
+	<target name="test-compile">
+		<mxmlc file="${main.src.loc}/SpecRunner.mxml" output="${bin.loc}/SpecRunner.swf">
+			<source-path path-element="${main.src.loc}" />
+			<library-path dir="${lib.loc}" append="true">
+				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
+				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
+				<!--<include name="flexunit-flexcoverlistener-4.1.0.53-sdk4.0.0.14159.swc" />-->
+			</library-path>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+		</mxmlc>
+	</target>
+	
+	<target name="test" depends="compile,test-only,report" />
+	
+	<target name="package" depends="test">
+		<copy file="${bin.loc}/smilkit-as3.swf" todir="${dist.loc}" />
+		
+		<zip destfile="${output.loc}/${ant.project.name}.zip">
+			<fileset dir="${dist.loc}" />
+		</zip>
+	</target>
+	
+	<target name="instrument" depends="compile,test-and-instrument,report" />
+	
+	<target name="test-and-instrument" depends="test-compile">
+		<parallel>
+			<sequential>
+				<exec executable="${FLEX_COVER_VIEWER}" dir="${bin.loc}" spawn="true">
+					<arg line="-output '${report.flexcover.loc}/${instrument.report.flexcover}'" />
+					<arg line="'${lib.loc}/${instrument.metadata}'" />
+				</exec>
+				<waitfor checkevery="3" checkeveryunit="second">
+					<available file="${report.flexcover.loc}/${instrument.report.flexcover}" />
+				</waitfor>
+				<tstamp>
+	               <format property="instrument.timestamp" pattern="MM/dd/yyyy HH:mm:ss.SSS" />
+	            </tstamp>
+	          	<!--<xslt in="${report.flexcover.loc}/${instrument.report.flexcover}" out="${report.flexcover.loc}/${instrument.report.cobertura}" style="${basedir}/fc-to-cobertura.xsl">
+	               <classpath>
+	                  <fileset dir="${build.lib.loc}">
+	                     <include name="saxon*.jar" />
+	                  </fileset>
+	               </classpath>
+	               <param name="sourcePath" expression="${main.src.loc}" />
+	               <param name="timestamp" expression="${instrument.timestamp}" />
+	               <param name="version" expression="0.81" />
+	            </xslt>-->
+			</sequential>
+			<sequential>
+            	<sleep seconds="30" />
+            	<flexunit swf="${bin.loc}/SpecRunner.swf" toDir="${report.loc}"
+						haltonfailure="false" verbose="true" localTrusted="true" />
+			</sequential>
+		</parallel>
+	</target>
+	
+	<target name="test-only" depends="test-compile">
+		<flexunit swf="${bin.loc}/SpecRunner.swf" toDir="${report.loc}"
+				haltonfailure="false" verbose="true" localTrusted="true" />
+	</target>
+	
+	<target name="report">
+		<junitreport todir="${report.loc}">
+			<fileset dir="${report.loc}">
+				<include name="TEST-*.xml" />
+			</fileset>
+			<report format="frames" todir="${report.loc}/html" />
+		</junitreport>
+	</target>
 </project>

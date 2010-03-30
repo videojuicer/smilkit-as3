@@ -18,6 +18,26 @@ package org.smilkit.dom
 			this._name = name;
 		}
 		
+		public function get id():String
+		{
+			if (this.hasAttributeNS("xml", "id"))
+			{
+				return this.getAttributeNS("xml", "id");
+			}
+			
+			return this.getAttribute("id");
+		}
+		
+		public function set id(id:String):void
+		{
+			if (this.hasAttributeNS("xml", "id"))
+			{
+				return this.setAttributeNS("xml", "id", id);
+			}
+			
+			this.setAttribute("id", id);
+		}
+		
 		public function get tagName():String
 		{
 			return this._name;
@@ -33,9 +53,20 @@ package org.smilkit.dom
 			return this._name;
 		}
 		
+		/**
+		 * Queries the element for a live <code>INodeList</code> of all the matching
+		 * descendents.
+		 * 
+		 * @param tagname The tag name of the <code>INode</code> to collect. "*" can be
+		 * used as a wildcard token, matching all descendents from this element.
+		 * 
+		 * @return Live instance of <code>DeepNodeList</code>.
+		 * 
+		 * @see DeepNodeList
+		 */
 		public function getElementsByTagName(name:String):INodeList
 		{
-			return null;
+			return new DeepNodeList(this, tagName) as INodeList;
 		}
 		
 		public function getElementsByTagNameNS(namespaceURI:String, localName:String):INodeList

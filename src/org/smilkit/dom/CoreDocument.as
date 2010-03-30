@@ -125,6 +125,17 @@ package org.smilkit.dom
 			throw new IllegalOperationError("Method Not Implemented Yet!");
 		}
 		
+		/**
+		 * Queries the document for a live <code>INodeList</code> of all the matching
+		 * descendents.
+		 * 
+		 * @param tagname The tag name of the <code>INode</code> to collect. "*" can be
+		 * used as a wildcard token, matching all elements in the document.
+		 * 
+		 * @return Live instance of <code>DeepNodeList</code>.
+		 * 
+		 * @see DeepNodeList
+		 */
 		public function getElementsByTagName(tagname:String):INodeList
 		{
 			return new DeepNodeList(this, tagname);
@@ -152,7 +163,9 @@ package org.smilkit.dom
 		
 		public function getElementById(elementId:String):IElement
 		{
-			throw new IllegalOperationError("Method Not Implemented Yet!");
+			
+			
+			return null;
 		}
 	}
 }
