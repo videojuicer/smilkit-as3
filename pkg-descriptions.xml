@@ -1,0 +1,75 @@
+<?xml version="1.0"?>
+<overviews>
+	<all-packages>
+		<description>
+		<![CDATA[
+			SMILKit-as3
+		]]>
+		</description>
+	</all-packages>
+	<all-classes>
+		<description>
+		<![CDATA[
+		
+		]]>
+		</description>
+	</all-classes>
+	<packages>
+		<!--
+			<package name="">
+				<shortDescription></shortDescription>
+				<description></description>
+				<propertiesDescription></propertiesDescription>
+				<functionsDescription></functionsDescription>
+			</package>
+		-->
+		<package name="org.smilkit">
+			<shortDescription>
+			<![CDATA[
+				
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.w3c">
+			<shortDescription>
+			<![CDATA[
+				W3C interface bindings.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				W3C interface bindings.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.w3c.dom">
+			<shortDescription>
+			<![CDATA[
+				Interface bindings for W3C DOM Level 2.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				Interface bindings for &lt;a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/"&gt;W3C DOM Level 2&lt;/a&gt;.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.w3c.dom.smil">
+			<shortDescription>
+			<![CDATA[
+				Interface bindings based on the W3C SMIL 3.0 Boston DOM.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				Interface bindings based on the &lt;a href="http://www.w3.org/TR/smil-boston-dom/cover.html"&gt;W3C SMIL 3.0 Boston DOM&lt;/a&gt;.
+			]]>
+			</description>
+		</package>
+	</packages>
+</overviews>
