@@ -1,7 +1,7 @@
 SMILKit-as3
 ===========
 
-SMILKit-as3 brings [SMIL 3.0][] rendering support to [Actionscript3][]. Provides an implementation of the W3C [SMIL Bostom DOM][] Working Draft specification to provide [SMIL 3.0][] DOM support.
+SMILKit-as3 brings [SMIL 3][] rendering support to [Actionscript3][]. Provides an implementation of the W3C [SMIL Bostom DOM][] Working Draft specification to provide [SMIL 3][] DOM support.
 
 Implements [DOM Level 2][] based on the [Xerces Java Parser][] implementation.
 
@@ -34,7 +34,7 @@ Authors
 License
 -------
 
-[SMIL 3.0][]: http://www.w3.org/TR/SMIL3/ "SMIL 3.0"
+[SMIL 3][]: http://www.w3.org/TR/SMIL3/ "SMIL 3.0"
 [Actionscript3][]: http://en.wikipedia.org/wiki/ActionScript "Actionscript3"
 [Flex SDK][]: http://opensource.adobe.com/wiki/display/flexsdk/Flex+SDK "Flex SDK"
 [DOM Level 2]: http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/ "W3C DOM Level 2"
