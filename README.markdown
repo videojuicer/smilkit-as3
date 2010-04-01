@@ -35,8 +35,13 @@ License
 -------
 
 [SMIL 3][]: http://www.w3.org/TR/SMIL3/ "SMIL 3.0"
+
 [Actionscript3][]: http://en.wikipedia.org/wiki/ActionScript "Actionscript3"
+
 [Flex SDK][]: http://opensource.adobe.com/wiki/display/flexsdk/Flex+SDK "Flex SDK"
+
 [DOM Level 2]: http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/ "W3C DOM Level 2"
+
 [SMIL Bostom DOM]: http://www.w3.org/TR/smil-boston-dom/cover.html "SMIL Bostom DOM"
+
 [Xerces Java Parser]: http://xerces.apache.org/xerces-j/apiDocs/index.html "Xerces Java Parser"
