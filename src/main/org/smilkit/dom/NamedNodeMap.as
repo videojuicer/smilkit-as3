@@ -116,12 +116,12 @@ package org.smilkit.dom
 		}
 		
 		/**
-		 * Retrieves an <code>INode</code> from the specified <code>namespaceURI<code> and <code>localName</code>.
+		 * Retrieves an <code>INode</code> from the specified <code>namespaceURI</code> and <code>localName</code>.
 		 * 
 		 * @param namespaceURI The namespace URI of the node to retrieve.
 		 * @param localName The local name of the node to retrieve.
 		 * 
-		 * @return The <code>INode</code> instance that matches the specified <code>namespaceURI<code> and <code>localName</code> or null
+		 * @return The <code>INode</code> instance that matches the specified <code>namespaceURI</code> and <code>localName</code> or null
 		 * if a match could not be found.
 		 */
 		public function getNamedItemNS(namespaceURI:String, localName:String):INode
@@ -132,7 +132,7 @@ package org.smilkit.dom
 		
 		/**
 		 * Add's a new <code>INode</code> instance to the list or updates the existing node by
-		 * matching on the <code>namespaceURI<code> and <code>localName</code>.
+		 * matching on the <code>namespaceURI</code> and <code>localName</code>.
 		 * 
 		 * @param arg The <code>INode</code> instance to store in the list. The node will then be accessible
 		 * via a named namespaced item search.
@@ -166,13 +166,13 @@ package org.smilkit.dom
 		}
 		
 		/**
-		 * Removes the <code>INode</code> instance that matches the <code>namespaceURI<code> and <code>localName</code>.
+		 * Removes the <code>INode</code> instance that matches the <code>namespaceURI</code> and <code>localName</code>.
 		 * 
 		 * @param namespaceURI The namespace URI of the node to remove.
 		 * @param localName The local name of the node to remove.
 		 * 
 		 * @return The <code>INode</code> that was removed or null if the node was not found from the
-		 * specified <code>namespaceURI<code> and <code>localName</code>.
+		 * specified <code>namespaceURI</code> and <code>localName</code>.
 		 */
 		public function removeNamedItemNS(namespaceURI:String, localName:String):INode
 		{
@@ -225,7 +225,7 @@ package org.smilkit.dom
 		
 		
 		/**
-		 * Locates a node from the <code>HashMap</code> from the specified start point by <code>namespaceURI<code> and <code>localName</code>.
+		 * Locates a node from the <code>HashMap</code> from the specified start point by <code>namespaceURI</code> and <code>localName</code>.
 		 *
 		 * @param namespaceURI The namespace URI of the node to retrieve.
 		 * @param localName The local name of the node to retrieve.
