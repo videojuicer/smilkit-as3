@@ -4,6 +4,7 @@ package org.smilkit.w3c.dom.smil
 
 	public interface ISMILDocument extends IDocument, IElementSequentialTimeContainer
 	{
-		
+		function createSMILElement(tagName:String):ISMILElement;
+		function createMediaElement(tagName:String):ISMILMediaElement;
 	}
 }

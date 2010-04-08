@@ -1,6 +1,19 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="true" version="3">
-  <includeClasses/>
+  <includeClasses>
+    <classEntry path="org.smilkit.dom.smil.SMILElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILMediaElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILSwitchElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILRefElement"/>
+    <classEntry path="org.smilkit.util.KeyPairHashMap"/>
+    <classEntry path="org.smilkit.handler.SMILKitHandler"/>
+    <classEntry path="org.smilkit.handler.VideoHandler"/>
+    <classEntry path="org.smilkit.handler.ImageHandler"/>
+    <classEntry path="org.smilkit.parsers.BostonDOMParser"/>
+    <classEntry path="org.smilkit.parsers.EntityResolver"/>
+    <classEntry path="org.smilkit.dom.smil.SMILDocument"/>
+    <classEntry path="org.smilkit.spec.tests.BostonDOMParserTestCase"/>
+  </includeClasses>
   <includeResources/>
   <namespaceManifests/>
 </flexLibProperties>

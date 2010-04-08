@@ -69,15 +69,14 @@
 	</target>
 	
 	<target name="asdocs">
-		<java jar="${FLEX_HOME}/lib/asdoc.jar" fork="true" failonerror="true">
-			<arg line="+flexlib '${FLEX_HOME}/frameworks'" />
-			<arg line="-doc-sources ${main.src.loc}" />
-			<arg line="-source-path+=${main.src.loc}" />
-			<arg line="-main-title 'smilkit-as3'" />
-			<arg line="-window-title 'smilkit-as3'" />
-			<arg line="-output ${report.asdocs.loc}" />
-			<arg line="-library-path+='${lib.loc}'" />
-		</java>
+		<asdoc output="${report.asdocs.loc}"
+			main-title="SMILKit-as3" window-title="SMILKit-as3"
+			failonerror="true" fork="true" keep-xml="true" skip-xsl="false">
+			<doc-sources path-element="${main.src.loc}" />
+			<compiler.source-path path-element="${main.src.loc}" />
+			<package-description-file>pkg-descriptions.xml</package-description-file>
+			<!-- <templates-path path-element="${tools.loc}/templates/asdocs" /> -->
+		</asdoc>
 	</target>
 	
 	<target name="test" depends="compile,test-only,report" />

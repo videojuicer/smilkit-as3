@@ -14,7 +14,7 @@ package org.smilkit.w3c.dom
 		
 		function getElementsByTagName(name:String):INodeList;
 
-		function getAttributeNS(namespaceURI:String, localName:String):String;
+		function getAttributeNS(namespaceURI:String, localName:String):Object;
 		function setAttributeNS(namespaceURI:String, qualifiedName:String, value:String):void;
 		function removeAttributeNS(namespaceURI:String, localName:String):void;
 		

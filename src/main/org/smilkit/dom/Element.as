@@ -22,10 +22,10 @@ package org.smilkit.dom
 		{
 			if (this.hasAttributeNS("xml", "id"))
 			{
-				return this.getAttributeNS("xml", "id");
+				return this.getAttributeNS("xml", "id").toString();
 			}
 			
-			return this.getAttribute("id");
+			return this.getAttribute("id").toString();
 		}
 		
 		public function set id(id:String):void
@@ -97,13 +97,13 @@ package org.smilkit.dom
 					this._attributes = new AttributeMap(this);
 				}
 				
-				newAttr.nodeValue = value;
+				newAttr.value = value;
 				
 				this._attributes.setNamedItem(newAttr);
 			}
 			else
 			{
-				newAttr.nodeValue = value;
+				newAttr.value = value;
 			}
 		}
 		
@@ -152,7 +152,7 @@ package org.smilkit.dom
 			return (this._attributes.removeItem(oldAttr) as IAttr);
 		}
 		
-		public function getAttributeNS(namespaceURI:String, localName:String):String
+		public function getAttributeNS(namespaceURI:String, localName:String):Object
 		{
 			if (this._attributes == null)
 			{
@@ -185,13 +185,13 @@ package org.smilkit.dom
 					this._attributes = new AttributeMap(this);
 				}
 				
-				newAttr.nodeValue = value;
+				newAttr.value = value;
 				
 				this._attributes.setNamedItemNS(newAttr);
 			}
 			else
 			{
-				newAttr.nodeValue = value;
+				newAttr.value = value;
 			}
 		}
 		

@@ -1,5 +1,6 @@
 package org.smilkit.spec
 {
+	import org.smilkit.spec.tests.BostonDOMParserTestCase;
 	import org.smilkit.spec.tests.DocumentTestCase;
 	import org.smilkit.spec.tests.ElementTestCase;
 	
@@ -12,5 +13,6 @@ package org.smilkit.spec
 	{
 		public var documentTest:DocumentTestCase;
 		public var elementTest:ElementTestCase;
+		public var bostonDOMParserTest:BostonDOMParserTestCase;
 	}
 }

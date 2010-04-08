@@ -65,7 +65,7 @@ package org.smilkit.dom
 		
 		public override function get nodeValue():String
 		{
-			return this.value;
+			return this.value.toString();
 		}
 		
 		public override function set nodeValue(nodeValue:String):void

@@ -4,6 +4,13 @@ package org.smilkit.util
 
 	public class ObjectManager
 	{
+		/**
+		 * Clone's an Actionscript 3.0 Object using a ByteArray as a buffer. 
+		 * 
+		 * @param source Object to clone.
+		 * 
+		 * @return The cloned Object.
+		 */
 		public static function clone(source:Object):Object
 		{
 			var buffer:ByteArray = new ByteArray();
