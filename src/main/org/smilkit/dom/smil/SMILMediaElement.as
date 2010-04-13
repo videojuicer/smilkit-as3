@@ -17,7 +17,7 @@ package org.smilkit.dom.smil
 		{
 			super(owner, name);
 			
-			this._handler = SMILKit.createElementHandler(name, this);
+			this._handler = SMILKit.createElementHandlerFor(this);
 		}
 		
 		public function get abstractAttr():String

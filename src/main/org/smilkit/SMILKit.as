@@ -4,14 +4,16 @@ package org.smilkit
 	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.VideoHandler;
+	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.util.HashMap;
 	import org.smilkit.util.KeyPairHashMap;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-
+	
 	/**
 	 * SMILKit's main static API object, allows the creation, manipulation and browsing of SMIL3.0 DOM documents.
 	 * 
@@ -36,54 +38,88 @@ package org.smilkit
 		/**
 		 * Create's a new SMIL 3.0 DOM <code>Document</code>.
 		 * 
+		 * @return The generated <code>IDocument</code>.
+		 * 
 		 * @see org.smilkit.dom.Document
 		 * @see org.smilkit.w3c.dom.IDocument
 		 */
 		public static function createSMILDocument():IDocument
 		{
-			return new Document(new DocumentType(null, "smil"));
+			return new Document(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
 		}
 		
-		public static function loadSMILDocument(smilURI:String):IDocument
+		/**
+		 * Load's and generates a SMIL document from the specified SMIL XML string.
+		 *
+		 * @param smil SMIL XML string to generate a document from.
+		 * 
+		 * @return Created <code>IDocument</code> instance. 
+		 */
+		public static function loadSMILDocument(smil:String):IDocument
 		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var document:IDocument = parser.parse(smil);
+			
+			return document;
+		}
+		
+		public static function defaultHandlers():void
+		{
+			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.VideoHandler, VideoHandler.toHandlerMap());
+		}
+		
+		public static function registerHandler(handlerClass:Class, handlerMap:HandlerMap):void
+		{
+			SMILKit.__handlers.setItem(handlerMap, handlerClass);
+		}
+		
+		public static function findHandlerFor(element:ISMILMediaElement):Class
+		{
+			for (var i:int = SMILKit.__handlers.length; i > 0; i--)
+			{
+				var handler:HandlerMap = SMILKit.__handlers.getItemAt(i) as HandlerMap;
+				
+				if (handler.match(element))
+				{
+					return SMILKit.__handlers.getKeyAt(i) as Class;
+				}
+			}
+			
 			return null;
 		}
 		
-		private static function registerDefaultHandlers():void
+		/**
+		 * Create a <code>SMILKitHandler</code> instance for the specified <code>ISMILMediaElement</code>
+		 * object.
+		 * 
+		 * @param element The <code>ISMILMediaElement</code> to find a matching hander for.
+		 * 
+		 * @return <code>SMILKitHandler</code> instance.
+		 */
+		public static function createElementHandlerFor(element:ISMILMediaElement):SMILKitHandler
 		{
-			SMILKit.registerHandler("animation", null);
-			SMILKit.registerHandler("audio", null);
-			SMILKit.registerHandler("img", org.smilkit.handler.ImageHandler);
-			SMILKit.registerHandler("text", null);
-			SMILKit.registerHandler("video", org.smilkit.handler.VideoHandler);
-		}
-		
-		public static function handlerRegisteredFor(type:String):Boolean
-		{
-			return SMILKit.__handlers.hasItem(type);
-		}
-		
-		public static function registerHandler(type:String, handlerClass:Class):void
-		{
-			SMILKit.__handlers.setItem(type, handlerClass);
-		}
-		
-		public static function findHandler(type:String):Class
-		{
-			return SMILKit.__handlers.getItem(type) as Class;
-		}
-		
-		public static function createElementHandler(type:String, element:ISMILMediaElement):SMILKitHandler
-		{
-			var klass:Class = SMILKit.findHandler(type);
+			var klass:Class = SMILKit.findHandlerFor(element);
 			var factory:ClassFactory = new ClassFactory(klass);
 			
 			return factory.newInstance();
 		}
 		
-		public static function removeHandler(type:String):void
+		public static function removeHandler(handlerClass:Class, handlerMap:HandlerMap = null):void
 		{
-			SMILKit.__handlers.removeItem(type);
+			for (var i:int = SMILKit.__handlers.length; i > 0; i--)
+			{
+				var hClass:Class = SMILKit.__handlers.getItemAt(i) as Class;
+				var hMap:HandlerMap = SMILKit.__handlers.getKeyAt(i) as HandlerMap;
+				
+				if (handlerClass == hClass)
+				{
+					if (handlerMap == null || hMap == handlerMap)
+					{
+						SMILKit.__handlers.removeItemAt(i);
+					}	
+				}
+			}
 		}
 	}
 }

@@ -25,6 +25,11 @@ package org.smilkit.util
 			}
 		}
 		
+		public function getKeyAt(index:int):Object
+		{
+			return this._keys[index];
+		}
+		
 		public function getNamedIndex(key:Object):int
 		{
 			if (this.hasItem(key))

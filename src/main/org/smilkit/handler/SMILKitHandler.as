@@ -4,22 +4,11 @@ package org.smilkit.handler
 
 	public class SMILKitHandler
 	{
-		public static var ANIMATION_HANDLER:String = "animation";
-		public static var AUDIO_HANDLER:String = "audio";
-		public static var IMAGE_HANDLER:String = "img";
-		public static var TEXT_HANDLER:String = "text";
-		public static var VIDEO_HANDLER:String = "video";
-		
 		protected var _element:IElement;
 		
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
-		}
-		
-		public function get type():String
-		{
-			return "";
 		}
 		
 		public function load():void
@@ -40,6 +29,12 @@ package org.smilkit.handler
 		public function seek(seekTo:Number):void
 		{
 			
+		}
+		
+		public static function toHandlerMap():HandlerMap
+		{
+			return null;
+			//return new HandlerMap([ "rtmp" ], [ "video/flv" = [ "flv", "f4v" ], "video/mpeg" = [ "mp4", "f4v" ] ]);
 		}
 	}
 }

@@ -13,6 +13,8 @@
     <classEntry path="org.smilkit.parsers.EntityResolver"/>
     <classEntry path="org.smilkit.dom.smil.SMILDocument"/>
     <classEntry path="org.smilkit.spec.tests.BostonDOMParserTestCase"/>
+    <classEntry path="org.smilkit.handler.HandlerMap"/>
+    <classEntry path="org.smilkit.util.URLParser"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

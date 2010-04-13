@@ -9,9 +9,9 @@ package org.smilkit.handler
 			super(element);
 		}
 		
-		public override function get type():String
+		public static function toHandlerMap():HandlerMap
 		{
-			return SMILKitHandler.VIDEO_HANDLER;
+			return new HandlerMap(['rtmp'], { 'video/flv': [ 'flv', 'f4v' ], 'video/mpeg': [ 'mp4', 'f4v' ] });
 		}
 	}
 }
