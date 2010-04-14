@@ -2,13 +2,18 @@ package org.smilkit.util
 {
 	import org.hamcrest.mxml.collection.Array;
 
-	public class KeyPairHashMap extends HashMap
+	public class Hashtable extends CollectionList
 	{
-		protected var _keys:HashMap = new HashMap();
+		protected var _keys:CollectionList = new CollectionList();
 		
-		public function KeyPairHashMap()
+		public function Hashtable()
 		{
 			super(null);
+		}
+		
+		public function get isEmpty():Boolean
+		{
+			return (this._keys.length == 0);
 		}
 		
 		public function getItem(key:Object):Object

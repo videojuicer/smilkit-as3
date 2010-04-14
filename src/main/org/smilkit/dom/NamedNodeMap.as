@@ -1,6 +1,6 @@
 package org.smilkit.dom
 {
-	import org.smilkit.util.HashMap;
+	import org.smilkit.util.CollectionList;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
@@ -14,7 +14,7 @@ package org.smilkit.dom
 	 */
 	public class NamedNodeMap implements INamedNodeMap
 	{
-		protected var _nodes:HashMap;
+		protected var _nodes:CollectionList;
 		protected var _ownerNode:INode;
 		
 		public function NamedNodeMap(ownerNode:INode)
@@ -70,7 +70,7 @@ package org.smilkit.dom
 			} else {
 				i = -1 - i;
 				if (this._nodes == null) {
-					this._nodes = new HashMap();
+					this._nodes = new CollectionList();
 				}
 				
 				this._nodes.addItemAt(arg, i);
@@ -156,7 +156,7 @@ package org.smilkit.dom
 			} else {
 				i = -1 - i;
 				if (this._nodes == null) {
-					this._nodes = new HashMap();
+					this._nodes = new CollectionList();
 				}
 				
 				this._nodes.addItemAt(arg, i);

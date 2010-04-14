@@ -16,6 +16,8 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.IProcessingInstruction;
 	import org.smilkit.w3c.dom.IText;
+	import org.smilkit.w3c.dom.events.IEvent;
+	import org.smilkit.w3c.dom.events.IEventListener;
 	
 	public class CoreDocument extends ParentNode implements IDocument
 	{
@@ -166,6 +168,21 @@ package org.smilkit.dom
 			
 			
 			return null;
+		}
+		
+		public function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		{
+			
+		}
+		
+		public function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		{
+			
+		}
+		
+		public function dispatchNodeEvent(node:INode, event:IEvent):Boolean
+		{
+			return false;
 		}
 	}
 }

@@ -1,10 +1,10 @@
 package org.smilkit.util
 {
-	public class HashMap
+	public class CollectionList
 	{
 		protected var _source:Array;
 		
-		public function HashMap(source:Array = null) {
+		public function CollectionList(source:Array = null) {
 			this._source = source;
 			
 			if (this._source == null)

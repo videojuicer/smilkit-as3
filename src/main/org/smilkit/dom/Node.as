@@ -1,6 +1,8 @@
 package org.smilkit.dom
 {
+	import flash.events.Event;
 	import flash.events.EventDispatcher;
+	import flash.events.IEventDispatcher;
 	
 	import org.smilkit.util.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
@@ -8,6 +10,9 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.smilkit.w3c.dom.events.IEvent;
+	import org.smilkit.w3c.dom.events.IEventListener;
+	import org.smilkit.w3c.dom.events.IEventTarget;
 	
 	/**
 	 * The base implementation class of any DOM tree, should never be accessed or created directly,
@@ -18,7 +23,7 @@ package org.smilkit.dom
 	 * @see org.smilkit.w3c.dom.INode
 	 * @see org.smilkit.w3c.dom.INodeList
 	 */
-	public class Node extends EventDispatcher implements INode, INodeList
+	public class Node implements INode, INodeList, IEventTarget
 	{
 		public static var ELEMENT_NODE:int = 1;
 		public static var ATTRIBUTE_NODE:int = 2;
@@ -106,6 +111,11 @@ package org.smilkit.dom
 			return this._ownerDocument;
 		}
 		
+		private function get coreOwnerDocument():CoreDocument
+		{
+			return this.ownerDocument as CoreDocument;
+		}
+		
 		public function get localName():String
 		{
 			return null;
@@ -189,6 +199,21 @@ package org.smilkit.dom
 		public function hasAttributes():Boolean
 		{
 			return false;
+		}
+		
+		public function addEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
+		{
+			this.coreOwnerDocument.addNodeEventListener(this, type, listener, useCapture);
+		}
+		
+		public function removeEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
+		{
+			this.coreOwnerDocument.removeNodeEventListener(this, type, listener, useCapture);
+		}
+		
+		public function dispatchEvent(event:IEvent):Boolean
+		{
+			return this.coreOwnerDocument.dispatchNodeEvent(this, event);
 		}
 	}
 }

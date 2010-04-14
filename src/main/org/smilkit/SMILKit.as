@@ -9,8 +9,8 @@ package org.smilkit
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.VideoHandler;
 	import org.smilkit.parsers.BostonDOMParser;
-	import org.smilkit.util.HashMap;
-	import org.smilkit.util.KeyPairHashMap;
+	import org.smilkit.util.CollectionList;
+	import org.smilkit.util.Hashtable;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	
@@ -25,7 +25,7 @@ package org.smilkit
 	public class SMILKit
 	{
 		private static var __version:String = "0.1.0";
-		private static var __handlers:KeyPairHashMap = new KeyPairHashMap();
+		private static var __handlers:Hashtable = new Hashtable();
 		
 		/**
 		 * Retrieve's the current SMILKit version.

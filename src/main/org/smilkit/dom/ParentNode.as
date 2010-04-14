@@ -8,7 +8,7 @@ package org.smilkit.dom
 	public class ParentNode extends ChildNode
 	{
 		protected var _firstChild:INode = null;
-		protected var _nodes:Array = null;
+		protected var _nodes:Vector.<INode> = null;
 		
 		public function ParentNode(owner:IDocument)
 		{
