@@ -1,29 +1,51 @@
 package org.smilkit.timing
 {
+	import org.smilkit.dom.events.EventListener;
+	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
 	public class TimingGraph
 	{
-		protected var _graph:Vector.<ResolvedTimeElement>;
-		protected var _document:ISMILDocument;
+		protected var _elements:Vector.<ResolvedTimeElement>;
+		protected var _document:SMILDocument;
+		
+		protected var _eventListener:EventListener;
 		
 		public function TimingGraph(document:ISMILDocument)
 		{
-			this._graph = new Vector.<ResolvedTimeElement>();
-			this._document = document;
+			this._elements = new Vector.<ResolvedTimeElement>();
+			this._document = document as SMILDocument;
 			
-			// add listeners to document
+			this._eventListener = new EventListener(this.onMutationEvent);
 			
+			this._document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this._eventListener, false);
+			this._document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this._eventListener, false);
 		}
 		
-		public function get graph():Vector.<ResolvedTimeElement>
+		public function get elements():Vector.<ResolvedTimeElement>
 		{
-			return this._graph;
+			return this._elements;
 		}
 		
 		public function get document():ISMILDocument
 		{
 			return this._document;
+		}
+		
+		public function rebuild():void
+		{
+			
+		}
+		
+		protected function onMutationEvent(e:MutationEvent):void
+		{
+			// something changed!!
 		}
 	}
 }

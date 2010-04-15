@@ -4,5 +4,6 @@
 .FlexUnitSettings
 .actionScriptProperties
 .flexLibProperties
+FlexUnitApplication.mxml
 bin/*
 target/*

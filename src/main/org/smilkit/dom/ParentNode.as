@@ -133,6 +133,8 @@ package org.smilkit.dom
 				throw new DOMException(DOMException.HIERARCHY_REQUEST_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "HIERARCHY_REQUEST_ERR"));
 			}
 			
+			(this.ownerDocument as Document).insertingNode(this, false);
+			
 			var newInternal:ChildNode = (newChild as ChildNode);
 			var refInternal:ChildNode = (refChild as ChildNode);
 
@@ -176,12 +178,37 @@ package org.smilkit.dom
 				}
 			}
 			
+			this.changed();
+			
+			(this.ownerDocument as Document).insertedNode(this, newInternal, false);
+			
 			// sent out changed event
 			return newChild;
 		}
 		
+		public override function removeChild(oldChild:INode):INode
+		{
+			if (oldChild != null && oldChild.parentNode != this)
+			{
+				throw new DOMException(DOMException.NOT_FOUND_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_FOUND_ERR"));
+			}
+			
+			(this.ownerDocument as Document).removingNode(this, oldChild, false);
+			
+			(oldChild as ChildNode).nextSibling = null;
+			(oldChild as ChildNode).previousSibling = null;
+			
+			this.changed();
+			
+			(this.ownerDocument as Document).removedNode(this, false);
+			
+			return oldChild;
+		}
+		
 		public override function replaceChild(newChild:INode, oldChild:INode):INode
 		{
+			(this.ownerDocument as Document).replacingNode(this);
+			
 			this.insertBefore(newChild, oldChild);
 			
 			if (newChild != oldChild)
@@ -189,7 +216,7 @@ package org.smilkit.dom
 				this.removeChild(oldChild);
 			}
 			
-			// send out replace event
+			(this.ownerDocument as Document).replacedNode(this);
 			
 			return oldChild;
 		}

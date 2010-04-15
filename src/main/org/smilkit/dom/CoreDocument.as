@@ -170,17 +170,17 @@ package org.smilkit.dom
 			return null;
 		}
 		
-		public function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			
 		}
 		
-		public function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			
 		}
 		
-		public function dispatchNodeEvent(node:INode, event:IEvent):Boolean
+		internal function dispatchNodeEvent(node:INode, event:IEvent):Boolean
 		{
 			return false;
 		}

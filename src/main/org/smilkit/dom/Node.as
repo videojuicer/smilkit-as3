@@ -140,6 +140,11 @@ package org.smilkit.dom
 			return 0;
 		}
 		
+		protected function get changes():int
+		{
+			return (this.ownerDocument as Document).changes;
+		}
+		
 		public function item(index:int):INode
 		{
 			return null;
@@ -214,6 +219,11 @@ package org.smilkit.dom
 		public function dispatchEvent(event:IEvent):Boolean
 		{
 			return this.coreOwnerDocument.dispatchNodeEvent(this, event);
+		}
+		
+		protected function changed():void
+		{
+			(this.ownerDocument as Document).changed();
 		}
 	}
 }

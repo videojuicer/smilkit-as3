@@ -1,7 +1,5 @@
 package org.smilkit.util
 {
-	import org.hamcrest.mxml.collection.Array;
-
 	public class Hashtable extends CollectionList
 	{
 		protected var _keys:CollectionList = new CollectionList();

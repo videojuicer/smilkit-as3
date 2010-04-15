@@ -1,7 +1,5 @@
 package org.smilkit.util
 {
-	import org.osmf.utils.URL;
-
 	public class URLParser
 	{
 		protected var _url:String;

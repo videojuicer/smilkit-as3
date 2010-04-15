@@ -8,17 +8,12 @@ package org.smilkit.timing
 		private var _end:uint;
 		private var _element:ISMILMediaElement;
 		
-		public function ResolvedTimeElement(element:ISMILMediaElement, begin:uint = -1, end:uint = -1)
+		public function ResolvedTimeElement(element:ISMILMediaElement, begin:uint, end:uint)
 		{
 			this._element = element;
 			
 			this._begin = begin;
 			this._end = end;
-			
-			if (this._begin == -1 || this._end == -1)
-			{
-				// set from element
-			}
 		}
 		
 		public function get begin():uint

@@ -5,6 +5,7 @@ package org.smilkit.dom
 	import mx.events.EventListenerRequest;
 	
 	import org.smilkit.dom.events.Event;
+	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.event.EventException;
 	import org.smilkit.event.ListenerCount;
 	import org.smilkit.util.CollectionList;
@@ -12,7 +13,9 @@ package org.smilkit.dom
 	import org.smilkit.util.ListenerEntry;
 	import org.smilkit.util.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
+	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;
+	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.events.IEvent;
 	import org.smilkit.w3c.dom.events.IEventListener;
@@ -31,13 +34,50 @@ package org.smilkit.dom
 	{
 		protected var _eventListeners:Hashtable;
 		protected var _mutationEvents:Boolean = false;
+		protected var _savedEnclosingAttr:EnclosingAttr;
+		protected var _iterators:Array;
+		protected var _ranges:Array;
 		
 		public function Document(documentType:IDocumentType)
 		{
 			super(documentType);
 		}
 		
-		public override function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		public function get mutationEvents():Boolean
+		{
+			return this._mutationEvents;
+		}
+		
+		public function set mutationEvents(value:Boolean):void
+		{
+			this._mutationEvents = value;
+		}
+		
+		public function createEvent(type:String):IEvent
+		{
+			if (type == "Events" || type == "Event")
+			{
+				return new Event();
+			}
+			else if (type == "MutationEvents" || type == "MutationEvent")
+			{
+				return new MutationEvent();
+			}
+			else if (type == "UIEvents" || type == "UIEvent")
+			{
+				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_SUPPORTED_ERR"));
+			}
+			else if (type == "MouseEvents" || type == "MouseEvent")
+			{
+				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_SUPPORTED_ERR"));
+			}
+			else
+			{
+				throw new DOMException(DOMException.NOT_SUPPORTED_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_SUPPORTED_ERR"));
+			}
+		}
+		
+		internal override function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
 			{
@@ -71,7 +111,7 @@ package org.smilkit.dom
 			}
 		}
 		
-		public override function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal override function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
 			{
@@ -122,7 +162,7 @@ package org.smilkit.dom
 			}
 		}
 		
-		public override function dispatchNodeEvent(node:INode, event:IEvent):Boolean
+		internal override function dispatchNodeEvent(node:INode, event:IEvent):Boolean
 		{
 			if (event == null)
 			{
@@ -278,7 +318,92 @@ package org.smilkit.dom
 			return e.preventDefaultEvent;
 		}
 		
-		protected function getEventListeners(node:INode):Vector.<ListenerEntry>
+		internal function dispatchEventToSubtree(node:INode, event:IEvent):void
+		{
+			(node as Node).dispatchEvent(event);
+			
+			if (node.nodeType == Node.ELEMENT_NODE)
+			{
+				var a:INamedNodeMap = node.attributes;
+				
+				for (var i:int = a.length - 1; i >= 0; i--)
+				{
+					this.dispatchingEventToSubtree(a.item(i), event);
+				}
+			}
+			
+			this.dispatchingEventToSubtree(node.firstChild, event);
+		}
+		
+		internal function dispatchingEventToSubtree(node:INode, event:IEvent):void
+		{
+			if (node == null)
+			{
+				return;
+			}
+			
+			(node as Node).dispatchEvent(event);
+			
+			if (node.nodeType == Node.ELEMENT_NODE)
+			{
+				var a:INamedNodeMap = node.attributes;
+				
+				for (var i:int = a.length - 1; i >= 0; i--)
+				{
+					this.dispatchingEventToSubtree(a.item(i), event);
+				}
+			}
+			
+			this.dispatchEventToSubtree(node.firstChild, event);
+			this.dispatchEventToSubtree(node.nextSibling, event);
+		}
+		
+		internal function saveEnclosingAttr(node:INode):void
+		{
+			this._savedEnclosingAttr = null;
+			
+			var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_ATTR_MODIFIED);
+			
+			if (lc.total > 0)
+			{
+				var eventAncestor:INode = node;
+				
+				while (true)
+				{
+					if (eventAncestor == null)
+					{
+						return;
+					}
+					
+					var type:int = eventAncestor.nodeType;
+					
+					if (type == Node.ATTRIBUTE_NODE)
+					{
+						var retval:EnclosingAttr = new EnclosingAttr();
+						retval.node = eventAncestor as IAttr;
+						retval.oldValue = retval.node.nodeValue;
+						
+						this._savedEnclosingAttr = retval;
+						
+						return;
+					}
+					else if (type == Node.ENTITY_REFERENCE_NODE)
+					{
+						eventAncestor = eventAncestor.parentNode;
+					}
+					else if (type == Node.TEXT_NODE)
+					{
+						eventAncestor = eventAncestor.parentNode;
+					}
+					else
+					{
+						return;
+					}
+				}
+			}
+		}
+		
+		internal function getEventListeners(node:INode):Vector.<ListenerEntry>
 		{
 			if (this._eventListeners == null)
 			{
@@ -288,7 +413,7 @@ package org.smilkit.dom
 			return (this._eventListeners.getItem(node) as Vector.<ListenerEntry>);
 		}
 		
-		protected function setEventListeners(node:INode, listeners:Vector.<ListenerEntry>):void
+		internal function setEventListeners(node:INode, listeners:Vector.<ListenerEntry>):void
 		{
 			if (this._eventListeners == null)
 			{
@@ -308,6 +433,261 @@ package org.smilkit.dom
 			{
 				this._eventListeners.setItem(node, listeners);
 				this._mutationEvents = true;
+			}
+		}
+		
+		internal function insertingNode(node:INode, replace:Boolean):void
+		{
+			if (this.mutationEvents)
+			{
+				if (!replace)
+				{
+					this.saveEnclosingAttr(node);
+				}
+			}
+		}
+		
+		internal function insertedNode(node:INode, newInternal:INode, replace:Boolean):void
+		{
+			if (this.mutationEvents)
+			{
+				this.mutationEventsInsertedNode(node, newInternal, replace);
+			}
+			
+			if (this._ranges != null)
+			{
+				this.notifyRangesInsertedNode(newInternal);
+			}
+		}
+		
+		internal function mutationEventsInsertedNode(node:INode, newInternal:INode, replace:Boolean):void
+		{
+			var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_NODE_INSERTED);
+			
+			if (lc.total > 0)
+			{
+				var me:MutationEvent = new MutationEvent();
+				me.initMutationEvent(MutationEvent.DOM_NODE_INSERTED, true, false, node, null, null, null, 0);
+				
+				this.dispatchNodeEvent(node, me);
+			}
+			
+			lc = ListenerCount.lookup(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT);
+			
+			if (lc.total > 0)
+			{
+				var eventAncestor:INode = node;
+				
+				if (this._savedEnclosingAttr != null)
+				{
+					eventAncestor = (this._savedEnclosingAttr.node.ownerDocument as INode);
+				}
+				
+				if (eventAncestor != null)
+				{
+					var p:INode = eventAncestor;
+					
+					while (p != null)
+					{
+						eventAncestor = p;
+						
+						if (p.nodeType == Node.ATTRIBUTE_NODE)
+						{
+							p = p.ownerDocument;
+						}
+						else
+						{
+							p = p.parentNode;
+						}
+					}
+					
+					if (eventAncestor.nodeType == Node.DOCUMENT_NODE)
+					{
+						me = new MutationEvent();
+						me.initMutationEvent(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, false, false, null, null, null, null, 0);
+						
+						this.dispatchEventToSubtree(newInternal, me);
+					}
+				}
+			}
+			
+			if (!replace)
+			{
+				this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
+			}
+		}
+		
+		internal function notifyRangesInsertedNode(newInternal:INode):void
+		{
+			//this.removeStaleRangeReferences();
+			
+		}
+		
+		internal function removingNode(node:INode, oldChild:INode, replace:Boolean):void
+		{
+			if (this._ranges != null)
+			{
+				this.notifyRangesRemovingNode(oldChild);
+			}
+			
+			if (this.mutationEvents)
+			{
+				this.mutationEventsRemovingNode(node, oldChild, replace);
+			}
+		}
+		
+		internal function notifyIteratorsRemovingNode(oldChild:INode):void
+		{
+			
+		}
+		
+		internal function notifyRangesRemovingNode(oldChild:INode):void
+		{
+			
+		}
+		
+		internal function mutationEventsRemovingNode(node:INode, oldChild:INode, replace:Boolean):void
+		{
+			if (!replace)
+			{
+				this.saveEnclosingAttr(node);
+			}
+			
+			var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_NODE_REMOVED);
+			
+			if (lc.total > 0)
+			{
+				var me:MutationEvent = new MutationEvent();
+				me.initMutationEvent(MutationEvent.DOM_NODE_REMOVED, true, false, node, null, null, null, 0);
+				
+				this.dispatchNodeEvent(oldChild, me);
+			}
+			
+			lc = ListenerCount.lookup(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT);
+			
+			if (lc.total > 0)
+			{
+				var eventAncestor:INode = this;
+				
+				if (this._savedEnclosingAttr != null)
+				{
+					eventAncestor = this._savedEnclosingAttr.node.ownerDocument;
+				}
+				
+				if (eventAncestor != null)
+				{
+					for (var p:INode = eventAncestor.parentNode; p != null; p = p.parentNode)
+					{
+						eventAncestor = p;
+					}
+					
+					if (eventAncestor.nodeType == Node.DOCUMENT_NODE)
+					{
+						me = new MutationEvent();
+						me.initMutationEvent(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, false, false, null, null, null, null, 0);
+						
+						this.dispatchEventToSubtree(oldChild, me);
+					}
+				}
+			}
+		}
+		
+		internal function removedNode(node:INode, replace:Boolean):void
+		{
+			if (this.mutationEvents)
+			{
+				if (!replace)
+				{
+					this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
+				}
+			}
+		}
+		
+		internal function replacingNode(node:INode):void
+		{
+			if (this.mutationEvents)
+			{
+				this.saveEnclosingAttr(node);
+			}
+		}
+		
+		internal function replacedNode(node:INode):void
+		{
+			if (this.mutationEvents)
+			{
+				this.saveEnclosingAttr(node);
+			}
+		}
+		
+		internal function replacingData(node:INode):void
+		{
+			if (this.mutationEvents)
+			{
+				this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
+			}
+		}
+		
+		internal function modifiedAttrValue(attr:IAttr, oldValue:String):void
+		{
+			if (this.mutationEvents)
+			{
+				this.dispatchAggregateEvents(attr, attr, oldValue, MutationEvent.MODIFICATION);
+			}
+		}
+		
+		internal function dispatchAggregateEvent(node:INode, enclosingAttr:EnclosingAttr):void
+		{
+			if (enclosingAttr != null)
+			{
+				this.dispatchAggregateEvents(node, enclosingAttr.node, enclosingAttr.oldValue, MutationEvent.MODIFICATION);	
+			}
+			else
+			{
+				this.dispatchAggregateEvents(node, null, null, 0);
+			}
+		}
+		
+		internal function dispatchAggregateEvents(node:INode, enclosingAttr:IAttr, oldValue:String, change:int):void
+		{
+			var owner:Node = null;
+			
+			if (enclosingAttr != null)
+			{
+				var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_ATTR_MODIFIED);
+				owner = (enclosingAttr.ownerElement as Node);
+				
+				if (lc.total > 0)
+				{
+					if (owner != null)
+					{
+						var me:MutationEvent = new MutationEvent();
+						me.initMutationEvent(MutationEvent.DOM_ATTR_MODIFIED, true, false, enclosingAttr, oldValue, enclosingAttr.nodeValue, enclosingAttr.nodeName, change);
+						
+						owner.dispatchEvent(me);
+					}
+				}
+			}
+			
+			lc = ListenerCount.lookup(MutationEvent.DOM_SUBTREE_MODIFIED);
+			
+			if (lc.total > 0)
+			{
+				me = new MutationEvent();
+				me.initMutationEvent(MutationEvent.DOM_SUBTREE_MODIFIED, true, false, null, null, null, null, 0);
+				
+				if (enclosingAttr != null)
+				{
+					this.dispatchNodeEvent(enclosingAttr, me);
+					
+					if (owner != null)
+					{
+						this.dispatchNodeEvent(owner, me);
+					}
+				}
+				else
+				{
+					this.dispatchNodeEvent(node, me);
+				}
 			}
 		}
 	}
