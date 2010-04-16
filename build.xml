@@ -55,7 +55,7 @@
 	</target>
 	
 	<target name="test-compile">
-		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/SpecRunner.swf">
+		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/smilkit-as3-specs.swf">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
 			<library-path dir="${lib.loc}" append="true">
@@ -89,7 +89,12 @@
 	</target>
 	
 	<target name="package">
-		<copy file="${bin.loc}/smilkit-as3.swf" todir="${dist.loc}" />
+		<copy file="${bin.loc}/smilkit-as3.swc" todir="${dist.loc}" />
+		<copy file="${bin.loc}/smilkit-as3-specs.swf" todir="${dist.loc}" />
+		<copy file="${basedir}/README.markdown" todir="${dist.loc}" />
+		<copy todir="${dist.loc}/asdocs">
+			<fileset dir="${report.loc}/asdocs" />
+		</copy>
 		
 		<zip destfile="${output.loc}/${ant.project.name}.zip">
 			<fileset dir="${dist.loc}" />
@@ -131,7 +136,7 @@
 	</target>
 	
 	<target name="test-only" depends="test-compile">
-		<flexunit swf="${bin.loc}/SpecRunner.swf" toDir="${report.unit.loc}"
+		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
 				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
 	</target>
 	
