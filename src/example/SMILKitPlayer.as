@@ -13,7 +13,7 @@ package
 			super();
 			
 			this._viewport = new Viewport();
-			//this._viewport.loadFrom("http://sixty.im/demo.smil");
+			this._viewport.location = "http://sixty.im/demo.smil";
 		
 			this.addChild(this._viewport.canvas);
 			

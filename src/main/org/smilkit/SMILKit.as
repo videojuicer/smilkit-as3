@@ -9,8 +9,8 @@ package org.smilkit
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.VideoHandler;
 	import org.smilkit.parsers.BostonDOMParser;
-	import org.smilkit.util.CollectionList;
-	import org.smilkit.util.Hashtable;
+	import org.smilkit.collections.List;
+	import org.smilkit.collections.Hashtable;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	
@@ -19,8 +19,8 @@ package org.smilkit
 	 * 
 	 * Implements the W3C DOM Level 2 specification and SMIL 3.0 Boston DOM specification.
 	 * 
-	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
-	 * @see SMIL Boston DOM: http://www.w3.org/TR/smil-boston-dom/
+	 * @see http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
+	 * @see http://www.w3.org/TR/smil-boston-dom/
 	 */
 	public class SMILKit
 	{
@@ -63,17 +63,41 @@ package org.smilkit
 			return document;
 		}
 		
+		/**
+		 * Register the default set of SMILKit handlers.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+	     */
 		public static function defaultHandlers():void
 		{
 			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.VideoHandler, VideoHandler.toHandlerMap());
 		}
 		
+		/**
+		 * Register the specified <code>Handler</code> class with the <code>HandlerMap</code>, handlers are registered
+		 * on the global SMILKit scope.
+		 * 
+		 * @param handlerClass The <code>Handler</code> class reference to register the map.
+		 * @param handlerMap A <code>HandlerMap</code> instance used for matching against the handler.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
 		public static function registerHandler(handlerClass:Class, handlerMap:HandlerMap):void
 		{
 			SMILKit.__handlers.setItem(handlerMap, handlerClass);
 		}
 		
+		/**
+		 * Finds a <code>Handler</code> class for the specified <code>ISMILMediaElement</code>, loops over
+		 * the registered handlers to find a match through the <code>HandlerMap</code>.
+		 * 
+		 * @param element The <code>ISMILMediaElement</code> instance to find a handler for.
+		 *
+		 * @return The matching <code>Handler</code> class, or null if not found.
+		 */
 		public static function findHandlerFor(element:ISMILMediaElement):Class
 		{
 			for (var i:int = SMILKit.__handlers.length; i > 0; i--)
@@ -96,6 +120,9 @@ package org.smilkit
 		 * @param element The <code>ISMILMediaElement</code> to find a matching hander for.
 		 * 
 		 * @return <code>SMILKitHandler</code> instance.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
 		 */
 		public static function createElementHandlerFor(element:ISMILMediaElement):SMILKitHandler
 		{
@@ -105,6 +132,15 @@ package org.smilkit
 			return factory.newInstance();
 		}
 		
+		/**
+		 * Remove the specified registered handler.
+		 *
+		 * @param handlerClass The <code>Class</code> to find the registered handlers to remove.
+		 * @param handlerMap A <code>HandlerMap</code> instance to match against, if not specified will remove all handlers that match on the handlerClass.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
 		public static function removeHandler(handlerClass:Class, handlerMap:HandlerMap = null):void
 		{
 			for (var i:int = SMILKit.__handlers.length; i > 0; i--)

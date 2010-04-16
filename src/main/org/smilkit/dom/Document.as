@@ -6,11 +6,11 @@ package org.smilkit.dom
 	
 	import org.smilkit.dom.events.Event;
 	import org.smilkit.dom.events.MutationEvent;
-	import org.smilkit.event.EventException;
-	import org.smilkit.event.ListenerCount;
-	import org.smilkit.util.CollectionList;
-	import org.smilkit.util.Hashtable;
-	import org.smilkit.util.ListenerEntry;
+	import org.smilkit.events.EventException;
+	import org.smilkit.events.ListenerCount;
+	import org.smilkit.collections.List;
+	import org.smilkit.collections.Hashtable;
+	import org.smilkit.collections.ListenerEntry;
 	import org.smilkit.util.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
@@ -37,22 +37,46 @@ package org.smilkit.dom
 		protected var _savedEnclosingAttr:EnclosingAttr;
 		protected var _iterators:Array;
 		protected var _ranges:Array;
+		protected var _changes:int = 0;
 		
 		public function Document(documentType:IDocumentType)
 		{
 			super(documentType);
 		}
 		
-		public function get mutationEvents():Boolean
+		/**
+		 * Specifies whether mutation events should be fired.
+		 */
+		internal function get mutationEvents():Boolean
 		{
 			return this._mutationEvents;
 		}
 		
-		public function set mutationEvents(value:Boolean):void
+		/**
+		 * Specifies whether mutation events should be fired.
+		 */
+		internal function set mutationEvents(value:Boolean):void
 		{
 			this._mutationEvents = value;
 		}
 		
+		/**
+		 * Returns the number of changes that have occured on this node.
+		 */
+		protected override function get changes():int
+		{
+			return this._changes;
+		}
+		
+		/**
+		 * Create a new <code>IEvent</code> instance with the specified type.
+		 * 
+		 * @param type The specified type of <code>IEvent</code> to create.
+		 * 
+		 * @return The newly created <code>IEvent</code> instance.
+		 * 
+		 * @exception DOMException.NOT_SUPPORTED_ERR, raised if the <code>IEvent</code> type is unsupported.
+		 */
 		public function createEvent(type:String):IEvent
 		{
 			if (type == "Events" || type == "Event")
@@ -77,6 +101,22 @@ package org.smilkit.dom
 			}
 		}
 		
+		/**
+		 * Increments the number of changes on this <code>Node</code>
+		 */
+		protected override function changed():void
+		{
+			this._changes++;
+		}
+		
+		/**
+		 * Add the specified <code>IEventListener</code> to the stack of registered listeners for the <code>INode</code>.
+		 * 
+		 * @param node The <code>INode</code> instance to register the event for.
+		 * @param type The event name to listen for.
+		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
+		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
+		 */
 		internal override function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
@@ -111,6 +151,14 @@ package org.smilkit.dom
 			}
 		}
 		
+		/**
+		 * Remove the specified <code>IEventListener</code> from the stack of registered listeners.
+		 * 
+		 * @param node The <code>INode</code> to remove the listener from.
+		 * @param type The event name to listen for.
+		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
+		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
+		 */
 		internal override function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
@@ -162,6 +210,14 @@ package org.smilkit.dom
 			}
 		}
 		
+		/**
+		 * Dispatch the specified <code>IEvent</code> through the DOM.
+		 * 
+		 * @param node The <code>INode> to dispatch the event on.
+		 * @param event The <code>IEvent</code> instance to dispatch.
+		 * 
+		 * @return Returns <code>true</code> if the event's <code>preventDefault</code> was invoked, otherwise <code>false</code>.
+		 */
 		internal override function dispatchNodeEvent(node:INode, event:IEvent):Boolean
 		{
 			if (event == null)

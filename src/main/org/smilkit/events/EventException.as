@@ -1,4 +1,4 @@
-package org.smilkit.event
+package org.smilkit.events
 {
 	import org.smilkit.w3c.dom.DOMException;
 	

@@ -1,4 +1,4 @@
-package org.smilkit.event
+package org.smilkit.events
 {
 	public class RuntimeException extends Error
 	{

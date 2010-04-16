@@ -1,6 +1,6 @@
 package org.smilkit.dom
 {
-	import org.smilkit.util.CollectionList;
+	import org.smilkit.collections.List;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -19,14 +19,14 @@ package org.smilkit.dom
 	{
 		protected var _rootNode:INode;
 		protected var _tagName:String; // tag name or "*" to select all tags
-		protected var _nodes:CollectionList;
+		protected var _nodes:List;
 		
 		public function DeepNodeList(rootNode:INode, tagName:String)
 		{
 			this._rootNode = rootNode;
 			this._tagName = tagName;
 			
-			this._nodes = new CollectionList();
+			this._nodes = new List();
 		}
 		
 		/**

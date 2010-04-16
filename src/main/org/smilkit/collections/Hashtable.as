@@ -1,8 +1,9 @@
-package org.smilkit.util
+package org.smilkit.collections
 {
-	public class Hashtable extends CollectionList
+
+	public class Hashtable extends List
 	{
-		protected var _keys:CollectionList = new CollectionList();
+		protected var _keys:List = new List();
 		
 		public function Hashtable()
 		{

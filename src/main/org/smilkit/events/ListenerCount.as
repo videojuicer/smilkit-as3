@@ -1,6 +1,6 @@
-package org.smilkit.event
+package org.smilkit.events
 {
-	import org.smilkit.util.Hashtable;
+	import org.smilkit.collections.Hashtable;
 
 	public class ListenerCount
 	{

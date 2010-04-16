@@ -1,4 +1,4 @@
-package org.smilkit.util
+package org.smilkit.collections
 {
 	import org.smilkit.w3c.dom.events.IEventListener;
 

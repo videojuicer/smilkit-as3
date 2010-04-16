@@ -140,9 +140,12 @@ package org.smilkit.dom
 			return 0;
 		}
 		
+		/**
+		 * Returns the number of changes that have occured on this node.
+		 */
 		protected function get changes():int
 		{
-			return (this.ownerDocument as Document).changes;
+			return (this._ownerDocument as Document).changes;
 		}
 		
 		public function item(index:int):INode
@@ -206,24 +209,48 @@ package org.smilkit.dom
 			return false;
 		}
 		
+		/**
+		 * Add the specified <code>IEventListener</code> to the stack of registered listeners.
+		 * 
+		 * @param type The event name to listen for.
+		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
+		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
+		 */
 		public function addEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			this.coreOwnerDocument.addNodeEventListener(this, type, listener, useCapture);
 		}
 		
+		/**
+		 * Remove the specified <code>IEventListener</code> from the stack of registered listeners.
+		 * 
+		 * @param type The event name to listen for.
+		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
+		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
+		 */
 		public function removeEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
 		{
 			this.coreOwnerDocument.removeNodeEventListener(this, type, listener, useCapture);
 		}
 		
+		/**
+		 * Dispatch the specified <code>IEvent</code> through the DOM.
+		 * 
+		 * @param event The <code>IEvent</code> instance to dispatch.
+		 * 
+		 * @return Returns <code>true</code> if the event's <code>preventDefault</code> was invoked, otherwise <code>false</code>.
+		 */
 		public function dispatchEvent(event:IEvent):Boolean
 		{
 			return this.coreOwnerDocument.dispatchNodeEvent(this, event);
 		}
 		
+		/**
+		 * Increments the number of changes on this <code>Node</code>
+		 */
 		protected function changed():void
 		{
-			(this.ownerDocument as Document).changed();
+			(this._ownerDocument as Document).changed();
 		}
 	}
 }
