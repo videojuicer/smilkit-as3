@@ -127,9 +127,15 @@ package org.smilkit
 		public static function createElementHandlerFor(element:ISMILMediaElement):SMILKitHandler
 		{
 			var klass:Class = SMILKit.findHandlerFor(element);
-			var factory:ClassFactory = new ClassFactory(klass);
 			
-			return factory.newInstance();
+			if (klass != null)
+			{
+				var factory:ClassFactory = new ClassFactory(klass);
+			
+				return factory.newInstance();
+			}
+			
+			return null;
 		}
 		
 		/**
