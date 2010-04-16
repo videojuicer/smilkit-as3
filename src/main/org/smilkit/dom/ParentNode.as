@@ -200,14 +200,14 @@ package org.smilkit.dom
 			
 			this.changed();
 			
-			(this.ownerDocument as Document).removedNode(this, false);
+			(this._ownerDocument as Document).removedNode(this, false);
 			
 			return oldChild;
 		}
 		
 		public override function replaceChild(newChild:INode, oldChild:INode):INode
 		{
-			(this.ownerDocument as Document).replacingNode(this);
+			(this._ownerDocument as Document).replacingNode(this);
 			
 			this.insertBefore(newChild, oldChild);
 			
@@ -216,7 +216,7 @@ package org.smilkit.dom
 				this.removeChild(oldChild);
 			}
 			
-			(this.ownerDocument as Document).replacedNode(this);
+			(this._ownerDocument as Document).replacedNode(this);
 			
 			return oldChild;
 		}

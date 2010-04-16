@@ -113,7 +113,7 @@ package org.smilkit.dom
 		
 		private function get coreOwnerDocument():CoreDocument
 		{
-			return this.ownerDocument as CoreDocument;
+			return this._ownerDocument as CoreDocument;
 		}
 		
 		public function get localName():String
@@ -143,7 +143,7 @@ package org.smilkit.dom
 		/**
 		 * Returns the number of changes that have occured on this node.
 		 */
-		protected function get changes():int
+		public function get changes():int
 		{
 			return (this._ownerDocument as Document).changes;
 		}

@@ -11,7 +11,7 @@ package org.smilkit.util
 		 * 
 		 * @return The cloned Object.
 		 */
-		public static function clone(source:Object):Object
+		public static function clone(source:Object):*
 		{
 			var buffer:ByteArray = new ByteArray();
 			buffer.writeObject(source);

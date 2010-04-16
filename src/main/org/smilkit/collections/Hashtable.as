@@ -40,7 +40,7 @@ package org.smilkit.collections
 			{
 				for (var i:int = this._keys.length; i > 0; i--)
 				{
-					if (key == this._keys[i])
+					if (key == this._keys.getItemAt(i))
 					{
 						return i;
 					}
@@ -58,7 +58,7 @@ package org.smilkit.collections
 			{
 				var n:int = this.length+1;
 				
-				this._keys[n] = key;
+				this._keys.setItemAt(key, n);
 				this.setItemAt(value, n);
 			}
 			else
@@ -82,7 +82,7 @@ package org.smilkit.collections
 		{
 			for (var i:int = this._keys.length; i > 0; i--)
 			{
-				if (key == this._keys[i])
+				if (key == this._keys.getItemAt(i))
 				{
 					return true;
 				}

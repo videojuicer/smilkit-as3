@@ -117,6 +117,7 @@ package org.smilkit.dom.events
 			this._type = type;
 			this._bubbles = bubbles;
 			this._cancelable = cancelable;
+			
 			this._initialized = true;
 		}
 	}

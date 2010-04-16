@@ -22,6 +22,11 @@ package org.smilkit.dom
 		
 		public override function get parentNode():INode
 		{
+			if (this._ownerDocument == this)
+			{
+				return null;
+			}
+			
 			return this._ownerDocument;
 		}
 		

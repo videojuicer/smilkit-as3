@@ -3,14 +3,15 @@ package org.smilkit.dom
 	import flash.events.IEventDispatcher;
 	
 	import mx.events.EventListenerRequest;
+	import mx.utils.ObjectUtil;
 	
+	import org.smilkit.collections.Hashtable;
+	import org.smilkit.collections.List;
+	import org.smilkit.collections.ListenerEntry;
 	import org.smilkit.dom.events.Event;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
-	import org.smilkit.collections.List;
-	import org.smilkit.collections.Hashtable;
-	import org.smilkit.collections.ListenerEntry;
 	import org.smilkit.util.ObjectManager;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
@@ -63,7 +64,7 @@ package org.smilkit.dom
 		/**
 		 * Returns the number of changes that have occured on this node.
 		 */
-		protected override function get changes():int
+		public override function get changes():int
 		{
 			return this._changes;
 		}
@@ -227,7 +228,7 @@ package org.smilkit.dom
 			
 			var e:Event = (event as Event);
 			
-			if (e.initialized || e.type == null || e.type == "")
+			if (!e.initialized || e.type == null || e.type == "")
 			{
 				throw new EventException(EventException.UNSPECIFIED_EVENT_TYPE_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "UNSPECIFIED_EVENT_TYPE_ERR"));
 			}
@@ -274,7 +275,7 @@ package org.smilkit.dom
 					
 					if (nodeListeners != null)
 					{
-						var listeners:Vector.<ListenerEntry> = ObjectManager.clone(nodeListeners) as Vector.<ListenerEntry>;
+						var listeners:Vector.<ListenerEntry> = nodeListeners.concat();
 						
 						for (var i:int = 0; i < listeners.length; i++)
 						{
@@ -306,7 +307,7 @@ package org.smilkit.dom
 				
 				if (!e.stopPropagationEvent && nodeListeners != null)
 				{
-					listeners = ObjectManager.clone(nodeListeners) as Vector.<ListenerEntry>;
+					listeners = nodeListeners.concat();
 					
 					for (var k:int = 0; k < listeners.length; k++)
 					{
@@ -343,11 +344,11 @@ package org.smilkit.dom
 						
 						if (nodeListeners != null)
 						{
-							var tlisteners:Vector.<ListenerEntry> = ObjectManager.clone(nodeListeners) as Vector.<ListenerEntry>;
+							var tlisteners:Vector.<ListenerEntry> = nodeListeners.concat();
 							
-							for (var t:int = 0; j < tlisteners.length; j++)
+							for (var t:int = 0; t < tlisteners.length; t++)
 							{
-								var tle:ListenerEntry = tlisteners[j];
+								var tle:ListenerEntry = tlisteners[t];
 								
 								if (!tle.useCapture && tle.type == e.type && (nodeListeners.indexOf(tle) != -1))
 								{
