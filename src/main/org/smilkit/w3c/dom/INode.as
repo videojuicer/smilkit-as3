@@ -1,10 +1,14 @@
 package org.smilkit.w3c.dom
 {
+	import org.smilkit.w3c.dom.events.IEvent;
+	import org.smilkit.w3c.dom.events.IEventTarget;
+	import org.smilkit.w3c.dom.events.IEventListener;
+
 	/**
 	 * @see org.smilkit.dom.Node
 	 * @see Document Object Model (DOM) Level 2 Views Specification: http://www.w3.org/TR/2000/REC-DOM-Level-2-Views-20001113
 	 */
-	public interface INode
+	public interface INode extends IEventTarget
 	{
 		function get nodeName():String;
 		function get nodeValue():String;

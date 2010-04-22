@@ -12,6 +12,8 @@ package org.smilkit.dom.smil
 	public class SMILMediaElement extends SMILElement implements ISMILMediaElement
 	{
 		protected var _handler:SMILKitHandler;
+		protected var _beginList:ITimeList;
+		protected var _endList:ITimeList;
 		
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
@@ -172,20 +174,22 @@ package org.smilkit.dom.smil
 		
 		public function get begin():ITimeList
 		{
-			return null;
+			return this._beginList;
 		}
 		
 		public function set begin(begin:ITimeList):void
 		{
+			this._beginList = begin;
 		}
 		
 		public function get end():ITimeList
 		{
-			return null;
+			return this._endList;
 		}
 		
 		public function set end(end:ITimeList):void
 		{
+			this._endList = end;
 		}
 		
 		public function get dur():Number

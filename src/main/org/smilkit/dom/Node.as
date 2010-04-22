@@ -23,7 +23,7 @@ package org.smilkit.dom
 	 * @see org.smilkit.w3c.dom.INode
 	 * @see org.smilkit.w3c.dom.INodeList
 	 */
-	public class Node implements INode, INodeList, IEventTarget
+	public class Node implements INode, INodeList
 	{
 		public static var ELEMENT_NODE:int = 1;
 		public static var ATTRIBUTE_NODE:int = 2;

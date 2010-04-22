@@ -6,5 +6,6 @@ package org.smilkit.w3c.dom.smil
 	{
 		function createSMILElement(tagName:String):ISMILElement;
 		function createMediaElement(tagName:String):ISMILMediaElement;
+		function createSequentialElement(tagName:String = null):IElementSequentialTimeContainer;
 	}
 }

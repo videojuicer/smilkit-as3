@@ -70,10 +70,10 @@ package org.smilkit.parsers
 					//child = (parent.ownerDocument as ISMILDocument).createSequentialElement();
 					break;
 				case "seq":
-					//child = (parent.ownerDocument as ISMILDocument).createParallelElement();
+					child = (parent.ownerDocument as ISMILDocument).createSequentialElement();
 					break;
 				case "body":
-					child = (doc as ISMILDocument).createSMILElement("body");
+					child = (parent.ownerDocument as ISMILDocument).createSequentialElement("body");
 					break;
 				case "ref": case "video": case "img": case "audio": case "text":
 					child = (doc as ISMILDocument).createMediaElement(node.localName());
@@ -99,7 +99,7 @@ package org.smilkit.parsers
 			
 			if (node.valueOf() != null)
 			{
-				child.nodeValue = node.valueOf();
+				//child.nodeValue = node.valueOf();
 			}
 			
 			// stack the child on the node

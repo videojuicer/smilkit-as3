@@ -214,7 +214,7 @@ package org.smilkit.dom
 		/**
 		 * Dispatch the specified <code>IEvent</code> through the DOM.
 		 * 
-		 * @param node The <code>INode> to dispatch the event on.
+		 * @param node The <code>INode</code> to dispatch the event on.
 		 * @param event The <code>IEvent</code> instance to dispatch.
 		 * 
 		 * @return Returns <code>true</code> if the event's <code>preventDefault</code> was invoked, otherwise <code>false</code>.
