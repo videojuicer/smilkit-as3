@@ -39,7 +39,6 @@ package org.smilkit.dom
 		public static var NOTATION_NODE:int = 12;
 		
 		protected var _ownerDocument:IDocument = null;
-		protected var _parentNode:INode = null;
 		
 		public function Node(owner:IDocument = null)
 		{

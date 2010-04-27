@@ -21,7 +21,7 @@ package org.smilkit.dom.smil
 		
 		public function add(time:ITime):void
 		{
-			this.addAt(time, this._times.length + 1);
+			this.addAt(time, this._times.length);
 		}
 		
 		public function addAt(time:ITime, index:int):void

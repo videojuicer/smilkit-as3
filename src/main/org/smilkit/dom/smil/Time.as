@@ -90,8 +90,10 @@ package org.smilkit.dom.smil
 						}
 						else
 						{
+							var dur:Number = (this._baseElement as ISMILMediaElement).dur;
+							
 							this._resolved = true;
-							this._resolvedOffset = previousDuration + (this._baseElement as ISMILMediaElement).dur;
+							this._resolvedOffset = previousDuration + dur;
 						}
 					}
 					else if (parent is IElementParallelTimeContainer)

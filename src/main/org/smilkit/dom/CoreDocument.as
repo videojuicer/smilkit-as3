@@ -2,6 +2,7 @@ package org.smilkit.dom
 {
 	import flash.errors.IllegalOperationError;
 	
+	import org.smilkit.collections.Hashtable;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.ICDATASection;
@@ -23,6 +24,7 @@ package org.smilkit.dom
 	{
 		protected var _documentType:IDocumentType;
 		protected var _documentElement:IElement;
+		protected var _identifiers:Hashtable;
 		
 		public function CoreDocument(documentType:IDocumentType)
 		{
@@ -165,9 +167,7 @@ package org.smilkit.dom
 		
 		public function getElementById(elementId:String):IElement
 		{
-			
-			
-			return null;
+			return this.getIdentifier(elementId);
 		}
 		
 		internal function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
@@ -183,6 +183,53 @@ package org.smilkit.dom
 		internal function dispatchNodeEvent(node:INode, event:IEvent):Boolean
 		{
 			return false;
+		}
+		
+		public function getIdentifier(id:String):IElement
+		{
+			if (this._identifiers == null)
+			{
+				return null;
+			}
+			
+			var element:IElement = this._identifiers.getItem(id) as IElement;
+			
+			if (element != null)
+			{
+				var parent:INode = element.parentNode;
+				
+				while (parent != null)
+				{
+					if (parent == this)
+					{
+						return element;
+					}
+					
+					parent = parent.parentNode;
+				}
+			}
+			
+			return element;
+		}
+		
+		public function removeIdentifier(id:String):void
+		{
+			if (this._identifiers == null)
+			{
+				return;
+			}
+			
+			this._identifiers.removeItem(id);
+		}
+		
+		public function addIdentifier(id:String, element:IElement):void
+		{
+			if (this._identifiers == null)
+			{
+				this._identifiers = new Hashtable();
+			}
+			
+			this._identifiers.setItem(id, element);
 		}
 	}
 }

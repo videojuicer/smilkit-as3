@@ -14,6 +14,7 @@ package org.smilkit.dom
 	{
 		protected var _previousSibling:ChildNode;
 		protected var _nextSibling:ChildNode;
+		protected var _parentNode:INode = null;
 		
 		public function ChildNode(owner:IDocument)
 		{
@@ -27,7 +28,15 @@ package org.smilkit.dom
 				return null;
 			}
 			
-			return this._ownerDocument;
+			return this._parentNode;
+		}
+		
+		/**
+		 * NON-DOM
+		 */
+		public function set parentNode(value:INode):void
+		{
+			this._parentNode = value;
 		}
 		
 		public override function get nextSibling():INode

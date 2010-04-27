@@ -9,11 +9,9 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	
-	public class SMILMediaElement extends SMILElement implements ISMILMediaElement
+	public class SMILMediaElement extends ElementTimeContainer implements ISMILMediaElement
 	{
 		protected var _handler:SMILKitHandler;
-		protected var _beginList:ITimeList;
-		protected var _endList:ITimeList;
 		
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
@@ -172,97 +170,27 @@ package org.smilkit.dom.smil
 			throw new IllegalOperationError("Unable to change 'type' on 'SMILMediaElement'");
 		}
 		
-		public function get begin():ITimeList
-		{
-			return this._beginList;
-		}
-		
-		public function set begin(begin:ITimeList):void
-		{
-			this._beginList = begin;
-		}
-		
-		public function get end():ITimeList
-		{
-			return this._endList;
-		}
-		
-		public function set end(end:ITimeList):void
-		{
-			this._endList = end;
-		}
-		
-		public function get dur():Number
-		{
-			return (this.getAttribute("dur") as Number);
-		}
-		
-		public function set dur(dur:Number):void
-		{
-			this.setAttribute("dur", (dur as String));
-		}
-		
-		public function get restart():uint
-		{
-			return (this.getAttribute("restart") as uint);
-		}
-		
-		public function set restart(restart:uint):void
-		{
-			this.setAttribute("restart", (restart as String));
-		}
-		
-		public function get fill():uint
-		{
-			return (this.getAttribute("fill") as uint);
-		}
-		
-		public function set fill(fill:uint):void
-		{
-			this.setAttribute("fill", (fill as String));
-		}
-		
-		public function get repeatCount():Number
-		{
-			return (this.getAttribute("repeatCount") as Number);
-		}
-		
-		public function set repeatCount(repeatCount:Number):void
-		{
-			this.setAttribute("repeatCount", (repeatCount as String));
-		}
-		
-		public function get repeatDur():Number
-		{
-			return (this.getAttribute("repeatDur") as Number);
-		}
-		
-		public function set repeatDur(repeatDur:Number):void
-		{
-			this.setAttribute("repeatDur", (repeatDur as String));
-		}
-		
-		public function beginElement():Boolean
+		public override function beginElement():Boolean
 		{
 			return false;
 		}
 		
-		public function endElement():Boolean
+		public override function endElement():Boolean
 		{
 			return false;
 		}
 		
-		public function pauseElement():void
+		public override function pauseElement():void
 		{
 			this._handler.pause();
 		}
 		
-		public function resumeElement():void
+		public override function resumeElement():void
 		{
 			this._handler.resume();
 		}
 		
-		public function seekElement(seekTo:Number):void
+		public override function seekElement(seekTo:Number):void
 		{
 			this._handler.seek(seekTo);
 		}

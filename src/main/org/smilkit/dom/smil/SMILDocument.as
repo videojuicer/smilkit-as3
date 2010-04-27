@@ -3,6 +3,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.Document;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.smilkit.w3c.dom.smil.IElementSequentialTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
@@ -118,6 +119,11 @@ package org.smilkit.dom.smil
 		public function createMediaElement(tagName:String):ISMILMediaElement
 		{
 			return new SMILMediaElement(this, tagName);
+		}
+		
+		public function createSequentialElement(tagName:String = "seq"):IElementSequentialTimeContainer
+		{
+			return new ElementSequentialTimeContainer(this, tagName);
 		}
 	}
 }

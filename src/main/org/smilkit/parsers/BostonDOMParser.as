@@ -1,5 +1,6 @@
 package org.smilkit.parsers
 {
+	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
 	import flash.net.URLLoader;
 	import flash.xml.XMLDocument;
@@ -7,11 +8,14 @@ package org.smilkit.parsers
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.dom.Element;
 	import org.smilkit.dom.Node;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
+	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
 	public class BostonDOMParser
@@ -70,10 +74,10 @@ package org.smilkit.parsers
 					//child = (parent.ownerDocument as ISMILDocument).createSequentialElement();
 					break;
 				case "seq":
-					child = (parent.ownerDocument as ISMILDocument).createSequentialElement();
+					child = (doc as ISMILDocument).createSequentialElement() as INode;
 					break;
 				case "body":
-					child = (parent.ownerDocument as ISMILDocument).createSequentialElement("body");
+					child = (doc as ISMILDocument).createSequentialElement("body") as INode;
 					break;
 				case "ref": case "video": case "img": case "audio": case "text":
 					child = (doc as ISMILDocument).createMediaElement(node.localName());
@@ -83,14 +87,23 @@ package org.smilkit.parsers
 					break;
 			}
 			
-			if (node.nodeKind() == Node.ELEMENT_NODE)
+			if (child == null)
 			{
-				var el:IElement = (child as IElement);
+				throw new IllegalOperationError("Failed to create node of type '"+node.localName().toString()+"'.");
+			}
+			
+			var el:IElement = (child as IElement);
 
-				// parse attributes
-				if (node.attributes().length() > 0)
+			// parse attributes
+			if (node.attributes().length() > 0)
+			{
+				for each (var a:XML in node.attributes())
 				{
-					for each (var a:XML in node.attributes())
+					if (a.localName() == "id")
+					{
+						(el as Element).setIdAttribute(a.toString());
+					}
+					else
 					{
 						el.setAttribute(a.localName(), a.toString());
 					}
@@ -99,7 +112,7 @@ package org.smilkit.parsers
 			
 			if (node.valueOf() != null)
 			{
-				//child.nodeValue = node.valueOf();
+				child.nodeValue = node.valueOf();
 			}
 			
 			// stack the child on the node

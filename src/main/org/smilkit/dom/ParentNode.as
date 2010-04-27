@@ -137,6 +137,8 @@ package org.smilkit.dom
 			
 			var newInternal:ChildNode = (newChild as ChildNode);
 			var refInternal:ChildNode = (refChild as ChildNode);
+			
+			newInternal.parentNode = this;
 
 			// first + only child
 			if (this.firstChild == null)
@@ -245,12 +247,22 @@ package org.smilkit.dom
 		{
 			if (this.firstChild == this.lastChild)
 			{
-				return (index== 0 ? this.firstChild : null);
+				return (index == 0 ? this.firstChild : null);
 			}
 			
-			// <TODO>
+			if (index < 0)
+			{
+				return null;
+			}
 			
-			return null;
+			var child:ChildNode = (this.firstChild as ChildNode);
+			
+			for (var i:int = 0; i < index && child != null; i++)
+			{
+				child = (child.nextSibling as ChildNode);
+			}
+			
+			return child;
 		}
 		
 		public override function normalize():void

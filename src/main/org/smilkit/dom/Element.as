@@ -304,5 +304,10 @@ package org.smilkit.dom
 			
 			return (this._attributes.getNamedItemNS(namespaceURI, localName) != null);
 		}
+		
+		public function setIdAttribute(name:String):void
+		{
+			(this.ownerDocument as Document).addIdentifier(name, this);
+		}
 	}
 }
