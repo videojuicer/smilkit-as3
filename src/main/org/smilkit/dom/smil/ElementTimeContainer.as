@@ -29,7 +29,7 @@ package org.smilkit.dom.smil
 		{
 			if (this._beginList == null)
 			{
-				this._beginList = this.parseTimeAttribute(this.getAttribute("begin"), true);
+				this._beginList = ElementTime.parseTimeAttribute(this.getAttribute("begin"), this, true);
 			}
 			
 			return this._beginList;
@@ -44,7 +44,7 @@ package org.smilkit.dom.smil
 		{
 			if (this._endList == null)
 			{
-				this._endList = this.parseTimeAttribute(this.getAttribute("end"), false);
+				this._endList = ElementTime.parseTimeAttribute(this.getAttribute("end"), this, false);
 			}
 			
 			return this._endList;
