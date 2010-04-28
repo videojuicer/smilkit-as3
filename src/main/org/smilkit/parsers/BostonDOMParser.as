@@ -68,10 +68,10 @@ package org.smilkit.parsers
 					child = (doc as ISMILDocument).createSMILElement("smil");
 					break;
 				case "switch":
-					//child = (parent.ownerDocument as ISMILDocument).createSwitchElement();
+					child = (parent.ownerDocument as ISMILDocument).createSwitchElement();
 					break;
 				case "par":
-					//child = (parent.ownerDocument as ISMILDocument).createSequentialElement();
+					child = (parent.ownerDocument as ISMILDocument).createParallelElement() as INode;
 					break;
 				case "seq":
 					child = (doc as ISMILDocument).createSequentialElement() as INode;

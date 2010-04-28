@@ -116,16 +116,14 @@ package org.smilkit.dom.smil
 							}
 							else
 							{
-								var endTime:ITime = (parent as IElementParallelTimeContainer).end.item(0);
+								var time:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
 								
-								if (endTime.resolved)
+								var begin:ITime = time.begin.item(0);
+								
+								if (begin.resolved)
 								{
-									this._resolvedOffset = endTime.resolvedOffset;
+									this._resolvedOffset = begin.resolvedOffset + time.dur;	
 									this._resolved = true;
-								}
-								else
-								{
-									this._resolved = false;
 								}
 							}
 						}

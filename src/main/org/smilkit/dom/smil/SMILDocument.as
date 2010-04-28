@@ -28,7 +28,7 @@ package org.smilkit.dom.smil
 		
 		public function get timeChildren():INodeList
 		{
-			return null;
+			return new ElementTimeNodeList(this);
 		}
 		
 		public function activeChildrenAt(instant:Number):INodeList

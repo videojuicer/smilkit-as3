@@ -17,7 +17,7 @@ package org.smilkit.dom.smil
 		
 		public function get timeChildren():INodeList
 		{
-			return null;
+			return new ElementTimeNodeList(this);
 		}
 		
 		public function activeChildrenAt(instant:Number):INodeList
@@ -58,6 +58,12 @@ package org.smilkit.dom.smil
 		public function get dur():Number
 		{
 			var dur:String = this.getAttribute("dur");
+			
+			if (dur == null)
+			{
+				return 0;
+			}
+			
 			var s:String = dur.substr(0, dur.length - 1);
 			
 			return new Number(s);
