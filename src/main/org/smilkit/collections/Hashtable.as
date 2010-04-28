@@ -31,7 +31,12 @@ package org.smilkit.collections
 		
 		public function getKeyAt(index:int):Object
 		{
-			return this._keys[index];
+			if (index > this.length || index < 0)
+			{
+				return null;
+			}
+			
+			return this._keys.getItemAt(index);
 		}
 		
 		public function getNamedIndex(key:Object):int
@@ -56,7 +61,7 @@ package org.smilkit.collections
 			
 			if (i == -1)
 			{
-				var n:int = this.length+1;
+				var n:int = this.length;
 				
 				this._keys.setItemAt(key, n);
 				this.setItemAt(value, n);

@@ -6,7 +6,7 @@
 			import org.flexunit.listeners.CIListener;
 			import org.flexunit.runner.FlexUnitCore;
 			import org.flexunit.runner.Request;
-			import org.smilkit.spec.DOMSuite;
+			import org.smilkit.spec.SMILKitSuite;
 	
 			protected var _core:FlexUnitCore;
 			
@@ -16,7 +16,7 @@
 				//this._core.addListener(new UIListener(this.uiListener));
 				this._core.addListener(new CIListener());
 				//this._core.addListener(new FlexCoverListener());
-				this._core.run(org.smilkit.spec.DOMSuite);
+				this._core.run(org.smilkit.spec.SMILKitSuite);
 			}
 	]]>
 	</mx:Script>

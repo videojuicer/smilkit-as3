@@ -1,4 +1,4 @@
-package org.smilkit.spec.tests
+package org.smilkit.spec.tests.dom
 {
 	import flexunit.framework.Assert;
 	

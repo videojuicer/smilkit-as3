@@ -20,27 +20,34 @@ package org.smilkit.handler
 		
 		public function match(element:ISMILMediaElement):Boolean
 		{
-			var req:URLParser = new URLParser(element.src);
+			var req:URLParser = new URLParser();
 			
-			if (this._protocols.indexOf(req.protocol) != -1)
+			if (element.src != null || element.src != "")
 			{
-				for (var i:String in this._mimeMap)
+				req.parse(element.src);
+				
+				if (this._protocols.indexOf(req.protocol) != -1)
 				{
-					var extensions:Array = this._mimeMap[i];
-					
-					for each (var ext:String in extensions)
+					for (var i:String in this._mimeMap)
 					{
-						if (ext == req.extension)
+						var extensions:Array = this._mimeMap[i];
+						
+						for each (var ext:String in extensions)
 						{
-							return true;
+							if (ext == req.extension)
+							{
+								return true;
+							}
 						}
+						
+						extensions = null;
 					}
 				}
-			}
-			
-			if (this._urlRegex.test(req.url))
-			{
-				return true;
+				
+				if (this._urlRegex != null && this._urlRegex.test(req.url))
+				{
+					return true;
+				}
 			}
 			
 			return false;

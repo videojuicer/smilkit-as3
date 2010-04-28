@@ -2,15 +2,15 @@ package org.smilkit
 {
 	import mx.core.ClassFactory;
 	
+	import org.smilkit.collections.Hashtable;
+	import org.smilkit.collections.List;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.handler.VideoHandler;
 	import org.smilkit.parsers.BostonDOMParser;
-	import org.smilkit.collections.List;
-	import org.smilkit.collections.Hashtable;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	
@@ -71,8 +71,8 @@ package org.smilkit
 	     */
 		public static function defaultHandlers():void
 		{
-			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
-			SMILKit.registerHandler(org.smilkit.handler.VideoHandler, VideoHandler.toHandlerMap());
+			//SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
 		}
 		
 		/**
@@ -98,15 +98,15 @@ package org.smilkit
 		 *
 		 * @return The matching <code>Handler</code> class, or null if not found.
 		 */
-		public static function findHandlerFor(element:ISMILMediaElement):Class
+		public static function findHandlerClassFor(element:ISMILMediaElement):Class
 		{
-			for (var i:int = SMILKit.__handlers.length; i > 0; i--)
+			for (var i:int = (SMILKit.__handlers.length-1); i >= 0; i--)
 			{
-				var handler:HandlerMap = SMILKit.__handlers.getItemAt(i) as HandlerMap;
+				var handler:HandlerMap = SMILKit.__handlers.getKeyAt(i) as HandlerMap;
 				
 				if (handler.match(element))
 				{
-					return SMILKit.__handlers.getKeyAt(i) as Class;
+					return SMILKit.__handlers.getItemAt(i) as Class;
 				}
 			}
 			
@@ -126,7 +126,7 @@ package org.smilkit
 		 */
 		public static function createElementHandlerFor(element:ISMILMediaElement):SMILKitHandler
 		{
-			var klass:Class = SMILKit.findHandlerFor(element);
+			var klass:Class = SMILKit.findHandlerClassFor(element);
 			
 			if (klass != null)
 			{

@@ -79,9 +79,11 @@ package org.smilkit.parsers
 				case "body":
 					child = (doc as ISMILDocument).createSequentialElement("body") as INode;
 					break;
-				case "ref": case "video": case "img": case "audio": case "text":
+				case "video": case "img": case "audio": case "text":
 					child = (doc as ISMILDocument).createMediaElement(node.localName());
 					break;
+				case "ref":
+					child = (doc as ISMILDocument).createReferenceElement() as INode;
 				default:					
 					child = (doc as ISMILDocument).createElement(node.localName());
 					break;

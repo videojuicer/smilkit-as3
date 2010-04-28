@@ -19,5 +19,12 @@ package org.smilkit.spec
 			"<video id=\"preroll\" src=\"http://media.smilkit.org/preroll.mp4\" dur=\"10s\" />" +
 			"<video id=\"content\" src=\"http://media.smilkit.org/demo.mp4\" dur=\"60s\" region=\"root\" />" +
 			"</par></body></smil>";
+		
+		public static var MP4_VIDEO_SMIL_XML:String =  "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body><seq id=\"holder\">" +
+			"<video id=\"video_http\" src=\"http://media.smilkit.org/preroll.mp4\" dur=\"10s\" />" +
+			"<video id=\"video_rtmp\" src=\"rtmp://media.smilkit.org/demo.mp4\" dur=\"60s\" region=\"root\" />" +
+			"</seq></body></smil>";
 	}
 }
