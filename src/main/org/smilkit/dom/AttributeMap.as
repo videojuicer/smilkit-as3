@@ -10,6 +10,16 @@ package org.smilkit.dom
 			super(ownerNode);
 		}
 		
+		public override function setNamedItem(arg:INode):INode
+		{
+			var previous:INode = this.getNamedItem(arg.nodeName);
+			var node:INode = super.setNamedItem(arg);
+			
+			(this._ownerNode.ownerDocument as Document).setAttributeNode(arg, previous);
+			
+			return previous;
+		}
+		
 		/**
 		 * NON-DOM: Removes the specified <code>INode</code> instance from the list of attributes,
 		 * uses object-object comparison rather than looking for the named item.
@@ -20,6 +30,15 @@ package org.smilkit.dom
 		 */
 		internal function removeItem(item:INode):INode
 		{
+			var document:Document = (this._ownerNode.ownerDocument as Document);
+			var attr:Attr = (item as Attr); 
+			
+			if (attr.isAttributeNode)
+			{
+				document.removeIdentifier(attr.value);
+				attr.isAttributeNode = false;
+			}
+			
 			var index:int = -1;
 			
 			for (var i:int = 0; i < this._nodes.length; i++)
@@ -35,7 +54,12 @@ package org.smilkit.dom
 				throw new DOMException(DOMException.NOT_FOUND_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "NOT_FOUND_ERR"));
 			}
 			
-			return (this._nodes.removeItemAt(i) as INode);
+			var node:INode = (this._nodes.removeItemAt(i) as INode);
+			
+			
+			document.removedAttributeNode(node, this._ownerNode, attr.name);
+			
+			return node;
 		}
 		
 		/**

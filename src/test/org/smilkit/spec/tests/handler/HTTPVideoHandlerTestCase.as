@@ -38,6 +38,10 @@ package org.smilkit.spec.tests.handler
 		public function canLoadAVideo():void
 		{
 			this._httpVideoHandler.load();
+			
+			// subscribe to the handler events
+			// wait till the metadata event is triggered
+			// pass
 		}
 	}
 }

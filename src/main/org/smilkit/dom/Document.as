@@ -16,6 +16,7 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;
+	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.events.IEvent;
@@ -746,6 +747,97 @@ package org.smilkit.dom
 					this.dispatchNodeEvent(node, me);
 				}
 			}
+		}
+		
+		public function modifyingCharacterData(node:INode, replace:Boolean):void
+		{
+			if (this.mutationEvents)
+			{
+				if (!replace)
+				{
+					this.saveEnclosingAttr(node);
+				}
+			}
+		}
+		
+		public function modifiedCharacterData(node:INode, oldValue:String, value:String, replace:Boolean):void
+		{
+			if (this.mutationEvents)
+			{
+				if (!replace)
+				{
+					var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_CHARACTER_DATA_MODIFIED);
+					
+					if (lc.total > 0)
+					{
+						var me:MutationEvent = new MutationEvent();
+						me.initMutationEvent(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, true, false,  null, oldValue, value, null, 0);
+						
+						this.dispatchNodeEvent(node, me);
+					}
+					
+					this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
+				}
+			}
+		}
+		
+		public function replacedCharacterData(node:INode, oldValue:String, value:String):void
+		{
+			this.modifiedCharacterData(node, oldValue, value, false);
+		}
+		
+		public function modifiedAttributeValue(node:IAttr, oldValue:String):void
+		{
+			if (this.mutationEvents)
+			{
+				this.dispatchAggregateEvents(node, node, oldValue, MutationEvent.MODIFICATION);
+			}
+		}
+		
+		public function removedAttributeNode(node:INode, oldNode:INode, name:String):void
+		{
+			if (this.mutationEvents)
+			{
+				var attr:Attr = (node as Attr);
+				var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_ATTR_MODIFIED);
+				
+				if (lc.total > 0)
+				{
+					var me:MutationEvent = new MutationEvent();
+					me.initMutationEvent(MutationEvent.DOM_ATTR_MODIFIED, true, false,  attr, attr.nodeValue, null, name, MutationEvent.REMOVAL);
+					
+					this.dispatchNodeEvent(oldNode, me);
+				}
+				
+				this.dispatchAggregateEvents(oldNode, null, null, 0);
+			}
+		}
+		
+		public function setAttributeNode(node:INode, previous:INode):void
+		{
+			if (this.mutationEvents)
+			{
+				var attr:Attr = (node as Attr);
+				
+				if (previous == null)
+				{
+					this.dispatchAggregateEvents(attr.ownerElement, attr, null, MutationEvent.ADDITION);
+				}
+				else
+				{
+					this.dispatchAggregateEvents(attr.ownerElement, attr, previous.nodeValue, MutationEvent.MODIFICATION);
+				}
+			}
+		}
+		
+		public function renamedElement(oldElement:IElement, newElement:IElement):void
+		{
+			
+		}
+		
+		public function renamedAttributeNode(oldAttr:IAttr, newAttr:IAttr):void
+		{
+			
 		}
 	}
 }

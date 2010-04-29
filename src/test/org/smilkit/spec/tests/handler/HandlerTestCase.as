@@ -1,4 +1,4 @@
-package org.smilkit.spec.tests
+package org.smilkit.spec.tests.handler
 {
 	import flexunit.framework.Assert;
 	

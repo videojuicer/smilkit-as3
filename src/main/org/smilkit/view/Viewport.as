@@ -16,11 +16,12 @@ package org.smilkit.view
 	{
 		protected var _document:ISMILDocument;
 		protected var _currentIndex:int = -1;
-		protected var _history:Array;
+		protected var _history:Vector.<String>;
+		protected var _autoRefresh:Boolean = true;
 		
 		public function Viewport()
 		{
-			this._history = new Array();
+			this._history = new Vector.<String>();
 		}
 		
 		public function get document():ISMILDocument
@@ -43,7 +44,7 @@ package org.smilkit.view
 			return null;
 		}
 		
-		public function get history():Array
+		public function get history():Vector.<String>
 		{
 			return this._history;
 		}
@@ -66,9 +67,22 @@ package org.smilkit.view
 			}
 			
 			this._history[this._history.length] = location;
-			this._currentIndex = this._history.length;
+			this._currentIndex = this._history.length-1;
 			
-			this.refresh();
+			if (this.autoRefresh)
+			{
+				this.refresh();
+			}
+		}
+		
+		public function get autoRefresh():Boolean
+		{
+			return this._autoRefresh;
+		}
+		
+		public function set autoRefresh(autoRefresh:Boolean):void
+		{
+			this._autoRefresh = autoRefresh;
 		}
 		
 		public function refresh():void
@@ -94,7 +108,10 @@ package org.smilkit.view
 			{
 				this._currentIndex--;
 				
-				this.refresh();
+				if (this.autoRefresh)
+				{
+					this.refresh();
+				}
 			}
 			
 			return false;
@@ -106,7 +123,10 @@ package org.smilkit.view
 			{
 				this._currentIndex++;
 				
-				this.refresh();
+				if (this.autoRefresh)
+				{
+					this.refresh();
+				}
 			}
 			
 			return false;

@@ -9,6 +9,7 @@ package org.smilkit.handler
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	
+	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
@@ -17,6 +18,7 @@ package org.smilkit.handler
 		protected var _netStream:NetStream;
 		protected var _video:Video;
 		protected var _soundTransformer:SoundTransform;
+		protected var _metadata:Metadata;
 		
 		public function HTTPVideoHandler(element:IElement)
 		{
@@ -25,7 +27,12 @@ package org.smilkit.handler
 		
 		public override function get intrinsicDuration():uint
 		{
-			return 0;
+			if (this._metadata == null || this._metadata.hasOwnProperty("duration"))
+			{
+				return super.intrinsicDuration;
+			}
+			
+			return this._metadata.duration;
 		}
 		
 		public override function get intrinsicWidth():uint
@@ -106,6 +113,20 @@ package org.smilkit.handler
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
 			
+		}
+		
+		protected function onMetaData(info:Object):void
+		{
+			if (this._metadata == null)
+			{
+				this._metadata = new Metadata(info);
+			}
+			else
+			{
+				this._metadata.update(info);
+			}
+			
+			trace("Video Metadata recieved: "+info.toString());
 		}
 		
 		public static function toHandlerMap():HandlerMap

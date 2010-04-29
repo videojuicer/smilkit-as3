@@ -25,7 +25,8 @@ package org.smilkit.dom
 		
 		protected var _value:Object = null;
 		protected var _name:String;
-
+		protected var _isAttributeNode:Boolean = false;
+		
 		public function Attr(owner:IDocument, name:String)
 		{
 			super(owner);
@@ -76,6 +77,16 @@ package org.smilkit.dom
 		public function get ownerElement():IElement
 		{
 			return super._ownerDocument as IElement;
+		}
+		
+		public function get isAttributeNode():Boolean
+		{
+			return this._isAttributeNode;
+		}
+		
+		public function set isAttributeNode(value:Boolean):void
+		{
+			this._isAttributeNode = value;
 		}
 	}
 }
