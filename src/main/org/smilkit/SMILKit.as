@@ -130,9 +130,9 @@ package org.smilkit
 			
 			if (klass != null)
 			{
-				var factory:ClassFactory = new ClassFactory(klass);
-			
-				return factory.newInstance();
+				var handler:SMILKitHandler = new klass(element);
+				
+				return handler;
 			}
 			
 			return null;
@@ -147,19 +147,27 @@ package org.smilkit
 		 * @see org.smilkit.handler.Handler
 		 * @see org.smilkit.handler.HandlerMap
 		 */
-		public static function removeHandler(handlerClass:Class, handlerMap:HandlerMap = null):void
+		public static function removeHandlers(handlerClass:Class = null, handlerMap:HandlerMap = null):void
 		{
-			for (var i:int = SMILKit.__handlers.length; i > 0; i--)
+			if (handlerClass == null)
 			{
-				var hClass:Class = SMILKit.__handlers.getItemAt(i) as Class;
-				var hMap:HandlerMap = SMILKit.__handlers.getKeyAt(i) as HandlerMap;
-				
-				if (handlerClass == hClass)
+				// clear all
+				SMILKit.__handlers.removeAll();
+			}
+			else
+			{
+				for (var i:int = SMILKit.__handlers.length; i > 0; i--)
 				{
-					if (handlerMap == null || hMap == handlerMap)
+					var hClass:Class = SMILKit.__handlers.getItemAt(i) as Class;
+					var hMap:HandlerMap = SMILKit.__handlers.getKeyAt(i) as HandlerMap;
+					
+					if (handlerClass == hClass)
 					{
-						SMILKit.__handlers.removeItemAt(i);
-					}	
+						if (handlerMap == null || hMap == handlerMap)
+						{
+							SMILKit.__handlers.removeItemAt(i);
+						}	
+					}
 				}
 			}
 		}
