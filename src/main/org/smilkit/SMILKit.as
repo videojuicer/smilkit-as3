@@ -11,6 +11,7 @@ package org.smilkit
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	
@@ -46,6 +47,18 @@ package org.smilkit
 		public static function createSMILDocument():IDocument
 		{
 			return new Document(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
+		}
+		
+		/**
+		 * Create's a new empty SMILKit <code>Viewport</code>.
+		 * 
+		 * @return The generated <code>Viewport</code>.
+		 * 
+		 * @see org.smilkit.view.Viewport
+		 */
+		public static function createEmptyViewport():Viewport
+		{
+			return new Viewport();
 		}
 		
 		/**

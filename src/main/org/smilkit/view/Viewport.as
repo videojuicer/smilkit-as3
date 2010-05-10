@@ -1,7 +1,9 @@
 package org.smilkit.view
 {
+	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
@@ -10,11 +12,19 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.render.RenderTree;
+	import org.smilkit.time.Heartbeat;
+	import org.smilkit.time.TimingGraph;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
-	public class Viewport
+	public class Viewport extends EventDispatcher
 	{
 		protected var _document:ISMILDocument;
+		protected var _timingGraph:TimingGraph;
+		protected var _renderTree:RenderTree;
+		protected var _heartbeat:Heartbeat;
+		
 		protected var _currentIndex:int = -1;
 		protected var _history:Vector.<String>;
 		protected var _autoRefresh:Boolean = true;
@@ -22,6 +32,12 @@ package org.smilkit.view
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
+			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
+		}
+		
+		public function get offset():Number
+		{
+			return 0;
 		}
 		
 		public function get document():ISMILDocument
@@ -29,9 +45,9 @@ package org.smilkit.view
 			return this._document;
 		}
 		
-		public function get timingGraph():Object
+		public function get timingGraph():TimingGraph
 		{
-			return null;
+			return this._timingGraph;
 		}
 		
 		public function get renderingTree():Object
@@ -39,9 +55,14 @@ package org.smilkit.view
 			return null;
 		}
 		
-		public function get canvas():Canvas
+		public function get heartbeat():Heartbeat
 		{
-			return null;
+			return this._heartbeat;
+		}
+		
+		public function get canvas():Sprite
+		{
+			return this._renderTree.canvas;
 		}
 		
 		public function get history():Vector.<String>
@@ -136,8 +157,10 @@ package org.smilkit.view
 		{
 			// parse dom
 			this._document = (SMILKit.loadSMILDocument(e.target.data) as ISMILDocument);
-			//this._timingGraph = new TimingGraph(this._document);
-			//this._renderingTree = new RenderingTree(this._timingGraph);
+			this._timingGraph = new TimingGraph(this._document);
+			this._renderTree = new RenderTree(this, this._timingGraph);
+			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
 		
 		private function onRefreshIOError(e:IOErrorEvent):void

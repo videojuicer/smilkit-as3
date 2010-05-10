@@ -1,7 +1,12 @@
 package org.smilkit.spec.tests.view
 {
-	import flexunit.framework.Assert;
+	import flash.events.Event;
 	
+	import flexunit.framework.Assert;
+	import flexunit.framework.AsyncTestHelper;
+	
+	import org.flexunit.async.Async;
+	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.Viewport;
 
 	public class ViewportTestCase
@@ -72,6 +77,17 @@ package org.smilkit.spec.tests.view
 			this._viewport.forward();
 			
 			Assert.assertEquals("http://smilkit.org/three.smil", this._viewport.location);
+		}
+		
+		[Test(async,timeout="3000",description="Tests loading a SMIL document across the network and through the viewport")]
+		public function attemptNetworkSMILLoad():void
+		{
+			this._viewport.autoRefresh = true;
+			this._viewport.location = "http://sixty.im/demo.smil";
+			//this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, function():void {
+			//	Assert.assertNotNull(this._viewport.document);
+			//	Assert.assertNotNull(this._viewport.document.getElementById("content"));
+			//});	
 		}
 	}
 }

@@ -36,7 +36,6 @@ package org.smilkit.parsers
 		public function parse(document:String):IDocument
 		{
 			var xml:XML = new XML(document);
-			
 			var doc:IDocument = new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
 			
 			this.parseNode(doc, xml);

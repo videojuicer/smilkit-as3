@@ -1,14 +1,18 @@
-package org.smilkit.timing
+package org.smilkit.time
 {
+	import flash.events.EventDispatcher;
+	
 	import org.smilkit.dom.events.EventListener;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
-	public class TimingGraph
+	public class TimingGraph extends EventDispatcher
 	{
 		protected var _elements:Vector.<ResolvedTimeElement>;
 		protected var _document:SMILDocument;
@@ -44,6 +48,8 @@ package org.smilkit.timing
 		public function rebuild():void
 		{
 			this.iterateTree(this._document as INode);
+			
+			this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.REBUILD));
 		}
 		
 		protected function iterateTree(node:INode):void
@@ -61,7 +67,7 @@ package org.smilkit.timing
 				
 				if (child is ISMILMediaElement)
 				{
-					var el:ISMILMediaElement = (child as ISMILMediaElement);
+					var el:SMILMediaElement = (child as SMILMediaElement);
 					
 					// check if element is resolved
 					if (true)
@@ -69,6 +75,8 @@ package org.smilkit.timing
 						var resolvedTimeElement:ResolvedTimeElement = new ResolvedTimeElement(el, 0, 0);
 						
 						this._elements.push(resolvedTimeElement);
+						
+						this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
 					}
 				}
 			}

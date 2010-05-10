@@ -1,4 +1,4 @@
-package org.smilkit.timing
+package org.smilkit.time
 {
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -29,6 +29,11 @@ package org.smilkit.timing
 		public function get element():ISMILMediaElement
 		{
 			return this._element;
+		}
+		
+		public function activeAt(offset:Number):Boolean
+		{
+			return (offset >= this._begin && offset <= this._end);
 		}
 	}
 }
