@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<flexLibProperties includeAllClasses="true" version="3">
+  <includeClasses>
+    <classEntry path="org.smilkit.dom.smil.SMILDocument"/>
+    <classEntry path="org.smilkit.dom.smil.SMILElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILMediaElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILRefElement"/>
+    <classEntry path="org.smilkit.dom.smil.SMILSwitchElement"/>
+    <classEntry path="org.smilkit.handler.HandlerMap"/>
+    <classEntry path="org.smilkit.handler.ImageHandler"/>
+    <classEntry path="org.smilkit.handler.SMILKitHandler"/>
+    <classEntry path="org.smilkit.handler.HTTPVideoHandler"/>
+    <classEntry path="org.smilkit.parsers.BostonDOMParser"/>
+    <classEntry path="org.smilkit.collections.Hashtable"/>
+    <classEntry path="org.smilkit.util.URLParser"/>
+    <classEntry path="org.smilkit.view.Viewport"/>
+    <classEntry path="org.smilkit.spec.tests.dom.BostonDOMParserTestCase"/>
+    <classEntry path="org.smilkit.time.TimingGraph"/>
+    <classEntry path="org.smilkit.time.ResolvedTimeElement"/>
+    <classEntry path="org.smilkit.w3c.dom.events.IEventTarget"/>
+    <classEntry path="org.smilkit.w3c.dom.events.IEvent"/>
+    <classEntry path="org.smilkit.w3c.dom.events.IEventListener"/>
+    <classEntry path="org.smilkit.w3c.dom.events.IDocumentEvent"/>
+    <classEntry path="org.smilkit.collections.ListenerEntry"/>
+    <classEntry path="org.smilkit.events.ListenerCount"/>
+    <classEntry path="org.smilkit.events.EventException"/>
+    <classEntry path="org.smilkit.events.RuntimeException"/>
+    <classEntry path="org.smilkit.dom.events.Event"/>
+    <classEntry path="org.smilkit.w3c.dom.events.IMutationEvent"/>
+    <classEntry path="org.smilkit.dom.events.MutationEvent"/>
+    <classEntry path="org.smilkit.dom.EnclosingAttr"/>
+    <classEntry path="org.smilkit.dom.events.EventListener"/>
+    <classEntry path="org.smilkit.spec.tests.dom.EventTestCase"/>
+    <classEntry path="org.smilkit.spec.Fixtures"/>
+    <classEntry path="org.smilkit.dom.smil.Time"/>
+    <classEntry path="org.smilkit.dom.smil.TimeList"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTime"/>
+    <classEntry path="org.smilkit.spec.tests.dom.TimeTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.ElementSequentialTimeContainer"/>
+    <classEntry path="org.smilkit.dom.smil.ElementParallelTimeContainer"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTimeContainer"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTimeNodeList"/>
+    <classEntry path="org.smilkit.spec.tests.handler.HandlerTestCase"/>
+    <classEntry path="org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase"/>
+    <classEntry path="org.smilkit.util.Metadata"/>
+    <classEntry path="org.smilkit.spec.tests.view.ViewportTestCase"/>
+    <classEntry path="org.smilkit.handler.HandlerEvent"/>
+    <classEntry path="org.smilkit.events.EventHandler"/>
+    <classEntry path="org.smilkit.events.ViewportEvent"/>
+    <classEntry path="org.smilkit.render.RenderTree"/>
+    <classEntry path="org.smilkit.time.Heartbeat"/>
+    <classEntry path="org.smilkit.util.logger.Logger"/>
+    <classEntry path="org.smilkit.events.TimingGraphEvent"/>
+    <classEntry path="org.smilkit.util.logger.LogMessage"/>
+    <classEntry path="org.smilkit.util.logger.LogLevel"/>
+    <classEntry path="org.smilkit.events.RenderTreeEvent"/>
+    <classEntry path="org.smilkit.render.DrawingBoard"/>
+    <classEntry path="org.smilkit.dom.CharacterData"/>
+    <classEntry path="org.smilkit.dom.Text"/>
+  </includeClasses>
+  <includeResources/>
+  <namespaceManifests/>
+</flexLibProperties>

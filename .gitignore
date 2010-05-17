@@ -1,9 +1,9 @@
 .DS_Store
-.project
+#.project
 .settings
 .FlexUnitSettings
 #.actionScriptProperties
-.flexLibProperties
+#.flexLibProperties
 FlexUnitApplication.mxml
 bin/*
 target/*
