@@ -38,7 +38,8 @@ package org.smilkit.dom
 		protected var _mutationEvents:Boolean = false;
 		protected var _savedEnclosingAttr:EnclosingAttr;
 		protected var _iterators:Array;
-		protected var _ranges:Array;
+		protected var _ranges:List;
+		protected var _referenceQueue:List;
 		protected var _changes:int = 0;
 		
 		public function Document(documentType:IDocumentType)
@@ -838,6 +839,74 @@ package org.smilkit.dom
 		public function renamedAttributeNode(oldAttr:IAttr, newAttr:IAttr):void
 		{
 			
+		}
+		
+		public function deletedText(node:CharacterData, offset:int, count:int):void
+		{
+			if (this._ranges != null)
+			{
+				this.notifyRangesDeletedText(node, offset, count);
+			}
+		}
+		
+		protected function notifyRangesDeletedText(node:CharacterData, offset:int, count:int):void
+		{
+			
+		}
+		
+		public function insertedText(node:CharacterData, offset:int, count:int):void
+		{
+			if (this._ranges != null)
+			{
+				this.notifyRangesInsertedText(node, offset, count);
+			}
+		}
+		
+		protected function notifyRangesInsertedText(node:CharacterData, offset:int, count:int):void
+		{
+			
+		}
+		
+		public function replacedText(node:CharacterData):void
+		{
+			if (this._ranges != null)
+			{
+				this.notifyRangesReplacedText(node);
+			}
+		}
+		
+		protected function notifyRangesReplacedText(node:CharacterData):void
+		{
+			
+		}
+		
+		protected function removeStaleRangeReferences():void
+		{
+			this.removeStaleReferences(this._referenceQueue, this._ranges);
+		}
+		
+		protected function removeStaleReferences(queue:List, list:List):void
+		{
+			var count:int = queue.length;
+			
+			if (count > 0)
+			{
+				for (var i:int = 0; i < list.length; i++)
+				{
+					var r:Object = list[i];
+					
+					if (r == null)
+					{
+						// remove from list
+						list.removeItemAt(i);
+						
+						if (--count <= 0)
+						{
+							return;
+						}
+					}
+				}
+			}
 		}
 	}
 }

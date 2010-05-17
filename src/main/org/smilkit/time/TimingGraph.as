@@ -47,7 +47,8 @@ package org.smilkit.time
 		
 		public function rebuild():void
 		{
-			this.iterateTree(this._document as INode);
+			// only go from the body, no point running through the other parts of a smil document
+			this.iterateTree(this._document.getElementsByTagName("body").item(0) as INode);
 			
 			this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.REBUILD));
 		}
@@ -62,7 +63,7 @@ package org.smilkit.time
 				
 				if (child.hasChildNodes())
 				{
-					this.iterateTree(node);
+					this.iterateTree(child);
 				}
 				
 				if (child is ISMILMediaElement)

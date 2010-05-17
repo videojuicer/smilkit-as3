@@ -10,11 +10,19 @@ package org.smilkit.util
 		}
 		
 		/**
+		 * A number that indicates the number of audio tracks.
+		 */
+		public function get audioChannels():uint
+		{
+			return this._internalInfo['audiochannels'];
+		}
+		
+		/**
 		 * A number that indicates the rate at which audio was encoded, in kilobytes per second.
 		 */
-		public function get audioDataRate():uint
+		public function get audioSampleRate():uint
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['audiosamplerate'];
 		}
 		
 		/**
@@ -22,15 +30,15 @@ package org.smilkit.util
 		 */
 		public function get audioDelay():Number
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['audiodelay'];
 		}
 		
 		/**
-		 * A number that indicates the audio codec id (code/decode technique) that was used.
+		 * A string that indicates the audio codec id (code/decode technique) that was used.
 		 */
-		public function get audioCodecId():uint
-		{
-			return this._internalInfo.audiodelay;
+		public function get audioCodecId():String
+		{			
+			return this._internalInfo['audiocodecid'];
 		}
 		
 		/**
@@ -38,21 +46,13 @@ package org.smilkit.util
 		 */
 		public function get audioCodec():String
 		{
-			switch (this.videoCodecId)
+			switch (this.audioCodecId)
 			{
-				case 0:
-					return "Uncompressed";
-				case 1:
-					return "Adaptive DPCM";
-				case 2:
-					return "MP3";
-				case 5:
-					return "Nellymoser 8kHz Mono";
-				case 6:
-					return "Nellymoser";
-				default:
-					return "Unknown ("+this.videoCodecId+")";
+				case "mp4a":
+					return "AAC";
 			}
+			
+			return this.audioCodecId.toUpperCase();
 		}
 		
 		/**
@@ -60,7 +60,7 @@ package org.smilkit.util
 		 */
 		public function get canSeekToEnd():Boolean
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['canseektoend'];
 		}
 		
 		/**
@@ -68,7 +68,7 @@ package org.smilkit.util
 		 */
 		public function get cuePoints():Array
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['seekpoints'];
 		}
 		
 		/**
@@ -76,7 +76,7 @@ package org.smilkit.util
 		 */
 		public function get duration():Number
 		{
-			return this._internalInfo.duration;
+			return this._internalInfo['duration'];
 		}
 		
 		/**
@@ -84,7 +84,7 @@ package org.smilkit.util
 		 */
 		public function get framerate():Number
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['videoframerate'];
 		}
 		
 		/**
@@ -92,23 +92,15 @@ package org.smilkit.util
 		 */
 		public function get height():uint
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['height'];
 		}
-		
-		/**
-		 * A number that is the video data rate of the FLV file.
-		 */
-		public function get videoDataRate():uint
-		{
-			return this._internalInfo.audiodelay;
-		}
-		
+
 		/**
 		 * A number that is the codec version that was used to encode the video.
 		 */
-		public function get videoCodecId():uint
+		public function get videoCodecId():String
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['videocodecid'];
 		}
 		
 		/**
@@ -118,17 +110,11 @@ package org.smilkit.util
 		{
 			switch (this.videoCodecId)
 			{
-				case 2:
-					return "H.263";
-				case 3:
-					return "Screenshare";
-				case 4:
-					return "VP6";
-				case 5:
-					return "VP6+A";
-				default:
-					return "Unknown ("+this.videoCodecId+")";
+				case "avc1":
+					return "H.264";
 			}
+			
+			return this.videoCodecId.toUpperCase();
 		}
 		
 		/**
@@ -136,7 +122,7 @@ package org.smilkit.util
 		 */
 		public function get width():uint
 		{
-			return this._internalInfo.audiodelay;
+			return this._internalInfo['width'];
 		}
 		
 		/**
@@ -155,6 +141,11 @@ package org.smilkit.util
 					this._internalInfo[key] = value;
 				}
 			}
+		}
+		
+		public function toString():String
+		{
+			return "Video: "+this.videoCodec+", "+this.framerate+"fps, "+this.width+" x "+this.height+". Audio: "+this.audioCodec+", "+this.audioChannels+" channels, "+this.audioSampleRate+" Hz.";
 		}
 	}
 }

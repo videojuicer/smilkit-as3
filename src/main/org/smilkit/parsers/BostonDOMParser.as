@@ -61,31 +61,38 @@ package org.smilkit.parsers
 				doc = parent.ownerDocument;
 			}
 			
-			switch (node.localName().toString())
+			if (node.nodeKind() == "text")
 			{
-				case "smil":
-					child = (doc as ISMILDocument).createSMILElement("smil");
-					break;
-				case "switch":
-					child = (parent.ownerDocument as ISMILDocument).createSwitchElement();
-					break;
-				case "par":
-					child = (parent.ownerDocument as ISMILDocument).createParallelElement() as INode;
-					break;
-				case "seq":
-					child = (doc as ISMILDocument).createSequentialElement() as INode;
-					break;
-				case "body":
-					child = (doc as ISMILDocument).createSequentialElement("body") as INode;
-					break;
-				case "video": case "img": case "audio": case "text":
-					child = (doc as ISMILDocument).createMediaElement(node.localName());
-					break;
-				case "ref":
-					child = (doc as ISMILDocument).createReferenceElement() as INode;
-				default:					
-					child = (doc as ISMILDocument).createElement(node.localName());
-					break;
+				child = parent.ownerDocument.createTextNode(node.toString());
+			}
+			else
+			{
+				switch (node.localName().toString())
+				{
+					case "smil":
+						child = (doc as ISMILDocument).createSMILElement("smil");
+						break;
+					case "switch":
+						child = (parent.ownerDocument as ISMILDocument).createSwitchElement();
+						break;
+					case "par":
+						child = (parent.ownerDocument as ISMILDocument).createParallelElement() as INode;
+						break;
+					case "seq":
+						child = (doc as ISMILDocument).createSequentialElement() as INode;
+						break;
+					case "body":
+						child = (doc as ISMILDocument).createSequentialElement("body") as INode;
+						break;
+					case "video": case "img": case "audio": case "text":
+						child = (doc as ISMILDocument).createMediaElement(node.localName());
+						break;
+					case "ref":
+						child = (doc as ISMILDocument).createReferenceElement() as INode;
+					default:					
+						child = (doc as ISMILDocument).createElement(node.localName());
+						break;
+				}
 			}
 			
 			if (child == null)

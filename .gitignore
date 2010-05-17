@@ -2,7 +2,7 @@
 .project
 .settings
 .FlexUnitSettings
-.actionScriptProperties
+#.actionScriptProperties
 .flexLibProperties
 FlexUnitApplication.mxml
 bin/*

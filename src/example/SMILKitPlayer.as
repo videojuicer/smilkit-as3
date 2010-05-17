@@ -15,7 +15,7 @@ package
 			this._viewport = new Viewport();
 			this._viewport.location = "http://sixty.im/demo.smil";
 		
-			this.addChild(this._viewport.canvas);
+			this.addChild(this._viewport.drawingBoard.canvas);
 			
 			this._viewport.document.resumeElement();
 		}

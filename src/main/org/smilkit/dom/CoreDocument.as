@@ -101,7 +101,7 @@ package org.smilkit.dom
 		
 		public function createTextNode(data:String):IText
 		{
-			throw new IllegalOperationError("Method Not Implemented Yet!");
+			return new Text(this, data);
 		}
 		
 		public function createComment(data:String):IComment

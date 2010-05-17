@@ -16,8 +16,11 @@ package org.smilkit.dom.smil
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
-			
-			this._handler = SMILKit.createElementHandlerFor(this);
+		}
+		
+		public function get handler():SMILKitHandler
+		{
+			return this._handler;
 		}
 		
 		public function get abstractAttr():String
@@ -187,7 +190,11 @@ package org.smilkit.dom.smil
 		
 		public override function resumeElement():void
 		{
-			this._handler.resume();
+			this._handler = SMILKit.createElementHandlerFor(this);
+			
+			this._handler.load();
+			
+			//this._handler.resume();
 		}
 		
 		public override function seekElement(seekTo:Number):void

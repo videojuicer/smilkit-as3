@@ -8,7 +8,7 @@ package org.smilkit.w3c.dom
 		
 		function substringData(offset:int, count:int):String;
 		function appendData(arg:String):void;
-		function insertData(offset:int, arg:String):void;
-		function deleteData(offset:int, count:int, arg:String):void;
+		function insertData(offset:int, data:String):void;
+		function deleteData(offset:int, count:int):void;
 	}
 }

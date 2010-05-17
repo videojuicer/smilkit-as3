@@ -38,9 +38,11 @@ package org.smilkit.dom
 		 */
 		public override function get lastChild():INode
 		{
-			if (this.firstChild != null)
+			var firstChild:ChildNode = (this.firstChild as ChildNode);
+			
+			if (firstChild != null)
 			{
-				return this.firstChild.previousSibling;	
+				return firstChild.previousSibling;	
 			}
 			
 			return null;

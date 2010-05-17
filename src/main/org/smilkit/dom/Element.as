@@ -4,6 +4,7 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INodeList;
 	
 	public class Element extends ParentNode implements IElement
@@ -51,6 +52,11 @@ package org.smilkit.dom
 		public override function get nodeName():String
 		{
 			return this._name;
+		}
+		
+		public override function get attributes():INamedNodeMap
+		{
+			return this._attributes;
 		}
 		
 		/**

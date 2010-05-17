@@ -1,5 +1,8 @@
 package org.smilkit.handler
 {
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
+	
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -35,6 +38,11 @@ package org.smilkit.handler
 		public function get intrinsicTemporal():Boolean
 		{
 			return false;
+		}
+		
+		public function get displayObject():DisplayObject
+		{
+			return null;
 		}
 		
 		public function get element():ISMILMediaElement

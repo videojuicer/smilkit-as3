@@ -13,6 +13,7 @@ package org.smilkit.view
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.TimingGraph;
@@ -24,6 +25,7 @@ package org.smilkit.view
 		protected var _timingGraph:TimingGraph;
 		protected var _renderTree:RenderTree;
 		protected var _heartbeat:Heartbeat;
+		protected var _drawingBoard:DrawingBoard;
 		
 		protected var _currentIndex:int = -1;
 		protected var _history:Vector.<String>;
@@ -33,11 +35,13 @@ package org.smilkit.view
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
+			
+			this._drawingBoard = new DrawingBoard();
 		}
 		
 		public function get offset():Number
 		{
-			return 0;
+			return this._heartbeat.offset;
 		}
 		
 		public function get document():ISMILDocument
@@ -60,10 +64,11 @@ package org.smilkit.view
 			return this._heartbeat;
 		}
 		
-		public function get canvas():Sprite
+		public function get drawingBoard():DrawingBoard
 		{
-			return this._renderTree.canvas;
+			return this._drawingBoard;
 		}
+		
 		
 		public function get history():Vector.<String>
 		{
@@ -158,7 +163,16 @@ package org.smilkit.view
 			// parse dom
 			this._document = (SMILKit.loadSMILDocument(e.target.data) as ISMILDocument);
 			this._timingGraph = new TimingGraph(this._document);
+			
+			// do an initial build of the timing graph
+			this._timingGraph.rebuild();
+			
 			this._renderTree = new RenderTree(this, this._timingGraph);
+			
+			// create render tree to drawingboard
+			// drawingboard is always around, and renderTree is constantly destroyed
+			// and recreated, so we have to make the link.
+			this._drawingBoard.renderTree = this._renderTree;
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}

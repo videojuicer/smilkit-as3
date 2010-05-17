@@ -1,5 +1,7 @@
 package org.smilkit.handler
 {
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
 	import flash.events.AsyncErrorEvent;
 	import flash.events.IOErrorEvent;
 	import flash.events.NetStatusEvent;
@@ -55,11 +57,17 @@ package org.smilkit.handler
 			return false;
 		}
 		
+		public override function get displayObject():DisplayObject
+		{
+			return (this._video as DisplayObject);
+		}
+		
 		public override function load():void
 		{
 			this._netConnection = new NetConnection();
 			this._netConnection.connect(null);
 			
+			this._video = new Video();
 			this._soundTransformer = new SoundTransform(0, 0);
 			
 			this._netStream = new NetStream(this._netConnection);
@@ -73,7 +81,6 @@ package org.smilkit.handler
 			
 			this._netStream.play(this.element.src);
 			
-			this._video = new Video();
 			this._video.smoothing = true;
 			this._video.deblocking = 1;
 			
@@ -97,7 +104,12 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			trace(e.toString());
+			trace("Netstatus: "+e.info.level+" "+e.info.code);
+			
+			if (e.info.code == "NetStream.Buffer.Full")
+			{
+				this.resume();
+			}
 		}
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
@@ -115,7 +127,7 @@ package org.smilkit.handler
 			
 		}
 		
-		protected function onMetaData(info:Object):void
+		public function onMetaData(info:Object):void
 		{
 			if (this._metadata == null)
 			{
@@ -126,7 +138,9 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
-			trace("Video Metadata recieved: "+info.toString());
+			trace("Metadata recieved: "+this._metadata.toString());
+			
+			this.resume();
 		}
 		
 		public static function toHandlerMap():HandlerMap
