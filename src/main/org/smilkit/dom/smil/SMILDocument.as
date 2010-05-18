@@ -57,7 +57,6 @@ package org.smilkit.dom.smil
 			{
 				this._endList = ElementTime.parseTimeAttribute(null, (this as IElement), false);
 			}
-			
 			return this._endList;
 		}
 		

@@ -5,6 +5,14 @@ package org.smilkit.time
 	
 	import org.smilkit.SMILKit;
 
+	/**
+	 * Heartbeat controls the timing of the player updates.
+	 * 
+	 * The Heartbeat instance will automatically adjust the timings of the players 
+	 * updates should the player experience any slow down that begins to effect performance
+	 *  
+	 * 
+	 */	
 	public class Heartbeat extends Timer
 	{
 		protected var _timer:Timer;
@@ -18,6 +26,12 @@ package org.smilkit.time
 		
 		public static var SLOW_BEATS_LIMIT:int = 5;
 		
+		/**
+		 * When created HeartBeat creates an event listener to listen to its own timer event
+		 * @constructor 
+		 * @param delay
+		 * 
+		 */		
 		public function Heartbeat(delay:Number)
 		{
 			super(delay, 0);
@@ -59,6 +73,7 @@ package org.smilkit.time
 			
 			super.reset();
 		}
+		
 		
 		protected function onTimer(e:TimerEvent):void
 		{

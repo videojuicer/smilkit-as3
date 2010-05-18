@@ -12,6 +12,12 @@ package org.smilkit.time
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
+	/**
+	 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed
+	 * 
+	 * The TimingGraph listens for changes in the ISMILDocument that is past to it and rebuilds itself should the ISMILdocument change
+	 * 
+	 */	
 	public class TimingGraph extends EventDispatcher
 	{
 		protected var _elements:Vector.<ResolvedTimeElement>;
@@ -19,6 +25,13 @@ package org.smilkit.time
 		
 		protected var _eventListener:EventListener;
 		
+		/**
+		 * Create the instance of the _element, and stores the reference to ISMILdocument in _document
+		 * Adds listeners to _document to listener for MutationEvents.
+		 * 
+		 * @param document
+		 * @constructor
+		 */		
 		public function TimingGraph(document:ISMILDocument)
 		{
 			this._elements = new Vector.<ResolvedTimeElement>();
@@ -45,14 +58,22 @@ package org.smilkit.time
 			return this._document;
 		}
 		
+		/**
+		 * Public function used to rebuild the list of ResolvedTimeElements 
+		 * 
+		 */		
 		public function rebuild():void
 		{
 			// only go from the body, no point running through the other parts of a smil document
 			this.iterateTree(this._document.getElementsByTagName("body").item(0) as INode);
-			
 			this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.REBUILD));
 		}
 		
+		/**
+		 * Recursive function used to parse ISMILdocument creating a list of value objects of ResolvedTimeElements 
+		 * @param node
+		 * 
+		 */		
 		protected function iterateTree(node:INode):void
 		{
 			var nodes:INodeList = node.childNodes;
@@ -83,6 +104,11 @@ package org.smilkit.time
 			}
 		}
 		
+		/**
+		 * Called when the document dispatches the MutationEvents for which the listeners are added in the contructor
+		 * @param e
+		 * 
+		 */		
 		protected function onMutationEvent(e:MutationEvent):void
 		{
 			this.rebuild();

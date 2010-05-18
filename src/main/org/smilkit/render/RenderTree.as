@@ -12,15 +12,38 @@ package org.smilkit.render
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
+	/**
+	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements
+	 * 
+	 */	
 	public class RenderTree extends EventDispatcher
 	{
+		/**
+		 * Stored reference to the TimingGraph instance from its parent viewport 
+		 */		
 		protected var _timeGraph:TimingGraph;
+		
+		
 		protected var _activeElements:Vector.<ResolvedTimeElement>;
+		
+		/**
+		 * Stored reference to the parent Viewport 
+		 */		
 		protected var _viewport:Viewport;
 		
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
 		
+		/**
+		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
+		 * 
+		 * Adds a listener to the heartbeat instance of the parent viewport and listens for when the TimingGraph is redrawn
+		 * 
+		 * @constructor 
+		 * @param viewport - the parent Viewport with which the render tree is associated
+		 * @param timeGraph - that has been created by the parent Viewport
+		 * 
+		 */		
 		public function RenderTree(viewport:Viewport, timeGraph:TimingGraph)
 		{
 			this._timeGraph = timeGraph;
@@ -84,6 +107,11 @@ package org.smilkit.render
 			this.update();
 		}
 		
+		/**
+		 * Checks the current position of the player and requests the stage be redrawn according to timings in the TimingGraph
+		 * @param offset
+		 * 
+		 */		
 		public function updateAt(offset:Number):void
 		{
 			// we only need to do a loop if the offset is less than our last change
@@ -149,11 +177,20 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		 * Function called when the TimingGraph rebuilds itself, this function in turn calls the reset function 
+		 * @param e
+		 * 
+		 */		
 		protected function onTimeGraphRebuild(e:TimingGraphEvent):void
 		{
 			this.reset();
 		}
 		
+		/**
+		 * Function called when the Viewports heartbeat dispatches a TimerEvent, which then updates the RenderTree 
+		 * @param e
+		 */		
 		protected function onHeartbeatBeat(e:TimerEvent):void
 		{
 			this.update();

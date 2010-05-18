@@ -21,10 +21,29 @@ package org.smilkit.view
 
 	public class Viewport extends EventDispatcher
 	{
+		/**
+		 * Holds the dom - data Representation of the loaded SMIL XML 
+		 */		
 		protected var _document:ISMILDocument;
+		
+		/**
+		 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed 
+		 */		
 		protected var _timingGraph:TimingGraph;
+		
+		/**
+		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
+		 */		
 		protected var _renderTree:RenderTree;
+		
+		/**
+		 * An instance of Heartbeat, the class which is responsible for controlling the rate at which the player updates and redraws 
+		 */		
 		protected var _heartbeat:Heartbeat;
+		
+		/**
+		 * Contains the main canvas Sprite to which all Rendertree elements are drawn and displayed
+		 */	
 		protected var _drawingBoard:DrawingBoard;
 		
 		protected var _currentIndex:int = -1;
@@ -35,7 +54,6 @@ package org.smilkit.view
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
-			
 			this._drawingBoard = new DrawingBoard();
 		}
 		
