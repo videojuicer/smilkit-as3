@@ -14,11 +14,8 @@ package org.smilkit.render
 	import spark.components.Label;
 	import spark.components.supportClasses.DisplayLayer;
 
-	/**
-	 * Contains the main canvas Sprite to which all Rendertree elements are drawn and displayed
-	 * 
-	 */	
-	public class DrawingBoard extends Sprite
+
+	public class DrawingBoard
 	{
 		protected var _renderTree:RenderTree;
 		protected var _canvas:Sprite;
