@@ -8,6 +8,7 @@ package org.smilkit.dom.smil
 	public class TimeList implements ITimeList
 	{
 		protected var _times:Vector.<ITime>;
+		protected var _timesResolved:int = 0;
 		
 		public function TimeList()
 		{
@@ -32,6 +33,31 @@ package org.smilkit.dom.smil
 		public function item(index:int):ITime
 		{
 			return (this._times != null && index < this._times.length ? (this._times[index]) : null);
+		}
+		
+		public function get resolved():Boolean
+		{
+			return (this._timesResolved == this.length);
+		}
+		
+		// TODO: update with a cache so we dont need to loop every time ...
+		public function resolve():Boolean
+		{
+			var count:int = this._timesResolved;
+			
+			for (var i:int = 0; i < this.length; i++)
+			{
+				var time:Time = (this.item(i) as Time);
+				
+				if (!time.resolved)
+				{
+					time.resolve();
+					
+					this._timesResolved++;
+				}
+			}
+			
+			return (count < this._timesResolved);
 		}
 	}
 }

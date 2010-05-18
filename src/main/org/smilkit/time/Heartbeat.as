@@ -35,7 +35,7 @@ package org.smilkit.time
 		public function Heartbeat(delay:Number)
 		{
 			super(delay, 0);
-			this.addEventListener(TimerEvent.TIMER, this.onTimer, true);
+			this.addEventListener(TimerEvent.TIMER, this.onTimer, false);
 		}
 		
 		public function get offset():Number

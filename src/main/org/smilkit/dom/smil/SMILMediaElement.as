@@ -173,6 +173,24 @@ package org.smilkit.dom.smil
 			throw new IllegalOperationError("Unable to change 'type' on 'SMILMediaElement'");
 		}
 		
+		/**
+		 * NON-DOM
+		 */
+		public function get resolved():Boolean
+		{
+			if (this._beginList == null || this._endList == null)
+			{
+				return false;
+			}
+			
+			if (!(this._beginList as TimeList).resolved || !(this._endList as TimeList).resolved)
+			{
+				return false;
+			}
+			
+			return true;
+		}
+		
 		public override function beginElement():Boolean
 		{
 			return false;
