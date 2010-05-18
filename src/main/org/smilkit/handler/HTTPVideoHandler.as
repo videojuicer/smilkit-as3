@@ -68,7 +68,7 @@ package org.smilkit.handler
 			this._netConnection.connect(null);
 			
 			this._video = new Video();
-			this._soundTransformer = new SoundTransform(0, 0);
+			this._soundTransformer = new SoundTransform(1, 0);
 			
 			this._netStream = new NetStream(this._netConnection);
 			

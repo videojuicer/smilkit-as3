@@ -14,7 +14,7 @@ package org.smilkit.render
 	import spark.components.Label;
 	import spark.components.supportClasses.DisplayLayer;
 
-	public class DrawingBoard extends Sprite
+	public class DrawingBoard
 	{
 		protected var _renderTree:RenderTree;
 		protected var _canvas:Sprite;
