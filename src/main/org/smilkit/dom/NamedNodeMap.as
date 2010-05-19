@@ -196,21 +196,33 @@ package org.smilkit.dom
 		 * 
 		 * @return <code>INode</code> instance of the matched node.
 		 */
-		protected function locateNamedNode(name:String, start:int):int {
+		protected function locateNamedNode(name:String, start:int):int
+		{
 			var i:int = 0;
 			
-			if (this._nodes != null) {
+			if (this._nodes != null)
+			{
 				var first:int = start;
-				var last:int = this.length - 1;
+				var last:int = this.length -1;
 				
-				while (first <= last) {
+				while (first <= last)
+				{
 					i = (first + last) / 2;
 					
 					var cur:Node = this._nodes.getItemAt(i) as Node;
 					
-					if (cur.nodeName == name) {
+					var test:int = name.localeCompare(cur.nodeName);
+					
+					if (test == 0)
+					{
 						return i;
-					} else {
+					}
+					else if (test < 0)
+					{
+						last = i - 1;
+					}
+					else
+					{
 						first = i + 1;
 					}
 				}

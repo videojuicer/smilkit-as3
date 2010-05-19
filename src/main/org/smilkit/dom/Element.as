@@ -311,9 +311,11 @@ package org.smilkit.dom
 			return (this._attributes.getNamedItemNS(namespaceURI, localName) != null);
 		}
 		
-		public function setIdAttribute(name:String):void
+		public function setIdAttribute(value:String):void
 		{
-			(this.ownerDocument as Document).addIdentifier(name, this);
+			this.setAttribute("id", value);
+			
+			(this.ownerDocument as Document).addIdentifier(value, this);
 		}
 	}
 }

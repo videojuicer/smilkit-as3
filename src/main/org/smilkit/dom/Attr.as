@@ -41,7 +41,7 @@ package org.smilkit.dom
 		
 		public override function get nodeName():String
 		{
-			return this._name;
+			return this.name;
 		}
 		
 		public function get specified():Boolean
