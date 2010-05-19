@@ -21,10 +21,13 @@ package org.smilkit.handler
 		protected var _video:Video;
 		protected var _soundTransformer:SoundTransform;
 		protected var _metadata:Metadata;
+		protected var _canvas:Sprite;
 		
 		public function HTTPVideoHandler(element:IElement)
 		{
 			super(element);
+			
+			this._canvas = new Sprite();
 		}
 		
 		public override function get intrinsicDuration():uint
@@ -59,7 +62,7 @@ package org.smilkit.handler
 		
 		public override function get displayObject():DisplayObject
 		{
-			return (this._video as DisplayObject);
+			return (this._canvas as DisplayObject);
 		}
 		
 		public override function load():void
@@ -67,8 +70,7 @@ package org.smilkit.handler
 			this._netConnection = new NetConnection();
 			this._netConnection.connect(null);
 			
-			this._video = new Video();
-			this._soundTransformer = new SoundTransform(1, 0);
+			this._soundTransformer = new SoundTransform(0.2, 0);
 			
 			this._netStream = new NetStream(this._netConnection);
 			
@@ -81,10 +83,13 @@ package org.smilkit.handler
 			
 			this._netStream.play(this.element.src);
 			
+			this._video = new Video();
 			this._video.smoothing = true;
 			this._video.deblocking = 1;
 			
 			this._video.attachNetStream(this._netStream as NetStream);
+		
+			this._canvas.addChild(this._video);
 		}
 		
 		public override function resume():void

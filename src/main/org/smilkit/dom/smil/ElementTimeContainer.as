@@ -138,5 +138,21 @@ package org.smilkit.dom.smil
 		{
 			// seek children 
 		}
+		
+		public function resolve():void
+		{
+			var begin:TimeList = (this.begin as TimeList);
+			var end:TimeList = (this.end as TimeList);
+			
+			if (begin != null && !begin.resolved)
+			{
+				begin.resolve();
+			}
+			
+			if (end != null && !end.resolved)
+			{
+				end.resolve();
+			}
+		}
 	}
 }

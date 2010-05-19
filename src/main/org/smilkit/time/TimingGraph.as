@@ -91,10 +91,15 @@ package org.smilkit.time
 				{
 					var el:SMILMediaElement = (child as SMILMediaElement);
 					
-					// check if element is resolved
-					if (true)
+					if (!el.resolved)
 					{
-						var resolvedTimeElement:ResolvedTimeElement = new ResolvedTimeElement(el, 0, 0);
+						el.resolve();
+					}
+					
+					// check if element is resolved
+					if (el.resolved)
+					{
+						var resolvedTimeElement:ResolvedTimeElement = new ResolvedTimeElement(el, el.begin.item(0).resolvedOffset, el.end.item(0).resolvedOffset);
 						
 						this._elements.push(resolvedTimeElement);
 						

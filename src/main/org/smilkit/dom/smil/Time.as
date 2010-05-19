@@ -42,24 +42,24 @@ package org.smilkit.dom.smil
 			switch (this.timeType)
 			{
 				case Time.SMIL_TIME_SYNC_BASED:
-					this._offset = (this._baseElement.parentNode as IElementTime).begin.item(0).offset;
-					
-					var parent:IElement = null;
+					var parent:IElementTimeContainer = null;
 					var element:IElement = this._baseElement;
 					
 					while (parent == null)
 					{
 						if (element.parentNode != null && element.parentNode is IElementTimeContainer)
 						{
-							parent = (element.parentNode as IElement);
+							parent = (element.parentNode as IElementTimeContainer);
 							break;
 						}
 					}
 					
+					this._offset = parent.begin.item(0).offset;
+					
 					if (parent is IElementSequentialTimeContainer)
 					{
 						// add up the duration of previous children
-						var children:INodeList = parent.childNodes;
+						var children:INodeList = (parent as IElement).childNodes;
 						var previousDuration:Number = 0;
 						
 						for (var i:int = 0; i < children.length; i++)
