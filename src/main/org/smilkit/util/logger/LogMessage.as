@@ -1,5 +1,8 @@
 package org.smilkit.util.logger
 {
+	/**
+	 * Stores a log message with the associated target object, level and message.
+	 */
 	public class LogMessage
 	{
 		protected var _level:String;
@@ -36,16 +39,27 @@ package org.smilkit.util.logger
 			}
 		}
 		
+		/**
+		 * The level of the <code>LogMessage</code> as a <code>String</code>.
+		 */
 		public function get level():String
 		{
 			return this._level;
 		}
 		
+		/**
+		 * Target object linked to the <code>LogMessage</code>.
+		 */
 		public function get targetObject():Object
 		{
 			return this._targetObject;
 		}
 		
+		/**
+		 * Returns the <code>LogMessage</code> as a readable string.
+		 * 
+		 * @return Readable string of the <code>LogMessage</code>.
+		 */
 		public function toString():String
 		{
 			var s:String = "["+LogLevel.stringForLevel(this._level)+"] "+this._message;

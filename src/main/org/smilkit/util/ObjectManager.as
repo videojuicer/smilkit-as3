@@ -2,6 +2,9 @@ package org.smilkit.util
 {
 	import flash.utils.ByteArray;
 
+	/**
+	 * ObjectManager provides a static helper that can be used to clone an <code>Object</code>.
+	 */ 
 	public class ObjectManager
 	{
 		/**

@@ -1,5 +1,9 @@
 package org.smilkit.util.logger
 {
+	/**
+	 * LogLevel describes the various levels of log reports, and provides helpers
+	 * for conversation.  
+	 */
 	public class LogLevel
 	{
 		public static var INFORMATION:String = "logMessageInformation";
@@ -8,6 +12,11 @@ package org.smilkit.util.logger
 		public static var FATAL:String = "logMessageFatal";
 		public static var DEBUG:String = "logMessageDebug";
 		
+		/**
+		 * Returns an integer index for the specified string level.
+		 * 
+		 * @return Index of the level specified as an integer.
+		 */
 		public static function indexForLevel(level:String):int
 		{
 			switch (level)
@@ -32,6 +41,11 @@ package org.smilkit.util.logger
 			return 0;
 		}
 		
+		/**
+		 * Returns a string for the specified int level.
+		 * 
+		 * @return String of the level specified.
+		 */
 		public static function stringForLevel(level:String):String
 		{
 			switch (level)

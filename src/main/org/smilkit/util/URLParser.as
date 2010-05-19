@@ -1,5 +1,8 @@
 package org.smilkit.util
 {
+	/**
+	 * Parse's a URL and provides helper properties for access to the different URL pieces.
+	 */ 
 	public class URLParser
 	{
 		protected var _url:String;
@@ -18,36 +21,57 @@ package org.smilkit.util
 			}
 		}
 		
+		/**
+		 * The original URL passed into the parser.
+		 */
 		public function get url():String
 		{
 			return this._url;
 		}
 		
+		/**
+		 * The hostname of the parsed URL.
+		 */
 		public function get host():String
 		{
 			return this._host;
 		}
 		
+		/**
+		 * Port number as a string of the parsed URL.
+		 */
 		public function get port():String
 		{
 			return this._port;
 		}
 		
+		/**
+		 * The protocol used in the URL.
+		 */
 		public function get protocol():String
 		{
 			return this._protocol;
 		}
 		
+		/**
+		 * The path defined in the parsed URL.
+		 */
 		public function get path():String
 		{
 			return this._path;
 		}
 		
+		/**
+		 * The parameters as an <code>Object</code> from the parsed URL.
+		 */
 		public function get parameters():Object
 		{
 			return this._parameters;
 		}
 		
+		/**
+		 * The file extension used in the parsed URL.
+		 */
 		public function get extension():String
 		{
 			var i:int = this.path.lastIndexOf('.');
@@ -60,6 +84,12 @@ package org.smilkit.util
 			return null;
 		}
 		
+		/**
+		 * Parses the specified URL <code>String</code> and populates the <code>URLParser</code>
+		 * instance with the extracted data. 
+		 * 
+		 * @param url The URL <code>String</code> to parse.
+		 */
 		public function parse(url:String):void
 		{
 			this._url = url;
