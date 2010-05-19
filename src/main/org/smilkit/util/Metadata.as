@@ -1,5 +1,10 @@
 package org.smilkit.util
 {
+	/**
+	 * Metadata class, is used with a video metadata object and provides access to the properties.
+	 * 
+	 * @see org.smilkit.handler.HTTPVideoHandler
+	 */
 	public class Metadata
 	{
 		protected var _internalInfo:Object;
@@ -143,6 +148,11 @@ package org.smilkit.util
 			}
 		}
 		
+		/**
+		 * Generates a <code>String</code> which includes all the metadata in a nice readable format.
+		 * 
+		 * @return The created metadata flatten <code>String</code>.
+		 */
 		public function toString():String
 		{
 			return "Video: "+this.videoCodec+", "+this.framerate+"fps, "+this.width+" x "+this.height+". Audio: "+this.audioCodec+", "+this.audioChannels+" channels, "+this.audioSampleRate+" Hz.";
