@@ -151,7 +151,7 @@ package org.smilkit.dom
 			var node:Node = null;
 			
 			if (i >= 0) {
-				node = this._nodes[i];
+				node = (this._nodes.getItemAt(i) as Node);
 				this._nodes.setItemAt(arg, i);
 			} else {
 				i = -1 - i;
@@ -236,14 +236,14 @@ package org.smilkit.dom
 		protected function locateNamedNodeNS(namespaceURI:String, name:String, start:int):int {
 			var i:int = 0;
 			
-			if (this._nodes != null) {
+			if (this._nodes != null && this._nodes.length > 0) {
 				var first:int = start;
 				var last:int = this.length - 1;
 				
 				while (first <= last) {
 					i = (first + last) / 2;
 					
-					var cur:Node = this._nodes[i] as Node;
+					var cur:Node = this._nodes.getItemAt(i) as Node;
 					
 					if (cur.nodeName == name && cur.namespaceURI == namespaceURI) {
 						return i;
