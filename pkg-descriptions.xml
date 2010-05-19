@@ -3,14 +3,14 @@
 	<all-packages>
 		<description>
 		<![CDATA[
-			SMILKit-as3
+			Documentation for all the packages that are included in the SMILKit engine.
 		]]>
 		</description>
 	</all-packages>
 	<all-classes>
 		<description>
 		<![CDATA[
-		
+			Documentation for all the classes that are included in the SMILKit engine, includes syntax, usage information and some code samples for the various methods, properties and events inside the SMILKit API.
 		]]>
 		</description>
 	</all-classes>
@@ -26,48 +26,204 @@
 		<package name="org.smilkit">
 			<shortDescription>
 			<![CDATA[
-				
+				The org.smilkit package is the base package used in SMILKit.
 			]]>
 			</shortDescription>
 			<description>
 			<![CDATA[
-				
+				The org.smilkit package is the base package used in SMILKit.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.collections">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.collections package contains the classes for list / array collections.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.collections package contains the classes for list / array collections.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.dom">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.dom package contains the implementation classes for the W3C DOM.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.dom package contains the implementation classes for the W3C DOM.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.dom.events">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.dom.events package contains the implementation classes of the W3C DOM event bindings.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.dom.events package contains the implementation classes of the W3C DOM event bindings.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.dom.smil">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.dom.smil package contains the implementation classes SMIL Boston DOM.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.dom.smil package contains the implementation classes SMIL Boston DOM.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.events">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.events package contains classes that define non-dom event objects.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.events package contains classes that define non-dom event objects.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.handler">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.handler package contains the classes for asset handler functionality, and includes the SMILKit default handlers.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.handler package contains the classes for asset handler functionality, and includes the SMILKit default handlers.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.parsers">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.parsers package contains the classes that are responsible for parsing an XML document.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.parsers package contains the classes that are responsible for parsing an XML document to the SMILKit DOM implementation.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.render">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.render package contains the classes used for rendering and positioning objects on the stage.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.render package contains the classes used for rendering and positioning objects on the stage.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.time">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.time package contains classes that handle timing in SMILKit including time resolution.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.time package contains classes that handle timing in SMILKit including time resolution.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.util">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.util package contains a collection of utility classes and helpers.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.util package contains a collection of utility classes and helpers, includes a Logger, Object cloning helpers and URL parser. 
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.util.logger">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.util.logger package contains the classes that provide logging functionality to SMILKit.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.util.logger package contains the classes that provide logging functionality to SMILKit.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.view">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.view package contains classes that provide view functionality, these provide high level support for embedding SMILKit.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.view package contains classes that provide view functionality, these provide high level support for embedding SMILKit.
 			]]>
 			</description>
 		</package>
 		<package name="org.smilkit.w3c">
 			<shortDescription>
 			<![CDATA[
-				W3C interface bindings.
+				The org.smilkit.w3c package contains the W3C bindings.
 			]]>
 			</shortDescription>
 			<description>
 			<![CDATA[
-				W3C interface bindings.
+				The org.smilkit.w3c package contains the W3C bindings.
 			]]>
 			</description>
 		</package>
 		<package name="org.smilkit.w3c.dom">
 			<shortDescription>
 			<![CDATA[
-				Interface bindings for W3C DOM Level 2.
+				The org.smilkit.w3c.dom package contains the W3C DOM Level 2 bindings.
 			]]>
 			</shortDescription>
 			<description>
 			<![CDATA[
-				Interface bindings for &lt;a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/"&gt;W3C DOM Level 2&lt;/a&gt;.
+				The org.smilkit.w3c.dom package contains the &lt;a href="http://www.w3.org/TR/2000/REC-DOM-Level-2-Core-20001113/"&gt;W3C DOM Level 2&lt;/a&gt; bindings.
+			]]>
+			</description>
+		</package>
+		<package name="org.smilkit.w3c.dom.events">
+			<shortDescription>
+			<![CDATA[
+				The org.smilkit.w3c.dom.events package contains the event class bindings from the W3C Level 2 DOM.
+			]]>
+			</shortDescription>
+			<description>
+			<![CDATA[
+				The org.smilkit.w3c.dom.events package contains the event class bindings from the W3C Level 2 DOM.
 			]]>
 			</description>
 		</package>
 		<package name="org.smilkit.w3c.dom.smil">
 			<shortDescription>
 			<![CDATA[
-				Interface bindings based on the W3C SMIL 3.0 Boston DOM.
+				The org.smilkit.w3c.dom.smil package contains the interface bindings based on the W3C SMIL 3.0 Boston DOM.
 			]]>
 			</shortDescription>
 			<description>
 			<![CDATA[
-				Interface bindings based on the &lt;a href="http://www.w3.org/TR/smil-boston-dom/cover.html"&gt;W3C SMIL 3.0 Boston DOM&lt;/a&gt;.
+				The org.smilkit.w3c.dom.smil package contains the interface bindings based on the &lt;a href="http://www.w3.org/TR/smil-boston-dom/cover.html"&gt;W3C SMIL 3.0 Boston DOM&lt;/a&gt; bindings.
 			]]>
 			</description>
 		</package>
