@@ -30,7 +30,6 @@ package org.smilkit.render
 		 * Stored reference to the parent Viewport 
 		 */		
 		protected var _viewport:Viewport;
-		
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
 		
@@ -166,7 +165,6 @@ package org.smilkit.render
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED));
 							}
 						}
-						
 						// always add to the new active list
 						newActiveElements.push(time);
 					}

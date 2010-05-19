@@ -42,7 +42,7 @@ package org.smilkit.view
 		protected var _heartbeat:Heartbeat;
 		
 		/**
-		 * Contains the main canvas Sprite to which all Rendertree elements are drawn and displayed
+		 * Contains the main canvas Sprite to which all RenderTree elements are drawn and displayed
 		 */	
 		protected var _drawingBoard:DrawingBoard;
 		
@@ -72,9 +72,9 @@ package org.smilkit.view
 			return this._timingGraph;
 		}
 		
-		public function get renderingTree():Object
+		public function get renderingTree():RenderTree
 		{
-			return null;
+			return this._renderTree;
 		}
 		
 		public function get heartbeat():Heartbeat
