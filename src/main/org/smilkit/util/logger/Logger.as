@@ -66,7 +66,7 @@ package org.smilkit.util.logger
 		 * 
 		 * @param message The message <code>String</code>
 		 * @param targetObject The target object associated with the log message.
-		 * @param level Level of the log message 
+		 * @param level Level of the log message. 
 		 */
 		public static function log(message:String, targetObject:Object, level:String = null):void
 		{
