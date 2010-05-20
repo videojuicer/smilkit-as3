@@ -3,6 +3,7 @@ package org.smilkit.render
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
+	import flash.events.Event;
 	
 	import mx.controls.Button;
 	import mx.controls.Label;
@@ -35,7 +36,6 @@ package org.smilkit.render
 		public function set renderTree(value:RenderTree):void
 		{
 			this._renderTree = value;
-			
 			this.reset();
 		}
 		
