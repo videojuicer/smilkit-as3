@@ -32,6 +32,7 @@
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
 	
 	<target name="clean">
+		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
 		<delete dir="${output.loc}" />
 	</target>
 	
@@ -69,6 +70,7 @@
 	</target>
 	
 	<target name="asdocs">
+		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
 		<asdoc output="${report.asdocs.loc}"
 			main-title="SMILKit-as3" window-title="SMILKit-as3"
 			failonerror="true" fork="true" keep-xml="true" skip-xsl="false">

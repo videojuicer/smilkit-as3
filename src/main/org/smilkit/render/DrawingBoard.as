@@ -2,6 +2,7 @@ package org.smilkit.render
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.errors.IllegalOperationError;
 	
 	import mx.controls.Button;
 	import mx.controls.Label;
@@ -15,7 +16,7 @@ package org.smilkit.render
 	import spark.components.supportClasses.DisplayLayer;
 
 
-	public class DrawingBoard
+	public class DrawingBoard extends Sprite
 	{
 		protected var _renderTree:RenderTree;
 		protected var _canvas:Sprite;
@@ -83,8 +84,33 @@ package org.smilkit.render
 		 */
 		public function reset():void
 		{
+			if (this._canvas != null && this._canvas.parent != null)
+			{
+				super.removeChild(this._canvas);
+			}
+			
 			this._elements = new Vector.<ResolvedTimeElement>();
 			this._canvas = new Sprite();
+			
+			if (this._renderTree != null)
+			{
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onRenderTreeElementAdded);
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onRenderTreeElementRemoved);
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
+			}
+			
+			super.addChild(this._canvas);
+		}
+		
+		public override function addChild(child:DisplayObject):DisplayObject
+		{
+			throw new IllegalOperationError("Invalid method call, you cannot add a child to SMILKits drawing board.");
+		}
+		
+		public override function removeChild(child:DisplayObject):DisplayObject
+		{
+			throw new IllegalOperationError("Invalid method call, you cannot remove a child from SMILKits drawing board.");
 		}
 		
 		protected function onRenderTreeElementAdded(e:RenderTreeEvent):void

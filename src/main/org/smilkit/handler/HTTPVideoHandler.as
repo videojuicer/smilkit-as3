@@ -1,5 +1,7 @@
 package org.smilkit.handler
 {
+	import flash.display.Bitmap;
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.AsyncErrorEvent;
@@ -70,7 +72,7 @@ package org.smilkit.handler
 			this._netConnection = new NetConnection();
 			this._netConnection.connect(null);
 			
-			this._soundTransformer = new SoundTransform(0.2, 0);
+			this._soundTransformer = new SoundTransform(0, 0);
 			
 			this._netStream = new NetStream(this._netConnection);
 			
