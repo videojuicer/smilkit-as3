@@ -86,8 +86,7 @@ package org.smilkit.view
 		{
 			return this._drawingBoard;
 		}
-		
-		
+			
 		public function get history():Vector.<String>
 		{
 			return this._history;

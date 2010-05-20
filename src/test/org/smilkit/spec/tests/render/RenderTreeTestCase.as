@@ -40,8 +40,8 @@ package org.smilkit.spec.tests.render
 			var elementsNum:int = renderElements.length;
 			var resolveTimeElement:ResolvedTimeElement = renderElements[0];
 			Assert.assertEquals(1, elementsNum);
-			//Assert.assertEquals("video_http", resolveTimeElement.element.id);
-			trace(resolveTimeElement.element.id);
+			Assert.assertEquals("video_http", resolveTimeElement.element.id);
+	
 		}
 		
 		protected function handleHasElementsTimeOut(passThroughData:Object):void
@@ -53,28 +53,40 @@ package org.smilkit.spec.tests.render
 		[Test(async, description="Tests that the RenderTree has a last change offset")]
 		public function hasLastChangeOffSet():void
 		{
-			
+			var asyncLastChangeOffSetCheck:Function = Async.asyncHandler(this, handleHasLastChangeOffSet, 5000, null, handleHasLastChangeOffSetTimeOut);
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncLastChangeOffSetCheck, false, 0, true);
+			this._viewport.location = "http://sixty.im/demo.smil";
 		}
 		
-		[Test(description="Tests that the RenderTree has a next change offset")]
+		protected function handleHasLastChangeOffSet(event:ViewportEvent, passThroughData:Object):void
+		{
+			var renderTree:RenderTree = this._viewport.renderingTree;
+			Assert.assertEquals(0,renderTree.lastChangeOffset);
+		}
+		
+		protected function handleHasLastChangeOffSetTimeOut(passThroughData:Object):void
+		{
+			Assert.fail( "Timeout reached before viewport refreshed: hasLastChangeOffSet");
+		}
+		
+		
+		[Test(async, description="Tests that the RenderTree has a next change offset")]
 		public function hasNextChangeOffSet():void
 		{
-			this._viewport.location = "http://smilkit.org/one.smil";
-			
+			var asyncNextOffSetCheck:Function = Async.asyncHandler(this, handleHasNextChangeOffSet, 5000, null, handleHasNextChangeOffSetTimeOut);
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncNextOffSetCheck, false, 0, true);
+			this._viewport.location = "http://sixty.im/demo.smil";
 		}
 		
-		[Test(description="Tests that the RenderTree has a TimingGraph")]
-		public function hasTimingGraph():void
+		protected function handleHasNextChangeOffSet(event:ViewportEvent, passThroughData:Object):void
 		{
-			this._viewport.location = "http://smilkit.org/one.smil";
-			
+			var renderTree:RenderTree = this._viewport.renderingTree;
+			Assert.assertEquals(-1,renderTree.nextChangeOffset);
 		}
 		
-		[Test(description="Tests that the RenderTree has a SMILDocument")]
-		public function hasDocument():void
+		protected function handleHasNextChangeOffSetTimeOut(passThroughData:Object):void
 		{
-			this._viewport.location = "http://smilkit.org/one.smil";
-			
+			Assert.fail( "Timeout reached before viewport refreshed: hasNextChangeOffSet");
 		}
 	}
 }
