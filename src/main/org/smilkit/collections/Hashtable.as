@@ -43,7 +43,7 @@ package org.smilkit.collections
 		{
 			if (this.hasItem(key))
 			{
-				for (var i:int = this._keys.length; i > 0; i--)
+				for (var i:int = this._keys.length; i >= 0; i--)
 				{
 					if (key == this._keys.getItemAt(i))
 					{
@@ -85,9 +85,11 @@ package org.smilkit.collections
 		
 		public function hasItem(key:Object):Boolean
 		{
-			for (var i:int = this._keys.length; i > 0; i--)
+			for (var i:int = this._keys.length; i >= 0; i--)
 			{
-				if (key == this._keys.getItemAt(i))
+				var newKey:String = this._keys.getItemAt(i) as String;
+				
+				if (key == newKey)
 				{
 					return true;
 				}

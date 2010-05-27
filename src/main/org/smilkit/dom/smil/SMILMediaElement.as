@@ -7,11 +7,14 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
+	import org.smilkit.w3c.dom.smil.ISMILRegionInterface;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	
-	public class SMILMediaElement extends ElementTimeContainer implements ISMILMediaElement
+	public class SMILMediaElement extends ElementTimeContainer implements ISMILMediaElement, ISMILRegionInterface
 	{
 		protected var _handler:SMILKitHandler;
+		protected var _region:SMILRegionElement;
 		
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
@@ -171,6 +174,28 @@ package org.smilkit.dom.smil
 		public function set type(type:String):void
 		{
 			throw new IllegalOperationError("Unable to change 'type' on 'SMILMediaElement'");
+		}
+		
+		public function get region():ISMILRegionElement
+		{
+			if (this.hasAttribute("region") && this._region == null)
+			{
+				var regionId:String = this.getAttribute("region");
+				
+				this._region = (this.ownerDocument.getElementById(regionId) as SMILRegionElement);
+			}
+			
+			return this._region;
+		}
+		
+		public function set region(region:ISMILRegionElement):void
+		{
+			this.setAttribute("region", region.id);
+	
+			if (this._region.id == this.getAttribute("region"))
+			{
+				this._region = null;
+			}
 		}
 		
 		/**

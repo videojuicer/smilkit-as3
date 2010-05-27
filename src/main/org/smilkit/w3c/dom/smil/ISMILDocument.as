@@ -10,6 +10,7 @@ package org.smilkit.w3c.dom.smil
 		function createParallelElement(tagName:String = "par"):IElementParallelTimeContainer;
 		function createSwitchElement(tagName:String = "switch"):ISMILSwitchElement;
 		function createReferenceElement(tagName:String = "ref"):ISMILRefElement;
+		function createRegionElement(tagName:String = "region"):ISMILRegionElement;
 		function createExclusiveElement(tagName:String = "excl"):IElementExclusiveTimeContainer;
 	}
 }

@@ -192,6 +192,8 @@ package org.smilkit.dom
 				return null;
 			}
 			
+			var i:int = this._identifiers.getNamedIndex(id);
+			
 			var element:IElement = this._identifiers.getItem(id) as IElement;
 			
 			if (element != null)

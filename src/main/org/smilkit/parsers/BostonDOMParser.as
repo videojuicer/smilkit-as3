@@ -89,6 +89,10 @@ package org.smilkit.parsers
 						break;
 					case "ref":
 						child = (doc as ISMILDocument).createReferenceElement() as INode;
+						break;
+					case "region":
+						child = (doc as ISMILDocument).createRegionElement("region");
+						break;
 					default:					
 						child = (doc as ISMILDocument).createElement(node.localName());
 						break;

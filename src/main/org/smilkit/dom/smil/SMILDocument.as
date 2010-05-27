@@ -13,6 +13,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ISMILRefElement;
+	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.smilkit.w3c.dom.smil.ISMILSwitchElement;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	
@@ -168,6 +169,11 @@ package org.smilkit.dom.smil
 		public function createReferenceElement(tagName:String = "ref"):ISMILRefElement
 		{
 			return new SMILRefElement(this, tagName);
+		}
+		
+		public function createRegionElement(tagName:String = "region"):ISMILRegionElement
+		{
+			return new SMILRegionElement(this, tagName);
 		}
 		
 		public function createExclusiveElement(tagName:String = "excl"):IElementExclusiveTimeContainer

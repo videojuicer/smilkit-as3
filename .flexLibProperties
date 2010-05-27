@@ -57,6 +57,9 @@
     <classEntry path="org.smilkit.render.DrawingBoard"/>
     <classEntry path="org.smilkit.dom.CharacterData"/>
     <classEntry path="org.smilkit.dom.Text"/>
+    <classEntry path="org.smilkit.render.RegionContainer"/>
+    <classEntry path="org.smilkit.dom.smil.SMILRegionElement"/>
+    <classEntry path="org.smilkit.util.MathHelper"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

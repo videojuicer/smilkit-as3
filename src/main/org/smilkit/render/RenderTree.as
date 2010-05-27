@@ -82,6 +82,11 @@ package org.smilkit.render
 			return this._timeGraph.document;
 		}
 		
+		public function get hasDocumentAttached():Boolean
+		{
+			return (this.timeGraph != null && this._timeGraph.document != null);
+		}
+		
 		/**
 		 * Updates the RenderTree for the current point in time (according to the Viewport).
 		 */
