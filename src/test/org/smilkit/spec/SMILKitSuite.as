@@ -3,6 +3,8 @@ package org.smilkit.spec
 	import flash.media.Video;
 	
 	import org.smilkit.handler.HTTPVideoHandler;
+	import org.smilkit.render.DrawingBoard;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.spec.tests.dom.BostonDOMParserTestCase;
 	import org.smilkit.spec.tests.dom.DocumentTestCase;
 	import org.smilkit.spec.tests.dom.ElementTestCase;
@@ -10,7 +12,12 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
+	import org.smilkit.spec.tests.render.DrawingBoardTestClass;
+	import org.smilkit.spec.tests.render.RenderTreeTestCase;
+	import org.smilkit.spec.tests.time.HeartbeatTestCase;
+	import org.smilkit.spec.tests.time.TimingGraphTestCase;
 	import org.smilkit.spec.tests.view.ViewportTestCase;
+	import org.smilkit.time.TimingGraph;
 	
 	/**
 	 * DOM test suite, contains <code>TestCases</code> for testing SMILKits implemented DOM.
@@ -32,5 +39,9 @@ package org.smilkit.spec
 		
 		// View Tests
 		public var viewportTest:ViewportTestCase;
+		public var drawingBoardTest:DrawingBoardTestClass;
+		public var heartbeatTest:HeartbeatTestCase;
+		public var renderTreeTest:RenderTreeTestCase;
+		public var timingGraph:TimingGraphTestCase;
 	}
 }

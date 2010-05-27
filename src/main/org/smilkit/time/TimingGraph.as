@@ -60,7 +60,6 @@ package org.smilkit.time
 		
 		/**
 		 * Public function used to rebuild the list of ResolvedTimeElements 
-		 * 
 		 */		
 		public function rebuild():void
 		{

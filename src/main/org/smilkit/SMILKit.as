@@ -77,7 +77,7 @@ package org.smilkit
 		}
 		
 		/**
-		 * Register the default set of SMILKit handlers.
+		 * Register the default set of SMILKit handlers
 		 *
 		 * @see org.smilkit.handler.Handler
 		 * @see org.smilkit.handler.HandlerMap

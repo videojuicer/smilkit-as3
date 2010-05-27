@@ -42,7 +42,6 @@ package org.smilkit.render
 		public function set renderTree(value:RenderTree):void
 		{
 			this._renderTree = value;
-			
 			this.reset();
 		}
 		
