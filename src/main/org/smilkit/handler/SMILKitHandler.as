@@ -2,7 +2,12 @@ package org.smilkit.handler
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.geom.Rectangle;
 	
+	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.render.RegionContainer;
+	import org.smilkit.util.MathHelper;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -68,6 +73,31 @@ package org.smilkit.handler
 		public function seek(seekTo:Number):void
 		{
 			
+		}
+		
+		public function resize():void
+		{
+			var mediaElement:SMILMediaElement = (this.element as SMILMediaElement);
+			var region:SMILRegionElement = (mediaElement.region as SMILRegionElement);
+			
+			if (region != null)
+			{
+				var container:RegionContainer = region.regionContainer;
+				
+				if (container != null)
+				{
+					var matrix:Rectangle = MathHelper.createMatrixFor(this, container);
+					
+					if (this.displayObject != null)
+					{
+						this.displayObject.width = matrix.width;
+						this.displayObject.height = matrix.height;
+						
+						this.displayObject.x = matrix.x;
+						this.displayObject.y = matrix.y;
+					}
+				}
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap
