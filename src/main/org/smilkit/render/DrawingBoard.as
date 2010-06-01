@@ -12,6 +12,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.ResolvedTimeElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -88,10 +89,10 @@ package org.smilkit.render
 							
 							if (region != null)
 							{
-								var displayObject:DisplayObject = (time.element as SMILMediaElement).handler.displayObject;
+								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 								
 								// place the element on to the region it belongs too
-								region.regionContainer.addChild(displayObject);
+								region.regionContainer.addAssetChild(handler);
 							}
 							
 							this._elements.push(time);
@@ -117,9 +118,40 @@ package org.smilkit.render
 					var node:INode = regions.item(i) as INode;
 					var region:SMILRegionElement = (node as SMILRegionElement);
 					
-					this._canvas.addChild(region.regionContainer);
+					region.regionContainer.drawingBoard = this;
+					
+					// hit a problem where the region would calculate its size based on the parent, when the region was
+					// drawn to the parent and then the next region is calculated. the parent width + height masks were changed 
+					// (as actionscript 3.0 sprites resize to fit there children). this made the next region calculations use another
+					// set of dimensions for the parent and then only the first region would be sized correctly.
+					//
+					// we get around this by going through the list of regions twice, first time around we calculate the position
+					// and sizing of each region, and then we go through again and add them to the drawing board
+					region.regionContainer.invalidateSizeAndLayout();
+					
 					this._regions.push(region.regionContainer);
 				}
+				
+				// add the regions now
+				for (var j:int = 0; j < this._regions.length; j++)
+				{
+					this._canvas.addChild(this._regions[j]);
+				}
+			}
+		}
+		
+		public function removeRegions():void
+		{
+			if (this.renderTree != null && this.renderTree.hasDocumentAttached && this._regions != null)
+			{
+				for (var i:int = 0; i < this._regions.length; i++)
+				{
+					var regionContainer:RegionContainer = this._regions[i];
+
+					this._canvas.removeChild(regionContainer);
+				}
+				
+				this._regions = new Vector.<RegionContainer>();
 			}
 		}
 		
@@ -131,6 +163,9 @@ package org.smilkit.render
 			if (this._canvas != null && this._canvas.parent != null)
 			{
 				super.removeChild(this._canvas);
+				
+				// we need to go through the regions and delete em
+				this.removeRegions();
 			}
 			
 			this._elements = new Vector.<ResolvedTimeElement>();
@@ -174,9 +209,9 @@ package org.smilkit.render
 		
 		public override function get width():Number
 		{
-			if (this.stage != null)
+			if (this.parent != null)
 			{
-				return this.stage.stageWidth;
+				return this.parent.width;
 			}
 			
 			return super.width;
@@ -195,9 +230,9 @@ package org.smilkit.render
 		
 		public override function get height():Number
 		{
-			if (this.stage != null)
+			if (this.parent != null)
 			{
-				return this.stage.stageHeight;
+				return this.parent.height;
 			}
 			
 			return super.height;
