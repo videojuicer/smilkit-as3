@@ -34,7 +34,7 @@ package org.smilkit.handler
 		
 		public override function get intrinsicDuration():uint
 		{
-			if (this._metadata == null || this._metadata.hasOwnProperty("duration"))
+			if (this._metadata == null)
 			{
 				return super.intrinsicDuration;
 			}
@@ -44,12 +44,22 @@ package org.smilkit.handler
 		
 		public override function get intrinsicWidth():uint
 		{
-			return 0;
+			if (this._metadata == null)
+			{
+				return super.intrinsicWidth;
+			}
+			
+			return this._metadata.width;
 		}
 		
 		public override function get intrinsicHeight():uint
 		{
-			return 0;
+			if (this._metadata == null)
+			{
+				return super.intrinsicHeight;
+			}
+			
+			return this._metadata.height;
 		}
 		
 		public override function get intrinsicSpatial():Boolean
@@ -146,6 +156,8 @@ package org.smilkit.handler
 			}
 			
 			trace("Metadata recieved: "+this._metadata.toString());
+			
+			this.resize();
 			
 			this.resume();
 		}
