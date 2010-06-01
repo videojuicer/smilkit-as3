@@ -2,6 +2,9 @@ package org.smilkit.w3c.dom.smil
 {
 	public interface ISMILRegionElement extends ISMILElement, IElementLayout
 	{
+		function get backgroundColor():String
+		function get backgroundOpacity():String
+		
 		function get fit():String;
 		function set fit(fit:String):void;
 		

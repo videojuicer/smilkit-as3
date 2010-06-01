@@ -85,7 +85,17 @@ package org.smilkit.dom.smil
 		
 		public function get backgroundColor():String
 		{
+			if (this.hasAttribute("backgroundColor"))
+			{
+				return this.getAttribute("backgroundColor");
+			}
+			
 			return this.getAttribute("background-color");
+		}
+		
+		public function get backgroundOpacity():String
+		{
+			return this.getAttribute("backgroundOpacity");
 		}
 		
 		public function set backgroundColor(backgroundColor:String):void
