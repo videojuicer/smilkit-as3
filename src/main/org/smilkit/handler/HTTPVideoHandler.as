@@ -82,7 +82,7 @@ package org.smilkit.handler
 			this._netConnection = new NetConnection();
 			this._netConnection.connect(null);
 			
-			this._soundTransformer = new SoundTransform(0, 0);
+			this._soundTransformer = new SoundTransform(0.2, 0);
 			
 			this._netStream = new NetStream(this._netConnection);
 			
