@@ -26,6 +26,26 @@ package org.smilkit.dom.smil
 				time.baseBegin = baseBegin;
 				
 				list.add(time);
+				
+				var container:ElementTimeContainer = baseElement as ElementTimeContainer;
+				
+				if (container.repeatCount > 0 || container.repeatDur > 0)
+				{
+					if (container.repeatDur > 0)
+					{
+						container.repeatCount = container.repeatDur / container.dur;
+					}
+					
+					// make a new time element for reach repeat
+					for (var j:int = 0; j < container.repeatCount; j++)
+					{
+						time = new Time(Time.SMIL_TIME_SYNC_BASED);
+						time.baseElement = baseElement;
+						time.baseBegin = baseBegin;
+					
+						list.add(time);
+					}
+				}
 			}
 			else
 			{
