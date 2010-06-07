@@ -20,6 +20,26 @@ package org.smilkit.dom.smil
 			return (this._times != null ? this._times.length : 0);
 		}
 		
+		public function get last():ITime
+		{
+			if (this.length > 0)
+			{
+				return this.item(this.length);
+			}
+			
+			return null;
+		}
+		
+		public function get first():ITime
+		{
+			if (this.length > 0)
+			{
+				return this.item(0);
+			}
+			
+			return null;
+		}
+		
 		public function add(time:ITime):void
 		{
 			this.addAt(time, this._times.length);

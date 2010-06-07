@@ -71,9 +71,9 @@ package org.smilkit.dom.smil
 								break;
 							}
 							
-							if ((child as IElementTime).end.item(0).resolved)
+							if ((child as IElementTime).end.last.resolved)
 							{
-								previousDuration += (child as IElementTime).end.item(0).resolvedOffset;
+								previousDuration += (child as IElementTime).end.last.resolvedOffset;
 							}
 							else
 							{
@@ -102,7 +102,7 @@ package org.smilkit.dom.smil
 						{
 							if (this.baseBegin)
 							{
-								var beginTime:ITime = (parent as IElementParallelTimeContainer).begin.item(0);
+								var beginTime:ITime = (parent as IElementParallelTimeContainer).begin.first;
 								
 								if (beginTime.resolved)
 								{
@@ -118,7 +118,7 @@ package org.smilkit.dom.smil
 							{
 								var time:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
 								
-								var begin:ITime = time.begin.item(0);
+								var begin:ITime = time.begin.first;
 								
 								if (begin.resolved)
 								{
