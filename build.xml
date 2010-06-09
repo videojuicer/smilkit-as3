@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<project name="smilkit-as3" default="compileAll" basedir=".">
+<project name="smilkit-as3" default="test" basedir=".">
 	<property environment="env" />
 	
 	<property name="instrument.metadata" value="flexunit-instrument.cvm" />
-   	<property name="instrument.report.flexcover" value="flexunit-instrument.cvr" />
-   	<property name="instrument.report.cobertura" value="coverage.xml" />
+  <property name="instrument.report.flexcover" value="flexunit-instrument.cvr" />
+  <property name="instrument.report.cobertura" value="coverage.xml" />
 	
 	<property name="main.src.loc" location="${basedir}/src/main" />
 	<property name="test.src.loc" location="${basedir}/src/test" />
@@ -31,7 +31,13 @@
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
 	
-	<target name="clean">
+	<target name="usage" description="Displays main targets of the build recipe">
+	  <java classname="org.apache.tools.ant.Main">
+	    <arg value="-projecthelp" />
+    </java>
+  </target>
+	
+	<target name="clean" description="Cleans the generated build files from the target">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
 		<delete dir="${output.loc}" />
 	</target>
@@ -46,7 +52,7 @@
 		<mkdir dir="${dist.loc}" />
 	</target>
 	
-	<target name="compile" depends="init">
+	<target name="compile" depends="init" description="Compiles the main SMILKit-as3 SWC">
 		<compc output="${bin.loc}/smilkit-as3.swc">
 			<source-path path-element="${main.src.loc}" />
 			<include-sources dir="${main.src.loc}" includes="*" />
@@ -55,7 +61,7 @@
 		</compc>
 	</target>
 	
-	<target name="test-compile">
+	<target name="test-compile" description="Compiles the nessary SWF's for running the test specs">
 		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/smilkit-as3-specs.swf">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
@@ -69,7 +75,7 @@
 		</mxmlc>
 	</target>
 	
-	<target name="asdocs">
+	<target name="asdocs" description="Generates asdocs from the SMILKit-as3 source">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
 		<asdoc output="${report.asdocs.loc}"
 			main-title="SMILKit-as3" window-title="SMILKit-as3"
@@ -81,7 +87,7 @@
 		</asdoc>
 	</target>
 	
-	<target name="test" depends="compile,test-only,report" />
+	<target name="test" depends="compile,test-only,report" description="Builds and runs the test specs and generates reports" />
 	<target name="build">
 		<antcall target="clean" />
 		<antcall target="compile" />
@@ -90,7 +96,7 @@
 		<antcall target="report" />
 	</target>
 	
-	<target name="package">
+	<target name="package" description="Package the SMILKit-as3 build into a distributable zip">
 		<copy file="${bin.loc}/smilkit-as3.swc" todir="${dist.loc}" />
 		<copy file="${bin.loc}/smilkit-as3-specs.swf" todir="${dist.loc}" />
 		<copy file="${basedir}/README.markdown" todir="${dist.loc}" />
@@ -142,7 +148,7 @@
 				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
 	</target>
 	
-	<target name="report">
+	<target name="report" description="Generates HTML reports for the last ran test specs">
 		<junitreport todir="${report.unit.loc}">
 			<fileset dir="${report.unit.loc}">
 				<include name="TEST-*.xml" />
