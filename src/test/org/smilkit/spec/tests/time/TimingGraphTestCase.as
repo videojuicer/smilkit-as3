@@ -5,7 +5,7 @@ package org.smilkit.spec.tests.time
 	import org.flexunit.async.Async;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.time.ResolvedTimeElement;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -66,9 +66,9 @@ package org.smilkit.spec.tests.time
 		protected function handleHasElements(event:ViewportEvent, passThroughData:Object):void
 		{
 			var timingGraph:TimingGraph = this._viewport.timingGraph;
-			var elements:Vector.<ResolvedTimeElement> = timingGraph.elements;
+			var elements:Vector.<TimingNode> = timingGraph.elements;
 			var elementsNum:int = elements.length;
-			var resolveTimeElement:ResolvedTimeElement = elements[0];
+			var resolveTimeElement:TimingNode = elements[0];
 			Assert.assertEquals(1, elementsNum);
 			Assert.assertEquals("video_http", resolveTimeElement.element.id);	
 		}

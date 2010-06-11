@@ -13,7 +13,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.time.ResolvedTimeElement;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	
@@ -27,7 +27,7 @@ package org.smilkit.render
 		protected var _renderTree:RenderTree;
 		protected var _applicationStage:Stage;
 		protected var _canvas:Sprite;
-		protected var _elements:Vector.<ResolvedTimeElement>;
+		protected var _elements:Vector.<TimingNode>;
 		protected var _regions:Vector.<RegionContainer>;
 		
 		public function DrawingBoard()
@@ -71,13 +71,13 @@ package org.smilkit.render
 		{
 			if (this.renderTree != null)
 			{
-				var elements:Vector.<ResolvedTimeElement> = this._renderTree.elements;
+				var elements:Vector.<TimingNode> = this._renderTree.elements;
 				
 				if (elements != null)
 				{
 					for (var i:int = 0; i < elements.length; i++)
 					{
-						var time:ResolvedTimeElement = elements[i];
+						var time:TimingNode = elements[i];
 						
 						// check if it doesnt exist yet
 						if (this._elements.indexOf(time) == -1)
@@ -168,7 +168,7 @@ package org.smilkit.render
 				this.removeRegions();
 			}
 			
-			this._elements = new Vector.<ResolvedTimeElement>();
+			this._elements = new Vector.<TimingNode>();
 			this._canvas = new Sprite();
 			
 			if (this._renderTree != null)

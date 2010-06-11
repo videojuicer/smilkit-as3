@@ -5,7 +5,7 @@ package org.smilkit.spec.tests.render
 	import org.flexunit.async.Async;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.RenderTree;
-	import org.smilkit.time.ResolvedTimeElement;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
 
 	public class RenderTreeTestCase
@@ -36,9 +36,9 @@ package org.smilkit.spec.tests.render
 		protected function handleHasElements(event:ViewportEvent, passThroughData:Object):void
 		{
 			var renderingTree:RenderTree = this._viewport.renderingTree;
-			var renderElements:Vector.<ResolvedTimeElement> = renderingTree.elements;
+			var renderElements:Vector.<TimingNode> = renderingTree.elements;
 			var elementsNum:int = renderElements.length;
-			var resolveTimeElement:ResolvedTimeElement = renderElements[0];
+			var resolveTimeElement:TimingNode = renderElements[0];
 			Assert.assertEquals(1, elementsNum);
 			Assert.assertEquals("video_http", resolveTimeElement.element.id);
 	

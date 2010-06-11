@@ -73,7 +73,10 @@ package org.smilkit.dom.smil
 				{
 					time.resolve();
 					
-					this._timesResolved++;
+					if (time.resolved)
+					{
+						this._timesResolved++;
+					}
 				}
 			}
 			

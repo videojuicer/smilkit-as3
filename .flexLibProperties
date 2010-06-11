@@ -16,7 +16,7 @@
     <classEntry path="org.smilkit.view.Viewport"/>
     <classEntry path="org.smilkit.spec.tests.dom.BostonDOMParserTestCase"/>
     <classEntry path="org.smilkit.time.TimingGraph"/>
-    <classEntry path="org.smilkit.time.ResolvedTimeElement"/>
+    <classEntry path="org.smilkit.time.TimingNode"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEventTarget"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEvent"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEventListener"/>

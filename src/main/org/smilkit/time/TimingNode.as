@@ -1,14 +1,15 @@
 package org.smilkit.time
 {
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
-	public class ResolvedTimeElement
+	public class TimingNode
 	{
-		private var _begin:uint;
-		private var _end:uint;
+		private var _begin:int;
+		private var _end:int;
 		private var _element:ISMILMediaElement;
 		
-		public function ResolvedTimeElement(element:ISMILMediaElement, begin:uint, end:uint)
+		public function TimingNode(element:ISMILMediaElement, begin:uint, end:uint)
 		{
 			this._element = element;
 			
@@ -16,12 +17,12 @@ package org.smilkit.time
 			this._end = end;
 		}
 		
-		public function get begin():uint
+		public function get begin():int
 		{
 			return this._begin;
 		}
 		
-		public function get end():uint
+		public function get end():int
 		{
 			return this._end;
 		}
@@ -33,6 +34,11 @@ package org.smilkit.time
 		
 		public function activeAt(offset:Number):Boolean
 		{
+			if (this._begin == Time.UNRESOLVED || this._end == Time.UNRESOLVED)
+			{
+				return false;
+			}
+			
 			return (offset >= this._begin && offset <= this._end);
 		}
 	}

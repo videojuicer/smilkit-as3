@@ -19,7 +19,7 @@ package org.smilkit.dom.smil
 		protected var _baseElement:IElement = null;
 		protected var _baseBegin:Boolean = false;
 		protected var _offset:Number = 0;
-		protected var _resolvedOffset:Number = 0;
+		protected var _resolvedOffset:Number = 0; //Time.UNRESOLVED;
 		protected var _event:String;
 		protected var _marker:String;
 		protected var _type:int = Time.SMIL_TIME_SYNC_BASED;
@@ -30,6 +30,9 @@ package org.smilkit.dom.smil
 		public static var SMIL_TIME_EVENT_BASED:int = 3;
 		public static var SMIL_TIME_WALLCLOCK:int = 4;
 		public static var SMIL_TIME_MEDIA_MARKER:int = 5;
+		
+		public static var INDEFINITE:int = -100;
+		public static var UNRESOLVED:int = -101;
 		
 		public function Time(type:int)
 		{
@@ -98,7 +101,14 @@ package org.smilkit.dom.smil
 					}
 					else if (parent is IElementParallelTimeContainer)
 					{
-						if ((parent as IElementParallelTimeContainer).begin.item(0).resolved)
+						var parentBeginList:TimeList = ((parent as IElementParallelTimeContainer).begin as TimeList);
+						
+						if (!parentBeginList.resolved)
+						{
+							parentBeginList.resolve();
+						}
+						
+						if (parentBeginList.resolved)
 						{
 							if (this.baseBegin)
 							{

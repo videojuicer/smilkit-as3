@@ -5,9 +5,10 @@ package org.smilkit.render
 	import flash.events.TimerEvent;
 	
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
-	import org.smilkit.time.ResolvedTimeElement;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -24,7 +25,7 @@ package org.smilkit.render
 		protected var _timeGraph:TimingGraph;
 		
 		
-		protected var _activeElements:Vector.<ResolvedTimeElement>;
+		protected var _activeElements:Vector.<TimingNode>;
 		
 		/**
 		 * Stored reference to the parent Viewport 
@@ -57,7 +58,7 @@ package org.smilkit.render
 			this.reset();
 		}
 		
-		public function get elements():Vector.<ResolvedTimeElement>
+		public function get elements():Vector.<TimingNode>
 		{
 			return this._activeElements;
 		}
@@ -105,7 +106,7 @@ package org.smilkit.render
 			this._lastChangeOffset = -1;
 			this._nextChangeOffset = -1;
 			
-			this._activeElements = new Vector.<ResolvedTimeElement>();
+			this._activeElements = new Vector.<TimingNode>();
 
 			// !!!!
 			this.update();
@@ -122,17 +123,17 @@ package org.smilkit.render
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
 			{
-				var elements:Vector.<ResolvedTimeElement> = this._timeGraph.elements;
-				var newActiveElements:Vector.<ResolvedTimeElement> = new Vector.<ResolvedTimeElement>();
+				var elements:Vector.<TimingNode> = this._timeGraph.elements;
+				var newActiveElements:Vector.<TimingNode> = new Vector.<TimingNode>();
 	
 				for (var i:int = 0; i < elements.length; i++)
 				{
-					var time:ResolvedTimeElement = elements[i];
+					var time:TimingNode = elements[i];
 					var previousIndex:int = this._activeElements.indexOf(time);
 					var alreadyExists:Boolean = (previousIndex != -1);
 					var activeNow:Boolean = time.activeAt(offset);
 					
-					if (time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1))
+					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1))
 					{
 						this._nextChangeOffset = time.begin;
 					}
@@ -161,7 +162,7 @@ package org.smilkit.render
 						// already exists
 						else
 						{
-							var previousTime:ResolvedTimeElement = this._activeElements[previousIndex];
+							var previousTime:TimingNode = this._activeElements[previousIndex];
 							
 							if (time === previousTime && time != previousTime)
 							{

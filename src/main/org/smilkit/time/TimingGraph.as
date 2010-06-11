@@ -6,6 +6,8 @@ package org.smilkit.time
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.Time;
+	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -20,7 +22,7 @@ package org.smilkit.time
 	 */	
 	public class TimingGraph extends EventDispatcher
 	{
-		protected var _elements:Vector.<ResolvedTimeElement>;
+		protected var _elements:Vector.<TimingNode>;
 		protected var _document:SMILDocument;
 		
 		protected var _eventListener:EventListener;
@@ -34,7 +36,7 @@ package org.smilkit.time
 		 */		
 		public function TimingGraph(document:ISMILDocument)
 		{
-			this._elements = new Vector.<ResolvedTimeElement>();
+			this._elements = new Vector.<TimingNode>();
 			this._document = document as SMILDocument;
 			
 			this._eventListener = new EventListener(this.onMutationEvent);
@@ -48,7 +50,7 @@ package org.smilkit.time
 			this._document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this._eventListener, false);
 		}
 		
-		public function get elements():Vector.<ResolvedTimeElement>
+		public function get elements():Vector.<TimingNode>
 		{
 			return this._elements;
 		}
@@ -81,29 +83,39 @@ package org.smilkit.time
 			{
 				var child:INode = nodes.item(i);
 				
-				if (child.hasChildNodes())
-				{
-					this.iterateTree(child);
-				}
-				
 				if (child is ISMILMediaElement)
 				{
 					var el:SMILMediaElement = (child as SMILMediaElement);
 					
+					// or maybe we resolve everytime?
 					if (!el.resolved)
 					{
 						el.resolve();
 					}
 					
-					// check if element is resolved
-					if (el.resolved)
+					var begin:int = Time.UNRESOLVED;
+					var end:int = Time.UNRESOLVED;
+					
+					if ((el.begin as TimeList).resolved)
 					{
-						var resolvedTimeElement:ResolvedTimeElement = new ResolvedTimeElement(el, el.begin.item(0).resolvedOffset, el.end.item(0).resolvedOffset);
-						
-						this._elements.push(resolvedTimeElement);
-						
-						this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
+						begin = el.begin.first.resolvedOffset;
 					}
+					
+					if ((el.end as TimeList).resolved)
+					{
+						end = el.end.first.resolvedOffset;
+					}
+					
+					var timeElement:TimingNode = new TimingNode(el, begin, end);
+					
+					this._elements.push(timeElement);
+					
+					this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
+				}
+				
+				if (child.hasChildNodes())
+				{
+					this.iterateTree(child);
 				}
 			}
 		}
