@@ -72,7 +72,7 @@ package org.smilkit.view
 			return this._timingGraph;
 		}
 		
-		public function get renderingTree():RenderTree
+		public function get renderTree():RenderTree
 		{
 			return this._renderTree;
 		}
