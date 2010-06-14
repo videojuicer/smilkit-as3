@@ -34,7 +34,7 @@ package org.smilkit.time
 		
 		public function activeAt(offset:Number):Boolean
 		{
-			if (this._begin == Time.UNRESOLVED || this._end == Time.UNRESOLVED)
+			if (this._begin == Time.UNRESOLVED)
 			{
 				return false;
 			}

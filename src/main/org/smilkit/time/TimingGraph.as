@@ -9,6 +9,7 @@ package org.smilkit.time
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.events.TimingGraphEvent;
+	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -23,7 +24,7 @@ package org.smilkit.time
 	public class TimingGraph extends EventDispatcher
 	{
 		protected var _elements:Vector.<TimingNode>;
-		protected var _document:SMILDocument;
+		protected var _objectPool:ViewportObjectPool;
 		
 		protected var _eventListener:EventListener;
 		
@@ -34,20 +35,20 @@ package org.smilkit.time
 		 * @param document
 		 * @constructor
 		 */		
-		public function TimingGraph(document:ISMILDocument)
+		public function TimingGraph(objectPool:ViewportObjectPool)
 		{
 			this._elements = new Vector.<TimingNode>();
-			this._document = document as SMILDocument;
+			this._objectPool = objectPool;
 			
 			this._eventListener = new EventListener(this.onMutationEvent);
 			
-			this._document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this._eventListener, false);
-			this._document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this._eventListener, false);
 		}
 		
 		public function get elements():Vector.<TimingNode>
@@ -57,7 +58,12 @@ package org.smilkit.time
 		
 		public function get document():ISMILDocument
 		{
-			return this._document;
+			return this._objectPool.document;
+		}
+		
+		public function get viewportObjectPool():ViewportObjectPool
+		{
+			return this._objectPool;
 		}
 		
 		/**
@@ -66,7 +72,7 @@ package org.smilkit.time
 		public function rebuild():void
 		{
 			// only go from the body, no point running through the other parts of a smil document
-			this.iterateTree(this._document.getElementsByTagName("body").item(0) as INode);
+			this.iterateTree(this.document.getElementsByTagName("body").item(0) as INode);
 			this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.REBUILD));
 		}
 		
@@ -87,7 +93,7 @@ package org.smilkit.time
 				{
 					var el:SMILMediaElement = (child as SMILMediaElement);
 					
-					// or maybe we resolve everytime?
+					// or maybe we resolve everytime incase it needs to change?
 					if (!el.resolved)
 					{
 						el.resolve();

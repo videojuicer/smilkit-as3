@@ -8,9 +8,10 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
-	import org.smilkit.time.TimingNode;
 	import org.smilkit.time.TimingGraph;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
+	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
 	/**
@@ -22,15 +23,11 @@ package org.smilkit.render
 		/**
 		 * Stored reference to the TimingGraph instance from its parent viewport 
 		 */		
-		protected var _timeGraph:TimingGraph;
+		protected var _objectPool:ViewportObjectPool;
 		
 		
 		protected var _activeElements:Vector.<TimingNode>;
 		
-		/**
-		 * Stored reference to the parent Viewport 
-		 */		
-		protected var _viewport:Viewport;
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
 		
@@ -44,16 +41,15 @@ package org.smilkit.render
 		 * @param timeGraph - that has been created by the parent Viewport
 		 * 
 		 */		
-		public function RenderTree(viewport:Viewport, timeGraph:TimingGraph)
+		public function RenderTree(objectPool:ViewportObjectPool)
 		{
-			this._timeGraph = timeGraph;
-			this._viewport = viewport;
+			this._objectPool = objectPool;
 			
 			// listener for every heart beat (so we recheck the timing tree)
-			this._viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatBeat);
+			this._objectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatBeat);
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
-			this._timeGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
 		
 			this.reset();
 		}
@@ -73,19 +69,19 @@ package org.smilkit.render
 			return this._lastChangeOffset;
 		}
 		
-		public function get timeGraph():TimingGraph
+		public function get timingGraph():TimingGraph
 		{
-			return this._timeGraph;
+			return this._objectPool.timingGraph;
 		}
 		
 		public function get document():ISMILDocument
 		{
-			return this._timeGraph.document;
+			return this._objectPool.document;
 		}
 		
 		public function get hasDocumentAttached():Boolean
 		{
-			return (this.timeGraph != null && this._timeGraph.document != null);
+			return (this.timingGraph != null && this.document != null);
 		}
 		
 		/**
@@ -93,7 +89,7 @@ package org.smilkit.render
 		 */
 		public function update():void
 		{
-			this.updateAt(this._viewport.offset);
+			this.updateAt(this._objectPool.viewport.offset);
 		}
 		
 		/**
@@ -123,7 +119,7 @@ package org.smilkit.render
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
 			{
-				var elements:Vector.<TimingNode> = this._timeGraph.elements;
+				var elements:Vector.<TimingNode> = this.timingGraph.elements;
 				var newActiveElements:Vector.<TimingNode> = new Vector.<TimingNode>();
 	
 				for (var i:int = 0; i < elements.length; i++)

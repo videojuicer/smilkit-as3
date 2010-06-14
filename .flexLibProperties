@@ -61,6 +61,7 @@
     <classEntry path="org.smilkit.dom.smil.SMILRegionElement"/>
     <classEntry path="org.smilkit.util.MathHelper"/>
     <classEntry path="org.smilkit.load.LoadScheduler"/>
+    <classEntry path="org.smilkit.view.ViewportObjectPool"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
