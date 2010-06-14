@@ -87,7 +87,7 @@ package org.smilkit.time
 				{
 					var el:SMILMediaElement = (child as SMILMediaElement);
 					
-					// or maybe we resolve everytime?
+					// or maybe we resolve everytime incase it needs to change?
 					if (!el.resolved)
 					{
 						el.resolve();
