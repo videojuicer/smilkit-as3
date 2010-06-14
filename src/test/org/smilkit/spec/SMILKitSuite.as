@@ -17,6 +17,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.time.HeartbeatTestCase;
 	import org.smilkit.spec.tests.time.TimingGraphTestCase;
 	import org.smilkit.spec.tests.view.ViewportTestCase;
+	import org.smilkit.spec.tests.load.LoadSchedulerTestCase;
 	import org.smilkit.time.TimingGraph;
 	
 	/**
@@ -43,5 +44,6 @@ package org.smilkit.spec
 		public var heartbeatTest:HeartbeatTestCase;
 		public var renderTreeTest:RenderTreeTestCase;
 		public var timingGraph:TimingGraphTestCase;
+		public var loadSchedulerTest:LoadSchedulerTestCase;
 	}
 }
