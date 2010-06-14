@@ -12,6 +12,7 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
@@ -22,19 +23,9 @@ package org.smilkit.view
 	public class Viewport extends EventDispatcher
 	{
 		/**
-		 * Holds the dom - data Representation of the loaded SMIL XML 
+		 *  An instance of ViewportObjectPool responsible for the active documents object pool.
 		 */		
-		protected var _document:ISMILDocument;
-		
-		/**
-		 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed 
-		 */		
-		protected var _timingGraph:TimingGraph;
-		
-		/**
-		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
-		 */		
-		protected var _renderTree:RenderTree;
+		protected var _objectPool:ViewportObjectPool;
 		
 		/**
 		 * An instance of Heartbeat, the class which is responsible for controlling the rate at which the player updates and redraws 
@@ -62,19 +53,24 @@ package org.smilkit.view
 			return this._heartbeat.offset;
 		}
 		
+		public function get viewportObjectPool():ViewportObjectPool
+		{
+			return this._objectPool;
+		}
+		
 		public function get document():ISMILDocument
 		{
-			return this._document;
+			return this.viewportObjectPool.document;
 		}
 		
 		public function get timingGraph():TimingGraph
 		{
-			return this._timingGraph;
+			return this.viewportObjectPool.timingGraph;
 		}
 		
 		public function get renderingTree():RenderTree
 		{
-			return this._renderTree;
+			return this.viewportObjectPool.renderTree;
 		}
 		
 		public function get heartbeat():Heartbeat
@@ -178,19 +174,20 @@ package org.smilkit.view
 		
 		private function onRefreshComplete(e:Event):void
 		{
+			// destroy the object pool n all its precious children
+			if (this._objectPool != null)
+			{
+				var objectPool:Object = { pool: this._objectPool };
+				this._objectPool = null;
+				
+				// we delete the object pool to avoid a memory leak when re-creating it,
+				delete objectPool.pool;
+			}
+			
 			// parse dom
-			this._document = (SMILKit.loadSMILDocument(e.target.data) as ISMILDocument);
-			this._timingGraph = new TimingGraph(this._document);
+			var document:SMILDocument = (SMILKit.loadSMILDocument(e.target.data) as SMILDocument);
 			
-			// do an initial build of the timing graph
-			this._timingGraph.rebuild();
-			
-			this._renderTree = new RenderTree(this, this._timingGraph);
-			
-			// create render tree to drawingboard
-			// drawingboard is always around, and renderTree is constantly destroyed
-			// and recreated, so we have to make the link.
-			this._drawingBoard.renderTree = this._renderTree;
+			this._objectPool = new ViewportObjectPool(this, document);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}

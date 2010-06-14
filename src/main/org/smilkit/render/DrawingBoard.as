@@ -261,7 +261,7 @@ package org.smilkit.render
 		
 		protected function onRenderTreeElementAdded(e:RenderTreeEvent):void
 		{
-			this.draw();
+			this.draw(); 
 		}
 		
 		protected function onRenderTreeElementRemoved(e:RenderTreeEvent):void
