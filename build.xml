@@ -8,6 +8,7 @@
 	
 	<property name="main.src.loc" location="${basedir}/src/main" />
 	<property name="test.src.loc" location="${basedir}/src/test" />
+	<property name="example.src.loc" location="${basedir}/src/example" />
 	
 	<property name="lib.loc" location="${basedir}/libs" />
 	<property name="output.loc" location="${basedir}/target" />
@@ -28,6 +29,22 @@
 		<isset property="FLEX_HEADLESS" />
 	</condition>
 	
+	<condition property="flash.player.loc" value="${env.FLASH_PLAYER}">
+	  <isset property="env.FLASH_PLAYER" />
+  </condition>
+	<condition property="flash.player.loc" value="">
+	  <os family="windows" />
+  </condition>
+  <condition property="flash.player.loc" value="/Applications/Adobe/Flash\ Player.app/Contents/MacOS/Flash\ Player">
+	  <os family="mac" />
+  </condition>
+  <condition property="flash.player.loc" value="">
+	  <os family="unix" />
+  </condition>
+  <fail unless="flash.player.loc">Path to the Flash Player was not set</fail>
+  
+  <echo>Flash Player: ${flash.player.loc}</echo>
+	
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
 	
@@ -38,11 +55,11 @@
   </target>
 	
 	<target name="clean" description="Cleans the generated build files from the target">
-		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
+		<delete file="${main.src.loc}/FlexUnitApplication.mxml" /> <!-- when running the tests from flex builder, this file is created -->
 		<delete dir="${output.loc}" />
 	</target>
 	
-	<target name="init">
+	<target name="init" depends="clean">
 		<mkdir dir="${output.loc}" />
 		<mkdir dir="${bin.loc}" />
 		<mkdir dir="${report.loc}" />
@@ -53,7 +70,7 @@
 	</target>
 	
 	<target name="compile" depends="init" description="Compiles the main SMILKit-as3 SWC">
-		<compc output="${bin.loc}/smilkit-as3.swc">
+		<compc output="${bin.loc}/smilkit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
 			<include-sources dir="${main.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
@@ -75,6 +92,23 @@
 		</mxmlc>
 	</target>
 	
+	<target name="example" depends="compile" description="Compiles the example player using the SMILKit-as3 library">
+	  <mxmlc file="${example.src.loc}/SMILKitPlayer.as" output="${bin.loc}/smilkit-as3-player.swf" static-link-runtime-shared-libraries="true">
+	    <source-path path-element="${example.src.loc}" />
+	    <library-path dir="${bin.loc}" append="true">
+	      <include name="smilkit-as3.swc" />
+	    </library-path>
+			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+			<compiler.headless-server>true</compiler.headless-server>
+    </mxmlc>
+	</target>
+	
+	<target name="example-run" description="Launch the compiled example player using the Flash Player">
+	  <exec executable="${flash.player.loc}" spawn="true">
+	   <arg line="${bin.loc}/smilkit-as3-player.swf" />
+	  </exec>
+  </target>
+	
 	<target name="asdocs" description="Generates asdocs from the SMILKit-as3 source">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />
 		<asdoc output="${report.asdocs.loc}"
@@ -88,10 +122,12 @@
 	</target>
 	
 	<target name="test" depends="compile,test-only,report" description="Builds and runs the test specs and generates reports" />
+	
 	<target name="build">
 		<antcall target="clean" />
 		<antcall target="compile" />
 		<antcall target="test-only" />
+		<antcall target="example" />
 		<antcall target="asdocs" />
 		<antcall target="report" />
 	</target>
@@ -99,6 +135,7 @@
 	<target name="package" description="Package the SMILKit-as3 build into a distributable zip">
 		<copy file="${bin.loc}/smilkit-as3.swc" todir="${dist.loc}" />
 		<copy file="${bin.loc}/smilkit-as3-specs.swf" todir="${dist.loc}" />
+		<copy file="${bin.loc}/smilkit-as3-player.swf" todir="${dist.loc}" />
 		<copy file="${basedir}/README.markdown" todir="${dist.loc}" />
 		<copy todir="${dist.loc}/asdocs">
 			<fileset dir="${report.loc}/asdocs" />
