@@ -21,6 +21,12 @@ package org.smilkit.spec.tests.dom
 			this._document = (parser.parse(Fixtures.BASIC_SMIL_XML) as ISMILDocument);
 		}
 		
+		[After]
+		public function tearDown():void
+		{
+			this._document = null;
+		}
+		
 		[Test(description="Test dispatching mutation events on a node")]
 		public function testMutations():void
 		{
