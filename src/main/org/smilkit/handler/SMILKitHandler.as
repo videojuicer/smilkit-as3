@@ -6,6 +6,7 @@ package org.smilkit.handler
 	
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.w3c.dom.IElement;
@@ -14,15 +15,35 @@ package org.smilkit.handler
 	public class SMILKitHandler
 	{
 		protected var _element:IElement;
+		protected var _startedLoading:Boolean = false;
+		protected var _completedLoading:Boolean = false;
+		protected var _completedResolving:Boolean = false;
+		
+		protected var _intrinsicDuration:int = Time.UNRESOLVED;
 		
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
 		}
 		
-		public function get intrinsicDuration():uint
+		public function get startedLoading():Boolean
 		{
-			return 0;
+			return false;
+		}
+		
+		public function get completedLoading():Boolean
+		{
+			return false;
+		}
+		
+		public function get completedResolving():Boolean
+		{
+			return false;
+		}
+		
+		public function get intrinsicDuration():int
+		{
+			return this._intrinsicDuration;
 		}
 		
 		public function get intrinsicWidth():uint
@@ -73,6 +94,18 @@ package org.smilkit.handler
 		public function seek(seekTo:Number):void
 		{
 			
+		}
+		
+		protected function resolved(resolvedDuration:int):void
+		{
+			this._intrinsicDuration = resolvedDuration;
+			this._completedResolving = true;
+			
+			// here we update the dom
+			if (this.element != null && this.element.dur == Time.UNRESOLVED)
+			{
+				this.element.dur = this._intrinsicDuration;
+			}
 		}
 		
 		public function resize():void

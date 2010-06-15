@@ -14,6 +14,7 @@ package org.smilkit.handler
 	import flash.net.NetStream;
 	
 	import org.smilkit.util.Metadata;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
@@ -32,7 +33,7 @@ package org.smilkit.handler
 			this._canvas = new Sprite();
 		}
 		
-		public override function get intrinsicDuration():uint
+		/*public override function get intrinsicDuration():int
 		{
 			if (this._metadata == null)
 			{
@@ -40,7 +41,7 @@ package org.smilkit.handler
 			}
 			
 			return this._metadata.duration;
-		}
+		}*/
 		
 		public override function get intrinsicWidth():uint
 		{
@@ -102,6 +103,8 @@ package org.smilkit.handler
 			this._video.attachNetStream(this._netStream as NetStream);
 		
 			this._canvas.addChild(this._video);
+			
+			this._startedLoading = true;
 		}
 		
 		public override function resume():void
@@ -155,7 +158,9 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
-			trace("Metadata recieved: "+this._metadata.toString());
+			Logger.info("Metadata recieved: "+this._metadata.toString());
+			
+			this.resolved(this._metadata.duration);
 			
 			this.resize();
 			
