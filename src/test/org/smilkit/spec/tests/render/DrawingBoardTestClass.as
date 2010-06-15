@@ -40,7 +40,7 @@ package org.smilkit.spec.tests.render
 			var drawingBoard:DrawingBoard = this._viewport.drawingBoard;
 			var renderTree:RenderTree = drawingBoard.renderTree;
 			
-			Assert.assertStrictlyEquals(this._viewport.renderingTree, renderTree);
+			Assert.assertStrictlyEquals(this._viewport.renderTree, renderTree);
 		}
 		
 		protected function handleHasRenderTreeTimeOut(passThroughData:Object):void

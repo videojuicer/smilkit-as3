@@ -84,10 +84,13 @@ package org.smilkit.load {
 			this._objectPool = objectPool;
 		}
 		
-		public function startWorking() {
+		public function start():Boolean {
 			if(!this._working) {
 				// move JIT mailbox to JIT worklist
+				
+				return true;
 			}
+			return false;
 		}
 		
 		private function handlerAddedToRenderTree():void {}
@@ -101,6 +104,7 @@ package org.smilkit.load {
 		}
 		
 		private function bindJustInTimeEvents():void {}
+		private function bindWorkQueueEvents():void {}
 		
 		private function rebuildResolveQueue():void {}
 		private function rebuildPreloadQueue():void {}

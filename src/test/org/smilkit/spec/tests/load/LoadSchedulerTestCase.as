@@ -6,8 +6,10 @@ package org.smilkit.spec.tests.load
 	import flexunit.framework.AsyncTestHelper;
 	
 	import org.flexunit.async.Async;
+	
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.Viewport;
+	import org.smilkit.load.LoadScheduler;
 
 	public class LoadSchedulerTestCase
 	{		
