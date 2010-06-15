@@ -32,17 +32,7 @@ package org.smilkit.handler
 			
 			this._canvas = new Sprite();
 		}
-		
-		/*public override function get intrinsicDuration():int
-		{
-			if (this._metadata == null)
-			{
-				return super.intrinsicDuration;
-			}
-			
-			return this._metadata.duration;
-		}*/
-		
+
 		public override function get intrinsicWidth():uint
 		{
 			if (this._metadata == null)
@@ -61,6 +51,11 @@ package org.smilkit.handler
 			}
 			
 			return this._metadata.height;
+		}
+		
+		public override function get resolvable():Boolean
+		{
+			return true;
 		}
 		
 		public override function get intrinsicSpatial():Boolean
@@ -161,10 +156,6 @@ package org.smilkit.handler
 			Logger.info("Metadata recieved: "+this._metadata.toString());
 			
 			this.resolved(this._metadata.duration);
-			
-			this.resize();
-			
-			this.resume();
 		}
 		
 		public static function toHandlerMap():HandlerMap

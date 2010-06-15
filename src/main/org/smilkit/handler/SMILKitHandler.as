@@ -28,17 +28,17 @@ package org.smilkit.handler
 		
 		public function get startedLoading():Boolean
 		{
-			return false;
+			return this._startedLoading;
 		}
 		
 		public function get completedLoading():Boolean
 		{
-			return false;
+			return this._completedLoading;
 		}
 		
 		public function get completedResolving():Boolean
 		{
-			return false;
+			return this._completedResolving;
 		}
 		
 		public function get intrinsicDuration():int
@@ -71,6 +71,16 @@ package org.smilkit.handler
 			return null;
 		}
 		
+		public function get resolvable():Boolean
+		{
+			return false;
+		}
+		
+		public function get preloadable():Boolean
+		{
+			return true;
+		}
+		
 		public function get element():ISMILMediaElement
 		{
 			return (this._element as ISMILMediaElement);
@@ -96,6 +106,54 @@ package org.smilkit.handler
 			
 		}
 		
+		/**
+		 * Cancels the loading of the implementing handler, handlers should discard
+		 * there current progress when this method is called unless loading is complete. 
+		 */
+		public function cancel():void
+		{
+			this._completedLoading = false;
+			this._startedLoading = false;
+		}
+		
+		public function movedToJustInTimeWorkList():void
+		{
+			if (!this.startedLoading)
+			{
+				this.load();
+			}
+		}
+		
+		public function movedToPreloadWorkList():void
+		{
+			if (!this.startedLoading && this.preloadable)
+			{
+				this.load();
+			}
+		}
+		
+		public function movedToResolveWorkList():void
+		{
+			if (!this.startedLoading && this.resolvable)
+			{
+				this.load();
+			}
+		}
+		
+		public function removedFromLoadScheduler():void
+		{
+			if (this.startedLoading)
+			{
+				this.cancel();
+			}
+		}
+		
+		/**
+		 * Triggers the resolved event on the handler, the specified resolvedDuration
+		 * is used to update the DOM element assigned to this handler.
+		 * 
+		 * @param resolvedDuration The resolved duration in miliseconds.
+		 */
 		protected function resolved(resolvedDuration:int):void
 		{
 			this._intrinsicDuration = resolvedDuration;
@@ -108,6 +166,15 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Resizes the handler display object to fit inside the parent region. Uses a generic
+		 * formula to resize the display object to fit inside the parent region as much as
+		 * possible whilst maintaining the aspect-ratio.
+		 * 
+		 * Can be overridden by the implmeneting handler to provide different resizing logic.
+		 * 
+		 * @see MathHelper.createMatrixFor
+		 */ 
 		public function resize():void
 		{
 			var mediaElement:SMILMediaElement = (this.element as SMILMediaElement);
