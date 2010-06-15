@@ -16,7 +16,7 @@ package org.smilkit.dom.smil
 	public class Time implements ITime
 	{
 		protected var _resolved:Boolean = false;
-		protected var _baseElement:IElement = null;
+		protected var _baseElement:INode = null;
 		protected var _baseBegin:Boolean = false;
 		protected var _offset:Number = 0;
 		protected var _resolvedOffset:Number = 0; //Time.UNRESOLVED;
@@ -45,100 +45,7 @@ package org.smilkit.dom.smil
 			switch (this.timeType)
 			{
 				case Time.SMIL_TIME_SYNC_BASED:
-					var parent:IElementTimeContainer = null;
-					var element:IElement = this._baseElement;
-					
-					while (parent == null)
-					{
-						if (element.parentNode != null && element.parentNode is IElementTimeContainer)
-						{
-							parent = (element.parentNode as IElementTimeContainer);
-							break;
-						}
-					}
-					
-					this._offset = parent.begin.item(0).offset;
-					
-					if (parent is IElementSequentialTimeContainer)
-					{
-						// add up the duration of previous children
-						var children:INodeList = (parent as IElement).childNodes;
-						var previousDuration:Number = 0;
-						
-						for (var i:int = 0; i < children.length; i++)
-						{
-							var child:INode = children.item(i);
-							
-							if (child == this._baseElement)
-							{
-								break;
-							}
-							
-							if ((child as IElementTime).end.last.resolved)
-							{
-								previousDuration += (child as IElementTime).end.last.resolvedOffset;
-							}
-							else
-							{
-								this._resolved = false;
-								
-								return;
-							}
-						}
-						
-						if (this.baseBegin)
-						{
-							this._resolved = true;
-							this._resolvedOffset = previousDuration;
-						}
-						else
-						{
-							var dur:Number = (this._baseElement as ISMILMediaElement).dur;
-							
-							this._resolved = true;
-							this._resolvedOffset = previousDuration + dur;
-						}
-					}
-					else if (parent is IElementParallelTimeContainer)
-					{
-						var parentBeginList:TimeList = ((parent as IElementParallelTimeContainer).begin as TimeList);
-						
-						if (!parentBeginList.resolved)
-						{
-							parentBeginList.resolve();
-						}
-						
-						if (parentBeginList.resolved)
-						{
-							if (this.baseBegin)
-							{
-								var beginTime:ITime = (parent as IElementParallelTimeContainer).begin.first;
-								
-								if (beginTime.resolved)
-								{
-									this._resolvedOffset = beginTime.resolvedOffset;
-									this._resolved = true;
-								}
-								else
-								{
-									this._resolved = false;
-								}
-							}
-							else
-							{
-								var time:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
-								
-								var begin:ITime = time.begin.first;
-								
-								if (begin.resolved)
-								{
-									this._resolvedOffset = begin.resolvedOffset + time.dur;	
-									this._resolved = true;
-								}
-							}
-						}
-					}
-					
+					this.resolveSyncBased();
 					break;
 				case Time.SMIL_TIME_EVENT_BASED:
 					var pieces:Array = this.event.split(".");
@@ -165,6 +72,116 @@ package org.smilkit.dom.smil
 					break;
 				case Time.SMIL_TIME_WALLCLOCK:
 					break;
+			}
+		}
+		
+		private function resolveSyncBased():void
+		{
+			var parent:IElementTimeContainer = null;
+			var element:INode = this._baseElement;
+			
+			while (parent == null)
+			{
+				if (element.parentNode != null && element.parentNode is IElementTimeContainer)
+				{
+					parent = (element.parentNode as IElementTimeContainer);
+					break;
+				}
+			}
+			
+			this._offset = parent.begin.item(0).offset;
+			
+			if (parent is IElementSequentialTimeContainer)
+			{
+				this.resolveSequentialSyncBased(parent as IElementSequentialTimeContainer);
+			}
+			else if (parent is IElementParallelTimeContainer)
+			{
+				this.resolveParallelSyncBased(parent as IElementParallelTimeContainer);
+			}
+		}
+		
+		private function resolveParallelSyncBased(parent:IElementParallelTimeContainer):void
+		{
+			var parentBeginList:TimeList = ((parent as IElementParallelTimeContainer).begin as TimeList);
+			
+			if (!parentBeginList.resolved)
+			{
+				parentBeginList.resolve();
+			}
+			
+			if (parentBeginList.resolved)
+			{
+				if (this.baseBegin)
+				{
+					var beginTime:ITime = (parent as IElementParallelTimeContainer).begin.first;
+					
+					if (beginTime.resolved)
+					{
+						this._resolvedOffset = beginTime.resolvedOffset;
+						this._resolved = true;
+					}
+					else
+					{
+						this._resolved = false;
+					}
+				}
+				else
+				{
+					var time:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
+					var begin:ITime = time.begin.first;
+					
+					if (begin.resolved)
+					{
+						this._resolvedOffset = begin.resolvedOffset + time.dur;	
+						this._resolved = true;
+					}
+				}
+			}
+		}
+		
+		private function resolveSequentialSyncBased(parent:IElementSequentialTimeContainer):void
+		{
+			// add up the duration of previous children
+			var children:INodeList = (parent as INode).childNodes;
+			var previousDuration:Number = 0;
+			
+			for (var i:int = 0; i < children.length; i++)
+			{
+				var child:INode = children.item(i);
+				
+				if (child == this._baseElement)
+				{
+					break;
+				}
+				
+				var timeContainer:IElementTimeContainer = (child as IElementTimeContainer);
+				
+				(timeContainer.end as TimeList).resolve();
+				
+				if (timeContainer.end.first.resolved)
+				{
+					previousDuration += (child as IElementTime).end.first.resolvedOffset;
+				}
+				else
+				{
+					this._resolved = false;
+					
+					return;
+				}
+			}
+			
+			if (this.baseBegin)
+			{
+				this._resolved = true;
+				this._resolvedOffset = previousDuration;
+			}
+			else
+			{
+				var dur:Number = (this._baseElement as ISMILMediaElement).dur;
+				
+				this._resolved = true;
+				this._resolvedOffset = previousDuration + dur;
 			}
 		}
 		
@@ -202,12 +219,12 @@ package org.smilkit.dom.smil
 			this._offset = offset;
 		}
 		
-		public function get baseElement():IElement
+		public function get baseElement():INode
 		{
 			return this._baseElement;
 		}
 		
-		public function set baseElement(baseElement:IElement):void
+		public function set baseElement(baseElement:INode):void
 		{
 			this._baseElement = baseElement;
 		}
