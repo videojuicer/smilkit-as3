@@ -1,6 +1,6 @@
 package org.smilkit.w3c.dom.smil
 {
-	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INode;
 
 	public interface ITime
 	{
@@ -13,8 +13,8 @@ package org.smilkit.w3c.dom.smil
 		function get offset():Number;
 		function set offset(offset:Number):void;
 		
-		function get baseElement():IElement;
-		function set baseElement(baseElement:IElement):void;
+		function get baseElement():INode;
+		function set baseElement(baseElement:INode):void;
 		
 		function get baseBegin():Boolean;
 		function set baseBegin(baseBegin:Boolean):void;

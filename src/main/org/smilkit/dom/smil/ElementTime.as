@@ -2,6 +2,7 @@ package org.smilkit.dom.smil
 {
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
+	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 
 	public class ElementTime
@@ -13,7 +14,7 @@ package org.smilkit.dom.smil
 		public static var FILL_REMOVE:int = 0;
 		public static var FILL_FREEZE:int = 1;
 		
-		public static function parseTimeAttribute(attributeValue:String, baseElement:IElement, baseBegin:Boolean):ITimeList
+		public static function parseTimeAttribute(attributeValue:String, baseElement:INode, baseBegin:Boolean):ITimeList
 		{			
 			var list:TimeList = new TimeList();
 			
@@ -27,23 +28,26 @@ package org.smilkit.dom.smil
 				
 				list.add(time);
 				
-				var container:ElementTimeContainer = baseElement as ElementTimeContainer;
-				
-				if (container.repeatCount > 0 || container.repeatDur > 0)
+				if (!baseElement is ISMILDocument)
 				{
-					if (container.repeatDur > 0)
-					{
-						container.repeatCount = container.repeatDur / container.dur;
-					}
+					var container:ElementTimeContainer = baseElement as ElementTimeContainer;
 					
-					// make a new time element for reach repeat
-					for (var j:int = 0; j < container.repeatCount; j++)
+					if (container != null && container.repeatCount > 0 || container.repeatDur > 0)
 					{
-						time = new Time(Time.SMIL_TIME_SYNC_BASED);
-						time.baseElement = baseElement;
-						time.baseBegin = baseBegin;
-					
-						list.add(time);
+						if (container.repeatDur > 0)
+						{
+							container.repeatCount = container.repeatDur / container.dur;
+						}
+						
+						// make a new time element for reach repeat
+						for (var j:int = 0; j < container.repeatCount; j++)
+						{
+							time = new Time(Time.SMIL_TIME_SYNC_BASED);
+							time.baseElement = baseElement;
+							time.baseBegin = baseBegin;
+						
+							list.add(time);
+						}
 					}
 				}
 			}

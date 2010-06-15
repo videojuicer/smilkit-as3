@@ -2,11 +2,13 @@ package org.smilkit.spec.tests.time
 {
 	import flexunit.framework.Assert;
 	
+	import mx.utils.object_proxy;
+	
 	import org.flexunit.async.Async;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.time.TimingNode;
 	import org.smilkit.time.TimingGraph;
+	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
@@ -39,8 +41,7 @@ package org.smilkit.spec.tests.time
 
 		protected function handleHasDocument(event:ViewportEvent, passThroughData:Object):void
 		{
-			var timingGraph:TimingGraph = this._viewport.timingGraph;
-			var document:ISMILDocument = timingGraph.document; 
+			var document:ISMILDocument = this._viewport.viewportObjectPool.document; 
 			
 			// check document.timeChildren
 			Assert.assertEquals(3, document.timeChildren.length);

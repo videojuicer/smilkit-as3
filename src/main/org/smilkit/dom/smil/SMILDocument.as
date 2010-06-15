@@ -41,7 +41,7 @@ package org.smilkit.dom.smil
 		{
 			if (this._beginList == null)
 			{
-				this._beginList = ElementTime.parseTimeAttribute(null, (this as IElement), true);
+				this._beginList = ElementTime.parseTimeAttribute(null, this, true);
 			}
 			
 			return this._beginList;
