@@ -3,6 +3,7 @@ package org.smilkit.handler
 	import flash.events.EventDispatcher;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.dom.smil.SMILMediaElement;
@@ -115,6 +116,8 @@ package org.smilkit.handler
 		{
 			this._completedLoading = false;
 			this._startedLoading = false;
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_CANCELLED, this));
 		}
 		
 		public function movedToJustInTimeWorkList():void
@@ -165,6 +168,8 @@ package org.smilkit.handler
 			{
 				this.element.dur = this._intrinsicDuration;
 			}
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));
 		}
 		
 		/**

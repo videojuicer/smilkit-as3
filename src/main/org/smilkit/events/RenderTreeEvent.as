@@ -1,6 +1,8 @@
 package org.smilkit.events
 {
 	import flash.events.Event;
+	
+	import org.smilkit.handler.SMILKitHandler;
 
 	public class RenderTreeEvent extends Event
 	{
@@ -9,9 +11,18 @@ package org.smilkit.events
 		public static var ELEMENT_REPLACED:String = "renderTreeElementReplaced";
 		public static var ELEMENT_MODIFIED:String = "renderTreeElementModified";
 		
-		public function RenderTreeEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+		protected var _handler:SMILKitHandler;
+		
+		public function RenderTreeEvent(type:String, handler:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
+			
+			this._handler = handler;
+		}
+		
+		public function get handler():SMILKitHandler
+		{
+			return this._handler;
 		}
 	}
 }

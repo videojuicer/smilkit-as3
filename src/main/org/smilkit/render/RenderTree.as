@@ -5,9 +5,11 @@ package org.smilkit.render
 	import flash.events.TimerEvent;
 	
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
+	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
@@ -128,6 +130,7 @@ package org.smilkit.render
 					var previousIndex:int = this._activeElements.indexOf(time);
 					var alreadyExists:Boolean = (previousIndex != -1);
 					var activeNow:Boolean = time.activeAt(offset);
+					var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 					
 					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1))
 					{
@@ -140,7 +143,7 @@ package org.smilkit.render
 						this._lastChangeOffset = offset;
 						
 						// remove from canvas
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED));
+						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 						
 						// dont add to new vector
 					}
@@ -153,7 +156,7 @@ package org.smilkit.render
 							this._lastChangeOffset = offset;
 							
 							// actually draw element to canvas ....
-							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED));
+							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
 						// already exists
 						else
@@ -164,7 +167,7 @@ package org.smilkit.render
 							{
 								this._lastChangeOffset = offset;
 								
-								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED));
+								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
 						}
 						// always add to the new active list
