@@ -91,7 +91,7 @@ package org.smilkit.load {
 		}
 		
 		public function set handlers(handlers:Vector.<SMILKitHandler>):void {
-			
+			// TODO compare and broadcast removed/added on the appropriate items
 		}
 		
 		public function start():Boolean {
@@ -122,6 +122,8 @@ package org.smilkit.load {
 		public function addHandlerToWorkQueue(handler:SMILKitHandler):Boolean {
 			if(this.hasHandler(handler)) return false;
 			this._workQueue.push(handler);
+			handler.addEventListener(this._completionEventType, this.onWorkUnitCompleted);
+			handler.addEventListener(this._failureEventType, this.onWorkUnitFailed);
 			return true;
 		}
 		
@@ -167,7 +169,13 @@ package org.smilkit.load {
 			priorityWorker.addEventListener(WorkerEvent.WORKER_RESUMED, this.onPriorityWorkerResumed);
 		}
 		
-		public function onHandlerCompletionEvent(e:WorkerEvent):void {
+		
+		
+		public function onWorkUnitCompleted(e:WorkerEvent):void {
+			
+		}
+		
+		public function onWorkUnitFailed(e:WorkerEvent):void {
 			
 		}
 		
