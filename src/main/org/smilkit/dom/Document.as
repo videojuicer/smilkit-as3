@@ -13,6 +13,7 @@ package org.smilkit.dom
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
 	import org.smilkit.util.ObjectManager;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;
@@ -379,6 +380,11 @@ package org.smilkit.dom
 		
 		internal function dispatchEventToSubtree(node:INode, event:IEvent):void
 		{
+			if (node == null)
+			{
+				return;
+			}
+			
 			(node as Node).dispatchEvent(event);
 			
 			if (node.nodeType == Node.ELEMENT_NODE)

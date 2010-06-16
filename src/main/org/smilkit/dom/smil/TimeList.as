@@ -63,7 +63,8 @@ package org.smilkit.dom.smil
 		// TODO: update with a cache so we dont need to loop every time ...
 		public function resolve():Boolean
 		{
-			var count:int = this._timesResolved;
+			var oldCount:int = this._timesResolved;
+			this._timesResolved = 0;
 			
 			for (var i:int = 0; i < this.length; i++)
 			{
@@ -78,9 +79,13 @@ package org.smilkit.dom.smil
 						this._timesResolved++;
 					}
 				}
+				else
+				{
+					this._timesResolved++;
+				}
 			}
 			
-			return (count < this._timesResolved);
+			return (oldCount < this._timesResolved);
 		}
 	}
 }

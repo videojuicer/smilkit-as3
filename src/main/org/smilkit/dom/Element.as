@@ -17,6 +17,7 @@ package org.smilkit.dom
 			super(owner);
 			
 			this._name = name;
+			this._attributes = new AttributeMap(this);
 		}
 		
 		public function get id():String
