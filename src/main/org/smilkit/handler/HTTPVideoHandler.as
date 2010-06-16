@@ -87,6 +87,7 @@ package org.smilkit.handler
 			this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
 			
 			this._netStream.client = this;
+			this._netStream.bufferTime = 10;
 			this._netStream.soundTransform = this._soundTransformer;
 			
 			this._netStream.play(this.element.src);
@@ -121,25 +122,53 @@ package org.smilkit.handler
 		{
 			trace("Netstatus: "+e.info.level+" "+e.info.code);
 			
-			if (e.info.code == "NetStream.Buffer.Full")
+			switch (e.info.code)
 			{
-				this.resume();
+				case "NetStream.Buffer.Full":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					break;
+				case "NetStream.Buffer.Empty":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					break;
+				case "NetStream.Play.Failed":
+				case "NetStream.Play.NoSupportedTrackFound":
+				case "NetStream.Play.FileStructureInvalid":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+					break;
+				case "NetStream.Unpublish.Success":
+				case "NetStream.Play.Stop":
+					// playback has finished, important for live events (so we can continue)
+					break;
+				case "NetStream.Pause.Notify":
+					break;
+				case "NetStream.Unpause.Notify":
+					break;
+				case "NetStream.Seek.Failed":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_FAILED, this));
+					break;
+				case "NetStream.Seek.InvalidTime":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
+					break;
+				case "NetStream.Seek.Notify":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_COMPLETED, this));
+					break;
 			}
 		}
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
-			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onSecurityErrorEvent(e:SecurityErrorEvent):void
 		{
-			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		public function onMetaData(info:Object):void

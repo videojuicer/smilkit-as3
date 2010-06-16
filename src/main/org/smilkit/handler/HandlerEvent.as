@@ -4,7 +4,12 @@ package org.smilkit.handler
 	
 	public class HandlerEvent extends Event
 	{
-		public static var SEEK_COMPLETED:String = "handlerSeekedCompleted";
+		public static var SEEK_FAILED:String = "handlerSeekFailed";
+		public static var SEEK_INVALID:String = "handlerSeekInvalid";
+		public static var SEEK_COMPLETED:String = "handlerSeekCompleted";
+		
+		public static var LOAD_UNAUTHORISED:String = "handlerLoadUnauthorised";
+		public static var LOAD_FAILED:String = "handlerLoadFailed";
 		
 		public static var LOAD_READY:String = "handlerLoadReady";
 		public static var LOAD_WAITING:String = "handlerLoadWaiting";
