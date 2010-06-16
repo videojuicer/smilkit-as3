@@ -3,6 +3,7 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.TimingGraph;
+	import org.smilkit.load.LoadScheduler;
 
 	public dynamic class ViewportObjectPool
 	{
@@ -22,6 +23,12 @@ package org.smilkit.view
 		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
 		 */	
 		protected var _renderTree:RenderTree;
+		
+		/* 
+		 * An instance of LoadScheduler responsible for determining current load priorities and performing opportunistic
+		 * loading where possible.
+		*/
+		protected var _loadScheduler:LoadScheduler;
 		
 		public function ViewportObjectPool(viewport:Viewport, document:SMILDocument)
 		{

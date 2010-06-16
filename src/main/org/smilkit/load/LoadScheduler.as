@@ -1,10 +1,12 @@
 package org.smilkit.load {
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.render.RenderTree;
+	import org.smilkit.load.Worker;
 	
 	/**
 	 * An instance of LoadScheduler listens to both the TimingGraph and RenderTree objects for
@@ -30,8 +32,8 @@ package org.smilkit.load {
 	 *    on multiple lists/queues, the highest-priority entry will be retained.
 	 * 2. handers receive a movedToJustInTimeWorkList call when the load scheduler receives a JIT request from 
 	 *    the RenderTree.
-	 * 3. handers receive a becameActiveInResolveQueue call when the scheduler advances the resolve queue.
-	 * 4. handers receive a becameActiveInPreloadQueue call when the scheduler advances the preload queue.
+	 * 3. handers receive a movedToResolveWorkList call when the scheduler advances the resolve queue.
+	 * 4. handers receive a movedToPreloadWorkList call when the scheduler advances the preload queue.
 	 * 3. handers receiving a removedFromLoadScheduler call can safely assume that they do not exist on any queues. 
 	 *    This call is only sent when removing an hander from a worklist without adding it to another.
      * 
@@ -57,31 +59,36 @@ package org.smilkit.load {
 		protected var _working:Boolean = false;
 		
 		/*
-		 * The justInTime workQueue, a special case. When the LoadScheduler is not yet working, JIT requests
-		 * land in this queue. Upon work starting, the entire queue is flushed into the JIT worklist and new
-		 * JIT requests are appended directly to the worklist, skipping this queue object.
+		 * The justInTime worker, a queue/list pair with no concurrency.
 		*/
-		protected var _justInTimeMailbox:Array = [];
+		protected var _justInTimeWorker:Worker;
 		
 		/*
-		* The justInTime worklist, an n-concurrency list of high-priority handers needed for the current
-		* render state. The RenderTree is used as the data source for this list.
+		* The resolve worker, a queue/list pair with concurrency of 1 with priority lower than that of the justInTimeWorker
+		* but higher than that of the preloadWorker
 		*/
-		protected var _justInTimeWorkList:Array = [];
+		protected var _resolveWorker:Worker;
+		protected var _resolveWorkerConcurrencyLimit:uint;
 		/*
-		* The resolve workqueue, a linear queue of handers to be resolved but not fully preloaded. This list is
-		* opportunistic in nature and uses the timing graph as a data source.
-		*/
-		protected var _resolveWorkQueue:Array = [];
-		/*
-		* The preload workqueue, a linear queue of handers to be fully preloaded. This list is opportunistic in
+		* The preload workqueue, a queue/list pair of handers to be fully preloaded. This list is opportunistic in
 		* nature and uses the timing graph as a data source.
 		*/
-		protected var _preloadWorkQueue:Array = [];
-		
-		
-		public function LoadScheduler(objectPool:ViewportObjectPool) {
+		protected var _preloadWorker:Worker;
+		protected var _preloadWorkerConcurrencyLimit:uint;
+
+		public function LoadScheduler(objectPool:ViewportObjectPool, resolveConcurrency:uint=1, preloadConcurrency:uint=1) {
 			this._objectPool = objectPool;
+			this._resolveWorkerConcurrencyLimit = resolveConcurrency;
+			this._preloadWorkerConcurrencyLimit = preloadConcurrency;
+			
+			this._justInTimeWorker = new Worker("loadCompleted", "loadFailed", 0);
+			this._justInTimeWorker.loggerName = "JustInTime Worker";
+			
+			this._resolveWorker = new Worker("resolveCompleted", "loadFailed", this._resolveWorkerConcurrencyLimit, this._justInTimeWorker);
+			this._resolveWorker.loggerName = "Resolve Worker";
+			
+			this._preloadWorker = new Worker("loadCompleted", "loadFailed", this._preloadWorkerConcurrencyLimit, this._resolveWorker);
+			this._preloadWorker.loggerName = "Preload Worker";
 		}
 		
 		public function start():Boolean {
@@ -95,13 +102,7 @@ package org.smilkit.load {
 		
 		private function handlerAddedToRenderTree():void {}
 		private function handlerRemovedFromRenderTree():void {}
-		
-		private function get timingGraph():TimingGraph {
-			return this._objectPool.timingGraph;
-		}
-		private function get renderTree():RenderTree {
-			return this._objectPool.renderTree;
-		}
+		private function timingGraphRebuilt():void {}
 		
 		private function bindJustInTimeEvents():void {}
 		private function bindWorkQueueEvents():void {}
@@ -111,6 +112,12 @@ package org.smilkit.load {
 		private function shouldAdvanceResolveQueue():void {}
 		private function shouldAdvancePreloadQueue():void {}
 		
+		private function get timingGraph():TimingGraph {
+			return this._objectPool.timingGraph;
+		}
+		private function get renderTree():RenderTree {
+			return this._objectPool.renderTree;
+		}
 	}
 	
 }

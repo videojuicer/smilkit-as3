@@ -34,5 +34,8 @@ package org.smilkit.spec.tests.load
 	
 	// Pending tests:
 	
+	// Has all three workers instantiated on creation
+	// When rebuilding the queues, includes only unresolved resolvables in the resolve queue
+	// When rebuilding the queues, includes only unloaded preloadables in the preload queue
 	
 }
