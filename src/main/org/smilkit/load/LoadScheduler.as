@@ -64,6 +64,11 @@ package org.smilkit.load {
 		protected var _justInTimeWorker:Worker;
 		
 		/*
+		 * A pointer to the master control worker
+		*/ 
+		protected var _masterWorker:Worker;
+		
+		/*
 		* The resolve worker, a queue/list pair with concurrency of 1 with priority lower than that of the justInTimeWorker
 		* but higher than that of the preloadWorker
 		*/
@@ -89,13 +94,23 @@ package org.smilkit.load {
 			
 			this._preloadWorker = new Worker("loadCompleted", "loadFailed", this._preloadWorkerConcurrencyLimit, this._resolveWorker);
 			this._preloadWorker.loggerName = "Preload Worker";
+			
+			this._masterWorker = this._justInTimeWorker;
 		}
 		
 		public function start():Boolean {
 			if(!this._working) {
-				// move JIT mailbox to JIT worklist
-				
+				this._working = true;
+				this._masterWorker.start();
 				return true;
+			}
+			return false;
+		}
+		
+		public function stop():Boolean {
+			if(this._working) {
+				this._working = false;
+				this._masterWorker.stop();
 			}
 			return false;
 		}

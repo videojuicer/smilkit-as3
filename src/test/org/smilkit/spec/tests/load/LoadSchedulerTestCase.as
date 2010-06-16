@@ -22,6 +22,7 @@ package org.smilkit.spec.tests.load
 			this._viewport = new Viewport();
 			// dont want to actually load
 			this._viewport.autoRefresh = false;
+			//this._scheduler = this._viewport._objectPool.loadScheduler;
 		}
 		
 		[After]
@@ -35,6 +36,10 @@ package org.smilkit.spec.tests.load
 	// Pending tests:
 	
 	// Has all three workers instantiated on creation
+	
+	// Starting when stopped returns true and causes the master worker to start
+	// Stopping when started returns true and causes the master worker to stop
+	
 	// When rebuilding the queues, includes only unresolved resolvables in the resolve queue
 	// When rebuilding the queues, includes only unloaded preloadables in the preload queue
 	

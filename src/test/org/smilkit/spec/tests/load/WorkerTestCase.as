@@ -7,33 +7,58 @@ package org.smilkit.spec.tests.load
 	
 	import org.flexunit.async.Async;
 	
+	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.load.Worker;
 	import org.smilkit.events.WorkerEvent;
 
 	public class WorkerTestCase
 	{		
-		protected var _scheduler:LoadScheduler;
 		protected var _priorityWorker:Worker;
 		protected var _slaveWorker:Worker;
+		
+		protected var _handlerPool:Vector.<SMILKitHandler>;
+		
+		// Mock event names used for testing the event loops
+		protected var _dummyResolveEventName:String = "dummyResolveCompleted";
+		protected var _dummyCompleteEventName:String = "dummyLoadCompleted";
+		protected var _dummyFailedEventName:String = "dummyFailedBecauseHeIsADummy";
 		
 		[Before]
 		public function setUp():void
 		{
-			
+			// no concurrency limit
+			this._priorityWorker = new Worker(this._dummyResolveEventName, this._dummyFailedEventName);
+			// set concurrency limit, slaved to priority worker
+			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, 3, this._priorityWorker);
 		}
 		
 		[After]
 		public function tearDown():void
 		{
-			
+			this._priorityWorker = null;
+			this._slaveWorker = null;
+		}
+		
+		[Test(description="Tests the start/stop toggle from a stopped state")]
+		public function startFunctionsOnlyOnceAndSetsWorkingToTrue():void {
+			Assert.assertFalse(this._priorityWorker.working);
+			Assert.assertFalse(this._priorityWorker.stop());
+			Assert.assertTrue(this._priorityWorker.start());
+			Assert.assertTrue(this._priorityWorker.working);
+		}
+
+		[Test(description="Tests the start/stop toggle from a started state")]
+		public function stopFunctionsOnceOnlyAndSetsWorkingToFalse():void {
+			this._priorityWorker.start();
+			Assert.assertFalse(this._priorityWorker.start());
+			Assert.assertTrue(this._priorityWorker.working);
+			Assert.assertTrue(this._priorityWorker.stop());
+			Assert.assertFalse(this._priorityWorker.working);
 		}
 	}
 	
 	// Pending tests:
-	
-	// is not working until start() is called
-	// stops working when stop() is called
 	
 	// advancing the queue when stopped does nothing, even when below concurrency limit
 	

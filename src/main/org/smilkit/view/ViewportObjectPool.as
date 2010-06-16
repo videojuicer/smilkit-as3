@@ -68,6 +68,9 @@ package org.smilkit.view
 			// make the first render tree!
 			this._renderTree = new RenderTree(this);
 			
+			// schedule those loads
+			this._loadScheduler = new LoadScheduler(this);
+			
 			// create render tree to drawingboard
 			// drawingboard is always around, and renderTree is constantly destroyed
 			// and recreated, so we have to make the link.
