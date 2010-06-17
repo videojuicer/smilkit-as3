@@ -114,12 +114,12 @@ package org.smilkit.dom
 		}
 		
 		/**
-		 * Applies the specified mutation function to the parent object without dispatching
+		 * Applies the specified mutation <code>Function</code> to the parent object without dispatching
 		 * any mutation events, and once the mutation has completed a <code>DOM_SUBTREE_MODIFIED</code> event
 		 * is dispatched from the node.
 		 * 
-		 * @params node The parent object to apply the mutation to (must be a child of this document).
-		 * @params mutation The mutation function to run on the parent object.
+		 * @params node The parent <code>Node</code> to apply the mutation to (must be a child of this document).
+		 * @params mutation The mutation <code>Function</code> to run on the parent object.
 		 * 
 		 * @return Boolean Returns the state of the mutation events after the mutation has took place.
 		 *
