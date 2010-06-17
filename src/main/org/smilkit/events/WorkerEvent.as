@@ -19,7 +19,7 @@ package org.smilkit.events
 			this._worker = worker;
 		}
 		
-		public function get worker():SMILKitHandler
+		public function get worker():Worker
 		{
 			return this._worker;
 		}

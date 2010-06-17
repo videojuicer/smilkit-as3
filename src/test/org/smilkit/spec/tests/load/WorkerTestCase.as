@@ -16,7 +16,7 @@ package org.smilkit.spec.tests.load
 	import org.smilkit.load.Worker;
 	import org.smilkit.events.WorkerEvent;
 	
-	import org.smilkit.spec.mocks.MockHandler;
+	import org.smilkit.spec.mock.MockHandler;
 
 	public class WorkerTestCase
 	{		
@@ -32,6 +32,8 @@ package org.smilkit.spec.tests.load
 		protected var _dummyResolveEventName:String = "dummyResolveCompleted";
 		protected var _dummyCompleteEventName:String = "dummyLoadCompleted";
 		protected var _dummyFailedEventName:String = "dummyFailedBecauseHeIsADummy";
+		
+		protected var _slaveWorkerConcurrency:uint = 3;
 		
 		[Before]
 		public function setUp():void
@@ -55,7 +57,7 @@ package org.smilkit.spec.tests.load
 			// no concurrency limit
 			this._priorityWorker = new Worker(this._dummyResolveEventName, this._dummyFailedEventName);
 			// set concurrency limit, slaved to priority worker
-			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, 3, this._priorityWorker);
+			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, this._slaveWorkerConcurrency, this._priorityWorker);
 			
 			// create a pool of handlers to work with
 			
@@ -87,20 +89,70 @@ package org.smilkit.spec.tests.load
 		}
 		
 		// advancing the queue when stopped does nothing, even when below concurrency limit
-		[Test(description="Tests the advance() method to ensure that nothing is advanced when the worker is stopped")]
+		
+		[Test(description="Tests the addHandlerToWorkQueue() method to ensure that the queue is not filled when not started")]
 		public function advanceDoesNotMoveItemsToWorkListWhenStopped():void {
 			Assert.assertFalse(this._priorityWorker.working);
-			Assert.assertFalse(this._priorityWorker.advance());
+			// add some items to the queue
+			for(var i:uint=0; i<6; i++)
+			{
+				var h:SMILKitHandler = this._handlerPool[i];
+				// Put some items on the priority worker, which has no set concurrency
+				this._priorityWorker.addHandlerToWorkQueue(h);
+				Assert.assertFalse(this._priorityWorker.hasHandlerInWorkList(h));
+				Assert.assertTrue(this._priorityWorker.hasHandlerInWorkQueue(h));
+				
+				// Put some items on the slave worker, which has limited concurrency
+				this._slaveWorker.addHandlerToWorkQueue(h);
+				Assert.assertFalse(this._slaveWorker.hasHandlerInWorkList(h));
+				Assert.assertTrue(this._slaveWorker.hasHandlerInWorkQueue(h));
+			}
+			
 		}
 		
+		// advancing the queue when active fills the worklist to capacity
+		// advancing the queue when worklist filled to capacity moves no items
+		[Test(description="Tests the start() method on populated workers to ensure that the queue is filled to capacity")]
+		public function startingAdvancesAndFillsTheWorkListToCapacity():void {
+			Assert.assertFalse(this._priorityWorker.working);
+			// add some items to the queue
+			for(var i:uint=0; i<6; i++)
+			{
+				var h:SMILKitHandler = this._handlerPool[i];
+				// Put some items on the priority worker, which has no set concurrency
+				this._priorityWorker.addHandlerToWorkQueue(h);
+				// Put some items on the slave worker, which has limited concurrency
+				this._slaveWorker.addHandlerToWorkQueue(h);
+			}
+			this._priorityWorker.start();
+			this._slaveWorker.start();
+			for(var j:uint=0; j<6; j++)
+			{
+				var o:SMILKitHandler = this._handlerPool[j];
+				Assert.assertTrue(this._priorityWorker.hasHandlerInWorkList(o));
+				Assert.assertFalse(this._priorityWorker.hasHandlerInWorkQueue(o));
+				
+				if(j < this._slaveWorkerConcurrency)
+				{
+					// should have workers up to the concurrency count in the list
+					Assert.assertTrue(this._slaveWorker.hasHandlerInWorkList(o));
+					Assert.assertFalse(this._slaveWorker.hasHandlerInWorkQueue(o));
+				}
+				else 
+				{
+					// everything else should be in the queue
+					Assert.assertFalse(this._slaveWorker.hasHandlerInWorkList(o));
+					Assert.assertTrue(this._slaveWorker.hasHandlerInWorkQueue(o));
+				}
+			}
+		}
 	}
 	
 	// Pending tests:
 	
 	
 	
-	// advancing the queue when active fills the worklist to capacity
-	// advancing the queue when worklist filled to capacity moves no items
+
 	
 	// advancing the queue when nothing is queued or listed fires the IDLE event
 	// idle event does not fire if worker was idle last advance
