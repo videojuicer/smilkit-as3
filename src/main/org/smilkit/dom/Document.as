@@ -115,12 +115,15 @@ package org.smilkit.dom
 		
 		/**
 		 * Applies the specified mutation function to the parent object without dispatching
-		 * any mutation events.
+		 * any mutation events, and once the mutation has completed a <code>DOM_SUBTREE_MODIFIED</code> event
+		 * is dispatched from the node.
 		 * 
 		 * @params node The parent object to apply the mutation to (must be a child of this document).
 		 * @params mutation The mutation function to run on the parent object.
 		 * 
 		 * @return Boolean Returns the state of the mutation events after the mutation has took place.
+		 *
+		 * @throws DOMException.WRONG_DOCUMENT_ERR
 		 */
 		public function applyMutation(node:INode, mutation:Function):Boolean
 		{
@@ -136,6 +139,8 @@ package org.smilkit.dom
 			mutation.call(node);
 		
 			this.mutationEvents = previousMutations;
+			
+			this.dispatchNodeEvent(node, new MutationEvent(MutationEvent.DOM_SUBTREE_MODIFIED));
 		
 			return this.mutationEvents;
 		}
