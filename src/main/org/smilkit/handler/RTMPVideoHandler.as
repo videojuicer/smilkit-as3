@@ -3,6 +3,7 @@ package org.smilkit.handler
 	import flash.events.NetStatusEvent;
 	
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.events.HandlerEvent;
 	
 	public class RTMPVideoHandler extends SMILKitHandler
 	{

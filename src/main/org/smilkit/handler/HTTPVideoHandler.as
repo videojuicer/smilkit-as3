@@ -16,6 +16,7 @@ package org.smilkit.handler
 	import org.smilkit.util.Metadata;
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.events.HandlerEvent;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{
@@ -116,6 +117,17 @@ package org.smilkit.handler
 		public override function seek(seekTo:Number):void
 		{
 			this._netStream.seek(seekTo);
+		}
+		
+		public override function cancel():void
+		{
+			this._netStream.close();
+			this._netConnection.close();
+			
+			this._netConnection = null;
+			this._netStream = null;
+			
+			super.cancel();
 		}
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void

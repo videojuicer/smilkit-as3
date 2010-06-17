@@ -1,6 +1,7 @@
-package org.smilkit.handler
+package org.smilkit.events
 {
 	import flash.events.Event;
+	import org.smilkit.handler.SMILKitHandler;
 	
 	public class HandlerEvent extends Event
 	{

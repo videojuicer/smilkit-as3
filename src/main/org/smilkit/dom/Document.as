@@ -140,7 +140,10 @@ package org.smilkit.dom
 		
 			this.mutationEvents = previousMutations;
 			
-			this.dispatchNodeEvent(node, new MutationEvent(MutationEvent.DOM_SUBTREE_MODIFIED));
+			var me:MutationEvent = new MutationEvent();
+			me.initMutationEvent(MutationEvent.DOM_SUBTREE_MODIFIED, true, false, node, null, null, null, 0);
+			
+			this.dispatchNodeEvent(node, me);
 		
 			return this.mutationEvents;
 		}

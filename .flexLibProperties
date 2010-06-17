@@ -44,7 +44,7 @@
     <classEntry path="org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase"/>
     <classEntry path="org.smilkit.util.Metadata"/>
     <classEntry path="org.smilkit.spec.tests.view.ViewportTestCase"/>
-    <classEntry path="org.smilkit.handler.HandlerEvent"/>
+    <classEntry path="org.smilkit.events.HandlerEvent"/>
     <classEntry path="org.smilkit.events.EventHandler"/>
     <classEntry path="org.smilkit.events.ViewportEvent"/>
     <classEntry path="org.smilkit.render.RenderTree"/>
@@ -66,6 +66,7 @@
     <classEntry path="org.smilkit.events.WorkUnitEvent"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.handler.RTMPVideoHandler"/>
+    <classEntry path="org.smilkit.util.RedirectLoader"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
