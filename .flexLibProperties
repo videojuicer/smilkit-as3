@@ -65,6 +65,7 @@
     <classEntry path="org.smilkit.events.WorkerEvent"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.handler.RTMPVideoHandler"/>
+    <classEntry path="org.smilkit.util.RedirectLoader"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
