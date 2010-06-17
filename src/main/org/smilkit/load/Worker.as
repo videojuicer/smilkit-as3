@@ -4,7 +4,8 @@ package org.smilkit.load {
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.events.WorkerEvent;
-	/*
+	import org.smilkit.events.HandlerEvent;
+	/**
 	 * An instance of load.Worker deals with queueing and prioritisation of handler load tasks.
 	 * Each worker encapsulates a workQueue, which is a linear list of items to be processed,
 	 * and a workList of items currently being worked on with a settable concurrency limit.
@@ -22,53 +23,53 @@ package org.smilkit.load {
 	*/
 	public class Worker extends EventDispatcher {
 		
-		/*
+		/**
 		 * Settable concurrency lets you place a limit on the maximum length of the workList. A null value means no concurrency limit.
 		*/
 		private var _concurrency:uint;
 		
-		/*
+		/**
 		* The workQueue vector stores all handlers pending action in this worklist.
 		*/
 		private var _workQueue:Vector.<SMILKitHandler>;
 		
-		/*
+		/**
 		 * The workList vector stores references to all handlers currently being worked on.
 		*/
 		private var _workList:Vector.<SMILKitHandler>;
 		
-		/* 
+		/** 
 		 * Boolean flag to indicate whether items in the queue should advance to the workList when space frees up.
 		*/
 		private var _working:Boolean = false;
 		
-		/*
+		/**
 		 * The type of HandlerEvent to listen for. When this event is triggered on an asset it will be considered
 		 * complete for the purposes of this Worker instance.
 		*/
 		private var _completionEventType:String;
 				
-		/*
+		/**
 		 * The type of HandlerEvent to listen for. When this event is triggered on an asset it will be considered
 		 * failed for the purposes of this Worker instance and discarded from the queue.
 		*/
 		private var _failureEventType:String;
-		/*
+		/**
 		 * A right-of-way priority delegate to which this worker will cede priority.
 		*/
 		private var _priorityWorker:Worker;
 		
-		/*
+		/**
 		 * An optional name to use when logging status messages.
 		*/
 		public var loggerName:String = "Worker";
 		
-		/*
+		/**
 		 * An internal flag used to retain state between advances.
 		*/
 		private var _idleOnLastAdvance:Boolean = false;
 		
-		/*
+		/**
 		 * Create a new Worker instance.
 		 *
 		 * @param completionEventType A <code>String</code> referring to a HandlerEvent type used for completion notices on this Worker.
@@ -95,27 +96,33 @@ package org.smilkit.load {
 		}
 		
 		public function start():Boolean {
-			if(!this.working) {
+			if(!this.working) 
+			{
 				this._working = true;
 				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STARTED));
 				this.advance();
 				return true;
-			} else {
+			} 
+			else 
+			{
 				return false;
 			}
 		}
 		
 		public function stop():Boolean {
-			if(this.working) {
+			if(this.working) 
+			{
 				this._working = false;
 				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STOPPED));
 				return true;
-			} else {
+			} 
+			else 
+			{
 				return false;
 			}
 		}
 		
-		/* 
+		/** 
 		 * Adds a handler to the back of the workQueue.
 		 * @return A boolean, false if the handler was already on the workList or the workQueue in this worker and true if it was added.
 		*/
@@ -127,15 +134,17 @@ package org.smilkit.load {
 			return true;
 		}
 		
-		/*
+		/**
 		 * Removes a handler from the queue.
 		*/		
 		public function removeHandler(handler:SMILKitHandler):Boolean {
-			if(this.hasHandlerInWorkList(handler)) {
+			if(this.hasHandlerInWorkList(handler)) 
+			{
 				// TODO remove from vector
 				this.advance();
 			} 
-			if(this.hasHandlerInWorkQueue(handler)) {
+			if(this.hasHandlerInWorkQueue(handler)) 
+			{
 				//TODO remove from vector
 			}
 			return false;
@@ -153,10 +162,31 @@ package org.smilkit.load {
 			return (this._workQueue.indexOf(handler) != -1);
 		}
 		
+		/**
+		 * Returns the number of items from the workQueue that are eligible to be placed
+		 * in the workList, taking into account the current concurrency setting and the
+		 * lengths of the workList and workQueue.
+		 * @return A <code>uint</code> representing the number of steps the worker can advance.
+		*/
+		private function advanceCapacity():uint {
+			if(this._concurrency < 1) 
+			{
+				// Unlimited concurrency. Go for broke and punt everything from the queue.
+				return this._workQueue.length;
+			}
+			else 
+			{
+				var listRemain:uint = this._concurrency - this._workList.length;
+				
+			}
+		}
+		
 		private function advance():Boolean {
-			if(this.working) {
-				if(this._concurrency < 1) {
-					
+			if(this.working) 
+			{
+				var cap:uint = this.advanceCapacity();
+				for(var i:uint=0; i < cap; i++) {
+					// push workqueue item onto worklist and broadcast WORK_UNIT_STARTED
 				}
 			}
 			return false;
@@ -171,11 +201,11 @@ package org.smilkit.load {
 		
 		
 		
-		public function onWorkUnitCompleted(e:WorkerEvent):void {
+		public function onWorkUnitCompleted(e:HandlerEvent):void {
 			
 		}
 		
-		public function onWorkUnitFailed(e:WorkerEvent):void {
+		public function onWorkUnitFailed(e:HandlerEvent):void {
 			
 		}
 		

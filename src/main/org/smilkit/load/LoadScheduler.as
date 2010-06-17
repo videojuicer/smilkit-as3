@@ -7,8 +7,10 @@ package org.smilkit.load {
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.load.Worker;
+	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.events.HandlerEvent;
 	
-	/**
+	/***
 	 * An instance of LoadScheduler listens to both the TimingGraph and RenderTree objects for
 	 * change/rebuild events and attempts to make the best decisions for prioritising load order.
 	 * 
@@ -48,33 +50,33 @@ package org.smilkit.load {
 	 * 6. Become active in the preload queue if at index 0 and if both the JIT list and the resolve queue are empty.
 	*/
 	public class LoadScheduler {
-		/**
+		/***
 		 * An instance of ViewportObjectPool is required in order to reference the RenderTree and TimingGraph instances. 
 		 */
 		protected var _objectPool:ViewportObjectPool;
 		
-		/**
+		/***
 		 * Used in conditional checks to prevent the scheduler from starting work more than once.
 		 */
 		protected var _working:Boolean = false;
 		
-		/*
+		/**
 		 * The justInTime worker, a queue/list pair with no concurrency.
 		*/
 		protected var _justInTimeWorker:Worker;
 		
-		/*
+		/**
 		 * A pointer to the master control worker
 		*/ 
 		protected var _masterWorker:Worker;
 		
-		/*
+		/**
 		* The resolve worker, a queue/list pair with concurrency of 1 with priority lower than that of the justInTimeWorker
 		* but higher than that of the preloadWorker
 		*/
 		protected var _resolveWorker:Worker;
 		protected var _resolveWorkerConcurrencyLimit:uint;
-		/*
+		/**
 		* The preload workqueue, a queue/list pair of handers to be fully preloaded. This list is opportunistic in
 		* nature and uses the timing graph as a data source.
 		*/

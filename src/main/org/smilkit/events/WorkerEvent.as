@@ -1,7 +1,8 @@
 package org.smilkit.events
 {
 	import flash.events.Event;
-		
+	import org.smilkit.handler.SMILKitHandler;	
+	
 	public class WorkerEvent extends Event
 	{
 		public static var WORKER_STARTED:String = "workerStarted";
@@ -11,6 +12,8 @@ package org.smilkit.events
 		
 		public static var WORK_UNIT_STARTED:String = "workUnitStarted";
 		public static var WORK_UNIT_COMPLETED:String = "workUnitCompleted";
+		
+		public var _handler:SMILKitHandler;
 		
 		public function WorkerEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

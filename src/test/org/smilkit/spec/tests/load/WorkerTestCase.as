@@ -31,6 +31,9 @@ package org.smilkit.spec.tests.load
 			this._priorityWorker = new Worker(this._dummyResolveEventName, this._dummyFailedEventName);
 			// set concurrency limit, slaved to priority worker
 			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, 3, this._priorityWorker);
+			
+			// create a pool of handlers to work with
+			
 		}
 		
 		[After]
@@ -38,6 +41,7 @@ package org.smilkit.spec.tests.load
 		{
 			this._priorityWorker = null;
 			this._slaveWorker = null;
+			this._handlerPool = null;
 		}
 		
 		[Test(description="Tests the start/stop toggle from a stopped state")]
@@ -56,11 +60,18 @@ package org.smilkit.spec.tests.load
 			Assert.assertTrue(this._priorityWorker.stop());
 			Assert.assertFalse(this._priorityWorker.working);
 		}
+		
+		// advancing the queue when stopped does nothing, even when below concurrency limit
+		[Test(description="Tests the advance() method to ensure that nothing is advanced when the worker is stopped")]
+		public function advanceDoesNotMoveItemsToWorkListWhenStopped():void {
+			
+		}
+		
 	}
 	
 	// Pending tests:
 	
-	// advancing the queue when stopped does nothing, even when below concurrency limit
+	
 	
 	// advancing the queue when active fills the worklist to capacity
 	
