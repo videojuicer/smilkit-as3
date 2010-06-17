@@ -118,6 +118,17 @@ package org.smilkit.handler
 			this._netStream.seek(seekTo);
 		}
 		
+		public override function cancel():void
+		{
+			this._netStream.close();
+			this._netConnection.close();
+			
+			this._netConnection = null;
+			this._netStream = null;
+			
+			super.cancel();
+		}
+		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
 			trace("Netstatus: "+e.info.level+" "+e.info.code);
