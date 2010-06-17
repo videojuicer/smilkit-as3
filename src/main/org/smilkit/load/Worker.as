@@ -4,6 +4,7 @@ package org.smilkit.load {
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.events.HandlerEvent;
 	/**
 	 * An instance of load.Worker deals with queueing and prioritisation of handler load tasks.
@@ -99,7 +100,7 @@ package org.smilkit.load {
 			if(!this.working) 
 			{
 				this._working = true;
-				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STARTED));
+				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STARTED, this));
 				this.advance();
 				return true;
 			} 
@@ -113,7 +114,7 @@ package org.smilkit.load {
 			if(this.working) 
 			{
 				this._working = false;
-				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STOPPED));
+				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STOPPED, this));
 				return true;
 			} 
 			else 
@@ -177,17 +178,26 @@ package org.smilkit.load {
 			else 
 			{
 				var listRemain:uint = this._concurrency - this._workList.length;
-				
+				var queueRemain:uint = this._workQueue.length;
+				if(listRemain <= 0) return 0;
+				else return (listRemain > queueRemain)? queueRemain : listRemain;
 			}
 		}
 		
+		/**
+		 * Refills the workList to capacity
+		*/
 		private function advance():Boolean {
 			if(this.working) 
 			{
 				var cap:uint = this.advanceCapacity();
+				if(cap <= 0) return false;
 				for(var i:uint=0; i < cap; i++) {
 					// push workqueue item onto worklist and broadcast WORK_UNIT_STARTED
+					// remove from workQueue
 				}
+				// Check idle state and transmit idle event if transitioning to idle
+				// Transmit resumed event if resuming from idle
 			}
 			return false;
 		}

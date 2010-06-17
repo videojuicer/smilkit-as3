@@ -1,7 +1,8 @@
 package org.smilkit.events
 {
 	import flash.events.Event;
-	import org.smilkit.handler.SMILKitHandler;	
+	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.load.Worker;	
 	
 	public class WorkerEvent extends Event
 	{
@@ -10,14 +11,17 @@ package org.smilkit.events
 		public static var WORKER_IDLE:String = "workerIdling";
 		public static var WORKER_RESUMED:String = "workerResumed";
 		
-		public static var WORK_UNIT_STARTED:String = "workUnitStarted";
-		public static var WORK_UNIT_COMPLETED:String = "workUnitCompleted";
+		protected var _worker:Worker;
 		
-		public var _handler:SMILKitHandler;
-		
-		public function WorkerEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function WorkerEvent(type:String, worker:Worker, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
+			this._worker = worker;
+		}
+		
+		public function get worker():SMILKitHandler
+		{
+			return this._worker;
 		}
 	}
 }

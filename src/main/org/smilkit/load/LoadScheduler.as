@@ -91,10 +91,10 @@ package org.smilkit.load {
 			this._justInTimeWorker = new Worker("loadCompleted", "loadFailed", 0);
 			this._justInTimeWorker.loggerName = "JustInTime Worker";
 			
-			this._resolveWorker = new Worker("resolveCompleted", "loadFailed", this._resolveWorkerConcurrencyLimit, this._justInTimeWorker);
+			this._resolveWorker = new Worker(HandlerEvent.DURATION_RESOLVED, HandlerEvent.LOAD_FAILED, this._resolveWorkerConcurrencyLimit, this._justInTimeWorker);
 			this._resolveWorker.loggerName = "Resolve Worker";
 			
-			this._preloadWorker = new Worker("loadCompleted", "loadFailed", this._preloadWorkerConcurrencyLimit, this._resolveWorker);
+			this._preloadWorker = new Worker(HandlerEvent.LOAD_COMPLETED, HandlerEvent.LOAD_FAILED, this._preloadWorkerConcurrencyLimit, this._resolveWorker);
 			this._preloadWorker.loggerName = "Preload Worker";
 			
 			this._masterWorker = this._justInTimeWorker;

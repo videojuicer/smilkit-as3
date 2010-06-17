@@ -63,6 +63,7 @@
     <classEntry path="org.smilkit.load.LoadScheduler"/>
     <classEntry path="org.smilkit.load.Worker"/>
     <classEntry path="org.smilkit.events.WorkerEvent"/>
+    <classEntry path="org.smilkit.events.WorkUnitEvent"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.handler.RTMPVideoHandler"/>
   </includeClasses>
