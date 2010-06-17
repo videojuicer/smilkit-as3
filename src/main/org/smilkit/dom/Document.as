@@ -114,6 +114,33 @@ package org.smilkit.dom
 		}
 		
 		/**
+		 * Applies the specified mutation function to the parent object without dispatching
+		 * any mutation events.
+		 * 
+		 * @params node The parent object to apply the mutation to (must be a child of this document).
+		 * @params mutation The mutation function to run on the parent object.
+		 * 
+		 * @return Boolean Returns the state of the mutation events after the mutation has took place.
+		 */
+		public function applyMutation(node:INode, mutation:Function):Boolean
+		{
+			if (node.ownerDocument != this)
+			{
+				throw new DOMException(DOMException.WRONG_DOCUMENT_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "WRONG_DOCUMENT_ERR"));
+			}
+			
+			var previousMutations:Boolean = this.mutationEvents;
+			
+			this.mutationEvents = false;
+			
+			mutation.call(node);
+		
+			this.mutationEvents = previousMutations;
+		
+			return this.mutationEvents;
+		}
+		
+		/**
 		 * Add the specified <code>IEventListener</code> to the stack of registered listeners for the <code>INode</code>.
 		 * 
 		 * @param node The <code>INode</code> instance to register the event for.
