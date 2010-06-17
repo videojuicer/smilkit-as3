@@ -16,6 +16,7 @@ package org.smilkit.handler
 	import org.smilkit.util.Metadata;
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.events.HandlerEvent;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{

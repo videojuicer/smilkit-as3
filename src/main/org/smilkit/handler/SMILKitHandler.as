@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.events.HandlerEvent;
 
 	public class SMILKitHandler extends EventDispatcher
 	{
