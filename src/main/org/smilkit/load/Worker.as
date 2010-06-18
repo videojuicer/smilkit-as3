@@ -132,6 +132,8 @@ package org.smilkit.load {
 			this._workQueue.push(handler);
 			handler.addEventListener(this._completionEventType, this.onWorkUnitCompleted);
 			handler.addEventListener(this._failureEventType, this.onWorkUnitFailed);
+			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_QUEUED, handler));
+			this.advance();
 			return true;
 		}
 		
@@ -139,16 +141,19 @@ package org.smilkit.load {
 		 * Removes a handler from the queue.
 		*/		
 		public function removeHandler(handler:SMILKitHandler):Boolean {
+			var res:Boolean = false;
 			if(this.hasHandlerInWorkList(handler)) 
 			{
-				// TODO remove from vector
-				this.advance();
+				this._workList.splice(this._workList.indexOf(handler), 1);
+				res = true;
 			} 
 			if(this.hasHandlerInWorkQueue(handler)) 
 			{
-				//TODO remove from vector
+				this._workQueue.splice(this._workList.indexOf(handler), 1);
+				res = true;
 			}
-			return false;
+			if(res) this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_REMOVED, handler));
+			return res;
 		}
 		
 		public function hasHandler(handler:SMILKitHandler):Boolean {
@@ -169,40 +174,73 @@ package org.smilkit.load {
 		 * lengths of the workList and workQueue.
 		 * @return A <code>uint</code> representing the number of steps the worker can advance.
 		*/
-		private function advanceCapacity():uint {
-			if(this._concurrency < 1) 
+		public function advanceCapacity():uint {
+			if(this._concurrency <= 0) 
 			{
 				// Unlimited concurrency. Go for broke and punt everything from the queue.
 				return this._workQueue.length;
 			}
 			else 
 			{
-				var listRemain:uint = this._concurrency - this._workList.length;
-				var queueRemain:uint = this._workQueue.length;
-				if(listRemain <= 0) return 0;
-				else return (listRemain > queueRemain)? queueRemain : listRemain;
+				var listRemain:uint = this._concurrency - this._workList.length; // Remaining capacity on the list
+				var queueRemain:uint = this._workQueue.length; // Remaining items on the queue
+				if(listRemain <= 0) return 0; // Full list means no advance capacity
+				else return (listRemain > queueRemain)? queueRemain : listRemain; // Return the smaller of the two figures
 			}
 		}
 		
 		/**
-		 * Refills the workList to capacity
+		 * Refills the workList to capacity and broadcasts WORK_UNIT_LISTED events on all items
+		 * newly added to the workList.
+		 * @return A <code>uint</code> indicating the number of items that were advanced onto the workList.
 		*/
-		private function advance():Boolean {
+		public function advance():uint {
 			if(this.working) 
 			{
-				var cap:uint = this.advanceCapacity();
-				if(cap <= 0) return false;
-				for(var i:uint=0; i < cap; i++) {
-					// push workqueue item onto worklist and broadcast WORK_UNIT_STARTED
-					// remove from workQueue
+				var limit:uint = this.advanceCapacity();
+				var moved:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
+				for(var i:uint=0; i < limit; i++) {
+					//throw new Error(this.loggerName+" wQ size: "+this._workQueue.length+" wL size: "+this._workList.length);
+					var h:SMILKitHandler = this._workQueue[i];
+					// push workqueue item onto worklist and broadcast WORK_UNIT_LISTED
+					this._workList.push(h);
+					moved.push(h);
 				}
-				// Check idle state and transmit idle event if transitioning to idle
-				// Transmit resumed event if resuming from idle
+				// Splice the moved items from the workQueue
+				this._workQueue.splice(0, moved.length);
+				// Dispatch LISTED event on moved items
+				for(var j:uint=0; j < moved.length; j++)
+				{
+					var movedHandler:SMILKitHandler = moved[j];
+					this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_LISTED, movedHandler));					
+				}
+				
+				// Check idle state and transmit idle event if transitioning to idle 
+				if(this._idleOnLastAdvance && !this.idle) {
+					// If it was idle on last advance and isn't idle now, then we're resuming.
+					this._idleOnLastAdvance = false;
+					this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_RESUMED, this));
+				} else if(!this._idleOnLastAdvance && this.idle)
+				{
+					// If it wasn't idle last time and it is idle now, then we're going idle.
+					this._idleOnLastAdvance = true;
+					this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_IDLE, this));
+				}
+				return limit;
 			}
-			return false;
+			return 0;
 		}
 		
-		private function bindPriorityWorkerEvents(priorityWorker:Worker):void {
+		/**
+		 * Returns a boolean to indicate whether or not the worker is currently in an idle state
+		 * (i.e. is working, and has nothing on either the queue or the list) 
+		*/
+		public function get idle():Boolean
+		{
+			return (this.working && (this._workQueue.length <= 0) && (this._workList.length <= 0));
+		}
+		
+		protected function bindPriorityWorkerEvents(priorityWorker:Worker):void {
 			priorityWorker.addEventListener(WorkerEvent.WORKER_STARTED, this.onPriorityWorkerStarted);
 			priorityWorker.addEventListener(WorkerEvent.WORKER_STOPPED, this.onPriorityWorkerStopped);
 			priorityWorker.addEventListener(WorkerEvent.WORKER_IDLE, this.onPriorityWorkerIdle);
@@ -212,7 +250,8 @@ package org.smilkit.load {
 		
 		
 		public function onWorkUnitCompleted(e:HandlerEvent):void {
-			
+			// Broadcast WorkUnitComplete
+			// removeHandler
 		}
 		
 		public function onWorkUnitFailed(e:HandlerEvent):void {
@@ -239,11 +278,11 @@ package org.smilkit.load {
 			this.stop();
 		}
 		
-		private function logInfo(msg:String):void {
+		protected function logInfo(msg:String):void {
 			Logger.info("Worker : "+this.loggerName+" "+msg, {"self": this, "priorityWorker": this._priorityWorker});
 		}
 		
-		private function logDebug(msg:String):void {
+		protected function logDebug(msg:String):void {
 			Logger.debug("Worker : "+this.loggerName+" "+msg, {"self": this, "priorityWorker": this._priorityWorker});
 		}
 		
