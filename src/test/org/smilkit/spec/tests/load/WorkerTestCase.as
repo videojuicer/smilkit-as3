@@ -56,9 +56,10 @@ package org.smilkit.spec.tests.load
 			
 			// no concurrency limit
 			this._priorityWorker = new Worker(this._dummyResolveEventName, this._dummyFailedEventName);
+			this._priorityWorker.loggerName = "priorityWorker";
 			// set concurrency limit, slaved to priority worker
 			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, this._slaveWorkerConcurrency, this._priorityWorker);
-			
+			this._slaveWorker.loggerName = "slaveWorker";
 			// create a pool of handlers to work with
 			
 		}
@@ -110,28 +111,38 @@ package org.smilkit.spec.tests.load
 			
 		}
 		
-		// advancing the queue when active fills the worklist to capacity
-		// advancing the queue when worklist filled to capacity moves no items
-		[Test(description="Tests the start() method on populated workers to ensure that the queue is filled to capacity")]
-		public function startingAdvancesAndFillsTheWorkListToCapacity():void {
+		[Test(description="Tests the start() method on a populated worker with no concurrency to ensure that the queue is filled to capacity")]
+		public function startingWorkerWithNoConcurrencyAdvancesAndFillsTheWorkListToCapacity():void {
 			Assert.assertFalse(this._priorityWorker.working);
 			// add some items to the queue
 			for(var i:uint=0; i<6; i++)
 			{
 				var h:SMILKitHandler = this._handlerPool[i];
-				// Put some items on the priority worker, which has no set concurrency
 				this._priorityWorker.addHandlerToWorkQueue(h);
-				// Put some items on the slave worker, which has limited concurrency
-				this._slaveWorker.addHandlerToWorkQueue(h);
 			}
+			Assert.assertEquals(this._priorityWorker.advanceCapacity(), 6);
 			this._priorityWorker.start();
-			this._slaveWorker.start();
 			for(var j:uint=0; j<6; j++)
 			{
 				var o:SMILKitHandler = this._handlerPool[j];
 				Assert.assertTrue(this._priorityWorker.hasHandlerInWorkList(o));
 				Assert.assertFalse(this._priorityWorker.hasHandlerInWorkQueue(o));
-				
+			}
+		}
+		
+		[Test(description="Tests the start() method on a populated worker with a set concurrency limit to ensure that the queue is filled to capacity")]
+		public function startingWorkerWithLimitedConcurrencyAdvancesAndFillsTheWorkListToCapacity():void {
+			// add some items to the queue
+			for(var i:uint=0; i<6; i++)
+			{
+				var h:SMILKitHandler = this._handlerPool[i];
+				this._slaveWorker.addHandlerToWorkQueue(h);
+			}
+			Assert.assertEquals(this._slaveWorker.advanceCapacity(), 3);
+			this._slaveWorker.start();
+			for(var j:uint=0; j<6; j++)
+			{
+				var o:SMILKitHandler = this._handlerPool[j];
 				if(j < this._slaveWorkerConcurrency)
 				{
 					// should have workers up to the concurrency count in the list
@@ -146,6 +157,9 @@ package org.smilkit.spec.tests.load
 				}
 			}
 		}
+		
+		
+		
 	}
 	
 	// Pending tests:
@@ -178,6 +192,9 @@ package org.smilkit.spec.tests.load
 	// stops working onPriorityWorkerResume
 	// stops working onPriorityWorkerStarted
 	// starts working onPriorityWorkerIdle
+	
+	// receiving the completion event removes the handler from the worker and dispatches WORK_UNIT_COMPLETE and WORK_UNIT_REMOVED
+	// receiving the failure event removes the handler from the worker and dispatches WORK_UNIT_FAILEd and WORK_UNIT_REMOVED
 	
 	
 }
