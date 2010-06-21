@@ -53,6 +53,11 @@ package org.smilkit.view
 			return this._heartbeat.offset;
 		}
 		
+		public function get playing():Boolean
+		{
+			return this._heartbeat.running;
+		}
+		
 		public function get viewportObjectPool():ViewportObjectPool
 		{
 			return this._objectPool;
