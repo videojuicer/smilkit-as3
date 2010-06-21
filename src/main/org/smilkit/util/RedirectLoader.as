@@ -21,6 +21,16 @@ package org.smilkit.util
 			this._loaders = new Vector.<Loader>();
 		}
 		
+		public function get currentLoader():Loader
+		{
+			if (this._loaders.length == 0)
+			{
+				return null;
+			}
+			
+			return this._loaders[(this._loaders.length - 1)];
+		}
+		
 		public function load(request:URLRequest, context:LoaderContext):void
 		{
 			this._context = context;

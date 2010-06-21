@@ -170,8 +170,11 @@ package org.smilkit.render
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
 						}
+						
 						// always add to the new active list
 						newActiveElements.push(time);
+						
+						// do we have enough data to actual run this or should be wait for moar?
 					}
 				}
 				

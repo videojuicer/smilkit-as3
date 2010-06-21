@@ -1,6 +1,5 @@
 package org.smilkit.handler
 {
-	import flash.events.EventDispatcher;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.EventDispatcher;
@@ -9,11 +8,11 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.events.HandlerEvent;
 
 	public class SMILKitHandler extends EventDispatcher
 	{
@@ -126,6 +125,12 @@ package org.smilkit.handler
 			if (!this.startedLoading)
 			{
 				this.load();
+			}
+			
+			if (this.completedLoading)
+			{
+				// were ready since load has finished!
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 			}
 		}
 		
