@@ -114,6 +114,7 @@ package org.smilkit.load {
 			if(this.working) 
 			{
 				this._working = false;
+				this._idleOnLastAdvance = false; // Reset idle event flag
 				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STOPPED, this));
 				return true;
 			} 
@@ -153,6 +154,7 @@ package org.smilkit.load {
 				res = true;
 			}
 			if(res) this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_REMOVED, handler));
+			this.advance();
 			return res;
 		}
 		
@@ -250,12 +252,13 @@ package org.smilkit.load {
 		
 		
 		public function onWorkUnitCompleted(e:HandlerEvent):void {
-			// Broadcast WorkUnitComplete
+			// Broadcast WORK_UNIT_COMPLETED
 			// removeHandler
 		}
 		
 		public function onWorkUnitFailed(e:HandlerEvent):void {
-			
+			// Dispatch WORK_UNIT_FAILED
+			// removeHandler
 		}
 		
 		public function onPriorityWorkerStarted(e:WorkerEvent):void {

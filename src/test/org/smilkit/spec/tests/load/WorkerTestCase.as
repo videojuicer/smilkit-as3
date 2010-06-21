@@ -15,6 +15,7 @@ package org.smilkit.spec.tests.load
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.load.Worker;
 	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.events.WorkUnitEvent;
 	
 	import org.smilkit.spec.mock.MockHandler;
 
@@ -34,6 +35,10 @@ package org.smilkit.spec.tests.load
 		protected var _dummyFailedEventName:String = "dummyFailedBecauseHeIsADummy";
 		
 		protected var _slaveWorkerConcurrency:uint = 3;
+		
+		// Used to pick up event dispatches during tests
+		protected var _onWorkerIdleFlag:Boolean;
+		protected var _onWorkerResumedFlag:Boolean;
 		
 		[Before]
 		public function setUp():void
@@ -60,8 +65,10 @@ package org.smilkit.spec.tests.load
 			// set concurrency limit, slaved to priority worker
 			this._slaveWorker = new Worker(this._dummyCompleteEventName, this._dummyFailedEventName, this._slaveWorkerConcurrency, this._priorityWorker);
 			this._slaveWorker.loggerName = "slaveWorker";
-			// create a pool of handlers to work with
-			
+
+			// Reset event flags
+			this._onWorkerIdleFlag = false;
+			this._onWorkerResumedFlag = false;			
 		}
 		
 		[After]
@@ -157,22 +164,98 @@ package org.smilkit.spec.tests.load
 				}
 			}
 		}
+
+		// advancing the queue when nothing is queued or listed fires the IDLE event
+		// advancing the queue when things are queued and the worker was idle last advance transmits resume event
+		[Test(description="Tests the event dispatcher to ensure that the WORKER_IDLE event is dispatched only when transitioning to the idle state")]
+		public function advancingWorkerDispatchesIdleOrResumedEventAppropriately():void {
+			// Set up with local event listeners
+			Assert.assertFalse(this._onWorkerIdleFlag);
+			Assert.assertFalse(this._priorityWorker.working);
+			this._priorityWorker.addEventListener(WorkerEvent.WORKER_IDLE, this.onWorkerIdle);
+			this._priorityWorker.addEventListener(WorkerEvent.WORKER_RESUMED, this.onWorkerResumed);
+			
+			// idle event dispatched when working but nothing to do
+			this._priorityWorker.start();
+			Assert.assertTrue(this._onWorkerIdleFlag);
+			Assert.assertFalse(this._onWorkerResumedFlag);
+
+			// idle event does not fire if worker was idle last advance
+			this._onWorkerIdleFlag = false;
+			this._priorityWorker.advance();
+			Assert.assertFalse(this._onWorkerIdleFlag);
+			
+			// resume event is dispatched when work given
+			this._priorityWorker.addHandlerToWorkQueue(this._handlerPool[0]);
+			Assert.assertTrue(this._onWorkerResumedFlag);
+			
+			// resume event does not fire if worker not idle when given more work
+			this._onWorkerResumedFlag = false;
+			this._priorityWorker.addHandlerToWorkQueue(this._handlerPool[1]);
+			Assert.assertFalse(this._onWorkerResumedFlag);
+		}
+		// Matching private receiver for above test
+		protected function onWorkerIdle(event:WorkerEvent):void
+		{
+			this._onWorkerIdleFlag = true;
+		}
+		protected function onWorkerResumed(event:WorkerEvent):void
+		{
+			this._onWorkerResumedFlag = true;
+		}
 		
-		
+		[Test(description="Tests the priority worker event listeners to ensure that right of way is correctly given to the priority worker")]
+		public function priorityWorkerEventsAreHandledBySlaveWorker():void
+		{
+			// Populate priority worker and slave worker
+			for(var i:uint=0; i<6; i++)
+			{
+				this._priorityWorker.addHandlerToWorkQueue(this._handlerPool[i]);
+				this._slaveWorker.addHandlerToWorkQueue(this._handlerPool[i+6]);
+			}
+			
+			// Assert starting state
+			Assert.assertFalse(this._priorityWorker.working);
+			Assert.assertFalse(this._slaveWorker.working);
+			
+			// stops working onPriorityWorkerStarted
+			this._slaveWorker.start();
+			Assert.assertTrue(this._slaveWorker.working);
+			this._priorityWorker.start();
+			Assert.assertFalse(this._slaveWorker.working);
+			
+			// stops working onPriorityWorkerStopped
+			this._priorityWorker.start();
+			this._slaveWorker.start();
+			Assert.assertTrue(this._slaveWorker.working);
+			this._priorityWorker.stop();
+			Assert.assertFalse(this._slaveWorker.working);
+			
+			// starts working onPriorityWorkerIdle
+			this._slaveWorker.stop();
+			this._priorityWorker.start();
+			for(var j:uint=0; j<6; j++)
+			{
+				// remove handlers from priority worker
+				this._priorityWorker.removeHandler(this._handlerPool[j]);
+			}
+			Assert.assertTrue(this._priorityWorker.idle);
+			Assert.assertTrue(this._slaveWorker.working);
+			
+			// stops working onPriorityWorkerResume
+			for(var k:uint=0; k<6; k++)
+			{
+				// dump more handlers on to the priority worker to make it resume
+				this._priorityWorker.addHandlerToWorkQueue(this._handlerPool[k]);
+			}
+			Assert.assertFalse(this._priorityWorker.idle);
+			Assert.assertFalse(this._slaveWorker.working);
+		}
 		
 	}
 	
 	// Pending tests:
 	
-	
-	
-
-	
-	// advancing the queue when nothing is queued or listed fires the IDLE event
-	// idle event does not fire if worker was idle last advance
-	
-	// advancing the queue when things are queued and the worker was idle last advance transmits resume event
-	// resume event does not fire if worker was not previously idle
 	
 	// stopping rewinds the queue
 	// rewinding moves all workList items to the front of the workQueue
@@ -183,15 +266,6 @@ package org.smilkit.spec.tests.load
 	
 	// removeHandlerFromWorkQueue: removing a handler that is on the workqueue returns true and slices the queue
 	// removeHandlerFromWorkQueue: removing a handler that is not present on the workqueue returns false and does not alter the queue.
-	
-	// hasHandler returns true if the given handler is in the workqueue
-	// hasHandler returns true if the given handler is in the worklist
-	// hasHandler returns false if the given handler is in neither list
-	
-	// stops working onPriorityWorkerStopped
-	// stops working onPriorityWorkerResume
-	// stops working onPriorityWorkerStarted
-	// starts working onPriorityWorkerIdle
 	
 	// receiving the completion event removes the handler from the worker and dispatches WORK_UNIT_COMPLETE and WORK_UNIT_REMOVED
 	// receiving the failure event removes the handler from the worker and dispatches WORK_UNIT_FAILEd and WORK_UNIT_REMOVED
