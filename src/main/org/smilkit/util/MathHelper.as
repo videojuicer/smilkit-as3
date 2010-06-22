@@ -7,6 +7,14 @@ package org.smilkit.util
 
 	public class MathHelper
 	{
+		/**
+		 * Checks if the specified value is a percentage by checking for 
+		 * the % symbol.
+		 * 
+		 * @param value Value is check.
+		 * 
+		 * @return True if the value is a percentage, false otherwise.
+		 */
 		public static function isPercentage(value:*):Boolean
 		{
 			var s:String = value.toString();
@@ -14,6 +22,13 @@ package org.smilkit.util
 			return (s.lastIndexOf("%") != -1);
 		}
 		
+		/**
+		 * Converts a percentage number into an integer by removing the trailing %.
+		 * 
+		 * @param value Value to parse into an integer.
+		 * 
+		 * @return The integer result of the specified value.
+		 */
 		public static function percentageToInteger(value:*):uint
 		{
 			var s:String = value.toString();
@@ -22,6 +37,15 @@ package org.smilkit.util
 			return parseInt(v);
 		}
 		
+		/**
+		 * Creates a <code>Rectangle</code> <code>Matrix</code> which fits the handler to the parent
+		 * region whilst keeping the aspect ration.
+		 * 
+		 * @param handler The <code>SMILKitHandler</code> to create a <code>Matrix</code> for.
+		 * @param region The <code>RegionContainer</code> to fit the handler inside of.
+		 * 
+		 * @return Generated <code>Rectangle</code> <code>Matrix</code> with the sizes for the handler.
+		 */
 		public static function createMatrixFor(handler:SMILKitHandler, region:RegionContainer):Rectangle
 		{
 			// this is where we do the logic for the fitting to a canvas and the like ...
