@@ -29,6 +29,11 @@ package org.smilkit.util
 			return this._url;
 		}
 		
+		public function get hostname():String
+		{
+			return this.protocol+"://"+this.host+":"+this.port;
+		}
+		
 		/**
 		 * The hostname of the parsed URL.
 		 */

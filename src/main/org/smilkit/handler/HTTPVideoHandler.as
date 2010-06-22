@@ -13,10 +13,12 @@ package org.smilkit.handler
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	
+	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.handler.state.HandlerState;
+	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
-	import org.smilkit.events.HandlerEvent;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{
@@ -74,6 +76,11 @@ package org.smilkit.handler
 			return (this._canvas as DisplayObject);
 		}
 		
+		public override function get handlerState():HandlerState
+		{
+			return new VideoHandlerState(this.element.src, 0, this._netConnection, this._netStream, this._video, this._canvas);	
+		}
+		
 		public override function load():void
 		{
 			this._netConnection = new NetConnection();
@@ -117,6 +124,13 @@ package org.smilkit.handler
 		public override function seek(seekTo:Number):void
 		{
 			this._netStream.seek(seekTo);
+		}
+		
+		public override function merge(handlerState:HandlerState):Boolean
+		{
+			// cant merge anything with a http video!
+			
+			return false;
 		}
 		
 		public override function cancel():void

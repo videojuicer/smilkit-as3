@@ -67,6 +67,8 @@
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.handler.RTMPVideoHandler"/>
     <classEntry path="org.smilkit.util.RedirectLoader"/>
+    <classEntry path="org.smilkit.handler.state.HandlerState"/>
+    <classEntry path="org.smilkit.handler.state.VideoHandlerState"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

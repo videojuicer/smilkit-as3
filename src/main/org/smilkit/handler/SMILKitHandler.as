@@ -9,6 +9,7 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.w3c.dom.IElement;
@@ -21,6 +22,7 @@ package org.smilkit.handler
 		protected var _completedLoading:Boolean = false;
 		protected var _completedResolving:Boolean = false;
 		
+		protected var _currentOffset:int;
 		protected var _intrinsicDuration:int = Time.UNRESOLVED;
 		
 		public function SMILKitHandler(element:IElement)
@@ -83,9 +85,19 @@ package org.smilkit.handler
 			return true;
 		}
 		
+		public function get handlerState():HandlerState
+		{
+			return null;	
+		}
+		
 		public function get element():ISMILMediaElement
 		{
 			return (this._element as ISMILMediaElement);
+		}
+		
+		public function get currentOffset():int
+		{
+			return this._currentOffset;
 		}
 		
 		public function load():void
@@ -106,6 +118,18 @@ package org.smilkit.handler
 		public function seek(seekTo:Number):void
 		{
 			
+		}
+		
+		public function merge(handlerState:HandlerState):Boolean
+		{
+			if (this.handlerState.compatibleWith(handlerState))
+			{
+				this._currentOffset = handlerState.handlerOffset;
+				
+				return true;
+			}
+			
+			return false;
 		}
 		
 		/**
