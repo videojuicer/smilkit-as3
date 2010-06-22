@@ -131,6 +131,9 @@ package org.smilkit.load {
 		public function addHandlerToWorkQueue(handler:SMILKitHandler):Boolean {
 			if(this.hasHandler(handler)) return false;
 			this._workQueue.push(handler);
+			// TODO bind generic "done" listener
+			
+			// bind specific event listeners
 			handler.addEventListener(this._completionEventType, this.onWorkUnitCompleted);
 			handler.addEventListener(this._failureEventType, this.onWorkUnitFailed);
 			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_QUEUED, handler));
@@ -252,13 +255,19 @@ package org.smilkit.load {
 		
 		
 		public function onWorkUnitCompleted(e:HandlerEvent):void {
-			// Broadcast WORK_UNIT_COMPLETED
+			// dispatch WORK_UNIT_COMPLETED
+			var h:SMILKitHandler = e.handler;
+			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_COMPLETED, h));
 			// removeHandler
+			this.removeHandler(h);
 		}
 		
 		public function onWorkUnitFailed(e:HandlerEvent):void {
 			// Dispatch WORK_UNIT_FAILED
+			var h:SMILKitHandler = e.handler;
+			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_FAILED, h));
 			// removeHandler
+			this.removeHandler(h);
 		}
 		
 		public function onPriorityWorkerStarted(e:WorkerEvent):void {

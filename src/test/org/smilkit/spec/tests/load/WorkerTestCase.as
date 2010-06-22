@@ -268,7 +268,7 @@ package org.smilkit.spec.tests.load
 	// removeHandlerFromWorkQueue: removing a handler that is not present on the workqueue returns false and does not alter the queue.
 	
 	// receiving the completion event removes the handler from the worker and dispatches WORK_UNIT_COMPLETE and WORK_UNIT_REMOVED
-	// receiving the failure event removes the handler from the worker and dispatches WORK_UNIT_FAILEd and WORK_UNIT_REMOVED
+	// receiving the failure event removes the handler from the worker and dispatches WORK_UNIT_FAILED and WORK_UNIT_REMOVED
 	
 	
 }
