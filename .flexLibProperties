@@ -69,6 +69,7 @@
     <classEntry path="org.smilkit.util.RedirectLoader"/>
     <classEntry path="org.smilkit.handler.state.HandlerState"/>
     <classEntry path="org.smilkit.handler.state.VideoHandlerState"/>
+    <classEntry path="org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
