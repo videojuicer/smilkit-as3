@@ -48,41 +48,77 @@ package org.smilkit.view
 			this._drawingBoard = new DrawingBoard();
 		}
 		
+		/**
+		 * The current offset for the current <code>Document</code>.
+		 */
 		public function get offset():Number
 		{
 			return this._heartbeat.offset;
 		}
 		
+		/**
+		 * Indicates whether the <code>Viewport</code> is playing or not.
+		 */
 		public function get playing():Boolean
 		{
 			return this._heartbeat.running;
 		}
 		
+		/**
+		 * Returns the current <code>ViewportObjectPool</code>.
+		 * 
+		 * @see org.smilkit.view.ViewportObjectPool
+		 */
 		public function get viewportObjectPool():ViewportObjectPool
 		{
 			return this._objectPool;
 		}
 		
+		/**
+		 * Returns the current active <code>SMILDocument</code>.
+		 * 
+		 * @see org.smilkit.dom.smil.SMILDocument
+		 */
 		public function get document():ISMILDocument
 		{
 			return this.viewportObjectPool.document;
 		}
 		
+		/**
+		 * Returns the current <code>TimingGraph</code> object for the active document.
+		 * 
+		 * @see org.smilkit.time.TimingGraph
+		 */
 		public function get timingGraph():TimingGraph
 		{
 			return this.viewportObjectPool.timingGraph;
 		}
 		
+		/**
+		 * Returns the current <code>RenderTree</code> object for the active document.
+		 * 
+		 * @see org.smilkit.render.RenderTree
+		 */
 		public function get renderTree():RenderTree
 		{
 			return this.viewportObjectPool.renderTree;
 		}
 		
+		/**
+		 * Returns the current <code>Heartbeat</code> object for the active document.
+		 * 
+		 * @see org.smilkit.time.Heartbeat
+		 */
 		public function get heartbeat():Heartbeat
 		{
 			return this._heartbeat;
 		}
 		
+		/**
+		 * Returns the current <code>DrawingBoard</code> object for the active document.
+		 * 
+		 * @see org.smilkit.render.DrawingBoard
+		 */
 		public function get drawingBoard():DrawingBoard
 		{
 			return this._drawingBoard;
@@ -93,6 +129,10 @@ package org.smilkit.view
 			return this._history;
 		}
 		
+		/**
+		 * The current location for the <code>Viewport</code>, a URL pointing to the
+		 * active SMIL document. 
+		 */
 		public function get location():String
 		{
 			if (this._currentIndex == -1)
@@ -103,6 +143,12 @@ package org.smilkit.view
 			return this._history[this._currentIndex];
 		}
 		
+		/**
+		 * Sets the URL location for the code>Viewport</code> location, will auto load the requested
+		 * location unless <code>autoRefresh</code> is set to false.
+		 * 
+		 * @see org.smilkit.view.Viewport.autoRefresh
+		 */
 		public function set location(location:String):void
 		{
 			if (location == this.location)
@@ -119,16 +165,31 @@ package org.smilkit.view
 			}
 		}
 		
+		/**
+		 * Indicates the auto refresh state, if auto refresh is enabled and if the
+		 * <code>location</code> of the <code>Viewport</code> is changed the <code>Viewport</code>
+		 * will automatically load the requested SMIL document.
+		 */
 		public function get autoRefresh():Boolean
 		{
 			return this._autoRefresh;
 		}
 		
+		/**
+		 * Sets the auto refresh state, if auto refresh is enabled and if the
+		 * <code>location</code> of the <code>Viewport</code> is changed the <code>Viewport</code>
+		 * will automatically load the requested SMIL document.
+		 */
 		public function set autoRefresh(autoRefresh:Boolean):void
 		{
 			this._autoRefresh = autoRefresh;
 		}
 		
+		/**
+		 * Refreshs the contents of the <code>Viewport</code> based on the current <code>Viewport.location</code>, if the location is updated
+		 * and auto-refresh is enabled this method is automatically called. Otherwise the next
+		 * time the refresh method is called the new location is used.
+		 */
 		public function refresh():void
 		{
 			if (this.location == null || this.location == "")
@@ -146,6 +207,9 @@ package org.smilkit.view
 			loader.load(request);
 		}
 		
+		/**
+		 * Moves one step back in the history list and sets the location to the old url.
+		 */
 		public function back():Boolean
 		{
 			if (this._currentIndex > 0)
@@ -162,6 +226,9 @@ package org.smilkit.view
 			return false;
 		}
 		
+		/**
+		 * Moves one step forward in the history list and sets the location to the new url.
+		 */
 		public function forward():Boolean
 		{
 			if (this._currentIndex < (this._history.length - 1))
