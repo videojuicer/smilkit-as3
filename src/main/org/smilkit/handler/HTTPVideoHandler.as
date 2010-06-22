@@ -151,9 +151,13 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
+					this._netStream.bufferTime = 30; // expand buffer
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					break;
 				case "NetStream.Buffer.Empty":
+					this._netStream.bufferTime = 8; // reduce buffer
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
 				case "NetStream.Play.Failed":
@@ -164,10 +168,13 @@ package org.smilkit.handler
 				case "NetStream.Unpublish.Success":
 				case "NetStream.Play.Stop":
 					// playback has finished, important for live events (so we can continue)
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					break;
 				case "NetStream.Pause.Notify":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 					break;
 				case "NetStream.Unpause.Notify":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					break;
 				case "NetStream.Seek.Failed":
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_FAILED, this));
@@ -176,7 +183,7 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_COMPLETED, this));
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 					break;
 			}
 		}

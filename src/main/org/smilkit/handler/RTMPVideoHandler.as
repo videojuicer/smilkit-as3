@@ -91,12 +91,15 @@ package org.smilkit.handler
 		public override function load():void
 		{
 			this._playOptions = new NetStreamPlayOptions();
+			this._soundTransformer = new SoundTransform(0.2, 0);
 			
 			this._netConnection = new NetConnection();
-			this._netConnection.connect(this.handlerState.extractedSrc.hostname);
+			this._netConnection.addEventListener(NetStatusEvent.NET_STATUS, this.onConnectionNetStatusEvent);
+			this._netConnection.addEventListener(IOErrorEvent.IO_ERROR, this.onConnectionIOErrorEvent);
+			this._netConnection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onConnectionAsyncErrorEvent);
+			this._netConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onConnectionSecurityErrorEvent);
 			
-			
-			this._soundTransformer = new SoundTransform(0.2, 0);
+			this._netConnection.connect(this.handlerState.extractedSrc.hostname);	
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
@@ -133,14 +136,63 @@ package org.smilkit.handler
 			super.cancel();
 		}
 		
+		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
+		{
+			switch (e.info.code)
+			{
+				case "NetConnection.Connect.Success":
+					this._netStream = new NetStream(this._netConnection);
+					
+					this._netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
+					this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
+					this._netStream.addEventListener(NetStatusEvent.NET_STATUS, this.onNetStatusEvent);
+
+					this._netStream.client = this;
+					
+					this._netStream.play(this.element.src);
+					
+					this._video = new Video();
+					this._video.smoothing = true;
+					this._video.deblocking = 1;
+					
+					this._video.attachNetStream(this._netStream);
+					
+					this._canvas.addChild(this._video);
+					
+					this._startedLoading = true;
+					
+					break;
+			}
+		}
+		
+		protected function onConnectionIOErrorEvent(e:IOErrorEvent):void
+		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+		}
+		
+		protected function onConnectionSecurityErrorEvent(e:SecurityErrorEvent):void
+		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+		}
+		
+		protected function onConnectionAsyncErrorEvent(e:AsyncErrorEvent):void
+		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+		}
+		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
+					this._netStream.bufferTime = 30; // expand buffer
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					break;
 				case "NetStream.Buffer.Empty":
+					this._netStream.bufferTime = 8; // reduce buffer
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
 				case "NetStream.Failed":
@@ -166,7 +218,7 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_COMPLETED, this));
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 					break;
 			}
 		}

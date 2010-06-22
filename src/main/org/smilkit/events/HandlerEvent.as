@@ -7,7 +7,11 @@ package org.smilkit.events
 	{
 		public static var SEEK_FAILED:String = "handlerSeekFailed";
 		public static var SEEK_INVALID:String = "handlerSeekInvalid";
-		public static var SEEK_COMPLETED:String = "handlerSeekCompleted";
+		public static var SEEK_NOTIFY:String = "handlerSeekNotify";
+		
+		public static var STOP_NOTIFY:String = "handlerStopNotify";
+		public static var PAUSE_NOTIFY:String = "handlerPauseNotify";
+		public static var RESUME_NOTIFY:String = "handlerResumeNotify";
 		
 		public static var LOAD_UNAUTHORISED:String = "handlerLoadUnauthorised";
 		public static var LOAD_FAILED:String = "handlerLoadFailed";
