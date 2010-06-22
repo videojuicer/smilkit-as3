@@ -12,13 +12,14 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
+	import org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase;
+	import org.smilkit.spec.tests.load.LoadSchedulerTestCase;
+	import org.smilkit.spec.tests.load.WorkerTestCase;
 	import org.smilkit.spec.tests.render.DrawingBoardTestClass;
 	import org.smilkit.spec.tests.render.RenderTreeTestCase;
 	import org.smilkit.spec.tests.time.HeartbeatTestCase;
 	import org.smilkit.spec.tests.time.TimingGraphTestCase;
 	import org.smilkit.spec.tests.view.ViewportTestCase;
-	import org.smilkit.spec.tests.load.LoadSchedulerTestCase;
-	import org.smilkit.spec.tests.load.WorkerTestCase;
 	import org.smilkit.time.TimingGraph;
 	
 	/**
@@ -38,6 +39,9 @@ package org.smilkit.spec
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;
 		public var httpVideoHandlerTest:HTTPVideoHandlerTestCase;
+		
+		// TODO: need a testable rtmp stream (not highwinds because of the url signing)
+		//public var rtmpVideoHandlerTest:RTMPVideoHandlerTestCase;
 		
 		// View Tests
 		public var viewportTest:ViewportTestCase;
