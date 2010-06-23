@@ -2,6 +2,7 @@ package org.smilkit.handler
 {
 	import flash.net.URLRequest;
 	
+	import org.smilkit.util.ObjectManager;
 	import org.smilkit.util.URLParser;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -18,6 +19,50 @@ package org.smilkit.handler
 			this._urlRegex = urlRegex;
 		}
 		
+		public function get protocols():Array
+		{
+			return this._protocols;
+		}
+		
+		public function get mimeMap():Object
+		{
+			return this._mimeMap;
+		}
+		
+		public function get urlRegex():RegExp
+		{
+			return this._urlRegex;
+		}
+		
+		/**
+		 * Merges the specified <code>HandlerMap</code> instance with the current instance,
+		 * this instance can be overwritten by members of the specified <code>HandlerMap</code>.
+		 *
+		 * @param handlerMap The <code>HandlerMap</code> instance to merge with the current.
+		 * 
+		 * @return The combined <code>HandlerMap</code> instance.
+		 */
+		public function merge(handlerMap:HandlerMap):HandlerMap
+		{
+			var mergedMap:HandlerMap = new HandlerMap(null, null, null);
+			
+			mergedMap._protocols = this._protocols.concat(handlerMap._protocols);
+			mergedMap._mimeMap = ObjectManager.merge(this._mimeMap, handlerMap._mimeMap);
+			
+			return mergedMap;
+		}
+		
+		/**
+		 * Run's a match test against this <code>HandlerMap</code> instance for the specified
+		 * <code>ISMILMediaElement</code> instance.
+		 * 
+		 * @param element The <code>ISMILMediaElement</code> instance to run the test against.
+		 * 
+		 * @return True if this <code>HandlerMap</code> matches against the specified
+		 * <code>ISMILMediaElement</code>, false if the test failed to match.
+		 * 
+		 * @see org.smilkit.w3c.dom.smil.ISMILMediaElement
+		 */
 		public function match(element:ISMILMediaElement):Boolean
 		{
 			var req:URLParser = new URLParser();

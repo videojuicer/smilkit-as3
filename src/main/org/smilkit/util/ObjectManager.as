@@ -24,5 +24,25 @@ package org.smilkit.util
 			
 			return clone;
 		}
+		
+		public static function merge(source:Object, withSource:Object):Object
+		{
+			var mergedObject:Object = new Object();
+			
+			ObjectManager.copyPropertiesTo(source, mergedObject);
+			ObjectManager.copyPropertiesTo(withSource, mergedObject);
+			
+			return mergedObject;
+		}
+		
+		public static function copyPropertiesTo(source:Object, to:Object):Object
+		{
+			for (var i:String in source)
+			{
+				to[i] = source[i];
+			}
+			
+			return to;
+		}
 	}
 }
