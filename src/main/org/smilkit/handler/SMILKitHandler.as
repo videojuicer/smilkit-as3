@@ -105,21 +105,64 @@ package org.smilkit.handler
 			
 		}
 		
+		/**
+		 * Pause's the playback of the handler instance, as a pause does not usually occur
+		 * on a stream instantly a <code>HandlerEvent.PAUSE_NOTIFY</code> should be dispatched
+		 * once the stream has actually paused.
+		 * 
+		 * @see org.smilkit.event.HandlerEvent.PAUSE_NOTIFY
+		 */
 		public function pause():void
 		{
 			
 		}
 		
+		/**
+		 * Resume's playback of the handler instance, as a resume does not usually occur on
+		 * a stream straight away a <code>HandlerEvent.RESUME_NOTIFY</code> is dispatched
+		 * once the resume has been completed successfully.
+		 * 
+		 * @see org.smilkit.event.HandlerEvent.RESUME_NOTIFY
+		 */
 		public function resume():void
 		{
 			
 		}
 		
+		/**
+		 * Seeks the handler instance to the specified offset, as a seek does not usually happen
+		 * on a stream straight away a <code>HandlerEvent.SEEK_NOTIFY</code> is dispatched once
+		 * the seek has been completed successfully. In Flash a seek can only occur on a keyframe
+		 * in a video stream, so the actual seek time will most likely differ after the event
+		 * is dispatched.
+		 * 
+		 * If the seek offset is an invalid time, a <code>HandlerEvent.SEEK_INVALIDTIME</code>
+		 * event is dispatched. If a seek was requested on a stream that is broken or the seek
+		 * could not be completed successfully a <code>HandlerEvent.SEEK_FAILED</code> will be
+		 * dispatched.
+		 * 
+		 * @param seekTo The offset to seek the handler to.
+		 * 
+		 * @see org.smilkit.event.HandlerEvent.SEEK_NOTIFY
+		 * @see org.smilkit.event.HandlerEvent.SEEK_INVALIDTIME
+		 * @see org.smilkit.event.HandlerEvent.SEEK_FAILED
+		 */
 		public function seek(seekTo:Number):void
 		{
 			
 		}
 		
+		/**
+		 * Merges the old handler state into this handler instance, this mainly provides
+		 * functionality for switching dynamic streams through RTMP.
+		 * 
+		 * @param handlerState The <code>HandlerState</code> to merge with the current handler instance.
+		 * 
+		 * @return Returns true if the <code>HandlerState</code> was successfully merged with
+		 * the current handler instance, false otherwise.
+		 * 
+		 * @see org.smilkit.handler.HandlerState
+		 */
 		public function merge(handlerState:HandlerState):Boolean
 		{
 			if (this.handlerState.compatibleWith(handlerState))
@@ -144,6 +187,13 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_CANCELLED, this));
 		}
 		
+		/**
+		 * Callback method for when the <code>LoadScheduler</code> moves this handler instance
+		 * to the just in time work list. The just in time queue starts loading as soon as its
+		 * placed on the queue.
+		 * 
+		 * @see org.smilkit.load.LoadScheduler
+		 */
 		public function movedToJustInTimeWorkList():void
 		{
 			if (!this.startedLoading)
@@ -158,6 +208,12 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Callback method for when the <code>LoadScheduler</code> moves this handler instance
+		 * to the preload work list. 
+		 * 
+		 * @see org.smilkit.load.LoadScheduler
+		 */
 		public function movedToPreloadWorkList():void
 		{
 			if (!this.startedLoading && this.preloadable)
@@ -166,6 +222,15 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Callback method for when the <code>LoadScheduler</code> moves this handler instance
+		 * to the resolve work list. When the handler is moved to the resolve work list, the 
+		 * handler begins to load until it is resolved, after that an event is dispatched to
+		 * the <code>LoadScheduler</code> which either cancels the loading of the handler or keeps
+		 * it going (if its about to be played back).
+		 * 
+		 * @see org.smilkit.load.LoadScheduler
+		 */
 		public function movedToResolveWorkList():void
 		{
 			if (!this.startedLoading && this.resolvable)
@@ -174,6 +239,12 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Callback method for when the <code>LoadScheduler</code> removes this handler instance
+		 * from any work list.
+		 * 
+		 * @see org.smilkit.load.LoadScheduler
+		 */
 		public function removedFromLoadScheduler():void
 		{
 			if (this.startedLoading)
@@ -236,10 +307,17 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Returns a <code>HandlerMap</code> which can be used to match and register against
+		 * this handler instance.
+		 * 
+		 * @return The <code>HandlerMap</code> instance for this handler.
+		 * 
+		 * @see org.smilkit.handler.HandlerMap
+		 */
 		public static function toHandlerMap():HandlerMap
 		{
 			return null;
-			//return new HandlerMap([ "rtmp" ], [ "video/flv" = [ "flv", "f4v" ], "video/mpeg" = [ "mp4", "f4v" ] ]);
 		}
 	}
 }
