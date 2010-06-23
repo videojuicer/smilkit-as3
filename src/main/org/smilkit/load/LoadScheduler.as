@@ -2,30 +2,40 @@ package org.smilkit.load {
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.util.logger.Logger;
+	import org.smilkit.handler.SMILKitHandler;	
+	
+	import org.smilkit.dom.smil.SMILMediaElement;	
+	import org.smilkit.time.TimingNode;
+	
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.load.Worker;
+	
 	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.events.TimingGraphEvent;
 	
 	/***
 	 * An instance of LoadScheduler listens to both the TimingGraph and RenderTree objects for
 	 * change/rebuild events and attempts to make the best decisions for prioritising load order.
 	 * 
-	 * LoadScheduler has multiple priority channels through which handers may be loaded.
+	 * LoadScheduler has multiple priority channels through which handers may be loaded. These channels
+	 * are created as instances of the Worker class. Each Worker instance is managed by the LoadScheduler.
 	 * 
-	 * The highest priority channel is the justInTime worklist, attempting to load objects as they are
-	 * added to the RenderTree instance. This worklist has no concurrency limit; just-in-time load 
+	 * The highest priority worker is the justInTime instance, attempting to load objects as they are
+	 * added to the RenderTree instance. This worker has no concurrency limit; just-in-time load 
 	 * events are handled on-demand regardless of concurrency.
 	 * 
-	 * The next in priority order is the resolve workqueue. When no justInTime items are being actively 
-	 * loaded, the LoadScheduler will look for resolvable handers of unresolved duration to work on. The resolve workqueue
-	 * has a concurrency limit of 1 and functions as a FIFO.
+	 * The next in priority order is the resolve worker. When no justInTime items are being actively 
+	 * loaded, the LoadScheduler will look for resolvable handers of unresolved duration to work on. The resolve worker
+	 * has a concurrency limit of 1.
 	 * 
-	 * The lowest priority workqueue is the preload workqueue. When no justInTime items are being worked 
-	 * on, and no time-unresolved handers remain in the document, the LoadScheduler will attempt 
+	 * Lowest priority is the preload worker. When no justInTime items are being worked 
+	 * on, and the resolve worker is also idle, the LoadScheduler will attempt 
 	 * to opportunistically load data for any preloadable handers in the document 
 	 * (e.g. HTTP progressive video, images, text files).
 	 * 
@@ -37,17 +47,9 @@ package org.smilkit.load {
 	 * 3. handers receive a movedToResolveWorkList call when the scheduler advances the resolve queue.
 	 * 4. handers receive a movedToPreloadWorkList call when the scheduler advances the preload queue.
 	 * 3. handers receiving a removedFromLoadScheduler call can safely assume that they do not exist on any queues. 
-	 *    This call is only sent when removing an hander from a worklist without adding it to another.
      * 
-	 * handers are moved between lists/queues on the following basis:
-	 * 1. Moved to the justInTime worklist when receiving a handlerAddedToRenderTree event
-	 * 2. Removed from the justInTime worklist when removedFromRenderTree or when load completed.
-	 * 
-	 * 3. Moved to the resolve queue if resolvable.
-	 * 4. Become active in the resolve queue if at index 0 and if the JIT list is empty.
-	 * 
-	 * 5. Moved to the preload queue if preloadable.
-	 * 6. Become active in the preload queue if at index 0 and if both the JIT list and the resolve queue are empty.
+	 * To avoid producing erroneous removedFromLoadScheduler calls during a worker rebuild, the LoadScheduler will always
+	 * move handlers between workers by adding the handler to the new worker BEFORE removing it from the old one.
 	*/
 	public class LoadScheduler {
 		/***
@@ -98,6 +100,10 @@ package org.smilkit.load {
 			this._preloadWorker.loggerName = "Preload Worker";
 			
 			this._masterWorker = this._justInTimeWorker;
+			
+			this.bindJustInTimeRenderTreeEvents();
+			this.bindOpportunisticTimingGraphEvents();
+			this.bindWorkUnitEvents();
 		}
 		
 		public function start():Boolean {
@@ -117,22 +123,131 @@ package org.smilkit.load {
 			return false;
 		}
 		
-		private function handlerAddedToRenderTree():void {}
-		private function handlerRemovedFromRenderTree():void {}
-		private function timingGraphRebuilt():void {}
+		/**
+		* Binds to the object pool's render tree in order to receive just in time handler notifications.
+		*/
+		protected function bindJustInTimeRenderTreeEvents():void
+		{
+			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
+			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
+		}
 		
-		private function bindJustInTimeEvents():void {}
-		private function bindWorkQueueEvents():void {}
+		/**
+		* Called when a handler is added to the RenderTree. Takes the following actions:
+		* 1. Adds the handler to the JIT worker's queue
+		* 2. Removes the handler from the Resolve and Preload workers
+		*/
+		protected function onHandlerAddedToRenderTree(event:RenderTreeEvent):void {
+			this._justInTimeWorker.addHandlerToWorkQueue(event.handler);
+			this._resolveWorker.removeHandler(event.handler);
+			this._preloadWorker.removeHandler(event.handler);
+		}
 		
-		private function rebuildResolveQueue():void {}
-		private function rebuildPreloadQueue():void {}
-		private function shouldAdvanceResolveQueue():void {}
-		private function shouldAdvancePreloadQueue():void {}
+		/**
+		* Called when a handler is removed from the RenderTree. Takes the following actions:
+		* 1. Remove the handler from the JIT worker
+		* 2. Rebuild the opportunistic workers
+		*/
+		protected function onHandlerRemovedFromRenderTree(event:RenderTreeEvent):void 
+		{
+			this._justInTimeWorker.removeHandler(event.handler);
+			this.rebuildOpportunisticWorkers();
+		}
+
+		protected function bindOpportunisticTimingGraphEvents():void 
+		{
+			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
+		}
 		
-		private function get timingGraph():TimingGraph {
+		/**
+		* Called when the Timing graph is rebuilt in any way. Causes the load scheduler to rebuild the opportunistic workers.
+		*/
+		protected function onTimingGraphRebuild():void 
+		{
+			this.rebuildOpportunisticWorkers();
+		}
+		
+		protected function bindWorkUnitEvents():void
+		{
+			this._justInTimeWorker.addEventListener(WorkUnitEvent.WORK_UNIT_LISTED, this.onHandlerMovedToJustInTimeWorkerWorkList);
+			this._resolveWorker.addEventListener(WorkUnitEvent.WORK_UNIT_LISTED, this.onHandlerMovedToResolveWorkerWorkList);
+			this._preloadWorker.addEventListener(WorkUnitEvent.WORK_UNIT_LISTED, this.onHandlerMovedToPreloadWorkerWorkList);
+			// Bind removal event WORK_UNIT_REMOVED
+			this._justInTimeWorker.addEventListener(WorkUnitEvent.WORK_UNIT_REMOVED, this.onHandlerRemovedFromWorker);
+			this._resolveWorker.addEventListener(WorkUnitEvent.WORK_UNIT_REMOVED, this.onHandlerRemovedFromWorker);
+			this._preloadWorker.addEventListener(WorkUnitEvent.WORK_UNIT_REMOVED, this.onHandlerRemovedFromWorker);
+		}
+
+		protected function onHandlerMovedToJustInTimeWorkerWorkList(event:WorkUnitEvent):void 
+		{
+			event.handler.movedToJustInTimeWorkList();
+		}
+		protected function onHandlerMovedToResolveWorkerWorkList(event:WorkUnitEvent):void 
+		{
+			event.handler.movedToResolveWorkList();
+		}
+		protected function onHandlerMovedToPreloadWorkerWorkList(event:WorkUnitEvent):void 
+		{
+			event.handler.movedToPreloadWorkList();
+		}
+		protected function onHandlerRemovedFromWorker(event:WorkUnitEvent):void
+		{
+			var h:SMILKitHandler = event.handler;
+			if(!this._justInTimeWorker.hasHandler(h) && !this._resolveWorker.hasHandler(h) && !this._preloadWorker.hasHandler(h))
+			{
+				h.removedFromLoadScheduler();
+			}
+		}
+		
+		/** 
+		* Rebuilds the work queues for the resolve and preload workers.
+		* The timing graph is used as a data source.
+		* Workers that are already on the just in time worker are not eligible for inclusion on the opportunistic workers.
+		*/
+		protected function rebuildOpportunisticWorkers():void {
+			var opportunisticWorkers:Vector.<Worker> = new Vector.<Worker>;
+				opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);
+			
+			var timingGraphElements:Vector.<TimingNode> = this.timingGraph.elements;
+			for(var i:uint=0; i<timingGraphElements.length; i++)
+			{
+				var h:SMILKitHandler = (timingGraphElements[i].element as SMILMediaElement).handler;
+				
+				// Skip if the handler is on the JIT worker
+				if(this._justInTimeWorker.hasHandler(h)) continue;
+				
+				// For each element, determine where it's handler should be.
+				var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
+				// Put it there.
+				targetWorker.addHandlerToWorkQueue(h);
+				
+				// If it exists on another worker, remove it.
+				for(var j:uint=0; j<opportunisticWorkers.length; j++)
+				{
+					var opWorker:Worker = opportunisticWorkers[j];
+					if(opWorker != targetWorker) opWorker.removeHandler(h);
+				}
+			}
+		}
+		
+		/**
+		* Inspects the given handler and determines which opportunistic worker it belongs on, if any.
+		* If the handler is resolvable but not resolved, the resolve worker will be returned.
+		* If the handler is ((resolvable and resolved) or (not resolvable)) and also (preloadable but not preloaded) then the preload worker will be returned.
+		* If the handler is not suitable for opportunistic loading or opportunistic loading has already taken place, null will be returned.
+		* @return a Worker instance or null.
+		*/
+		protected function opportunisticWorkerForHandler(handler:SMILKitHandler):Worker 
+		{
+			return this._resolveWorker;
+		}
+		
+		
+		
+		protected function get timingGraph():TimingGraph {
 			return this._objectPool.timingGraph;
 		}
-		private function get renderTree():RenderTree {
+		protected function get renderTree():RenderTree {
 			return this._objectPool.renderTree;
 		}
 	}

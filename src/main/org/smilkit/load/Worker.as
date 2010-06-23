@@ -92,7 +92,7 @@ package org.smilkit.load {
 			return this._working;
 		}
 		
-		public function set handlers(handlers:Vector.<SMILKitHandler>):void {
+		public function rebuild(handlers:Vector.<SMILKitHandler>):void {
 			// TODO compare and broadcast removed/added on the appropriate items
 		}
 		
@@ -288,6 +288,16 @@ package org.smilkit.load {
 		public function onPriorityWorkerResumed(e:WorkerEvent):void {
 			this.logInfo("Priority worker was idling but has now resumed. Ceding priority and shutting down.");
 			this.stop();
+		}
+		
+		public function get workQueue():Vector.<SMILKitHandler>
+		{
+			return this._workQueue;
+		}
+		
+		public function get workList():Vector.<SMILKitHandler>
+		{
+			return this._workList;
 		}
 		
 		protected function logInfo(msg:String):void {
