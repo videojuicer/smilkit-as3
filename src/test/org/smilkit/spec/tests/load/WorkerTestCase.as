@@ -252,6 +252,21 @@ package org.smilkit.spec.tests.load
 			Assert.assertFalse(this._slaveWorker.working);
 		}
 		
+		[Test(description="Tests worker.allHandlers to ensure that it returns a concatenated vector of all handlers in the list and the queue and does not alter the originals")]
+		public function allHandlersReturnsConcatenatedListNonDestructively():void
+		{
+			var t:uint = 6;
+			for(var i:uint=0; i<t; i++)
+			{
+				this._slaveWorker.addHandlerToWorkQueue(this._handlerPool[i]);
+			}
+			this._slaveWorker.start();
+			var all:Vector.<SMILKitHandler> = this._slaveWorker.handlers;
+			Assert.assertEquals(t, all.length);
+			Assert.assertEquals(this._slaveWorkerConcurrency, this._slaveWorker.workList.length);
+			Assert.assertEquals(t-this._slaveWorkerConcurrency, this._slaveWorker.workQueue.length);
+		}
+		
 	}
 	
 	// Pending tests:

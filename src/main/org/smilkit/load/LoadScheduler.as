@@ -84,6 +84,16 @@ package org.smilkit.load {
 		*/
 		protected var _preloadWorker:Worker;
 		protected var _preloadWorkerConcurrencyLimit:uint;
+		
+		/**
+		* A vector of all the workers used by the scheduler.
+		*/
+		protected var _workers:Vector.<Worker>;
+		
+		/**
+		* A vector of all the opportunistic (i.e. not just-in-time workers) used by the scheduler.
+		*/
+		protected var _opportunisticWorkers:Vector.<Worker>;
 
 		public function LoadScheduler(objectPool:ViewportObjectPool, resolveConcurrency:uint=1, preloadConcurrency:uint=1) {
 			this._objectPool = objectPool;
@@ -100,6 +110,12 @@ package org.smilkit.load {
 			this._preloadWorker.loggerName = "Preload Worker";
 			
 			this._masterWorker = this._justInTimeWorker;
+			
+			this._workers = new Vector.<Worker>;
+			this._workers.push(this._justInTimeWorker, this._resolveWorker, this._preloadWorker);
+			
+			this._opportunisticWorkers = new Vector.<Worker>;
+			this._opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);			
 			
 			this.bindJustInTimeRenderTreeEvents();
 			this.bindOpportunisticTimingGraphEvents();
@@ -205,27 +221,61 @@ package org.smilkit.load {
 		* Workers that are already on the just in time worker are not eligible for inclusion on the opportunistic workers.
 		*/
 		protected function rebuildOpportunisticWorkers():void {
-			var opportunisticWorkers:Vector.<Worker> = new Vector.<Worker>;
-				opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);
-			
+			// Get timing graph contents
 			var timingGraphElements:Vector.<TimingNode> = this.timingGraph.elements;
+			
+			// Move timing graph contents onto their correct handlers
 			for(var i:uint=0; i<timingGraphElements.length; i++)
 			{
 				var h:SMILKitHandler = (timingGraphElements[i].element as SMILMediaElement).handler;
-				
 				// Skip if the handler is on the JIT worker
-				if(this._justInTimeWorker.hasHandler(h)) continue;
-				
+				if(this._justInTimeWorker.hasHandler(h)) continue;				
 				// For each element, determine where it's handler should be.
 				var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
-				// Put it there.
-				targetWorker.addHandlerToWorkQueue(h);
-				
-				// If it exists on another worker, remove it.
-				for(var j:uint=0; j<opportunisticWorkers.length; j++)
+				// Move it there.
+				this.moveHandlerToWorker(h, targetWorker);
+			}
+			// Purge orphaned handlers from the workers
+			this.purgeOrphanedHandlers();
+		}
+		
+		/**
+		* Moves the specified handler to the specified worker's work queue by adding and then removing in order.
+		*/
+		protected function moveHandlerToWorker(handler:SMILKitHandler, targetWorker:Worker):void
+		{
+			// Do the add
+			targetWorker.addHandlerToWorkQueue(handler);
+			// Remove from any others
+			for(var i:uint=0; i<this._workers.length; i++)
+			{
+				var candidateWorker:Worker = this._workers[i];
+				if(candidateWorker != targetWorker) candidateWorker.removeHandler(handler);
+			}
+		}
+		
+		/**
+		* Removes items from the workers that are not present on the given vector of handlers.
+		*/
+		protected function purgeOrphanedHandlers():void
+		{
+			// Build flat list of handlers
+			var timingGraphElements:Vector.<TimingNode> = this.timingGraph.elements;
+			var timingGraphHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
+			for(var i:uint=0; i<timingGraphElements.length; i++)
+			{
+				timingGraphHandlers.push((timingGraphElements[i].element as SMILMediaElement).handler);
+			}
+			// Scan workers
+			for(var j:uint=0; j<this._workers.length; j++)
+			{
+				var worker:Worker = this._workers[j];
+				var workerHandlers:Vector.<SMILKitHandler> = worker.handlers;
+				// Check worker's handlers against the timing graph list
+				for(var k:uint=0; k<workerHandlers.length; k++)
 				{
-					var opWorker:Worker = opportunisticWorkers[j];
-					if(opWorker != targetWorker) opWorker.removeHandler(h);
+					var h:SMILKitHandler = workerHandlers[k];
+					if(timingGraphHandlers.indexOf(h) < 0) worker.removeHandler(h);
 				}
 			}
 		}

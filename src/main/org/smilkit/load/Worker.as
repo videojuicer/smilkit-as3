@@ -92,10 +92,6 @@ package org.smilkit.load {
 			return this._working;
 		}
 		
-		public function rebuild(handlers:Vector.<SMILKitHandler>):void {
-			// TODO compare and broadcast removed/added on the appropriate items
-		}
-		
 		public function start():Boolean {
 			if(!this.working) 
 			{
@@ -298,6 +294,14 @@ package org.smilkit.load {
 		public function get workList():Vector.<SMILKitHandler>
 		{
 			return this._workList;
+		}
+		
+		/**
+		* Returns a vector containing the contents of both the work list and the work queue.
+		*/
+		public function get handlers():Vector.<SMILKitHandler>
+		{
+			return this._workList.concat(this._workQueue);
 		}
 		
 		protected function logInfo(msg:String):void {
