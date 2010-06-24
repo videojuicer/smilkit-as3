@@ -230,8 +230,11 @@ package org.smilkit.load {
 				if(this._justInTimeWorker.hasHandler(h)) continue;				
 				// For each element, determine where it's handler should be.
 				var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
-				// Move it there.
-				this.moveHandlerToWorker(h, targetWorker);
+				if(targetWorker)
+				{
+					// Move it there.
+					this.moveHandlerToWorker(h, targetWorker);
+				}
 			}
 			// Purge orphaned handlers from the workers
 			this.purgeOrphanedHandlers();
@@ -287,7 +290,19 @@ package org.smilkit.load {
 		*/
 		protected function opportunisticWorkerForHandler(handler:SMILKitHandler):Worker 
 		{
-			return this._resolveWorker;
+			if(this._justInTimeWorker.hasHandler(handler)) return null;
+			if(handler.resolvable && !handler.completedResolving)
+			{
+				return this._resolveWorker;
+			}
+			else if(handler.preloadable && !handler.completedLoading)
+			{
+				return this._preloadWorker;
+			}
+			else
+			{
+				return null;
+			}
 		}
 		
 		
