@@ -154,7 +154,10 @@ package org.smilkit.load {
 		* 2. Removes the handler from the Resolve and Preload workers
 		*/
 		protected function onHandlerAddedToRenderTree(event:RenderTreeEvent):void {
-			this.moveHandlerToWorker(event.handler, this._justInTimeWorker);
+			if(event.handler)
+			{
+				this.moveHandlerToWorker(event.handler, this._justInTimeWorker);
+			}
 		}
 		
 		/**
