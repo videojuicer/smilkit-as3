@@ -100,7 +100,7 @@ package org.smilkit.load {
 			this._resolveWorkerConcurrencyLimit = resolveConcurrency;
 			this._preloadWorkerConcurrencyLimit = preloadConcurrency;
 			
-			this._justInTimeWorker = new Worker("loadCompleted", "loadFailed", 0);
+			this._justInTimeWorker = new Worker(HandlerEvent.LOAD_COMPLETED, HandlerEvent.LOAD_FAILED, 0);
 			this._justInTimeWorker.loggerName = "JustInTime Worker";
 			
 			this._resolveWorker = new Worker(HandlerEvent.DURATION_RESOLVED, HandlerEvent.LOAD_FAILED, this._resolveWorkerConcurrencyLimit, this._justInTimeWorker);
@@ -176,7 +176,7 @@ package org.smilkit.load {
 		/**
 		* Called when the Timing graph is rebuilt in any way. Causes the load scheduler to rebuild the opportunistic workers.
 		*/
-		protected function onTimingGraphRebuild():void 
+		protected function onTimingGraphRebuild(event:TimingGraphEvent):void 
 		{
 			this.rebuildOpportunisticWorkers();
 		}
@@ -230,7 +230,7 @@ package org.smilkit.load {
 				if(this._justInTimeWorker.hasHandler(h)) continue;				
 				// For each element, determine where it's handler should be.
 				var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
-				if(targetWorker)
+				if(targetWorker != null)
 				{
 					// Move it there.
 					this.moveHandlerToWorker(h, targetWorker);

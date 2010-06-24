@@ -58,13 +58,15 @@ package org.smilkit.view
 			return this._renderTree;
 		}
 		
+		public function get loadScheduler():LoadScheduler
+		{
+			return this._loadScheduler;
+		}
+		
 		public function reset():void
 		{
 			this._timingGraph = new TimingGraph(this);
-			
-			// do an initial build of the timing graph
-			this._timingGraph.rebuild();
-			
+
 			// make the first render tree!
 			this._renderTree = new RenderTree(this);
 			
@@ -75,6 +77,9 @@ package org.smilkit.view
 			// drawingboard is always around, and renderTree is constantly destroyed
 			// and recreated, so we have to make the link.
 			this.viewport.drawingBoard.renderTree = this.renderTree;
+			
+			// Build the timing graph and set off the whole machine
+			this._timingGraph.rebuild();
 		}
 	}
 }

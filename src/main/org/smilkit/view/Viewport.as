@@ -14,6 +14,7 @@ package org.smilkit.view
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
@@ -81,6 +82,7 @@ package org.smilkit.view
 		 */
 		public function get document():ISMILDocument
 		{
+			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.document;
 		}
 		
@@ -91,7 +93,18 @@ package org.smilkit.view
 		 */
 		public function get timingGraph():TimingGraph
 		{
+			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.timingGraph;
+		}
+		
+		/**
+		* Returns the current <code>LoadScheduler</code> object for the active document.
+		* @see org.smilkit.load.LoadScheduler
+		*/
+		public function get loadScheduler():LoadScheduler
+		{
+			if(!this.viewportObjectPool) return null;
+			return this.viewportObjectPool.loadScheduler;
 		}
 		
 		/**
@@ -101,6 +114,7 @@ package org.smilkit.view
 		 */
 		public function get renderTree():RenderTree
 		{
+			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.renderTree;
 		}
 		
