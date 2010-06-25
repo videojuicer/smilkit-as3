@@ -7,6 +7,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.handler.SMILKitHandler;
@@ -33,6 +34,9 @@ package org.smilkit.render
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
 		
+		protected var _waitingQueue:Vector.<SMILKitHandler>;
+		protected var _loadReadyState:Boolean = false;
+		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
 		 * 
@@ -52,7 +56,7 @@ package org.smilkit.render
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
-		
+			
 			this.reset();
 		}
 		
@@ -105,6 +109,20 @@ package org.smilkit.render
 			this._nextChangeOffset = -1;
 			
 			this._activeElements = new Vector.<TimingNode>();
+			
+			if (this._waitingQueue != null && this._waitingQueue.length > 0)
+			{
+				for (var i:int = 0; i < this._waitingQueue.length; i++)
+				{
+					var handler:SMILKitHandler = this._waitingQueue[i];
+					
+					handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+					handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+				}
+			}
+			
+			this._waitingQueue = null;
+			this._waitingQueue = new Vector.<SMILKitHandler>();
 
 			// !!!!
 			this.update();
@@ -142,6 +160,9 @@ package org.smilkit.render
 					{
 						this._lastChangeOffset = offset;
 						
+						handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+						handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+				
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 						
@@ -154,6 +175,10 @@ package org.smilkit.render
 						if (!alreadyExists)
 						{
 							this._lastChangeOffset = offset;
+							
+							// we add our listeners for the dependancy management
+							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
@@ -173,8 +198,6 @@ package org.smilkit.render
 						
 						// always add to the new active list
 						newActiveElements.push(time);
-						
-						// do we have enough data to actual run this or should be wait for moar?
 					}
 				}
 				
@@ -183,6 +206,54 @@ package org.smilkit.render
 			}
 		}
 		
+		protected function onHandlerLoadWaiting(e:HandlerEvent):void
+		{
+			// add to waiting list
+			this._waitingQueue.push(e.handler);
+			
+			this.loadStateCheck()
+		}
+		
+		protected function onHandlerLoadReady(e:HandlerEvent):void
+		{
+			// remove from waiting list
+			var i:int = this._waitingQueue.indexOf(e.handler, 0);
+			
+			if (i != -1)
+			{
+				this._waitingQueue.splice(i, 1);
+			}
+			
+			this.loadStateCheck();
+		}
+		
+		/**
+		 * Runs a waiting / ready state check on the render tree contents and dispatches
+		 * an event if the state changes.
+		 */
+		protected function loadStateCheck():void
+		{
+			if (this._waitingQueue.length == 0)
+			{
+				if (!this._loadReadyState)
+				{
+					this._loadReadyState = true;
+				
+					// we have nothing on our plate, so we are ready!
+					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+				}
+			}
+			else
+			{
+				if (this._loadReadyState)
+				{
+					this._loadReadyState = false;
+					
+					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
+				}
+			}
+		}
+
 		/**
 		 * Function called when the TimingGraph rebuilds itself, this function in turn calls the reset function 
 		 * @param e

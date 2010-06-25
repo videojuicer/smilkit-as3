@@ -11,6 +11,7 @@ package org.smilkit.events
 		public static var ELEMENT_REPLACED:String = "renderTreeElementReplaced";
 		public static var ELEMENT_MODIFIED:String = "renderTreeElementModified";
 		
+		public static var READY:String = "renderTreeReady";
 		public static var WAITING_FOR_DATA:String = "renderTreeWaitingForData";
 		
 		protected var _handler:SMILKitHandler;

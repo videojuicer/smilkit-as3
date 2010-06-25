@@ -233,11 +233,12 @@ package org.smilkit.dom.smil
 		
 		public override function resumeElement():void
 		{
-			this._handler = SMILKit.createElementHandlerFor(this);
+			if (this._handler == null)
+			{
+				this._handler = SMILKit.createElementHandlerFor(this);
+			}
 			
-			this._handler.load();
-			
-			//this._handler.resume();
+			this._handler.resume();
 		}
 		
 		public override function seekElement(seekTo:Number):void
