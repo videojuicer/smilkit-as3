@@ -27,6 +27,15 @@ package org.smilkit.spec.tests.view
 			this._viewport = null;
 		}
 		
+		// Pending tests:
+		// Instantiates with playState == Viewport.STOPPED
+		// Play starts the heartbeat and sets the playState to Viewport.PLAYING
+		// Pause pauses the heartbeat, maintaining the offset, and sets the playstate to Viewport.PAUSED
+		// Stop stops the heartbeat, resetting the offset, and sets the playstate to Viewport.STOPPED
+		// Entering an uncommitted 
+		
+		
+		
 		[Test(description="Tests the history tracking of the viewport")]
 		public function canTrackHistory():void
 		{
