@@ -258,6 +258,21 @@ package org.smilkit.view
 			return false;
 		}
 		
+		public function resume():void
+		{
+			
+		}
+		
+		public function pause():void
+		{
+			
+		}
+		
+		public function seek(offset:int):void
+		{
+			
+		}
+		
 		private function onRefreshComplete(e:Event):void
 		{
 			// destroy the object pool n all its precious children

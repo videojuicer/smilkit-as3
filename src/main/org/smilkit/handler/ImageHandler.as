@@ -75,6 +75,8 @@ package org.smilkit.handler
 		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+			
+			
 		}
 		
 		protected function onLoaderError(e:IOErrorEvent):void
