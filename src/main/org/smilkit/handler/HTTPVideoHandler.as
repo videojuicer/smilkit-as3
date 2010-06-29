@@ -123,17 +123,26 @@ package org.smilkit.handler
 		
 		public override function resume():void
 		{
-			this._netStream.resume();
+			if (this._netStream != null)
+			{
+				this._netStream.resume();
+			}
 		}
 		
 		public override function pause():void
 		{
-			this._netStream.pause();
+			if (this._netStream != null)
+			{
+				this._netStream.pause();
+			}
 		}
 		
 		public override function seek(seekTo:Number):void
 		{
-			this._netStream.seek(seekTo);
+			if (this._netStream != null)
+			{
+				this._netStream.seek(seekTo);
+			}
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
