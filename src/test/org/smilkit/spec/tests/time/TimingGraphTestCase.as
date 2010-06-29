@@ -5,7 +5,9 @@ package org.smilkit.spec.tests.time
 	import mx.utils.object_proxy;
 	
 	import org.flexunit.async.Async;
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
@@ -20,6 +22,8 @@ package org.smilkit.spec.tests.time
 		public function setUp():void
 		{
 			this._viewport = new Viewport();
+			
+			SMILKit.defaultHandlers();
 		}
 		
 		[After]
@@ -59,30 +63,28 @@ package org.smilkit.spec.tests.time
 		[Test(async, description="Tests that the elements collection is populated")]
 		public function hasElements():void
 		{
-			var asyncElementsCheck:Function = Async.asyncHandler(this, handleHasElements, 5000, null, handleHasElementsTimeOut);
+			var asyncElementsCheck:Function = Async.asyncHandler(this, this.handleHasElements, 2000, null, this.handleHasElementsTimeOut);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncElementsCheck, false, 0, true);
+			
 			this._viewport.location = "http://sixty.im/demo.smil";	
 		}
 		
-		protected function handleHasElements(event:ViewportEvent, passThroughData:Object):void
+		protected function handleHasElements(event:ViewportEvent, passThru:Object):void
 		{
 			var timingGraph:TimingGraph = this._viewport.timingGraph;
 			var elements:Vector.<TimingNode> = timingGraph.elements;
 			var elementsNum:int = elements.length;
-			var resolveTimeElement:TimingNode = elements[0];
+			
 			Assert.assertEquals(1, elementsNum);
+			
+			var resolveTimeElement:TimingNode = elements[0];
+			
 			Assert.assertEquals("video_http", resolveTimeElement.element.id);	
 		}
 		
 		protected function handleHasElementsTimeOut(passThroughData:Object):void
 		{
-			Assert.fail( "Timeout reached before viewport refreshed: handleHasElements");
+			Assert.fail( "Timeout reached whilst waiting for the viewport to refresh.");
 		}
-		
-		
-		
-		
-		
-		
 	}
 }

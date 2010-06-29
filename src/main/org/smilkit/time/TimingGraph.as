@@ -37,6 +37,10 @@ package org.smilkit.time
 			this._elements = new Vector.<TimingNode>();
 			this._objectPool = objectPool;
 			
+			// non-dom mutation events
+			this.document.addEventListener(MutationEvent.NON_DOM_HANDLER_MODIFIED, this.onHandlerModified, false);
+			
+			// dom mutation events
 			this.document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onMutationEvent, false);
 			this.document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this.onMutationEvent, false);
 			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this.onMutationEvent, false);
@@ -94,24 +98,27 @@ package org.smilkit.time
 						el.resolve();
 					}
 					
-					var begin:int = Time.UNRESOLVED;
-					var end:int = Time.UNRESOLVED;
-					
-					if ((el.begin as TimeList).resolved)
+					if (el.handler != null)
 					{
-						begin = el.begin.first.resolvedOffset;
+						var begin:int = Time.UNRESOLVED;
+						var end:int = Time.UNRESOLVED;
+						
+						if ((el.begin as TimeList).resolved)
+						{
+							begin = el.begin.first.resolvedOffset;
+						}
+						
+						if ((el.end as TimeList).resolved)
+						{
+							end = el.end.first.resolvedOffset;
+						}
+						
+						var timeElement:TimingNode = new TimingNode(el, begin, end);
+						
+						this._elements.push(timeElement);
+						
+						this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
 					}
-					
-					if ((el.end as TimeList).resolved)
-					{
-						end = el.end.first.resolvedOffset;
-					}
-					
-					var timeElement:TimingNode = new TimingNode(el, begin, end);
-					
-					this._elements.push(timeElement);
-					
-					this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
 				}
 				
 				if (child.hasChildNodes())
@@ -127,6 +134,11 @@ package org.smilkit.time
 		 * 
 		 */		
 		protected function onMutationEvent(e:MutationEvent):void
+		{
+			this.rebuild();
+		}
+		
+		protected function onHandlerModified(e:MutationEvent):void
 		{
 			this.rebuild();
 		}

@@ -17,6 +17,11 @@ package org.smilkit.dom.events
 		public static var DOM_ATTR_MODIFIED:String = "DOMAttrModified";
 		public static var DOM_CHARACTER_DATA_MODIFIED:String = "DOMCharacterDataModified";
 		
+		/**
+		 * NON-DOM: For whenever a handler is updated or modified or replaced.
+		 */
+		public static var NON_DOM_HANDLER_MODIFIED:String = "NONDOMHandlerModified";
+		
 		protected var _relatedNode:INode;
 		protected var _prevValue:String;
 		protected var _newValue:String;

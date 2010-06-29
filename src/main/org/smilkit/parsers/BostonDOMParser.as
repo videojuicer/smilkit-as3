@@ -105,6 +105,12 @@ package org.smilkit.parsers
 			}
 			
 			var el:IElement = (child as IElement);
+			
+			// stack the child on the node
+			if (parent != null)
+			{
+				parent.appendChild(child);
+			}
 
 			// parse attributes
 			if (node.attributes().length() > 0)
@@ -125,12 +131,6 @@ package org.smilkit.parsers
 			if (node.valueOf() != null)
 			{
 				child.nodeValue = node.valueOf();
-			}
-			
-			// stack the child on the node
-			if (parent != null)
-			{
-				parent.appendChild(child);
 			}
 			
 			// and then transverse 

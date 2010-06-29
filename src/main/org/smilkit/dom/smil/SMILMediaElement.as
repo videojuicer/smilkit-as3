@@ -3,6 +3,7 @@ package org.smilkit.dom.smil
 	import flash.errors.IllegalOperationError;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.Document;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IAttr;
@@ -224,8 +225,23 @@ package org.smilkit.dom.smil
 		{
 			if (e.attrName == "src" || e.attrName == "type")
 			{
-				this._handler = SMILKit.createElementHandlerFor(this);
+				if (e.prevValue != e.newValue)
+				{
+					this.updateHandler();
+				
+					(this.ownerDocument as Document).handlerModified(this, null, this._handler);
+				}
 			}
+		}
+		
+		public override function resolve():void
+		{
+			if (this._handler == null)
+			{
+				this.updateHandler();
+			}
+			
+			super.resolve();
 		}
 		
 		public override function beginElement():Boolean
@@ -251,6 +267,13 @@ package org.smilkit.dom.smil
 		public override function seekElement(seekTo:Number):void
 		{
 			this._handler.seek(seekTo);
+		}
+		
+		private function updateHandler():void
+		{
+			this._handler = SMILKit.createElementHandlerFor(this);
+			
+			//(this.ownerDocument as Document).handlerModified(this, null, this._handler);
 		}
 	}
 }

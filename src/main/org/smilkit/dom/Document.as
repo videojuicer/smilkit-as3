@@ -12,6 +12,7 @@ package org.smilkit.dom
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
+	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.util.ObjectManager;
 	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.DOMException;
@@ -826,6 +827,27 @@ package org.smilkit.dom
 					
 					this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
 				}
+			}
+		}
+		
+		/**
+		 * NON-DOM: Handler modified dispatch handler.
+		 */
+		public function handlerModified(node:INode, oldHandler:SMILKitHandler, handler:SMILKitHandler):void
+		{
+			if (this.mutationEvents)
+			{
+				var lc:ListenerCount = ListenerCount.lookup(MutationEvent.NON_DOM_HANDLER_MODIFIED);
+				
+				if (lc.total > 0)
+				{
+					var me:MutationEvent = new MutationEvent();
+					me.initMutationEvent(MutationEvent.NON_DOM_HANDLER_MODIFIED, true, false, node, null, null, null, 0);
+					
+					this.dispatchNodeEvent(node, me);
+				}
+				
+				this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
 			}
 		}
 		

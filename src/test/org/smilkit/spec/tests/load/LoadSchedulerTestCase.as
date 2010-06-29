@@ -46,6 +46,12 @@ package org.smilkit.spec.tests.load
 			this._viewport = null;
 			this._scheduler = null;
 		}
+		
+		[Test(description="TODO - empty test cases fail")]
+		public function replaceWithTests():void
+		{
+			
+		}
 	}
 	
 	// Pending tests:
