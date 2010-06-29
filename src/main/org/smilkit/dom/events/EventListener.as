@@ -21,8 +21,8 @@ package org.smilkit.dom.events
 		{
 			if (this.callback != null)
 			{
-				this._callback.call(event);
-			}
+				this._callback(event);
+			} 
 		}
 	}
 }
