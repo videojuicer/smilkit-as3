@@ -29,7 +29,7 @@ package org.smilkit.collections
 			return (this._source != null) ? this._source.length : 0;
 		}
 		
-		public function getItemAt(index:int):Object
+		public function getItemAt(index:int):*
 		{
 			if (index < 0 || index >= this.length)
 			{
@@ -40,7 +40,7 @@ package org.smilkit.collections
 			return this.source[index];
 		}
 		
-		public function setItemAt(item:Object, index:int):Object
+		public function setItemAt(item:*, index:int):*
 		{
 			if (index < 0 || index >= this.length)
 			{
@@ -54,12 +54,12 @@ package org.smilkit.collections
 			return old;
 		}
 		
-		public function addItem(item:Object):void
+		public function addItem(item:*):void
 		{
 			this.addItemAt(item, this.length);
 		}
 		
-		public function addItemAt(item:Object, index:int):void
+		public function addItemAt(item:*, index:int):void
 		{
 			if (index < 0 || index > this.length) {
 				//throw new ListException(ListException.OUT_OF_BOUNDS_ERR, "Index '"+index+"' out of bounds on Array");
@@ -68,12 +68,12 @@ package org.smilkit.collections
 			this.source.splice(index, 0, item);
 		}
 		
-		public function getItemIndex(item:Object):int
+		public function getItemIndex(item:*):int
 		{
 			return this.getItemIndexFrom(item, 0);
 		}
 		
-		public function getItemIndexFrom(item:Object, start:int):int
+		public function getItemIndexFrom(item:*, start:int):int
 		{
 			if (start < 0 || start > this.length)
 			{
@@ -91,7 +91,7 @@ package org.smilkit.collections
 				{
 					i = (first + last) / 2;
 					
-					var cur:Object = this.source[i];
+					var cur:* = this.source[i];
 					
 					if (cur == item)
 					{
@@ -112,14 +112,14 @@ package org.smilkit.collections
 			return -1 - i;
 		}
 		
-		public function removeItemAt(index:int):Object
+		public function removeItemAt(index:int):*
 		{
 			if (index < 0 || index >= this.length)
 			{
 				//throw new ListException(ListException.OUT_OF_BOUNDS_ERR, "Index '"+index+"' out of bounds on Array");
 			}
 			
-			var old:Object = this.source.splice(index, 1)[0];
+			var old:* = this.source.splice(index, 1)[0];
 			
 			return old;
 		}

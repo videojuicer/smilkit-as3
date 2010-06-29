@@ -282,7 +282,7 @@ package org.smilkit.dom
 			e.stopPropagationEvent = false;
 			e.preventDefaultEvent = false;
 			
-			var pv:Array = new Array(10);
+			var pv:Array = new Array();
 			var p:INode = node;
 			var n:INode = p.parentNode;
 			
@@ -293,6 +293,8 @@ package org.smilkit.dom
 				p = n;
 				n = n.parentNode;
 			}
+			var nodeListeners:Vector.<ListenerEntry>;
+			var listeners:Vector.<ListenerEntry>;
 			
 			// needs capturing ....
 			if (count.captures > 0)
@@ -309,11 +311,11 @@ package org.smilkit.dom
 					var rn:INode = (pv[r] as INode);
 					e.currentTarget = (rn as IEventTarget);
 					
-					var nodeListeners:Vector.<ListenerEntry> = this.getEventListeners(node);
+					nodeListeners = this.getEventListeners(node);
 					
 					if (nodeListeners != null)
 					{
-						var listeners:Vector.<ListenerEntry> = nodeListeners.concat();
+						listeners = nodeListeners.concat();
 						
 						for (var i:int = 0; i < listeners.length; i++)
 						{
@@ -510,7 +512,9 @@ package org.smilkit.dom
 				return null;
 			}
 			
-			return (this._eventListeners.getItem(node) as Vector.<ListenerEntry>);
+			var listeners:* = this._eventListeners.getItem(node);
+			
+			return listeners;
 		}
 		
 		internal function setEventListeners(node:INode, listeners:Vector.<ListenerEntry>):void
@@ -754,7 +758,7 @@ package org.smilkit.dom
 			if (enclosingAttr != null)
 			{
 				var lc:ListenerCount = ListenerCount.lookup(MutationEvent.DOM_ATTR_MODIFIED);
-				owner = (enclosingAttr.ownerElement as Node);
+				owner = ((enclosingAttr as Attr).ownerNode as Node);
 				
 				if (lc.total > 0)
 				{
@@ -863,11 +867,11 @@ package org.smilkit.dom
 				
 				if (previous == null)
 				{
-					this.dispatchAggregateEvents(attr.ownerElement, attr, null, MutationEvent.ADDITION);
+					this.dispatchAggregateEvents(attr.ownerNode, attr, null, MutationEvent.ADDITION);
 				}
 				else
 				{
-					this.dispatchAggregateEvents(attr.ownerElement, attr, previous.nodeValue, MutationEvent.MODIFICATION);
+					this.dispatchAggregateEvents(attr.ownerNode, attr, previous.nodeValue, MutationEvent.MODIFICATION);
 				}
 			}
 		}

@@ -30,6 +30,11 @@ package org.smilkit.dom
 			return (this._nodes != null ? this._nodes.length : 0);
 		}
 		
+		public function ownerNode():INode
+		{
+			return this._ownerNode;
+		}
+		
 		/**
 		 * Retrieves an <code>INode</code> from the specified name.
 		 * 

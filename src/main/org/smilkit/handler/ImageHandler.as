@@ -3,6 +3,7 @@ package org.smilkit.handler
 	import flash.display.Bitmap;
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
+	import flash.display.LoaderInfo;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
@@ -73,10 +74,16 @@ package org.smilkit.handler
 		
 		protected function onLoaderComplete(e:Event):void
 		{
+			var loaderInfo:LoaderInfo = (e.target as LoaderInfo);
+			
+			this._intrinsicWidth = loaderInfo.width;
+			this._intrinsicHeight = loaderInfo.height;
+			
+			var bitmapData:BitmapData = (loaderInfo.content as BitmapData);
+			this._bitmap = new Bitmap(bitmapData, "auto", true);
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
-			
-			
 		}
 		
 		protected function onLoaderError(e:IOErrorEvent):void

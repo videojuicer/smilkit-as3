@@ -15,7 +15,7 @@ package org.smilkit.collections
 			return (this._keys.length == 0);
 		}
 		
-		public function getItem(key:Object):Object
+		public function getItem(key:*):*
 		{
 			var i:int = this.getNamedIndex(key);
 			
@@ -29,7 +29,7 @@ package org.smilkit.collections
 			}
 		}
 		
-		public function getKeyAt(index:int):Object
+		public function getKeyAt(index:int):*
 		{
 			if (index > this.length || index < 0)
 			{
@@ -39,7 +39,7 @@ package org.smilkit.collections
 			return this._keys.getItemAt(index);
 		}
 		
-		public function getNamedIndex(key:Object):int
+		public function getNamedIndex(key:*):int
 		{
 			if (this.hasItem(key))
 			{
@@ -55,7 +55,7 @@ package org.smilkit.collections
 			return -1;
 		}
 		
-		public function setItem(key:Object, value:Object):void
+		public function setItem(key:*, value:*):void
 		{
 			var i:int = this.getNamedIndex(key);
 			
@@ -72,7 +72,7 @@ package org.smilkit.collections
 			}
 		}
 		
-		public function removeItem(key:Object):void
+		public function removeItem(key:*):void
 		{
 			var i:int = this.getNamedIndex(key);
 			
@@ -83,11 +83,11 @@ package org.smilkit.collections
 			}
 		}
 		
-		public function hasItem(key:Object):Boolean
+		public function hasItem(key:*):Boolean
 		{
 			for (var i:int = this._keys.length; i >= 0; i--)
 			{
-				var newKey:String = this._keys.getItemAt(i) as String;
+				var newKey:* = this._keys.getItemAt(i);
 				
 				if (key == newKey)
 				{

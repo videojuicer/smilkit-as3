@@ -1,5 +1,6 @@
 package org.smilkit.time
 {
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -30,6 +31,11 @@ package org.smilkit.time
 		public function get element():ISMILMediaElement
 		{
 			return this._element;
+		}
+		
+		public function get mediaElement():SMILMediaElement
+		{
+			return (this._element as SMILMediaElement);
 		}
 		
 		public function activeAt(offset:Number):Boolean

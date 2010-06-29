@@ -129,12 +129,37 @@ package org.smilkit.render
 		}
 		
 		/**
+		 * Syncs up all the handlers that exist in the <code>RenderTree</code> so they all resume at the same time (or as close as possible).
+		 */
+		public function syncHandlers():void
+		{
+			if (this._objectPool.viewport.playing)
+			{
+				// resume all!
+				for (var i:int = 0; i < this.elements.length; i++)
+				{
+					var node:TimingNode = this.elements[i];
+					
+					node.mediaElement.handler.resume();
+				}
+			}
+			else
+			{
+				
+			}
+
+			// how we going to sync em all?
+		}
+		
+		/**
 		 * Checks the current position of the player and requests the stage be redrawn according to timings in the TimingGraph
-		 * @param offset
 		 * 
+		 * @param offset The offset to set the contents of the <code>RenderTree</code> to.
 		 */		
 		public function updateAt(offset:Number):void
 		{
+			var syncRequired:Boolean = false;
+			
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
@@ -162,6 +187,9 @@ package org.smilkit.render
 						
 						handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 						handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+						
+						// pause playback, we let the loadScheduler handles cancelling the loading
+						handler.pause();
 				
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
@@ -179,6 +207,8 @@ package org.smilkit.render
 							// we add our listeners for the dependancy management
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+							
+							syncRequired = true;
 							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
@@ -203,6 +233,11 @@ package org.smilkit.render
 				
 				// swap with new list
 				this._activeElements = newActiveElements;
+			}
+			
+			if (syncRequired)
+			{
+				this.syncHandlers();
 			}
 		}
 		

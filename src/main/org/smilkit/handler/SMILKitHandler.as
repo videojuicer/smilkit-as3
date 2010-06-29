@@ -2,6 +2,7 @@ package org.smilkit.handler
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.errors.IllegalOperationError;
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
@@ -80,6 +81,16 @@ package org.smilkit.handler
 			return false;
 		}
 		
+		public function get seekable():Boolean
+		{
+			return false;
+		}
+		
+		public function get syncable():Boolean
+		{
+			return false;
+		}
+		
 		public function get preloadable():Boolean
 		{
 			return true;
@@ -143,13 +154,18 @@ package org.smilkit.handler
 		 * 
 		 * @param seekTo The offset to seek the handler to.
 		 * 
+		 * @throws flash.errors.IllegalOperationError
+		 * 
 		 * @see org.smilkit.event.HandlerEvent.SEEK_NOTIFY
 		 * @see org.smilkit.event.HandlerEvent.SEEK_INVALIDTIME
 		 * @see org.smilkit.event.HandlerEvent.SEEK_FAILED
 		 */
 		public function seek(seekTo:Number):void
 		{
-			
+			if (this.seekable)
+			{
+				throw new IllegalOperationError("Unable to seek on a un-seekable SMILKitHandler.");
+			}
 		}
 		
 		/**

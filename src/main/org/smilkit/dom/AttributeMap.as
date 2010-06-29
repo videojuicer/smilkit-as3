@@ -13,7 +13,19 @@ package org.smilkit.dom
 		public override function setNamedItem(arg:INode):INode
 		{
 			var previous:INode = this.getNamedItem(arg.nodeName);
+			var attr:Attr = (arg as Attr);
+			
+			if (attr.ownerElement != null)
+			{
+				if (attr.ownerElement != this.ownerNode())
+				{
+					throw new DOMException(DOMException.WRONG_DOCUMENT_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "WRONG_DOCUMENT_ERR"));
+				}
+			}
+			
 			var node:INode = super.setNamedItem(arg);
+			
+			attr.ownerNode = this.ownerNode();
 			
 			(this._ownerNode.ownerDocument as Document).setAttributeNode(arg, previous);
 			

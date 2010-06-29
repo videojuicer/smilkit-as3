@@ -63,9 +63,19 @@ package org.smilkit.handler
 			return true;
 		}
 		
+		public override function get seekable():Boolean
+		{
+			return true;
+		}
+		
 		public override function get preloadable():Boolean
 		{
 			return false;
+		}
+		
+		public override function get syncable():Boolean
+		{
+			return true;
 		}
 		
 		public override function get intrinsicSpatial():Boolean

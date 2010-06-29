@@ -3,6 +3,7 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INode;
 	
 	/**
 	 * Attributes representats an XML attribute that usually appears on a
@@ -23,6 +24,7 @@ package org.smilkit.dom
 	{
 		private static const DTD:String = "http://www.w3.org/TR/REC-xml";
 		
+		protected var _ownerNode:INode = null;
 		protected var _value:Object = null;
 		protected var _name:String;
 		protected var _isAttributeNode:Boolean = false;
@@ -77,6 +79,16 @@ package org.smilkit.dom
 		public function get ownerElement():IElement
 		{
 			return super._ownerDocument as IElement;
+		}
+		
+		public function get ownerNode():INode
+		{
+			return this._ownerNode;
+		}
+		
+		public function set ownerNode(ownerNode:INode):void
+		{
+			this._ownerNode = ownerNode;
 		}
 		
 		public function get isAttributeNode():Boolean

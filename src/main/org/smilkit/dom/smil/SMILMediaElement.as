@@ -3,6 +3,8 @@ package org.smilkit.dom.smil
 	import flash.errors.IllegalOperationError;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.events.EventListener;
+	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
@@ -19,6 +21,9 @@ package org.smilkit.dom.smil
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
+			
+			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, new EventListener(this.onDOMAttributeModified), false);
+			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, new EventListener(this.onDOMAttributeModified), false);
 		}
 		
 		public function get handler():SMILKitHandler
@@ -216,6 +221,14 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
+		protected function onDOMAttributeModified(e:MutationEvent):void
+		{
+			if (e.attrName == "src" || e.attrName == "type")
+			{
+				this._handler = SMILKit.createElementHandlerFor(this);
+			}
+		}
+		
 		public override function beginElement():Boolean
 		{
 			return false;
@@ -232,12 +245,7 @@ package org.smilkit.dom.smil
 		}
 		
 		public override function resumeElement():void
-		{
-			if (this._handler == null)
-			{
-				this._handler = SMILKit.createElementHandlerFor(this);
-			}
-			
+		{			
 			this._handler.resume();
 		}
 		
