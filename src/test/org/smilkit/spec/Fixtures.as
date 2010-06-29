@@ -4,7 +4,7 @@ package org.smilkit.spec
 	{
 		public static var BASIC_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
-			"<body><video src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
+			"<body id=\"body\"><video id=\"content\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
 		
 		public static var BASIC_SEQ_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +

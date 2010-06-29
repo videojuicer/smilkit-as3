@@ -5,10 +5,12 @@ package org.smilkit.spec.tests.dom
 	import org.flexunit.async.Async;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
-	import org.smilkit.dom.events.EventListener;
+	import org.smilkit.dom.ParentNode;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
+	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.events.IEventListener;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
@@ -43,41 +45,45 @@ package org.smilkit.spec.tests.dom
 		[Test(async,description="Test listening for an event")]
 		public function listenForEvent():void
 		{
-			var asyncListener:Function = Async.asyncHandler(this, this.onEventDispatched, 2000, null,this.onEventTimeout);
-			var listener:EventListener = new EventListener(asyncListener);
-			
-			(this._document as Document).addEventListener(MutationEvent.DOM_NODE_REMOVED, listener, false);
-			
-			this._document.removeChild(this._document.firstChild);
+			var element:SMILMediaElement = (this._document.getElementById("content") as SMILMediaElement);
+			var passThru:Object = { childCount: (element.parentNode as ParentNode).length };
+			var asyncListener:Function = Async.asyncHandler(this, this.onEventDispatched, 2000, passThru, this.onEventTimeout);
+
+			(this._document as Document).addEventListener(MutationEvent.DOM_NODE_REMOVED, asyncListener, false);
+			element.parentNode.removeChild(element);
 		}
 		
 		[Test(async,description="Test listening for an attribute mutation event")]
 		public function listenForAttributeMutation():void
 		{
 			var asyncListener:Function = Async.asyncHandler(this, this.onAttributeMutation, 2000, null, this.onAttributeMutationTimeout);
-			var listener:EventListener = new EventListener(asyncListener);
-			
-			(this._document as Document).addEventListener(MutationEvent.DOM_ATTR_MODIFIED, listener, false);
+
+			(this._document as Document).addEventListener(MutationEvent.DOM_ATTR_MODIFIED, asyncListener, false);
 			
 			((this._document as Document).firstChild as Element).setAttribute("test", "hello world");
 		}
 		
-		protected function onEventDispatched(e:MutationEvent, passThru:Object):void
+		protected function onEventDispatched(e:MutationEvent, passThru:Object = null):void
 		{
-			Assert.assertNotNull(e.target);
+			var bodyElement:ParentNode = (this._document.getElementById("body") as ParentNode);
+			
+			Assert.assertNull(this._document.getElementById("content"));
+			Assert.assertEquals((passThru.childCount - 1), bodyElement.length);
 		}
 		
-		protected function onEventTimeout(passThru:Object):void
+		protected function onEventTimeout(passThru:Object = null):void
 		{
 			Assert.fail("Timeout occured whilst waiting for a mutation event on the DOM.");
 		}
 		
-		protected function onAttributeMutation(e:MutationEvent, passThru:Object):void
+		protected function onAttributeMutation(e:MutationEvent, passThru:Object = null):void
 		{
-			Assert.fail("Worked!");
+			var attributeValue:String = ((this._document as Document).firstChild as Element).getAttribute("test");
+			
+			Assert.assertEquals("hello world", attributeValue);
 		}
 		
-		protected function onAttributeMutationTimeout(passThru:Object):void
+		protected function onAttributeMutationTimeout(passThru:Object = null):void
 		{
 			Assert.fail("Timeout occured whilst waiting for a attribute mutation event on the DOM.");
 		}

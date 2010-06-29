@@ -170,12 +170,12 @@ package org.smilkit.dom
 			return this.getIdentifier(elementId);
 		}
 		
-		internal function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal function addNodeEventListener(node:INode, type:String, listener:Function, useCapture:Boolean):void
 		{
 			
 		}
 		
-		internal function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal function removeNodeEventListener(node:INode, type:String, listener:Function, useCapture:Boolean):void
 		{
 			
 		}

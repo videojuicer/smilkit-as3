@@ -25,11 +25,10 @@
     <classEntry path="org.smilkit.events.ListenerCount"/>
     <classEntry path="org.smilkit.events.EventException"/>
     <classEntry path="org.smilkit.events.RuntimeException"/>
-    <classEntry path="org.smilkit.dom.events.Event"/>
+    <classEntry path="org.smilkit.dom.events.DOMEvent"/>
     <classEntry path="org.smilkit.w3c.dom.events.IMutationEvent"/>
     <classEntry path="org.smilkit.dom.events.MutationEvent"/>
     <classEntry path="org.smilkit.dom.EnclosingAttr"/>
-    <classEntry path="org.smilkit.dom.events.EventListener"/>
     <classEntry path="org.smilkit.spec.tests.dom.EventTestCase"/>
     <classEntry path="org.smilkit.spec.Fixtures"/>
     <classEntry path="org.smilkit.dom.smil.Time"/>

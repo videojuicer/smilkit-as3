@@ -8,7 +8,7 @@ package org.smilkit.dom
 	import org.smilkit.collections.Hashtable;
 	import org.smilkit.collections.List;
 	import org.smilkit.collections.ListenerEntry;
-	import org.smilkit.dom.events.Event;
+	import org.smilkit.dom.events.DOMEvent;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
@@ -85,7 +85,7 @@ package org.smilkit.dom
 		{
 			if (type == "Events" || type == "Event")
 			{
-				return new Event();
+				return new DOMEvent();
 			}
 			else if (type == "MutationEvents" || type == "MutationEvent")
 			{
@@ -156,7 +156,7 @@ package org.smilkit.dom
 		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
 		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
 		 */
-		internal override function addNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal override function addNodeEventListener(node:INode, type:String, listener:Function, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
 			{
@@ -198,7 +198,7 @@ package org.smilkit.dom
 		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
 		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
 		 */
-		internal override function removeNodeEventListener(node:INode, type:String, listener:IEventListener, useCapture:Boolean):void
+		internal override function removeNodeEventListener(node:INode, type:String, listener:Function, useCapture:Boolean):void
 		{
 			if (type == null || type == "" || listener == null)
 			{
@@ -264,7 +264,7 @@ package org.smilkit.dom
 				return false;
 			}
 			
-			var e:Event = (event as Event);
+			var e:DOMEvent = (event as DOMEvent);
 			
 			if (!e.initialized || e.type == null || e.type == "")
 			{
@@ -299,7 +299,7 @@ package org.smilkit.dom
 			// needs capturing ....
 			if (count.captures > 0)
 			{
-				e.eventPhase = Event.CAPTURING_PHASE;
+				e.eventPhase = DOMEvent.CAPTURING_PHASE;
 				
 				for (var r:int = pv.length - 1; r >= 0; r--)
 				{
@@ -325,11 +325,12 @@ package org.smilkit.dom
 							{
 								try
 								{
-									entry.listener.handleEvent(e);
+									entry.listener(e);
 								}
 								catch (e:Error)
 								{
 									// catch all
+									trace("Capturing: "+e.toString());
 								}
 							}
 						}
@@ -340,7 +341,7 @@ package org.smilkit.dom
 			// bubbling ....
 			if (count.bubbles > 0)
 			{
-				e.eventPhase = Event.AT_TARGET;
+				e.eventPhase = DOMEvent.AT_TARGET;
 				e.currentTarget = (node as IEventTarget);
 				
 				nodeListeners = this.getEventListeners(node);
@@ -357,11 +358,12 @@ package org.smilkit.dom
 						{
 							try
 							{
-								le.listener.handleEvent(e);
+								le.listener(e);
 							}
 							catch (e:Error)
 							{
 								// catch all
+								trace("Bubbling: "+e.toString());
 							}
 						}
 					}
@@ -369,7 +371,7 @@ package org.smilkit.dom
 				
 				if (e.bubbles)
 				{
-					e.eventPhase = Event.BUBBLING_PHASE;
+					e.eventPhase = DOMEvent.BUBBLING_PHASE;
 					
 					for (var j:int = 0; j < pv.length; j++)
 					{
@@ -394,11 +396,11 @@ package org.smilkit.dom
 								{
 									try
 									{
-										tle.listener.handleEvent(e);
+										tle.listener(e);
 									}
 									catch(e:Error)
 									{
-										// catch all
+										trace("Bubble: "+e.toString());
 									}
 								}
 							}
@@ -408,7 +410,7 @@ package org.smilkit.dom
 			}
 			
 			if (count.defaults > 0 && (!e.cancelable || !e.preventDefaultEvent)) {
-				e.eventPhase = Event.DEFAULT_PHASE;
+				e.eventPhase = DOMEvent.DEFAULT_PHASE;
 				e.currentTarget = (node as IEventTarget);
 			}
 			

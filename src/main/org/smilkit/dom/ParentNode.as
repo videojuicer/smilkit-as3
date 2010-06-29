@@ -199,8 +199,45 @@ package org.smilkit.dom
 			
 			(this._ownerDocument as Document).removingNode(this, oldChild, false);
 			
+			if (oldChild == this.firstChild)
+			{
+				this._firstChild = oldChild.nextSibling;
+				
+				if (this.firstChild != null)
+				{
+					(this.firstChild as ChildNode).previousSibling = (oldChild.previousSibling as ChildNode);
+				}
+			}
+			else
+			{
+				var prevChild:ChildNode = (oldChild.previousSibling as ChildNode);
+				var nextChild:ChildNode = (oldChild.nextSibling as ChildNode);
+				
+				prevChild.nextSibling = nextChild;
+				
+				if (nextChild == null)
+				{
+					(this.firstChild as ChildNode).previousSibling = prevChild;
+				}
+				else
+				{
+					(nextChild as ChildNode).previousSibling = prevChild;
+				}
+			}
+			
+			(oldChild as ParentNode)._ownerDocument = null;
 			(oldChild as ChildNode).nextSibling = null;
 			(oldChild as ChildNode).previousSibling = null;
+			
+			if (oldChild is Element)
+			{
+				var oldElement:Element = (oldChild as Element);
+				
+				if (oldElement.id != "" && oldElement.id != null)
+				{
+					(this._ownerDocument as Document).removeIdentifier(oldElement.id);
+				}
+			}
 			
 			this.changed();
 			

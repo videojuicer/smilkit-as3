@@ -2,7 +2,6 @@ package org.smilkit.time
 {
 	import flash.events.EventDispatcher;
 	
-	import org.smilkit.dom.events.EventListener;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
@@ -26,8 +25,6 @@ package org.smilkit.time
 		protected var _elements:Vector.<TimingNode>;
 		protected var _objectPool:ViewportObjectPool;
 		
-		protected var _eventListener:EventListener;
-		
 		/**
 		 * Create the instance of the _element, and stores the reference to ISMILdocument in _document
 		 * Adds listeners to _document to listener for MutationEvents.
@@ -40,15 +37,13 @@ package org.smilkit.time
 			this._elements = new Vector.<TimingNode>();
 			this._objectPool = objectPool;
 			
-			this._eventListener = new EventListener(this.onMutationEvent);
-			
-			this.document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this._eventListener, false);
-			this.document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this._eventListener, false);
+			this.document.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_CHARACTER_DATA_MODIFIED, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this.onMutationEvent, false);
+			this.document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onMutationEvent, false);
 		}
 		
 		public function get elements():Vector.<TimingNode>

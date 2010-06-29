@@ -5,8 +5,8 @@ package org.smilkit.w3c.dom.events
 	public interface IEvent
 	{
 		function get type():String;
-		function get target():IEventTarget;
-		function get currentTarget():IEventTarget;
+		function get target():Object;
+		function get currentTarget():Object;
 		function get eventPhase():uint;
 		function get bubbles():Boolean;
 		function get cancelable():Boolean;

@@ -1,9 +1,11 @@
 package org.smilkit.dom.events
 {
+	import flash.events.Event;
+	
 	import org.smilkit.w3c.dom.events.IEvent;
 	import org.smilkit.w3c.dom.events.IEventTarget;
 
-	public class Event implements IEvent
+	public class DOMEvent extends Event implements IEvent
 	{
 		public static var CAPTURING_PHASE:uint = 0;
 		public static var AT_TARGET:uint = 1;
@@ -22,37 +24,37 @@ package org.smilkit.dom.events
 		
 		protected var _timestamp:int = Date.length;
 		
-		public function Event()
+		public function DOMEvent()
 		{
-			
+			super("domEvent");
 		}
 		
-		public function get type():String
+		public override function get type():String
 		{
 			return this._type;
 		}
 		
-		public function get target():IEventTarget
+		public override function get target():Object
 		{
 			return this._target;
 		}
 		
-		public function set target(value:IEventTarget):void
+		public function set target(value:Object):void
 		{
-			this._target = value;
+			this._target = (value as IEventTarget);
 		}
 		
-		public function get currentTarget():IEventTarget
+		public override function get currentTarget():Object
 		{
 			return this._currentTarget;
 		}
 		
-		public function set currentTarget(value:IEventTarget):void
+		public function set currentTarget(value:Object):void
 		{
-			this._currentTarget = value;
+			this._currentTarget = (value as IEventTarget);
 		}
 		
-		public function get eventPhase():uint
+		public override function get eventPhase():uint
 		{
 			return this._eventPhase;
 		}
@@ -67,12 +69,12 @@ package org.smilkit.dom.events
 			return this._initialized;
 		}
 		
-		public function get bubbles():Boolean
+		public override function get bubbles():Boolean
 		{
 			return this._bubbles;
 		}
 		
-		public function get cancelable():Boolean
+		public override function get cancelable():Boolean
 		{
 			return this._cancelable;
 		}
@@ -102,12 +104,12 @@ package org.smilkit.dom.events
 			return this._timestamp;
 		}
 		
-		public function stopPropagation():void
+		public override function stopPropagation():void
 		{
 			this._stopPropagation = true;
 		}
 		
-		public function preventDefault():void
+		public override function preventDefault():void
 		{
 			this._preventDefault = true;
 		}

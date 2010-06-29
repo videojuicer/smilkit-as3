@@ -3,7 +3,7 @@ package org.smilkit.dom.events
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.events.IMutationEvent;
 	
-	public class MutationEvent extends Event implements IMutationEvent
+	public class MutationEvent extends DOMEvent implements IMutationEvent
 	{
 		public static var MODIFICATION:int = 1;
 		public static var ADDITION:int = 2;

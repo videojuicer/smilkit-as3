@@ -1,7 +1,6 @@
 package org.smilkit.dom.smil
 {
 	import org.osmf.events.TimeEvent;
-	import org.smilkit.dom.events.EventListener;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -59,7 +58,7 @@ package org.smilkit.dom.smil
 						
 						if (eventElement != null)
 						{
-							eventElement.addEventListener(eventType, new EventListener(this.onEventOccurred), false);
+							eventElement.addEventListener(eventType, this.onEventOccurred, false);
 						}
 					}
 					break;

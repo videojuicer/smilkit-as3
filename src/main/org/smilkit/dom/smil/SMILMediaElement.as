@@ -3,7 +3,6 @@ package org.smilkit.dom.smil
 	import flash.errors.IllegalOperationError;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.events.EventListener;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IAttr;
@@ -22,8 +21,8 @@ package org.smilkit.dom.smil
 		{
 			super(owner, name);
 			
-			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, new EventListener(this.onDOMAttributeModified), false);
-			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, new EventListener(this.onDOMAttributeModified), false);
+			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMAttributeModified, false);
+			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onDOMAttributeModified, false);
 		}
 		
 		public function get handler():SMILKitHandler

@@ -215,7 +215,7 @@ package org.smilkit.dom
 		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
 		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
 		 */
-		public function addEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
+		public function addEventListener(type:String, listener:Function, useCapture:Boolean):void
 		{
 			this.coreOwnerDocument.addNodeEventListener(this, type, listener, useCapture);
 		}
@@ -227,7 +227,7 @@ package org.smilkit.dom
 		 * @param listener The <code>IEventListener</code> to execute when the event is dispatched.
 		 * @param useCapture True to register the listener on the capturing phase rather than at-target or bubbling.
 		 */
-		public function removeEventListener(type:String, listener:IEventListener, useCapture:Boolean):void
+		public function removeEventListener(type:String, listener:Function, useCapture:Boolean):void
 		{
 			this.coreOwnerDocument.removeNodeEventListener(this, type, listener, useCapture);
 		}
