@@ -12,6 +12,9 @@ package org.smilkit.spec.tests.view
 	public class ViewportTestCase
 	{		
 		protected var _viewport:Viewport;
+		protected var _viewportWithDocument:Viewport;
+		
+		protected var _viewportStateLastDispatch:String;
 		
 		[Before]
 		public function setUp():void
@@ -19,6 +22,7 @@ package org.smilkit.spec.tests.view
 			this._viewport = new Viewport();
 			// dont want to actually load
 			this._viewport.autoRefresh = false;
+			this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportStateChange);
 		}
 		
 		[After]
@@ -27,21 +31,62 @@ package org.smilkit.spec.tests.view
 			this._viewport = null;
 		}
 		
-		// Pending tests:
-		// Instantiates with playState == Viewport.PLAYBACK_PAUSED
+		protected function onViewportStateChange(event:ViewportEvent):void
+		{
+			this._viewportStateLastDispatch = this._viewport.playbackState;
+		}
+		
 		[Test(description="Tests that the viewport is instantiated in a paused state")]
 		public function instantiatesInPausedState():void
 		{
 			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewport.playbackState);
 		}
 		
-		// Resume starts the heartbeat and sets the playState to Viewport.PLAYBACK_PLAYING
-		// Pause pauses the heartbeat, maintaining the offset, and sets the playstate to Viewport.PLAYBACK_PAUSED
-		// Seeking pauses the heartbeat and sets the offset
-		// Seeking while already in a seek state returns true if the offset has changed
+		[Test(description="Tests the resume() and pause() methods to ensure that the playback state is properly changed.")]
+		public function resumeBeginsPlaybackAndPauseStopsPlayback():void
+		{
+			Assert.assertTrue(this._viewport.resume());
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+			
+			Assert.assertFalse(this._viewport.resume());
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+			
+			Assert.assertTrue(this._viewport.pause());
+			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewportStateLastDispatch);
+		}
 		
-		// Committing a seek while not in seek state returns false
-		// Committing a seek while in seek state reverts the state to the previously-active state
+		[Test(description="Tests the seek(offset) method to ensure that it throws the viewport into PLAYBACK_SEEKING state and that it registers a new offset as a state change")]
+		public function seekChangesStateAndRegistersANewOffsetAsANewState():void
+		{
+			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewport.playbackState);
+			Assert.assertTrue(this._viewport.seek(1));
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+			Assert.assertFalse(this._viewport.seek(1));
+			Assert.assertTrue(this._viewport.seek(2));
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+		}
+		
+
+		[Test(description="Tests the commitSeek() method to ensure that it returns false if no seek is in progress, and otherwise returns true and reverts the playback state.")]
+		public function commitSeekRevertsStateIfUncommittedSeekInProgress():void
+		{
+			// Committing a seek while not in seek state returns false
+			Assert.assertTrue(this._viewport.resume());
+			Assert.assertFalse(this._viewport.commitSeek());
+
+			// Committing a seek while in seek state reverts the state to the previously-active state
+			Assert.assertTrue(this._viewport.seek(1));
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+			Assert.assertTrue(this._viewport.commitSeek());
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewport.playbackState);
+			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+		}
 		
 		
 		[Test(description="Tests the history tracking of the viewport")]
