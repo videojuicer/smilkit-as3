@@ -23,6 +23,14 @@ package org.smilkit.view
 
 	public class Viewport extends EventDispatcher
 	{
+		
+		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
+		public static var PLAYBACK_PAUSED:String = "playbackPaused";
+		public static var PLAYBACK_SEEKING:String = "playbackSeeking";
+		
+		public static var SEEK_UNCOMMITTED:String = "seekTransient";
+		public static var SEEK_COMMITTED:String = "seekCommitted";
+		
 		/**
 		 *  An instance of ViewportObjectPool responsible for the active documents object pool.
 		 */		
@@ -42,11 +50,27 @@ package org.smilkit.view
 		protected var _history:Vector.<String>;
 		protected var _autoRefresh:Boolean = true;
 		
+		/**
+		* The current playback state for this Viewport instance.
+		*/
+		protected var _playbackState:String;
+		
+		/**
+		* The previous playback state for this Viewport instance. Toggle methods use this to store a state to which the viewport should be restored.
+		*/
+		protected var _previousPlaybackState:String;
+		
+		/**
+		* The offset last seeked to when in PLAYBACK_SEEKING state. Switching to a state other than PLAYBACK_SEEKING will reset this variable.
+		*/
+		protected var _previousUncommittedSeekOffset:int = -1;
+		
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
 			this._drawingBoard = new DrawingBoard();
+			this.pause();
 		}
 		
 		/**
@@ -258,19 +282,109 @@ package org.smilkit.view
 			return false;
 		}
 		
-		public function resume():void
+		public function resume():Boolean
+		{
+			return this.setPlaybackState(Viewport.PLAYBACK_PLAYING);
+		}
+		
+		public function pause():Boolean
+		{
+			return this.setPlaybackState(Viewport.PLAYBACK_PAUSED);
+		}
+		
+		public function seek(offset:uint):Boolean
+		{
+			return this.setPlaybackState(Viewport.PLAYBACK_SEEKING, offset);
+		}
+		
+		public function commitSeek():Boolean
+		{
+			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
+			{
+				this.revertPlaybackState();
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		/**
+		* Alters the playback state of the viewport instance to the given value.
+		* If the playback state already matches the given value, nothing happens and false is returned.
+		* If the given value is a new playback state, the playback state is set and a state change event is dispatched. True will be returned.
+		* There is a special case for registering a state change while the viewport's state is PLAYBACK_SEEKING. In this state, a state change will 
+		* be registered if *either* the newState or offset arguments differ from the last call.
+		*/
+		public function setPlaybackState(newState:String, offset:uint=0):Boolean
+		{
+			if(newState != this._playbackState)
+			{
+				// Register a basic state change
+				this._previousPlaybackState = this._playbackState;
+				this._playbackState = newState;
+				switch(this._playbackState)
+				{
+					case Viewport.PLAYBACK_PLAYING:
+						this._previousUncommittedSeekOffset = -1;
+						this.onPlaybackStateChangedToPlaying();
+						break;
+					case Viewport.PLAYBACK_PAUSED:
+						this._previousUncommittedSeekOffset = -1;
+						this.onPlaybackStateChangedToPaused();
+						break;
+					case Viewport.PLAYBACK_SEEKING:
+						this._previousUncommittedSeekOffset = offset;
+						this.onPlaybackStateChangedToSeekingWithOffset(offset);
+						break;
+				}
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
+				return true;
+			}
+			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
+			{
+				// Register a special case for changing offset while seeking
+				this._previousUncommittedSeekOffset = offset;
+				this.onPlaybackStateChangedToSeekingWithOffset(offset);
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+		
+		/**
+		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
+		*/
+		public function revertPlaybackState():void
+		{
+			this.setPlaybackState(this._previousPlaybackState);
+		}
+		
+		protected function onPlaybackStateChangedToPlaying():void
 		{
 			
 		}
 		
-		public function pause():void
+		protected function onPlaybackStateChangedToPaused():void
 		{
 			
 		}
 		
-		public function seek(offset:int):void
+		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
 			
+		}
+		
+		/**
+		* Public getter for the internal _playbackState variable
+		*/
+		public function get playbackState():String
+		{
+			return this._playbackState;
 		}
 		
 		private function onRefreshComplete(e:Event):void
