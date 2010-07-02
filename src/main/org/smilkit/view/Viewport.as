@@ -12,14 +12,18 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
+
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.events.RenderTreeEvent;
+
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.TimingGraph;
-	import org.smilkit.w3c.dom.smil.ISMILDocument;
+
 
 	public class Viewport extends EventDispatcher
 	{
@@ -224,6 +228,14 @@ package org.smilkit.view
 		}
 		
 		/**
+		* Public getter for the internal _playbackState variable
+		*/
+		public function get playbackState():String
+		{
+			return this._playbackState;
+		}
+		
+		/**
 		 * Refreshs the contents of the <code>Viewport</code> based on the current <code>Viewport.location</code>, if the location is updated
 		 * and auto-refresh is enabled this method is automatically called. Otherwise the next
 		 * time the refresh method is called the new location is used.
@@ -282,21 +294,42 @@ package org.smilkit.view
 			return false;
 		}
 		
+		/**
+		* Begins or resumes playback from the current playhead position.
+		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
+		*/
 		public function resume():Boolean
 		{
 			return this.setPlaybackState(Viewport.PLAYBACK_PLAYING);
 		}
 		
+		/**
+		* Pauses playback at the current playhead position.
+		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
+		*/		
 		public function pause():Boolean
 		{
 			return this.setPlaybackState(Viewport.PLAYBACK_PAUSED);
 		}
 		
+		/**
+		* Performs a seek to the given offset within the document. Calling this method throws the viewport instance into
+		* a "seeking" playback state, during which certain special behaviours apply - in particular, while in this state the
+		* viewport will not do any just-in-time loading of assets.
+		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
+		*/
 		public function seek(offset:uint):Boolean
 		{
 			return this.setPlaybackState(Viewport.PLAYBACK_SEEKING, offset);
 		}
 		
+		/**
+		* Reverts the viewport from a seeking state back to the previously-active playback state. You should call commitSeek()
+		* after any sequence of seek(offset) calls. For instance when implementing a basic drag and drop slider UI for seeking,
+		* you would call seek(offset) each time the user moves the play head during a drag operation and commitSeek() when the user
+		* releases the playhead.
+		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
+		*/
 		public function commitSeek():Boolean
 		{
 			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
@@ -366,25 +399,31 @@ package org.smilkit.view
 		
 		protected function onPlaybackStateChangedToPlaying():void
 		{
-			
+			this.loadScheduler.start();
+			this.heartbeat.resume();
 		}
 		
 		protected function onPlaybackStateChangedToPaused():void
 		{
-			
+			this.heartbeat.pause();
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
-			
+			this.heartbeat.pause();
+			this.heartbeat.offset = offset;
 		}
 		
-		/**
-		* Public getter for the internal _playbackState variable
-		*/
-		public function get playbackState():String
+		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
-			return this._playbackState;
+			this.heartbeat.pause();
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING_FOR_DATA));
+		}
+		
+		protected function onRenderTreeReady(event:RenderTreeEvent):void
+		{
+			if(this._playbackState == Viewport.PLAYBACK_PLAYING) this.heartbeat.resume();
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
 		private function onRefreshComplete(e:Event):void
@@ -395,6 +434,10 @@ package org.smilkit.view
 				var objectPool:Object = { pool: this._objectPool };
 				this._objectPool = null;
 				
+				// Trash old event listeners just in case
+				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+				
 				// we delete the object pool to avoid a memory leak when re-creating it,
 				delete objectPool.pool;
 			}
@@ -403,6 +446,10 @@ package org.smilkit.view
 			var document:SMILDocument = (SMILKit.loadSMILDocument(e.target.data) as SMILDocument);
 			
 			this._objectPool = new ViewportObjectPool(this, document);
+			
+			// Bind events to the newly-created objects
+			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
