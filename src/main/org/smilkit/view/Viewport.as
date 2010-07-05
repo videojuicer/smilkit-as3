@@ -411,7 +411,8 @@ package org.smilkit.view
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
 			this.heartbeat.pause();
-			this.heartbeat.offset = offset;
+			this.heartbeat.seek(offset);
+			// can rollback this seek: this.heartbeat.rollback();
 		}
 		
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
