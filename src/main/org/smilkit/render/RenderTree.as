@@ -145,7 +145,13 @@ package org.smilkit.render
 			}
 			else
 			{
-				
+				// pause all!
+				for (var j:int = 0; i < this.elements.length; i++)
+				{
+					var nodeJ:TimingNode = this.elements[j];
+					
+					nodeJ.mediaElement.handler.pause();
+				}
 			}
 
 			// how we going to sync em all?
@@ -221,6 +227,7 @@ package org.smilkit.render
 							if (time === previousTime && time != previousTime)
 							{
 								this._lastChangeOffset = offset;
+								syncRequired = true;
 								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}

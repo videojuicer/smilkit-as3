@@ -260,7 +260,7 @@ package org.smilkit.dom.smil
 		}
 		
 		public override function resumeElement():void
-		{			
+		{
 			this._handler.resume();
 		}
 		

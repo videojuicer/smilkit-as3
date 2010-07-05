@@ -19,6 +19,8 @@ package org.smilkit.time
 		protected var _baseline:Date = new Date();
 		protected var _offset:Number = 0;
 		protected var _slowBeats:int = 0;
+		protected var _running:Boolean = false;
+		protected var _runningOffset:Number = 0;
 		
 		public static var BPS_5:Number = 200;
 		public static var BPS_2:Number = 500;
@@ -35,12 +37,30 @@ package org.smilkit.time
 		public function Heartbeat(delay:Number)
 		{
 			super(delay, 0);
+			
 			this.addEventListener(TimerEvent.TIMER, this.onTimer, false);
+			
+			this._baseline = new Date();
+			this._offset = 0;
+			
+			super.start();
 		}
 		
+		/**
+		 * The total offset since the Heartbeat was created.
+		 */
 		public function get offset():Number
 		{
 			return this._offset;
+		}
+		
+		/**
+		 * The running offset, can be paused and resumed sperately away from the
+		 * actual offset.
+		 */
+		public function get runningOffset():Number
+		{
+			return this._runningOffset;
 		}
 		
 		public function get beatsPerSecond():Number
@@ -53,6 +73,10 @@ package org.smilkit.time
 			this.delay = (1000 / value);
 		}
 		
+		/**
+		 * The current count of slow beats, a slow beat is counted
+		 * when it takes longer to process than the set beat delay.
+		 */
 		public function get slowBeats():int
 		{
 			return this._slowBeats;
@@ -60,10 +84,12 @@ package org.smilkit.time
 		
 		public override function start():void
 		{
-			this._baseline = new Date();
-			this._offset = 0;
-			
-			super.start();
+			// no starting
+		}
+		
+		public override function stop():void
+		{
+			// no stopping
 		}
 		
 		public override function reset():void
@@ -71,9 +97,24 @@ package org.smilkit.time
 			this._baseline = new Date();
 			this._offset = 0;
 			
+			super.stop();
 			super.reset();
 		}
 		
+		public function resume():void
+		{
+			this._running = true;
+		}
+		
+		public function pause():void
+		{
+			this._running = false;
+		}
+		
+		public function seek(offset:Number):void
+		{
+			this._runningOffset = offset;
+		}
 		
 		protected function onTimer(e:TimerEvent):void
 		{
@@ -94,9 +135,17 @@ package org.smilkit.time
 			{
 				this._slowBeats = 0;
 			}
-			
+		
 			this._offset += beatDuration;
 			this._baseline = delta;
+			
+			if (this._running)
+			{
+				// we use the beat duration from the overall beat not just the running beat duration, this makes the running offset
+				// slightly more responsive but means if a resume happens the actual clock movement wont happen until the next beat.
+				// this however should be instant but depends on the delay / speed of the Timer class.
+				this._runningOffset += beatDuration;
+			}
 		}
 	}
 }
