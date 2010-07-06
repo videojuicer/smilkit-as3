@@ -48,7 +48,7 @@ package
 		{
 			this.addChild(this._viewport.drawingBoard);
 			
-			this._viewport.heartbeat.start();
+			this._viewport.resume();
 		}
 		
 		protected function onStageResize(e:Event):void

@@ -15,6 +15,7 @@ package org.smilkit.view
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
 
+	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.events.RenderTreeEvent;
 
@@ -24,6 +25,52 @@ package org.smilkit.view
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.TimingGraph;
 
+	/**
+	 * Dispatched when the <code>Viewport</code> instance has refreshed with a new document.
+	 * When this event is dispatched, the <code>Viewport</code> will have brand new <code>TimingGraph</code>, <code>RenderTree</code>
+	 * and <code>LoadScheduler</code> instances, so you'll have to rebind any event listeners you need to the new objects.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.REFRESH_COMPLETE
+	 */
+	[Event(name="viewportRefreshComplete", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when the <code>Viewport</code> instance changes playback state. Call myViewportInstance.playbackState
+	 * to get the new playback state.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.PLAYBACK_STATE_CHANGED
+	 */
+	[Event(name="viewportPlaybackStateChanged", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when the any of the <code>Viewport</code> instance's current set of media handlers dispatches
+	 * "waiting for data" event of it's own - e.g. a stream is buffering, an image is loading etc.
+	 * 
+	 * While waiting for data, the <code>Viewport</code>'s playback is halted (although the playback state will not
+	 * change to "paused"), and playback will resume automatically once all currently-active media handlers have 
+	 * reported ready, if the <code>Viewport</code> is currently playing.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.WAITING_FOR_DATA
+	 */
+	[Event(name="viewportWaitingForData", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when all the <code>Viewport</code>'s currently-active media handlers have loaded enough data for
+	 * playback to continue.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.READY
+	 */
+	[Event(name="viewportReady", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when the <code>Viewport</code>'s document is altered by an asset's duration being resolved, a SMIL 
+	 * submission completing or any other internal process. When this event is dispatched it is advisable to query the
+	 * document in case it's duration has changed so that you can update your application's user interface appropriately.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.DOCUMENT_MUTATED
+	 */
+	[Event(name="viewportDocumentMutated", type="org.smilkit.events.ViewportEvent")]
+	
 
 	public class Viewport extends EventDispatcher
 	{
@@ -427,6 +474,11 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
+		protected function onTimingGraphRebuild(event:TimingGraphEvent):void
+		{
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
+		}
+		
 		private function onRefreshComplete(e:Event):void
 		{
 			// destroy the object pool n all its precious children
@@ -436,6 +488,7 @@ package org.smilkit.view
 				this._objectPool = null;
 				
 				// Trash old event listeners just in case
+				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 				
@@ -449,6 +502,7 @@ package org.smilkit.view
 			this._objectPool = new ViewportObjectPool(this, document);
 			
 			// Bind events to the newly-created objects
+			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
