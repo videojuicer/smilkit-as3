@@ -46,7 +46,6 @@ package org.smilkit.spec.tests.render
 			
 			Assert.assertEquals(1, elementsNum);
 			Assert.assertEquals("video_http", resolveTimeElement.element.id);
-;
 		}
 		
 		protected function onTimingGraphRebuild(e:TimingGraphEvent, passThru:Object):void

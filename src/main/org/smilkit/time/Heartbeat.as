@@ -4,6 +4,14 @@ package org.smilkit.time
 	import flash.utils.Timer;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.events.HeartbeatEvent;
+	
+	/**
+	 * Dispatched when the running offset is changed.
+	 * 
+	 * @eventType org.smilkit.events.HeartbeatEvent.OFFSET_CHANGED
+	 */
+	[Event(name="heartbeatOffset", type="org.smilkit.events.HeartbeatEvent")]
 
 	/**
 	 * Heartbeat controls the timing of the player updates.
@@ -156,6 +164,8 @@ package org.smilkit.time
 		 */
 		public function pause():void
 		{
+			this.onTimer(null);
+			
 			this._running = false;
 		}
 		
@@ -167,7 +177,10 @@ package org.smilkit.time
 		public function seek(offset:Number):void
 		{
 			this._previousOffset = this._runningOffset;
+			this._baseline = new Date();
 			this._runningOffset = offset;
+			
+			this.onTimer(null);
 		}
 		
 		/**
@@ -207,6 +220,8 @@ package org.smilkit.time
 				// slightly more responsive but means if a resume happens the actual clock movement wont happen until the next beat.
 				// this however should be instant but depends on the delay / speed of the Timer class.
 				this._runningOffset += beatDuration;
+				
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.OFFSET_CHANGED, this._runningOffset));
 			}
 		}
 	}

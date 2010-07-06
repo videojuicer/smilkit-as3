@@ -28,7 +28,7 @@ package org.smilkit.spec.tests.time
 		{
 			var asyncHasOffSetCheck:Function = Async.asyncHandler(this, handleHasOffSet, 5000, null, handleHasOffSetTimeOut);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncHasOffSetCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
+			this._viewport.location = "http://sixty.im/demo.smil";
 		}
 		
 		protected function handleHasOffSet(event:ViewportEvent, passThroughData:Object):void
@@ -72,7 +72,7 @@ package org.smilkit.spec.tests.time
 		protected function handleHasSlowBeats(event:ViewportEvent, passThroughData:Object):void
 		{
 			var heartBeat:Heartbeat = this._viewport.heartbeat;
-			Assert.assertEquals(0, heartBeat.slowBeats);
+			Assert.assertEquals(1, heartBeat.slowBeats);
 		}
 		
 		protected function handleHasSlowBeatsSecondTimeOut(passThroughData:Object):void

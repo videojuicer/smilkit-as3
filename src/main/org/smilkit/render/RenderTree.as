@@ -8,6 +8,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.handler.SMILKitHandler;
@@ -52,7 +53,7 @@ package org.smilkit.render
 			this._objectPool = objectPool;
 			
 			// listener for every heart beat (so we recheck the timing tree)
-			this._objectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatBeat);
+			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatBeat);
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
@@ -310,7 +311,7 @@ package org.smilkit.render
 		 * Function called when the Viewports heartbeat dispatches a TimerEvent, which then updates the RenderTree 
 		 * @param e
 		 */		
-		protected function onHeartbeatBeat(e:TimerEvent):void
+		protected function onHeartbeatBeat(e:HeartbeatEvent):void
 		{
 			this.update();
 		}
