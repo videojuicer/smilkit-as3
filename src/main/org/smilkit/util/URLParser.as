@@ -1,7 +1,7 @@
 package org.smilkit.util
 {
 	/**
-	 * Parse's a URL and provides helper properties for access to the different URL pieces.
+	 * Parses a URL and provides helper properties for access to the different URL pieces.
 	 */ 
 	public class URLParser
 	{

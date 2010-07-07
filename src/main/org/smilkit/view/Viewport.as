@@ -14,6 +14,7 @@ package org.smilkit.view
 	import org.smilkit.SMILKit;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.util.DataURIParser;
 
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
@@ -294,14 +295,42 @@ package org.smilkit.view
 				throw new IllegalOperationError("Unable to navigate to null location.");
 			}
 			
+			if(this.location.indexOf("data:") == 0)
+			{
+				this.refreshWithDataURI();
+			}
+			else
+			{
+				this.refreshWithRemoteURI();
+			}
+		}
+		
+		/** 
+		* Refreshes the viewport with a remote URI. Only HTTP and HTTPS URIs are supported. 
+		*/
+		protected function refreshWithRemoteURI():void
+		{
 			var request:URLRequest = new URLRequest(this.location);
 			var loader:URLLoader = new URLLoader();
 			
-			loader.addEventListener(IOErrorEvent.IO_ERROR, this.onRefreshIOError);
-			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshSecurityError);
-			loader.addEventListener(Event.COMPLETE, this.onRefreshComplete);
+			loader.addEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
+			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
+			loader.addEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
 			
 			loader.load(request);
+		}
+		
+		/**
+		* Refreshes the viewport with a SMIL document contained within a Data URI. Data URIs are formed like so:
+		* data:[<MIME-type>][;charset="<encoding>"][;base64],<data>
+		* for example with utf-8 escaped markup:
+		* data:application/smil;charset=utf-8,ESCAPED_SMIL
+		* or with Base64-encoded markup:
+		* data:application/smil;base64,BASE_64_ENCODED_SMIL
+		*/
+		protected function refreshWithDataURI():void
+		{
+			
 		}
 		
 		/**
@@ -436,6 +465,36 @@ package org.smilkit.view
 			}
 		}
 		
+		private function refreshObjectPoolWithLoadedData(data:String):void
+		{
+			// destroy the object pool n all its precious children
+			if (this._objectPool != null)
+			{
+				var objectPool:Object = { pool: this._objectPool };
+				this._objectPool = null;
+				
+				// Trash old event listeners just in case
+				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
+				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+				
+				// we delete the object pool to avoid a memory leak when re-creating it,
+				delete objectPool.pool;
+			}
+			
+			// parse dom
+			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
+			
+			this._objectPool = new ViewportObjectPool(this, document);
+			
+			// Bind events to the newly-created objects
+			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
+			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+		}
+		
 		/**
 		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
 		*/
@@ -479,42 +538,22 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
 		}
 		
-		private function onRefreshComplete(e:Event):void
+		private function onRefreshWithRemoteURIComplete(e:Event):void
 		{
-			// destroy the object pool n all its precious children
-			if (this._objectPool != null)
-			{
-				var objectPool:Object = { pool: this._objectPool };
-				this._objectPool = null;
-				
-				// Trash old event listeners just in case
-				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
-				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
-				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
-				
-				// we delete the object pool to avoid a memory leak when re-creating it,
-				delete objectPool.pool;
-			}
-			
-			// parse dom
-			var document:SMILDocument = (SMILKit.loadSMILDocument(e.target.data) as SMILDocument);
-			
-			this._objectPool = new ViewportObjectPool(this, document);
-			
-			// Bind events to the newly-created objects
-			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
-			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
-			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
-			
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			this.refreshObjectPoolWithLoadedData(e.target.data);
 		}
 		
-		private function onRefreshIOError(e:IOErrorEvent):void
+		private function onRefreshWithDataURIComplete():void
 		{
 			
 		}
 		
-		private function onRefreshSecurityError(e:SecurityErrorEvent):void
+		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
+		{
+			
+		}
+		
+		private function onRefreshWithRemoteURISecurityError(e:SecurityErrorEvent):void
 		{
 			
 		}
