@@ -7,11 +7,13 @@ package org.smilkit.time
 	import org.smilkit.events.HeartbeatEvent;
 	
 	/**
-	 * Dispatched when the running offset is changed.
+	 * Dispatched when the running offset is changed, this is either due to the <code>Heartbeat</code> ticking
+	 * forward as it runs or during a pause or seek attempt (as a seek + pause change the offset to a specific value
+	 * the event is still dispatched). 
 	 * 
 	 * @eventType org.smilkit.events.HeartbeatEvent.OFFSET_CHANGED
 	 */
-	[Event(name="heartbeatOffset", type="org.smilkit.events.HeartbeatEvent")]
+	[Event(name="heartbeatOffsetChanged", type="org.smilkit.events.HeartbeatEvent")]
 
 	/**
 	 * Heartbeat controls the timing of the player updates.
