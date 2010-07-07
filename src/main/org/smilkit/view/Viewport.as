@@ -72,6 +72,29 @@ package org.smilkit.view
 	 */
 	[Event(name="viewportDocumentMutated", type="org.smilkit.events.ViewportEvent")]
 	
+	/**
+	 * Dispatched when the <code>Viewport</code>'s audio volume is set to 0, either via the mute() method or
+	 * by setting the <code>Viewport</code>'s volume to 0.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.AUDIO_MUTED
+	 */
+	[Event(name="viewportAudioMuted", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when the <code>Viewport</code>'s audio volume is set to a value higher than 0, if the viewport
+	 * was muted before the volume was set.
+	 * 
+	 * @eventType org.smilkit.events.ViewportEvent.AUDIO_UNMUTED
+	 */
+	[Event(name="viewportAudioUnmuted", type="org.smilkit.events.ViewportEvent")]
+	
+	/**
+	 * Dispatched when the <code>Viewport</code>'s audio volume is changed by any mechanism.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.AUDIO_VOLUME_CHANGED
+	 */
+	[Event(name="viewportAudioVolumeChanged", type="org.smilkit.events.ViewportEvent")]
+	
 
 	public class Viewport extends EventDispatcher
 	{
@@ -82,6 +105,8 @@ package org.smilkit.view
 		
 		public static var SEEK_UNCOMMITTED:String = "seekTransient";
 		public static var SEEK_COMMITTED:String = "seekCommitted";
+		
+		public static var VOLUME_MAX:uint = 100;
 		
 		/**
 		 *  An instance of ViewportObjectPool responsible for the active documents object pool.
@@ -117,6 +142,9 @@ package org.smilkit.view
 		*/
 		protected var _previousUncommittedSeekOffset:int = -1;
 		
+		protected var _volume:uint = 100;
+		protected var _unmuteRestoreVolume:uint;		
+		
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
@@ -138,7 +166,7 @@ package org.smilkit.view
 		 */
 		public function get playing():Boolean
 		{
-			return this._heartbeat.running;
+			return this.playbackState == Viewport.PLAYBACK_PLAYING;
 		}
 		
 		/**
@@ -284,6 +312,43 @@ package org.smilkit.view
 		}
 		
 		/**
+		* Sets the audio volume for this <code>Viewport</code> instance. 
+		* Accepts a <code>uint</code> between 0 and 100, with 0 being muted and 100 being maximum volume.
+		*/
+		public function set volume(volume:uint):void
+		{
+			this.setVolume(volume);
+		}
+		
+		/**
+		* Returns the viewport's current volume level as a uint between 0 and 100, with 0 being muted
+		* and 100 being maximum volume.
+		*/
+		public function get volume():uint
+		{
+			return this._volume;
+		}	
+		
+		/**
+		* Returns the value to which volume will be set when unmute() is next called. This is the value
+		* last set by a call to setVolume with the setRestorePoint argument given as true, or the max
+		* volume level if no restore point has been set.
+		*/
+		public function get unmuteRestoreVolume():uint
+		{
+			return (this._unmuteRestoreVolume)? this._unmuteRestoreVolume : Viewport.VOLUME_MAX;
+		}	
+		
+		/** 
+		* Public getter for the current mute toggle state for this <code>Viewport</code> instance.
+		* @return A <code>Boolean</code>, true if the viewport is currently muted.
+		*/
+		public function get muted():Boolean
+		{
+			return (this.volume <= 0);
+		}
+		
+		/**
 		 * Refreshs the contents of the <code>Viewport</code> based on the current <code>Viewport.location</code>, if the location is updated
 		 * and auto-refresh is enabled this method is automatically called. Otherwise the next
 		 * time the refresh method is called the new location is used.
@@ -330,7 +395,8 @@ package org.smilkit.view
 		*/
 		protected function refreshWithDataURI():void
 		{
-			
+			var parser:DataURIParser = new DataURIParser(this.location);
+			this.refreshObjectPoolWithLoadedData(parser.data);
 		}
 		
 		/**
@@ -465,6 +531,68 @@ package org.smilkit.view
 			}
 		}
 		
+		/**
+		* Mutes all audio output from this viewport instance, saving the current volume level as a restore
+		* point.
+		*
+		* @params setRestorePoint A <code>Boolean</code> specifying whether the current volume level should be used as a restore point when unmuting.
+		*/
+		public function mute(setRestorePoint:Boolean=false):Boolean
+		{
+			return this.setVolume(0, setRestorePoint);
+		}
+		
+		/**
+		* Returns the <code>Viewport</code> from a muted state, returning the volume level to the last volume restore point, or to the maximum volume
+		* if no restore point has been set.
+		*/
+		public function unmute():Boolean
+		{
+			return this.setVolume(this.unmuteRestoreVolume);
+		}
+		
+		/**
+		* Toggles the <code>Viewport</code> between a muted and unmuted state.
+		* 
+		* @params setRestorePoint A <code>Boolean</code> specifying whether the current volume level should be used as a restore point when unmuting.
+		*/
+		public function toggleMute(setRestorePoint:Boolean=false):Boolean
+		{
+			return (this.muted)? this.unmute() : this.mute(setRestorePoint);
+		}
+		
+		/**
+		* Sets the <code>Viewport</code>'s volume level, and dispatches a volume changed event if the given newVolume parameter differs from the current
+		* volume setting.
+		*
+		* @param newVolume A <code>uint</code> between 0 and 100 indicating the new desired volume level
+		* @param setRestorePoint A <code>Boolean</code> specifying whether the new volume level should be set as a restore point for the next unmute operation.
+		*/
+		public function setVolume(newVolume:uint, setRestorePoint:Boolean=false):Boolean
+		{
+			// Constrain value
+			newVolume = Math.max(0, Math.min(Viewport.VOLUME_MAX, newVolume));
+			
+			// Skip if not changed
+			if(newVolume != this.volume)
+			{
+				if(setRestorePoint) this._unmuteRestoreVolume = this.volume;
+				var mutedBeforeChange:Boolean = this.muted;
+
+				this._volume = newVolume;
+
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_VOLUME_CHANGED));
+				if(newVolume == 0 && !mutedBeforeChange) this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_MUTED));
+				if(newVolume > 0 && mutedBeforeChange) this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_UNMUTED));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
+		}
+				
+		
 		private function refreshObjectPoolWithLoadedData(data:String):void
 		{
 			// destroy the object pool n all its precious children
@@ -541,11 +669,6 @@ package org.smilkit.view
 		private function onRefreshWithRemoteURIComplete(e:Event):void
 		{
 			this.refreshObjectPoolWithLoadedData(e.target.data);
-		}
-		
-		private function onRefreshWithDataURIComplete():void
-		{
-			
 		}
 		
 		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
