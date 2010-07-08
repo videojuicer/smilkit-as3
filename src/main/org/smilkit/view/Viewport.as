@@ -263,9 +263,14 @@ package org.smilkit.view
 		
 		/**
 		 * Sets the URL location for the code>Viewport</code> location, will auto load the requested
-		 * location unless <code>autoRefresh</code> is set to false.
+		 * location unless <code>autoRefresh</code> is set to false. The location may be set as a regular
+		 * URL, or as a W3C data URI with the utf-8 character set. Data URIs may optionally be base64-encoded.
 		 * 
+		 * If <code>autoRefresh</code> is set to false, you must call <code>refresh</code> after setting the
+		 * location in order to load the new document.
+		 *
 		 * @see org.smilkit.view.Viewport.autoRefresh
+		 * @see org.smilkit.view.Viewport.refresh
 		 */
 		public function set location(location:String):void
 		{
