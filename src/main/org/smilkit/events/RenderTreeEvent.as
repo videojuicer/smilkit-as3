@@ -13,6 +13,7 @@ package org.smilkit.events
 		
 		public static var READY:String = "renderTreeReady";
 		public static var WAITING_FOR_DATA:String = "renderTreeWaitingForData";
+		public static var WAITING_FOR_SYNC:String = "renderTreeWaitingForSync";
 		
 		protected var _handler:SMILKitHandler;
 		

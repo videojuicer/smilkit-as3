@@ -35,8 +35,13 @@ package org.smilkit.render
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
 		
-		protected var _waitingQueue:Vector.<SMILKitHandler>;
-		protected var _loadReadyState:Boolean = false;
+		protected var _waitingForDataHandlerList:Vector.<SMILKitHandler>;
+		protected var _waitingForData:Boolean = false;
+		
+		protected var _offsetSyncHandlerList:Vector.<SMILKitHandler>;
+		protected var _offsetSyncOffsetList:Vector.<uint>;
+		protected var _offsetSyncRunning:Boolean = false;
+		protected var _offsetSyncNextResume:Boolean = false;
 		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
@@ -111,19 +116,19 @@ package org.smilkit.render
 			
 			this._activeElements = new Vector.<TimingNode>();
 			
-			if (this._waitingQueue != null && this._waitingQueue.length > 0)
+			if (this._waitingForDataHandlerList != null && this._waitingForDataHandlerList.length > 0)
 			{
-				for (var i:int = 0; i < this._waitingQueue.length; i++)
+				for (var i:int = 0; i < this._waitingForDataHandlerList.length; i++)
 				{
-					var handler:SMILKitHandler = this._waitingQueue[i];
+					var handler:SMILKitHandler = this._waitingForDataHandlerList[i];
 					
 					handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 					handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 				}
 			}
 			
-			this._waitingQueue = null;
-			this._waitingQueue = new Vector.<SMILKitHandler>();
+			this._waitingForDataHandlerList = null;
+			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
 
 			// !!!!
 			this.update();
@@ -132,8 +137,10 @@ package org.smilkit.render
 		/**
 		 * Syncs up all the handlers that exist in the <code>RenderTree</code> so they all resume at the same time (or as close as possible).
 		 */
-		public function syncHandlers():void
+		public function syncHandlersToViewportState():void
 		{
+			// TODO: Change volume
+			// TODO: Ignore syncing handlers
 			if (this._objectPool.viewport.playing)
 			{
 				// resume all!
@@ -154,8 +161,44 @@ package org.smilkit.render
 					nodeJ.mediaElement.handler.pause();
 				}
 			}
-
-			// how we going to sync em all?
+		}
+		
+		public function syncHandlersToViewportOffset():void
+		{
+			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+			this._offsetSyncOffsetList = new Vector.<uint>();
+			
+			for (var i:int = 0; i < this.elements.length; i++)
+			{
+				var node:TimingNode = this.elements[i];
+				var offset:uint = (this._objectPool.viewport.offset - node.begin);
+				
+				// syncs via a list of seek points
+				if (node.mediaElement.handler.syncable)
+				{
+					var nearestSyncPoint:Number = node.mediaElement.handler.findNearestSyncPoint(offset);
+					
+					node.mediaElement.handler.seek(nearestSyncPoint);
+					
+					node.mediaElement.handler.setVolume(0);
+					node.mediaElement.handler.resume();
+					
+					this._offsetSyncHandlerList.push(node.mediaElement.handler);
+					this._offsetSyncOffsetList.push(nearestSyncPoint);
+				}
+				// syncs anywhere 
+				else
+				{
+					node.mediaElement.handler.seek(offset);
+				}
+				
+				if (this._offsetSyncHandlerList.length > 0)
+				{
+					this._offsetSyncRunning = true;
+					
+					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+				}
+			}
 		}
 		
 		/**
@@ -192,8 +235,11 @@ package org.smilkit.render
 					{
 						this._lastChangeOffset = offset;
 						
-						handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
-						handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+						if (handler.hasEventListener(HandlerEvent.LOAD_WAITING))
+						{
+							handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+							handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+						}
 						
 						// pause playback, we let the loadScheduler handles cancelling the loading
 						handler.pause();
@@ -245,42 +291,42 @@ package org.smilkit.render
 			
 			if (syncRequired)
 			{
-				this.syncHandlers();
+				this.syncHandlersToViewportState();
 			}
 		}
 		
 		protected function onHandlerLoadWaiting(e:HandlerEvent):void
 		{
 			// add to waiting list
-			this._waitingQueue.push(e.handler);
+			this._waitingForDataHandlerList.push(e.handler);
 			
-			this.loadStateCheck()
+			this.checkLoadState()
 		}
 		
 		protected function onHandlerLoadReady(e:HandlerEvent):void
 		{
 			// remove from waiting list
-			var i:int = this._waitingQueue.indexOf(e.handler, 0);
+			var i:int = this._waitingForDataHandlerList.indexOf(e.handler, 0);
 			
 			if (i != -1)
 			{
-				this._waitingQueue.splice(i, 1);
+				this._waitingForDataHandlerList.splice(i, 1);
 			}
 			
-			this.loadStateCheck();
+			this.checkLoadState();
 		}
 		
 		/**
 		 * Runs a waiting / ready state check on the render tree contents and dispatches
 		 * an event if the state changes.
 		 */
-		protected function loadStateCheck():void
+		protected function checkLoadState():void
 		{
-			if (this._waitingQueue.length == 0)
+			if (this._waitingForDataHandlerList.length == 0)
 			{
-				if (!this._loadReadyState)
+				if (!this._waitingForData && !this._offsetSyncRunning)
 				{
-					this._loadReadyState = true;
+					this._waitingForData = true;
 				
 					// we have nothing on our plate, so we are ready!
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
@@ -288,9 +334,9 @@ package org.smilkit.render
 			}
 			else
 			{
-				if (this._loadReadyState)
+				if (this._waitingForData)
 				{
-					this._loadReadyState = false;
+					this._waitingForData = false;
 					
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
 				}

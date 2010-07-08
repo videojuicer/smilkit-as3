@@ -168,6 +168,16 @@ package org.smilkit.handler
 			}
 		}
 		
+		public function findNearestSyncPoint(offset:Number):Number
+		{
+			return 0;
+		}
+		
+		public function setVolume(volume:uint):void
+		{
+			
+		}
+		
 		/**
 		 * Merges the old handler state into this handler instance, this mainly provides
 		 * functionality for switching dynamic streams through RTMP.
