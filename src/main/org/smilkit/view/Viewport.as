@@ -44,16 +44,22 @@ package org.smilkit.view
 	[Event(name="viewportPlaybackStateChanged", type="org.smilkit.events.ViewportEvent")]
 	
 	/**
-	 * Dispatched when the any of the <code>Viewport</code> instance's current set of media handlers dispatches
-	 * "waiting for data" event of it's own - e.g. a stream is buffering, an image is loading etc.
-	 * 
-	 * While waiting for data, the <code>Viewport</code>'s playback is halted (although the playback state will not
-	 * change to "paused"), and playback will resume automatically once all currently-active media handlers have 
-	 * reported ready, if the <code>Viewport</code> is currently playing.
+	 * Dispatched when the <code>Viewport</code>'s playhead position changes, either through a natural progression during
+	 * playback or through any kind of seek operation.
 	 *
-	 * @eventType org.smilkit.events.ViewportEvent.WAITING_FOR_DATA
+	 * @eventType org.smilkit.events.ViewportEvent.PLAYBACK_OFFSET_CHANGED
 	 */
-	[Event(name="viewportWaitingForData", type="org.smilkit.events.ViewportEvent")]
+	[Event(name="viewportPlaybackOffsetChanged", type="org.smilkit.events.ViewportEvent")]
+	
+	
+	/**
+	 * Dispatched when the any of the <code>Viewport</code> is in a state where it must perform any kind of asynchronous
+	 * operation before playback at the current offset can continue. This should be loading or buffering an asset, or 
+	 * waiting for asset synchronisation when resuming from a seek operation.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.WAITING
+	 */
+	[Event(name="viewportWaiting", type="org.smilkit.events.ViewportEvent")]
 	
 	/**
 	 * Dispatched when all the <code>Viewport</code>'s currently-active media handlers have loaded enough data for
@@ -537,6 +543,14 @@ package org.smilkit.view
 		}
 		
 		/**
+		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
+		*/
+		public function revertPlaybackState():void
+		{
+			this.setPlaybackState(this._previousPlaybackState);
+		}
+		
+		/**
 		* Mutes all audio output from this viewport instance, saving the current volume level as a restore
 		* point.
 		*
@@ -628,14 +642,6 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
 		
-		/**
-		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
-		*/
-		public function revertPlaybackState():void
-		{
-			this.setPlaybackState(this._previousPlaybackState);
-		}
-		
 		protected function onPlaybackStateChangedToPlaying():void
 		{
 			this.loadScheduler.start();
@@ -657,7 +663,13 @@ package org.smilkit.view
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
 			this.heartbeat.pause();
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING_FOR_DATA));
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
+		}
+		
+		protected function onRenderTreeWaitingForSync(event:RenderTreeEvent):void
+		{
+			this.heartbeat.pause();
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
 		protected function onRenderTreeReady(event:RenderTreeEvent):void
