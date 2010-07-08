@@ -16,6 +16,7 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.util.DataURIParser;
 
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -168,6 +169,7 @@ package org.smilkit.view
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
+			this._heartbeat.addEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 			this._drawingBoard = new DrawingBoard();
 			this.pause();
 		}
@@ -664,15 +666,30 @@ package org.smilkit.view
 			// parse dom
 			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
 			
+			// Reset the heartbeat to zero
+			this.heartbeat.reset();
+			
+			// Create the object pool with internal timing graph, rendertree etc.
 			this._objectPool = new ViewportObjectPool(this, document);
 			
-			// Bind events to the newly-created objects
+			// Bind events to the newly-created object pool contents
+			this.heartbeat.removeEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
+			// Shout out REFRESH DONE LOL
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+		}
+		
+		/**
+		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
+		* during playback. Emits a public-facing viewport event.
+		*/ 
+		protected function onHeartbeatOffsetChanged():void
+		{
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
 		protected function onPlaybackStateChangedToPlaying():void
