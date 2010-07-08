@@ -12,6 +12,11 @@ package org.smilkit.events
 		// When switching playback states between playing, paused etc.
 		public static var PLAYBACK_STATE_CHANGED:String = "viewportPlaybackStateChanged";
 		
+		// When the volume is adjusted
+		public static var AUDIO_MUTED:String = "viewportAudioMuted";
+		public static var AUDIO_UNMUTED:String = "viewportAudioUnmuted";
+		public static var AUDIO_VOLUME_CHANGED:String = "viewportAudioVolumeChanged";
+		
 		// Load status events
 		public static var WAITING_FOR_DATA:String = "viewportWaitingForData";
 		public static var READY:String = "viewportReady";
