@@ -252,6 +252,37 @@ package org.smilkit.render
 			}
 		}
 		
+		protected function removeHandlerFromWaitingForSyncList(handler:SMILKitHandler):void
+		{
+			// find handler in the list
+			var index:int = -1;
+			
+			for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)
+			{
+				if (this._offsetSyncHandlerList[i] == handler)
+				{
+					index = i;
+					break;
+				}
+			}
+			
+			if (index >= 0)
+			{
+				this._offsetSyncHandlerList.splice(index, 1);
+				this._offsetSyncOffsetList.splice(index, 1);
+			}
+		}
+		
+		protected function removeHandlerFromWaitingForDataList(handler:SMILKitHandler):void
+		{
+			var index:int = this._waitingForDataHandlerList.indexOf(handler);
+			
+			if (index >= 0)
+			{
+				this._waitingForDataHandlerList.splice(index, 1);
+			}
+		}
+		
 		/**
 		 * Checks the current position of the player and requests the stage be redrawn according to timings in the TimingGraph
 		 * 
@@ -292,10 +323,15 @@ package org.smilkit.render
 						
 						// pause playback, we let the loadScheduler handles cancelling the loading
 						handler.pause();
+	
+						// remove from sync wait list
+						this.removeHandlerFromWaitingForSyncList(handler); // checkSyncOperation
+						// remove from load wait list
+						this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
 						
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
-						
+	
 						// dont add to new vector
 					}
 						// add active, non existant elements
