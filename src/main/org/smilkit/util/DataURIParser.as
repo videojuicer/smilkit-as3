@@ -60,16 +60,26 @@ package org.smilkit.util
 		
 		protected function parse(uri:String):void
 		{
+			// for performance reasons, break out the data fragment first and parse the URI header seperately.
+			// no need to run the raw data through a regex.
+			
+			var uriDataDelimiterIndex:int = uri.indexOf(",");
+
+			if(uriDataDelimiterIndex < 0) throw new IllegalOperationError("Invalid data URI pattern");
+
+			var uriHeader:String = uri.slice(0, uriDataDelimiterIndex);
+			var uriData:String = uri.slice(uriDataDelimiterIndex+1, uri.length);
+			
+			
 			// Example:
 			// data:[<MIME-type>][;charset="<encoding>"][;base64],<data>
-			var remainder:String = uri;			
 								//    | Data Fragment
 								//    |     | Content type
 								//    |     |                  | Base64 preflag
 								//    |     |                  |         | Charset                  | Base64 postflag
 								//    |     |                  |         |                          |         | Data segment
-			var dataPattern:RegExp = /^data:([a-z-]+\/[a-z-+]+)(;base64)?(;charset=([0-9A-Za-z-]+))?(base64)?,(.*)$/;
-			var matches:Array = uri.match(dataPattern);
+			var dataPattern:RegExp = /^data:([a-z-]+\/[a-z-+]+)(;base64)?(;charset=([0-9A-Za-z-]+))?(base64)?/;
+			var matches:Array = uriHeader.match(dataPattern);
 			
 			if(matches == null) throw new IllegalOperationError("Invalid data URI pattern");
 			
@@ -84,7 +94,7 @@ package org.smilkit.util
 			if(matches[2] == ";base64" || matches[5] == ";base64") this._base64 = true;
 			
 			// Stash data
-			this._rawData = matches[6];
+			this._rawData = uriData;
 			
 			// Decode and store data
 			this._data = (this.base64)? Base64.decode(this.rawData) : this.rawData;
