@@ -154,9 +154,19 @@ package org.smilkit.time
 		 * 
 		 * NOTE: this does not affect the actual <code>Timer</code>.
 		 */
-		public function resume():void
+		public function resume():Boolean
 		{
-			this._running = true;
+			if(this.running)
+			{
+				return false;
+			}
+			else
+			{
+				this._running = true;
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RESUMED, this.runningOffset));
+				return true;
+			}
+			
 		}
 		
 		/**
@@ -164,11 +174,19 @@ package org.smilkit.time
 		 * 
 		 * NOTE: this does not affect the actual <code>Timer</code>.
 		 */
-		public function pause():void
+		public function pause():Boolean
 		{
-			this.onTimer(null);
-			
-			this._running = false;
+			if(this.running)
+			{
+				this.onTimer(null);			
+				this._running = false;
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.PAUSED, this.runningOffset));
+				return true;
+			}
+			else
+			{
+				return false;
+			}
 		}
 		
 		/**
@@ -223,7 +241,7 @@ package org.smilkit.time
 				// this however should be instant but depends on the delay / speed of the Timer class.
 				this._runningOffset += beatDuration;
 				
-				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.OFFSET_CHANGED, this._runningOffset));
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.OFFSET_CHANGED, this.runningOffset));
 			}
 		}
 	}

@@ -686,7 +686,7 @@ package org.smilkit.view
 		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
 		* during playback. Emits a public-facing viewport event.
 		*/ 
-		protected function onHeartbeatOffsetChanged():void
+		protected function onHeartbeatOffsetChanged(event:HeartbeatEvent):void
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}

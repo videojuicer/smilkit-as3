@@ -4,20 +4,21 @@ package org.smilkit.events
 	
 	public class HeartbeatEvent extends Event
 	{
+		public static var RESUMED:String = "heartbeatResumed";
+		public static var PAUSED:String = "heartbeatPaused";
 		public static var OFFSET_CHANGED:String = "heartbeatOffsetChanged";
 		
-		protected var _offset:Number;
+		protected var _runningOffset:Number;
 		
-		public function HeartbeatEvent(type:String, offset:Number, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function HeartbeatEvent(type:String, runningOffset:Number, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
-			
-			this._offset = offset;
+			this._runningOffset = runningOffset;
 		}
 		
-		public function get offset():Number
+		public function get runningOffset():Number
 		{
-			return this._offset;
+			return this._runningOffset;
 		}
 	}
 }
