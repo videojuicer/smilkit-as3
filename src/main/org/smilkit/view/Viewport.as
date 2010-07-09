@@ -673,7 +673,6 @@ package org.smilkit.view
 			this._objectPool = new ViewportObjectPool(this, document);
 			
 			// Bind events to the newly-created object pool contents
-			this.heartbeat.removeEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
