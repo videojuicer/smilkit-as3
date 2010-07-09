@@ -147,7 +147,7 @@ package org.smilkit.render
 		{
 			// TODO: Change volume
 			// TODO: Ignore syncing handlers
-			if (this._objectPool.viewport.playing)
+			if (this._objectPool.viewport.playing && this._objectPool.viewport.ready)
 			{
 				// resume all!
 				for (var i:int = 0; i < this.elements.length; i++)
@@ -365,20 +365,21 @@ package org.smilkit.render
 		{
 			if (this._waitingForDataHandlerList.length == 0)
 			{
-				if (!this._waitingForData && !this._waitingForSync)
+				if (this._waitingForData)
 				{
-					this._waitingForData = true;
-					
-					// we have nothing on our plate, so we are ready!
+					// The list is empty, but we were waiting for data. This means the wait operation has concluded.
+					this._waitingForData = false;					
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
 				}
 			}
 			else
 			{
-				if (this._waitingForData)
+				if (!this._waitingForData && !this._waitingForSync)
 				{
-					this._waitingForData = false;
-					
+					// The wait list has items, but we are not yet officially waiting for data. 
+					// Set the waitingForData flag and dispatch the relevant event.
+					this._waitingForData = true;				
+					// we have nothing on our plate, so we are ready!
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
 				}
 			}
