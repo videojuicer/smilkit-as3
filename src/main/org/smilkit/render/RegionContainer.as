@@ -164,7 +164,7 @@ package org.smilkit.render
 				
 				this.graphics.clear();
 				this.graphics.beginFill(backgroundColour, alpha);
-				this.graphics.lineStyle(0, 0xff0000, 0.5);
+				this.graphics.lineStyle(0, 0xED05AF, 0.5);
 				this.graphics.drawRect(0, 0, this._matrix.width, this._matrix.height);
 				this.graphics.endFill();
 				

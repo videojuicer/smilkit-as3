@@ -105,7 +105,7 @@ package org.smilkit.handler
 			this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
 			
 			this._netStream.client = this;
-			this._netStream.bufferTime = 10;
+			this._netStream.bufferTime = 8;
 			this._netStream.soundTransform = this._soundTransformer;
 			
 			this._netStream.play(this.element.src);
@@ -114,11 +114,16 @@ package org.smilkit.handler
 			this._video.smoothing = true;
 			this._video.deblocking = 1;
 			
+
 			this._video.attachNetStream(this._netStream as NetStream);
+			
+			// dont want to actually play it back right now
 		
 			this._canvas.addChild(this._video);
 			
 			this._startedLoading = true;
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
 		public override function resume():void
@@ -165,7 +170,7 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			trace("Netstatus: "+e.info.level+" "+e.info.code);
+			Logger.debug("NetStatus Event on video: "+e.info.level+" "+e.info.code);
 			
 			switch (e.info.code)
 			{
@@ -225,6 +230,8 @@ package org.smilkit.handler
 		
 		public function onMetaData(info:Object):void
 		{
+			this._netStream.pause();
+			
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);

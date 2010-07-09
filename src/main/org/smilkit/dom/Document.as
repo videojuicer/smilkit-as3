@@ -331,7 +331,7 @@ package org.smilkit.dom
 								catch (e:Error)
 								{
 									// catch all
-									trace("Capturing: "+e.toString());
+									Logger.error("Failed to execute capturing listener: "+e.toString());
 								}
 							}
 						}
@@ -364,7 +364,7 @@ package org.smilkit.dom
 							catch (e:Error)
 							{
 								// catch all
-								trace("Bubbling: "+e.toString());
+								Logger.error("Failed to execute bubbling listener: "+e.toString());
 							}
 						}
 					}
@@ -401,7 +401,7 @@ package org.smilkit.dom
 									}
 									catch(e:Error)
 									{
-										trace("Bubble: "+e.toString());
+										Logger.error("Failed to execute bubble listener: "+e.toString());
 									}
 								}
 							}
