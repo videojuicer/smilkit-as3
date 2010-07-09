@@ -66,9 +66,9 @@ package org.smilkit.handler
 			return true;
 		}
 		
-		public override function get syncable():Boolean
+		public override function get syncPoints():Vector.<int>
 		{
-			return true;
+			return this._metadata.syncPoints;
 		}
 
 		public override function get intrinsicSpatial():Boolean

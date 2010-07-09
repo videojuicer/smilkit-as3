@@ -11,13 +11,14 @@ package org.smilkit.render
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
+	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
-
+	
 	/**
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements
 	 * 
@@ -25,10 +26,9 @@ package org.smilkit.render
 	public class RenderTree extends EventDispatcher
 	{
 		/**
-		 * Stored reference to the TimingGraph instance from its parent viewport 
+		 * Stored reference to the <code>ViewportObjectPool</code> instance including links to the parent <code>Viewport</code>.
 		 */		
 		protected var _objectPool:ViewportObjectPool;
-		
 		
 		protected var _activeElements:Vector.<TimingNode>;
 		
@@ -40,8 +40,11 @@ package org.smilkit.render
 		
 		protected var _offsetSyncHandlerList:Vector.<SMILKitHandler>;
 		protected var _offsetSyncOffsetList:Vector.<uint>;
-		protected var _offsetSyncRunning:Boolean = false;
 		protected var _offsetSyncNextResume:Boolean = false;
+		
+		protected var _waitingForSync:Boolean = false;
+		
+		protected var _performOffsetSyncOnNextResume:Boolean = false;
 		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
@@ -62,6 +65,9 @@ package org.smilkit.render
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+			
+			// listener to detect playback state changes on the viewport
+			this._objectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
 			
 			this.reset();
 		}
@@ -129,7 +135,7 @@ package org.smilkit.render
 			
 			this._waitingForDataHandlerList = null;
 			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
-
+			
 			// !!!!
 			this.update();
 		}
@@ -172,12 +178,10 @@ package org.smilkit.render
 			{
 				var node:TimingNode = this.elements[i];
 				var offset:uint = (this._objectPool.viewport.offset - node.begin);
+				var nearestSyncPoint:Number = node.mediaElement.handler.findNearestSyncPoint(offset);
 				
-				// syncs via a list of seek points
-				if (node.mediaElement.handler.syncable)
+				if (nearestSyncPoint < offset)
 				{
-					var nearestSyncPoint:Number = node.mediaElement.handler.findNearestSyncPoint(offset);
-					
 					node.mediaElement.handler.seek(nearestSyncPoint);
 					
 					node.mediaElement.handler.setVolume(0);
@@ -186,7 +190,6 @@ package org.smilkit.render
 					this._offsetSyncHandlerList.push(node.mediaElement.handler);
 					this._offsetSyncOffsetList.push(nearestSyncPoint);
 				}
-				// syncs anywhere 
 				else
 				{
 					node.mediaElement.handler.seek(offset);
@@ -194,9 +197,57 @@ package org.smilkit.render
 				
 				if (this._offsetSyncHandlerList.length > 0)
 				{
-					this._offsetSyncRunning = true;
+					this._waitingForSync = true;
 					
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+				}
+			}
+		}
+		
+		public function cancelOffsetSync():void
+		{
+			this._waitingForSync = false;
+			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+			this._offsetSyncOffsetList = new Vector.<uint>();
+			
+			this.syncHandlersToViewportState();
+		}
+		
+		public function checkSyncOperation():void
+		{
+			if (this._waitingForSync)
+			{
+				var removeIndexes:Array = new Array();
+				
+				for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)
+				{
+					var waitHandler:SMILKitHandler = this._offsetSyncHandlerList[i];
+					var waitOffset:uint = this._offsetSyncOffsetList[i];
+					
+					if (waitHandler.currentOffset >= this._objectPool.viewport.offset)
+					{
+						removeIndexes.push(i);
+						
+						// add to stage here??
+					}
+				}
+				
+				// work backwards to avoid a fuck up with the indexes in mid-loop
+				for (var j:uint = removeIndexes.length - 1; j >= 0; j--)
+				{
+					this._offsetSyncHandlerList.splice(j, 1);
+					this._offsetSyncOffsetList.splice(j, 1);
+				}
+				
+				if (this._offsetSyncHandlerList.length < 1)
+				{
+					this._waitingForSync = false;
+					this.syncHandlersToViewportState();
+					
+					if (!this._waitingForData)
+					{
+						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+					}
 				}
 			}
 		}
@@ -208,15 +259,13 @@ package org.smilkit.render
 		 */		
 		public function updateAt(offset:Number):void
 		{
-			var syncRequired:Boolean = false;
-			
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
 			{
 				var elements:Vector.<TimingNode> = this.timingGraph.elements;
 				var newActiveElements:Vector.<TimingNode> = new Vector.<TimingNode>();
-	
+				
 				for (var i:int = 0; i < elements.length; i++)
 				{
 					var time:TimingNode = elements[i];
@@ -243,13 +292,13 @@ package org.smilkit.render
 						
 						// pause playback, we let the loadScheduler handles cancelling the loading
 						handler.pause();
-				
+						
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 						
 						// dont add to new vector
 					}
-					// add active, non existant elements
+						// add active, non existant elements
 					else if (activeNow)
 					{
 						// only add to the canvas, when the element hasnt existed before
@@ -261,12 +310,10 @@ package org.smilkit.render
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 							
-							syncRequired = true;
-							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
-						// already exists
+							// already exists
 						else
 						{
 							var previousTime:TimingNode = this._activeElements[previousIndex];
@@ -274,7 +321,6 @@ package org.smilkit.render
 							if (time === previousTime && time != previousTime)
 							{
 								this._lastChangeOffset = offset;
-								syncRequired = true;
 								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
@@ -287,11 +333,6 @@ package org.smilkit.render
 				
 				// swap with new list
 				this._activeElements = newActiveElements;
-			}
-			
-			if (syncRequired)
-			{
-				this.syncHandlersToViewportState();
 			}
 		}
 		
@@ -324,10 +365,10 @@ package org.smilkit.render
 		{
 			if (this._waitingForDataHandlerList.length == 0)
 			{
-				if (!this._waitingForData && !this._offsetSyncRunning)
+				if (!this._waitingForData && !this._waitingForSync)
 				{
 					this._waitingForData = true;
-				
+					
 					// we have nothing on our plate, so we are ready!
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
 				}
@@ -342,7 +383,7 @@ package org.smilkit.render
 				}
 			}
 		}
-
+		
 		/**
 		 * Function called when the TimingGraph rebuilds itself, this function in turn calls the reset function 
 		 * @param e
@@ -360,6 +401,37 @@ package org.smilkit.render
 		protected function onHeartbeatBeat(e:HeartbeatEvent):void
 		{
 			this.update();
+		}
+		
+		protected function onHeartbeatTick(e:TimerEvent):void
+		{
+			this.checkSyncOperation();
+		}
+		
+		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
+		{
+			switch (this._objectPool.viewport.playbackState)
+			{
+				case Viewport.PLAYBACK_SEEKING:
+					this.cancelOffsetSync();
+					
+					this._performOffsetSyncOnNextResume = true;
+					break;
+				case Viewport.PLAYBACK_PLAYING:
+					if (this._performOffsetSyncOnNextResume)
+					{
+						this.syncHandlersToViewportOffset();
+						this._performOffsetSyncOnNextResume = false;
+					}
+					else
+					{
+						this.cancelOffsetSync();
+					}
+					break;
+				default:
+					this.cancelOffsetSync();
+					break;
+			}
 		}
 	}
 }

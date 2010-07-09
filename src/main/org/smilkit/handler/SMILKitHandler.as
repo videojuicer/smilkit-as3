@@ -86,9 +86,14 @@ package org.smilkit.handler
 			return false;
 		}
 		
+		public function get syncPoints():Vector.<int>
+		{
+			return new Vector.<int>();
+		}
+		
 		public function get syncable():Boolean
 		{
-			return false;
+			return (this.syncPoints != null && this.syncPoints.length > 0);
 		}
 		
 		public function get preloadable():Boolean
@@ -109,6 +114,14 @@ package org.smilkit.handler
 		public function get currentOffset():int
 		{
 			return this._currentOffset;
+		}
+		
+		/**
+		 * The tolerance to use when finding the nearest sync point in miliseconds.
+		 */
+		protected function get syncTolerance():Number
+		{
+			return 10,000;
 		}
 		
 		public function load():void
@@ -168,11 +181,51 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Finds the nearest sync point on the current handler to the specified offset, uses the handlers
+		 * <code>syncTolerance</code> value to determine if a sync point should be choosen before or after
+		 * the offset. 
+		 */
 		public function findNearestSyncPoint(offset:Number):Number
 		{
-			return 0;
+			var beforeSyncPoint:Number = offset;
+			var afterSyncPoint:Number = offset;
+			
+			if (this.syncable)
+			{
+				for (var i:int = 0; i < this.syncPoints.length; i++)
+				{
+					if (this.syncPoints[i] <= offset && this.syncPoints[i] > beforeSyncPoint)
+					{
+						beforeSyncPoint = this.syncPoints[i];
+					}
+					else if (this.syncPoints[i] >= offset && this.syncPoints[i] < afterSyncPoint)
+					{
+						afterSyncPoint = this.syncPoints[i];
+					}
+				}
+			}
+			
+			// is the before or after point closests?
+			var beforeDiff:Number = (offset - beforeSyncPoint);
+			var afterDiff:Number = (afterSyncPoint - offset);
+				
+			if (beforeDiff > this.syncTolerance && (afterDiff < beforeDiff && afterDiff <= this.syncTolerance))
+			{
+				return afterSyncPoint;
+			}
+			else
+			{
+				return beforeSyncPoint;
+			}
 		}
 		
+		/**
+		 * Sets the volume to the specified value, the volume value is treated
+		 * from 0-100, 0 being muted and a value of 100 would be full volume.
+		 * 
+		 * @param volume The integer value to set the volume to, between 0-100.
+		 */
 		public function setVolume(volume:uint):void
 		{
 			

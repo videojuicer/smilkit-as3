@@ -8,6 +8,7 @@ package org.smilkit.util
 	public class Metadata
 	{
 		protected var _internalInfo:Object;
+		protected var _syncPoints:Vector.<int> = new Vector.<int>();
 		
 		public function Metadata(info:Object)
 		{
@@ -74,6 +75,28 @@ package org.smilkit.util
 		public function get cuePoints():Array
 		{
 			return this._internalInfo['seekpoints'];
+		}
+		
+		/**
+		 * Typed vector of the possible sync points in this file, the default
+		 * value is an empty <code>Vector</code> not null;
+		 */
+		public function get syncPoints():Vector.<int>
+		{
+			if (this._syncPoints == null || (this.cuePoints != null && this._syncPoints.length != this.cuePoints.length))
+			{
+				this._syncPoints = new Vector.<int>();
+				
+				if (this.cuePoints != null)
+				{
+					for (var i:int = 0; i < this.cuePoints.length; i++)
+					{
+						this._syncPoints.push(this.cuePoints[i][0]);
+					}
+				}
+			}
+			
+			return this._syncPoints;
 		}
 		
 		/**

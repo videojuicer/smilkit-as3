@@ -47,7 +47,7 @@ package
 		protected function onRefreshComplete(e:ViewportEvent):void
 		{
 			this.addChild(this._viewport.drawingBoard);
-			
+
 			this._viewport.resume();
 		}
 		
