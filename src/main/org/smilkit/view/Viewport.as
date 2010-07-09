@@ -16,6 +16,7 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.util.DataURIParser;
 
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -44,16 +45,22 @@ package org.smilkit.view
 	[Event(name="viewportPlaybackStateChanged", type="org.smilkit.events.ViewportEvent")]
 	
 	/**
-	 * Dispatched when the any of the <code>Viewport</code> instance's current set of media handlers dispatches
-	 * "waiting for data" event of it's own - e.g. a stream is buffering, an image is loading etc.
-	 * 
-	 * While waiting for data, the <code>Viewport</code>'s playback is halted (although the playback state will not
-	 * change to "paused"), and playback will resume automatically once all currently-active media handlers have 
-	 * reported ready, if the <code>Viewport</code> is currently playing.
+	 * Dispatched when the <code>Viewport</code>'s playhead position changes, either through a natural progression during
+	 * playback or through any kind of seek operation.
 	 *
-	 * @eventType org.smilkit.events.ViewportEvent.WAITING_FOR_DATA
+	 * @eventType org.smilkit.events.ViewportEvent.PLAYBACK_OFFSET_CHANGED
 	 */
-	[Event(name="viewportWaitingForData", type="org.smilkit.events.ViewportEvent")]
+	[Event(name="viewportPlaybackOffsetChanged", type="org.smilkit.events.ViewportEvent")]
+	
+	
+	/**
+	 * Dispatched when the <code>Viewport</code> is in a state where it must perform any kind of asynchronous
+	 * operation before playback at the current offset can continue. This could be loading or buffering an asset,  
+	 * or waiting for asset synchronisation when resuming from a seek operation.
+	 *
+	 * @eventType org.smilkit.events.ViewportEvent.WAITING
+	 */
+	[Event(name="viewportWaiting", type="org.smilkit.events.ViewportEvent")]
 	
 	/**
 	 * Dispatched when all the <code>Viewport</code>'s currently-active media handlers have loaded enough data for
@@ -142,13 +149,27 @@ package org.smilkit.view
 		*/
 		protected var _previousUncommittedSeekOffset:int = -1;
 		
+		/**
+		*  The current audio output volume.
+		*/
 		protected var _volume:uint = 100;
+		
+		/**
+		* The volume to which audio should be restored when unmuting. If null, <code>Viewport.VOLUME_MAX</code> will be used.
+		*/
 		protected var _unmuteRestoreVolume:uint;		
+		
+		/**
+		* A flag used to note that an asynchronous operation is in progress on the rendertree, and that playback should be deferred
+		* until this operation is complete.
+		*/
+		protected var _waitingForRenderTree:Boolean = false;
 		
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
+			this._heartbeat.addEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 			this._drawingBoard = new DrawingBoard();
 			this.pause();
 		}
@@ -309,11 +330,29 @@ package org.smilkit.view
 		}
 		
 		/**
-		* Public getter for the internal _playbackState variable
+		* Public getter for the internal <code>_playbackState</code> variable
 		*/
 		public function get playbackState():String
 		{
 			return this._playbackState;
+		}
+		
+		/**
+		* Indicates whether the <code>Viewport</code> is waiting for any kind of asynchronous operation to complete
+		* before playback can begin.
+		*/
+		public function get waiting():Boolean
+		{
+			return this._waitingForRenderTree;
+		}
+		
+		/**
+		* Indicates that the <code>Viewport</code> is not waiting for any kind of asynchronous operation to complete
+		* and that playback can now begin.
+		*/
+		public function get ready():Boolean
+		{
+			return !this.waiting;
 		}
 		
 		/**
@@ -537,6 +576,14 @@ package org.smilkit.view
 		}
 		
 		/**
+		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
+		*/
+		public function revertPlaybackState():void
+		{
+			this.setPlaybackState(this._previousPlaybackState);
+		}
+		
+		/**
 		* Mutes all audio output from this viewport instance, saving the current volume level as a restore
 		* point.
 		*
@@ -609,6 +656,7 @@ package org.smilkit.view
 				// Trash old event listeners just in case
 				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 				
 				// we delete the object pool to avoid a memory leak when re-creating it,
@@ -618,28 +666,43 @@ package org.smilkit.view
 			// parse dom
 			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
 			
+			// Reset the heartbeat to zero
+			this.heartbeat.reset();
+			
+			// Create the object pool with internal timing graph, rendertree etc.
 			this._objectPool = new ViewportObjectPool(this, document);
 			
-			// Bind events to the newly-created objects
+			// Bind events to the newly-created object pool contents
+			this.heartbeat.removeEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
+			// Shout out REFRESH DONE LOL
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
 		
 		/**
-		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
-		*/
-		public function revertPlaybackState():void
+		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
+		* during playback. Emits a public-facing viewport event.
+		*/ 
+		protected function onHeartbeatOffsetChanged():void
 		{
-			this.setPlaybackState(this._previousPlaybackState);
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
 		protected function onPlaybackStateChangedToPlaying():void
 		{
-			this.loadScheduler.start();
-			this.heartbeat.resume();
+			// If the viewport is not ready, then this operation is deferred until it becomes ready.
+			// See onRenderTreeReady for the deferred dispatch to this method.
+			// Note that when this method is called by setPlaybackState, the playbackState has already 
+			// been altered and it is only the post state-change operation itself that is deferred.
+			if(!this._waitingForRenderTree)
+			{
+				this.loadScheduler.start();
+				this.heartbeat.resume();
+			}			
 		}
 		
 		protected function onPlaybackStateChangedToPaused():void
@@ -656,13 +719,23 @@ package org.smilkit.view
 		
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
+			this._waitingForRenderTree = true;
 			this.heartbeat.pause();
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING_FOR_DATA));
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
+		}
+		
+		protected function onRenderTreeWaitingForSync(event:RenderTreeEvent):void
+		{
+			this._waitingForRenderTree = true;
+			this.heartbeat.pause();
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
 		protected function onRenderTreeReady(event:RenderTreeEvent):void
 		{
-			if(this._playbackState == Viewport.PLAYBACK_PLAYING) this.heartbeat.resume();
+			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
+			if(this._waitingForRenderTree && this._playbackState == Viewport.PLAYBACK_PLAYING) this.onPlaybackStateChangedToPlaying();
+			this._waitingForRenderTree = false;			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
