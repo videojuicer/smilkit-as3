@@ -4,6 +4,7 @@ package org.smilkit.render
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
@@ -60,18 +61,21 @@ package org.smilkit.render
 		{
 			this._objectPool = objectPool;
 			
-			// listener for every heart beat (so we recheck the timing tree)
+			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
+			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+
+			// listener for every heart beat (so we recheck the timing graph)
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			
 			// listener for heartbeat stop/go events
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			
-			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
-			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
 			
 			// listener to detect playback state changes on the viewport
 			this._objectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			// listener for changing volume levels
+			this._objectPool.viewport.addEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
 			
 			this.reset();
 		}
@@ -104,6 +108,15 @@ package org.smilkit.render
 		public function get hasDocumentAttached():Boolean
 		{
 			return (this.timingGraph != null && this.document != null);
+		}
+		
+		/** 
+		* Higher-order accessor for all the RenderTree's internal wait links and other asynchronous machinery. 
+		* @return True if the RenderTree is not waiting for any operations to complete before playback can continue.
+		*/
+		public function get ready():Boolean
+		{
+			return (!this._waitingForData && !this._waitingForSync);
 		}
 		
 		/**
@@ -153,27 +166,24 @@ package org.smilkit.render
 			if (this._objectPool.viewport.heartbeat.running)
 			{
 				// Sync everything to a running state by resuming playback.
-				
-				// TODO: Change volume
-				
 				for (var i:int = 0; i < this.elements.length; i++)
 				{
 					var node:TimingNode = this.elements[i];
-					
 					node.mediaElement.handler.resume();
+					node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
 				}
 			}
 			else
 			{
 				// Sync to a paused heartbeat state by pausing everything EXCEPT handlers that are waiting for sync.
-				
-				// TODO: Ignore syncing handlers
-				
 				for (var j:int = 0; i < this.elements.length; i++)
 				{
-					var nodeJ:TimingNode = this.elements[j];
+					var pauseNode:TimingNode = this.elements[j];
+					var pauseHandler:SMILKitHandler = pauseNode.mediaElement.handler;
+					var inSyncWaitList:Boolean = (this._offsetSyncHandlerList && this._offsetSyncHandlerList.indexOf(pauseHandler) > -1);
 					
-					nodeJ.mediaElement.handler.pause();
+					// Do not pause handlers that are currently syncing
+					if(!inSyncWaitList) pauseHandler.pause();
 				}
 			}
 		}
@@ -196,12 +206,17 @@ package org.smilkit.render
 		* A RenderTreeEvent.READY event will be dispatched when the sync cycle completes, if the render tree is not waiting
 		* for data to load.
 		*
+		* A sync operation may only be cancelled by the need for another sync operation - once sync is in progress,
+		* it must complete before playback resume.
+		*
 		* The only exception to the sync cycle is made for video assets with extremely infrequent keyframes. If a handler's
 		* nearest prior seek point is outside of a predefined tolerance range, then we will settle for the nearest forward
 		* seek point, compromising sync accuracy for a speedy resume when a video asset is extremely heavily or poorly-compressed.
 		*/
 		public function syncHandlersToViewportOffset():void
 		{
+			Logger.debug("RenderTree: Beginning sync operation...");
+			
 			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
 			this._offsetSyncOffsetList = new Vector.<uint>();
 			
@@ -228,23 +243,29 @@ package org.smilkit.render
 				
 				if (this._offsetSyncHandlerList.length > 0)
 				{
+					Logger.debug("RenderTree: Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.");
+					
 					this._waitingForSync = true;
 					
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+				} 
+				else
+				{
+					Logger.debug("RenderTree: No handlers require sync at this time.")
 				}
 			}
 		}
 		
 		/**
-		* Cancels any sync operations that are in progress, and resyncs all handlers to the viewport state.
-		* @see org.smilkit.render.RenderTree.syncHandlersToViewportState
+		* Cancels any sync operations that are in progress.
 		*/
-		public function cancelOffsetSync():void
+		protected function cancelOffsetSync():void
 		{
+			Logger.debug("RenderTree: Cancelling sync operation.");
+			
 			this._waitingForSync = false;
 			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
 			this._offsetSyncOffsetList = new Vector.<uint>();
-			
 			this.syncHandlersToViewportState();
 		}
 		
@@ -256,10 +277,12 @@ package org.smilkit.render
 		* by the sync operation. If it has, it is removed from the sync wait list. If a sync is running but the sync wait
 		* list is empty once checkSyncOperation has run, then the sync operation is considered to be complete.
 		*/
-		public function checkSyncOperation():void
+		protected function checkSyncOperation():void
 		{
 			if (this._waitingForSync)
 			{
+				Logger.debug("RenderTree: Checking sync operation...");
+				
 				var removeIndexes:Array = new Array();
 				
 				for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)
@@ -269,7 +292,12 @@ package org.smilkit.render
 					
 					if (waitHandler.currentOffset >= this._objectPool.viewport.offset)
 					{
+						// Sync is complete on this handler.
+						
+						//
 						removeIndexes.push(i);
+						// 
+						waitHandler.pause();
 						
 						// add to stage here??
 					}
@@ -285,12 +313,20 @@ package org.smilkit.render
 				if (this._offsetSyncHandlerList.length < 1)
 				{
 					this._waitingForSync = false;
-					this.syncHandlersToViewportState();
 					
 					if (!this._waitingForData)
 					{
+						Logger.debug("RenderTree: Sync operation completed. RenderTree now READY.");
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
 					}
+					else
+					{
+						Logger.debug("RenderTree: Sync operation completed. Waiting for load wait cycle to complete before the RenderTree is READY.");
+					}
+				}
+				else
+				{
+					Logger.debug("RenderTree: Waiting on "+this._offsetSyncHandlerList.length+" handlers to sync before sync operation complete.");
 				}
 			}
 		}
@@ -301,12 +337,16 @@ package org.smilkit.render
 		protected function removeHandlerFromWaitingForSyncList(handler:SMILKitHandler):void
 		{
 			// find handler in the list
-			var index:int = this._offsetSyncHandlerList.indexOf(handler);
-			
-			if (index >= 0)
+			if(this._offsetSyncHandlerList != null) 
 			{
-				this._offsetSyncHandlerList.splice(index, 1);
-				this._offsetSyncOffsetList.splice(index, 1);
+				var index:int = this._offsetSyncHandlerList.indexOf(handler);
+
+				if (index >= 0)
+				{
+					this._offsetSyncHandlerList.splice(index, 1);
+					this._offsetSyncOffsetList.splice(index, 1);
+					this.checkSyncOperation();
+				}
 			}
 		}
 		
@@ -315,11 +355,15 @@ package org.smilkit.render
 		*/
 		protected function removeHandlerFromWaitingForDataList(handler:SMILKitHandler):void
 		{
-			var index:int = this._waitingForDataHandlerList.indexOf(handler);
-			
-			if (index >= 0)
+			if(this._waitingForDataHandlerList != null)
 			{
-				this._waitingForDataHandlerList.splice(index, 1);
+				var index:int = this._waitingForDataHandlerList.indexOf(handler);
+
+				if (index >= 0)
+				{
+					this._waitingForDataHandlerList.splice(index, 1);
+					this.checkLoadState();
+				}
 			}
 		}
 		
@@ -418,10 +462,10 @@ package org.smilkit.render
 		*/
 		protected function onHandlerLoadWaiting(e:HandlerEvent):void
 		{
+			Logger.debug("RenderTree: Handler dispatched LOAD_WAITING, about to enter load wait cycle.");
 			// add to waiting list
 			this._waitingForDataHandlerList.push(e.handler);
-			
-			this.checkLoadState()
+			this.checkLoadState();
 		}
 		
 		/**
@@ -429,6 +473,7 @@ package org.smilkit.render
 		*/
 		protected function onHandlerLoadReady(e:HandlerEvent):void
 		{
+			Logger.debug("RenderTree: Handler dispatched LOAD_READY, checking load wait cycle status.");
 			// remove from waiting list
 			this.removeHandlerFromWaitingForDataList(e.handler);			
 			this.checkLoadState();
@@ -445,21 +490,31 @@ package org.smilkit.render
 			{
 				if (this._waitingForData)
 				{
+					this._waitingForData = false;
 					// The list is empty, but we were waiting for data. This means the wait operation has concluded.
-					this._waitingForData = false;					
-					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+					if(!this._waitingForSync)
+					{
+						Logger.debug("RenderTree: Load wait cycle completed. RenderTree now READY.");
+						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+					}
+					else
+					{
+						Logger.debug("RenderTree: Load wait cycle completed. Still waiting for sync cycle to complete before RenderTree is READY.");
+					}
 				}
 			}
 			else
 			{
-				if (!this._waitingForData && !this._waitingForSync)
+				if (!this._waitingForData)
 				{
+					Logger.debug("RenderTree: Entering load wait cycle.");
 					// The wait list has items, but we are not yet officially waiting for data. 
 					// Set the waitingForData flag and dispatch the relevant event.
 					this._waitingForData = true;				
 					// we have nothing on our plate, so we are ready!
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
 				}
+				Logger.debug("RenderTree: Load wait cycle waiting for "+this._waitingForDataHandlerList.length+" handlers to dispatch LOAD_READY.");
 			}
 		}
 		
@@ -495,6 +550,15 @@ package org.smilkit.render
 			this.checkSyncOperation();
 		}
 		
+		/**
+		* Listens for the playback state changing in order to schedule the next sync cycle.
+		* A sync cycle is needed whenever we resume playback after a seek operation, therefore:
+		* 1. Every time the viewport enters a seek operation (by changing state to PLAYBACK_SEEKING), we flag that a sync is needed on the next resume operation.
+		* 2. Every time the viewport resumes playback (by changing state to PLAYBACK_PLAYING), we perform the sync operation if the <code>_performOffsetSyncOnNextResume</code> flag is set.
+		*
+		* This method is also the only entity that is allowed to cancel a running sync operation, if one is in progress, and only when
+		* replacing it with a new operation.
+		*/ 
 		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
 		{
 			switch (this._objectPool.viewport.playbackState)
@@ -510,15 +574,13 @@ package org.smilkit.render
 						this.syncHandlersToViewportOffset();
 						this._performOffsetSyncOnNextResume = false;
 					}
-					else
-					{
-						this.cancelOffsetSync();
-					}
-					break;
-				default:
-					this.cancelOffsetSync();
 					break;
 			}
+		}
+		
+		protected function onViewportAudioVolumeChanged(e:ViewportEvent):void
+		{
+			this.syncHandlersToViewportState();
 		}
 	}
 }

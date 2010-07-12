@@ -178,7 +178,7 @@ package org.smilkit.time
 		{
 			if(this.running)
 			{
-				this.onTimer(null);			
+				this.onTimer(null);	// Run the timer one last time to set the current baseline time and ensure that all time increments are properly accounted for.		
 				this._running = false;
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.PAUSED, this.runningOffset));
 				return true;

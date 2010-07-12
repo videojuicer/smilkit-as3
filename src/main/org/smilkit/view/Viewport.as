@@ -12,6 +12,7 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.util.DataURIParser;
@@ -179,7 +180,7 @@ package org.smilkit.view
 		 */
 		public function get offset():Number
 		{
-			return this._heartbeat.offset;
+			return this._heartbeat.runningOffset;
 		}
 		
 		/**
@@ -414,10 +415,12 @@ package org.smilkit.view
 			
 			if(this.location.indexOf("data:") == 0)
 			{
+				Logger.info("Viewport: About to refresh with Data URI.");
 				this.refreshWithDataURI();
 			}
 			else
 			{
+				Logger.info("Viewport: About to refresh with remote URL: "+this.location);
 				this.refreshWithRemoteURI();
 			}
 		}
@@ -548,6 +551,7 @@ package org.smilkit.view
 		{
 			if(newState != this._playbackState)
 			{
+				Logger.info("Viewport: About to change playback state to "+newState+".");
 				// Register a basic state change
 				this._previousPlaybackState = this._playbackState;
 				this._playbackState = newState;
@@ -571,6 +575,7 @@ package org.smilkit.view
 			}
 			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
 			{
+				Logger.info("Viewport: About to change playback state to "+newState+" (offset: "+offset+").");
 				// Register a special case for changing offset while seeking
 				this._previousUncommittedSeekOffset = offset;
 				this.onPlaybackStateChangedToSeekingWithOffset(offset);
@@ -588,6 +593,7 @@ package org.smilkit.view
 		*/
 		public function revertPlaybackState():void
 		{
+			Logger.debug("Viewport: About to revert playback state to "+this._previousPlaybackState+".");	
 			this.setPlaybackState(this._previousPlaybackState);
 		}
 		
@@ -642,8 +648,17 @@ package org.smilkit.view
 				this._volume = newVolume;
 
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_VOLUME_CHANGED));
-				if(newVolume == 0 && !mutedBeforeChange) this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_MUTED));
-				if(newVolume > 0 && mutedBeforeChange) this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_UNMUTED));
+				if(newVolume == 0 && !mutedBeforeChange)
+				{
+					Logger.info("Viewport: Audio muted.");	
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_MUTED));
+				} 
+				if(newVolume > 0 && mutedBeforeChange) 
+				{
+					Logger.info("Viewport: Audio unmuted.");
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_UNMUTED));
+				}
+				Logger.info("Viewport: Audio volume changed to "+newVolume+".");
 				return true;
 			}
 			else
@@ -687,6 +702,7 @@ package org.smilkit.view
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
 			// Shout out REFRESH DONE LOL
+			Logger.info("Viewport: Refresh completed with "+data.length+" characters of SMIL data.");
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
 		
@@ -707,18 +723,26 @@ package org.smilkit.view
 			// been altered and it is only the post state-change operation itself that is deferred.
 			if(!this._waitingForRenderTree)
 			{
+				Logger.info("Viewport: Playback state changed to PLAYBACK_PLAYING.");
 				this.loadScheduler.start();
 				this.heartbeat.resume();
-			}			
+			}
+			else
+			{
+				Logger.info("Viewport: Playback state changed to PLAYBACK_PLAYING, but RenderTree is not ready. Waiting for RenderTree to become ready before resuming playback.");
+			}	
 		}
 		
 		protected function onPlaybackStateChangedToPaused():void
 		{
+			Logger.info("Viewport: Playback state changed to PLAYBACK_PAUSED.");
 			this.heartbeat.pause();
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
+			Logger.info("Viewport: Playback state changed to PLAYBACK_SEEKING with offset: "+offset+".");
+			this.loadScheduler.stop();
 			this.heartbeat.pause();
 			this.heartbeat.seek(offset);
 			// can rollback this seek: this.heartbeat.rollback();
@@ -726,6 +750,7 @@ package org.smilkit.view
 		
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
+			Logger.info("Viewport: Waiting for more data to load.");
 			this._waitingForRenderTree = true;
 			this.heartbeat.pause();
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
@@ -733,6 +758,7 @@ package org.smilkit.view
 		
 		protected function onRenderTreeWaitingForSync(event:RenderTreeEvent):void
 		{
+			Logger.info("Viewport: Waiting for sync before playback can resume.");
 			this._waitingForRenderTree = true;
 			this.heartbeat.pause();
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
@@ -740,14 +766,20 @@ package org.smilkit.view
 		
 		protected function onRenderTreeReady(event:RenderTreeEvent):void
 		{
+			Logger.info("Viewport: Ready to play.");
+			this._waitingForRenderTree = false;		
 			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
-			if(this._waitingForRenderTree && this._playbackState == Viewport.PLAYBACK_PLAYING) this.onPlaybackStateChangedToPlaying();
-			this._waitingForRenderTree = false;			
+			if(this._waitingForRenderTree && this._playbackState == Viewport.PLAYBACK_PLAYING) 
+			{
+				Logger.info("Viewport: Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.");
+				this.onPlaybackStateChangedToPlaying();
+			}				
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
 		protected function onTimingGraphRebuild(event:TimingGraphEvent):void
 		{
+			Logger.debug("Viewport: Document mutated.");
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
 		}
 		
@@ -758,12 +790,12 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
 		{
-			
+			Logger.fatal("Viewport: Could not load remote document because of an IO Error.");
 		}
 		
 		private function onRefreshWithRemoteURISecurityError(e:SecurityErrorEvent):void
 		{
-			
+			Logger.fatal("Viewport: Could not load remote document because of a Security Error.");
 		}
 	}
 }
