@@ -412,6 +412,10 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		* Called when a handler reports that it needs more data. Throws the <code>RenderTree</code> into a waitingForData state
+		* and dispatches the matching event.
+		*/
 		protected function onHandlerLoadWaiting(e:HandlerEvent):void
 		{
 			// add to waiting list
@@ -420,6 +424,9 @@ package org.smilkit.render
 			this.checkLoadState()
 		}
 		
+		/**
+		* Called when a handler reports that it has enough data to begin playback.
+		*/
 		protected function onHandlerLoadReady(e:HandlerEvent):void
 		{
 			// remove from waiting list
@@ -429,7 +436,8 @@ package org.smilkit.render
 		
 		/**
 		 * Runs a waiting / ready state check on the render tree contents and dispatches
-		 * an event if the state changes.
+		 * an event if the state changes. This method is called whenever a handler throws a waitingForData event,
+		 * and whenever a handler declares that it now has enough data.
 		 */
 		protected function checkLoadState():void
 		{
