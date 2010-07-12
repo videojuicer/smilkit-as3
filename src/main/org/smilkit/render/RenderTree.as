@@ -61,7 +61,11 @@ package org.smilkit.render
 			this._objectPool = objectPool;
 			
 			// listener for every heart beat (so we recheck the timing tree)
-			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatBeat);
+			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			
+			// listener for heartbeat stop/go events
+			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
 			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
@@ -145,11 +149,13 @@ package org.smilkit.render
 		 */
 		public function syncHandlersToViewportState():void
 		{
-			// TODO: Change volume
-			// TODO: Ignore syncing handlers
-			if (this._objectPool.viewport.playing && this._objectPool.viewport.ready)
+			
+			if (this._objectPool.viewport.heartbeat.running)
 			{
-				// resume all!
+				// Sync everything to a running state by resuming playback.
+				
+				// TODO: Change volume
+				
 				for (var i:int = 0; i < this.elements.length; i++)
 				{
 					var node:TimingNode = this.elements[i];
@@ -159,7 +165,10 @@ package org.smilkit.render
 			}
 			else
 			{
-				// pause all!
+				// Sync to a paused heartbeat state by pausing everything EXCEPT handlers that are waiting for sync.
+				
+				// TODO: Ignore syncing handlers
+				
 				for (var j:int = 0; i < this.elements.length; i++)
 				{
 					var nodeJ:TimingNode = this.elements[j];
@@ -169,6 +178,28 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		* Starts an offset sync operation on all handlers in the <code>RenderTree</code> instance.
+		*
+		* An offset sync operation provides synchronised playback after a seek operation. Due to oddities with 
+		* seeking in compressed video, video assets often have a predefined set of seekable points (usually only
+		* keyframes may be used as seek destinations) and so a call to seek to an arbitrary point may actually
+		* seek a video to the keyframe *nearest* that arbitrary point. In order to provide proper synchronisation,
+		* we run a "sync cycle" any time we resume playback from a seek operation.
+		*
+		* The sync cycle is limited to handler instances that are known to have a limited set of seekable offsets.
+		* Each eligible handler is seeked to the nearest keyframe before the desired offset, and then allowed to play
+		* (while muted) to the requested arbitrary offset before being paused. When all eligible handlers have been
+		* synced to the desired offset, playback proper may resume.
+		* 
+		* A sync cycle is a "wait" operation and holds playback in a similar manner to waiting for more data to load.
+		* A RenderTreeEvent.READY event will be dispatched when the sync cycle completes, if the render tree is not waiting
+		* for data to load.
+		*
+		* The only exception to the sync cycle is made for video assets with extremely infrequent keyframes. If a handler's
+		* nearest prior seek point is outside of a predefined tolerance range, then we will settle for the nearest forward
+		* seek point, compromising sync accuracy for a speedy resume when a video asset is extremely heavily or poorly-compressed.
+		*/
 		public function syncHandlersToViewportOffset():void
 		{
 			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
@@ -204,6 +235,10 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		* Cancels any sync operations that are in progress, and resyncs all handlers to the viewport state.
+		* @see org.smilkit.render.RenderTree.syncHandlersToViewportState
+		*/
 		public function cancelOffsetSync():void
 		{
 			this._waitingForSync = false;
@@ -213,6 +248,14 @@ package org.smilkit.render
 			this.syncHandlersToViewportState();
 		}
 		
+		/**
+		* Checks the progress of an offset sync operation, if one is in progress. Called each time the heartbeat ticks, 
+		* regardless of whether the runningOffset is currently incrementing.
+		*
+		* During the offset sync, each syncing handler is checked to see if it has reached the internal offset required
+		* by the sync operation. If it has, it is removed from the sync wait list. If a sync is running but the sync wait
+		* list is empty once checkSyncOperation has run, then the sync operation is considered to be complete.
+		*/
 		public function checkSyncOperation():void
 		{
 			if (this._waitingForSync)
@@ -252,19 +295,13 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		* Removes a handler from the sync wait list. Called once the handler has synced to the desired offset.
+		*/
 		protected function removeHandlerFromWaitingForSyncList(handler:SMILKitHandler):void
 		{
 			// find handler in the list
-			var index:int = -1;
-			
-			for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)
-			{
-				if (this._offsetSyncHandlerList[i] == handler)
-				{
-					index = i;
-					break;
-				}
-			}
+			var index:int = this._offsetSyncHandlerList.indexOf(handler);
 			
 			if (index >= 0)
 			{
@@ -273,6 +310,9 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		* Removes a handler from the load wait list. Called once the handler declares that it is ready for playback.
+		*/
 		protected function removeHandlerFromWaitingForDataList(handler:SMILKitHandler):void
 		{
 			var index:int = this._waitingForDataHandlerList.indexOf(handler);
@@ -383,13 +423,7 @@ package org.smilkit.render
 		protected function onHandlerLoadReady(e:HandlerEvent):void
 		{
 			// remove from waiting list
-			var i:int = this._waitingForDataHandlerList.indexOf(e.handler, 0);
-			
-			if (i != -1)
-			{
-				this._waitingForDataHandlerList.splice(i, 1);
-			}
-			
+			this.removeHandlerFromWaitingForDataList(e.handler);			
 			this.checkLoadState();
 		}
 		
@@ -431,11 +465,19 @@ package org.smilkit.render
 			this.reset();
 		}
 		
+		protected function onHeartbeatResumed(e:HeartbeatEvent):void
+		{
+			this.syncHandlersToViewportState();
+		}
+		protected function onHeartbeatPaused(e:HeartbeatEvent):void
+		{
+			this.syncHandlersToViewportState();
+		}
+		
 		/**
 		 * Function called when the Viewports heartbeat dispatches a TimerEvent, which then updates the RenderTree 
-		 * @param e
 		 */		
-		protected function onHeartbeatBeat(e:HeartbeatEvent):void
+		protected function onHeartbeatRunningOffsetChanged(e:HeartbeatEvent):void
 		{
 			this.update();
 		}

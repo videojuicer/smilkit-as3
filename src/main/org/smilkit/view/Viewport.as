@@ -169,7 +169,7 @@ package org.smilkit.view
 		{
 			this._history = new Vector.<String>();
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
-			this._heartbeat.addEventListener(HeartbeatEvent.OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
+			this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			this._drawingBoard = new DrawingBoard();
 			this.pause();
 		}
@@ -330,7 +330,15 @@ package org.smilkit.view
 		}
 		
 		/**
-		* Public getter for the internal <code>_playbackState</code> variable
+		* Public getter for the internal <code>_playbackState</code> variable.
+		*
+		* Note that the playbackState is not indicative of the <code>Viewport</code>'s *readiness*. For example,
+		* if more data needs to be loaded during playback, <code>playbackState</code> will still return <code>Viewport.PLAYBACK_PLAYING</code>
+		* even though the playhead itself is currently held awaiting more data. Use <code>waiting</code> or <code>ready</code> to determine if
+		* the <code>Viewport</code> is currently waiting on any internal actions to complete before resuming.
+		*
+		* @see org.smilkit.view.Viewport.waiting
+		* @see org.smilkit.view.Viewport.ready
 		*/
 		public function get playbackState():String
 		{
@@ -686,7 +694,7 @@ package org.smilkit.view
 		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
 		* during playback. Emits a public-facing viewport event.
 		*/ 
-		protected function onHeartbeatOffsetChanged(event:HeartbeatEvent):void
+		protected function onHeartbeatRunningOffsetChanged(event:HeartbeatEvent):void
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}

@@ -11,9 +11,9 @@ package org.smilkit.time
 	 * forward as it runs or during a pause or seek attempt (as a seek + pause change the offset to a specific value
 	 * the event is still dispatched). 
 	 * 
-	 * @eventType org.smilkit.events.HeartbeatEvent.OFFSET_CHANGED
+	 * @eventType org.smilkit.events.HeartbeatEvent.RUNNING_OFFSET_CHANGED
 	 */
-	[Event(name="heartbeatOffsetChanged", type="org.smilkit.events.HeartbeatEvent")]
+	[Event(name="heartbeatRunningOffsetChanged", type="org.smilkit.events.HeartbeatEvent")]
 
 	/**
 	 * Heartbeat controls the timing of the player updates.
@@ -241,7 +241,7 @@ package org.smilkit.time
 				// this however should be instant but depends on the delay / speed of the Timer class.
 				this._runningOffset += beatDuration;
 				
-				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.OFFSET_CHANGED, this.runningOffset));
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.runningOffset));
 			}
 		}
 	}

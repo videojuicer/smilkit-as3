@@ -6,7 +6,7 @@ package org.smilkit.events
 	{
 		public static var RESUMED:String = "heartbeatResumed";
 		public static var PAUSED:String = "heartbeatPaused";
-		public static var OFFSET_CHANGED:String = "heartbeatOffsetChanged";
+		public static var RUNNING_OFFSET_CHANGED:String = "heartbeatRunningOffsetChanged";
 		
 		protected var _runningOffset:Number;
 		
