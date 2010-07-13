@@ -26,14 +26,19 @@ package org.smilkit.handler
 			super(element);
 		}
 		
-		public override function get intrinsicWidth():uint
+		public override function get width():uint
 		{
 			return this._intrinsicWidth;
 		}
 		
-		public override function get intrinsicHeight():uint
+		public override function get height():uint
 		{
 			return this._intrinsicHeight;
+		}
+		
+		public override function get spatial():Boolean
+		{
+			return true;
 		}
 		
 		public override function get resolvable():Boolean

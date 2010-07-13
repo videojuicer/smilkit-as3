@@ -38,21 +38,21 @@ package org.smilkit.handler
 			this._canvas = new Sprite();
 		}
 		
-		public override function get intrinsicWidth():uint
+		public override function get width():uint
 		{
 			if (this._metadata == null)
 			{
-				return super.intrinsicWidth;
+				return super.width;
 			}
 			
 			return this._metadata.width;
 		}
 		
-		public override function get intrinsicHeight():uint
+		public override function get height():uint
 		{
 			if (this._metadata == null)
 			{
-				return super.intrinsicHeight;
+				return super.height;
 			}
 			
 			return this._metadata.height;
@@ -78,14 +78,14 @@ package org.smilkit.handler
 			return true;
 		}
 		
-		public override function get intrinsicSpatial():Boolean
+		public override function get spatial():Boolean
 		{
-			return false;
+			return true;
 		}
 		
-		public override function get intrinsicTemporal():Boolean
+		public override function get temporal():Boolean
 		{
-			return false;
+			return true;
 		}
 		
 		public override function get displayObject():DisplayObject

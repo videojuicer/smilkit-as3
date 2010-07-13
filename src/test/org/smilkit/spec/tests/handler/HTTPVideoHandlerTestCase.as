@@ -50,7 +50,7 @@ package org.smilkit.spec.tests.handler
 		protected function onHandlerResolved(e:HandlerEvent, passThru:Object):void
 		{
 			// check its the right resolved duration
-			Assert.assertEquals(210, e.handler.intrinsicDuration);
+			Assert.assertEquals(210, e.handler.duration);
 			
 			// check the dom is still using the defined smil ending
 			Assert.assertEquals(10, e.handler.element.dur);

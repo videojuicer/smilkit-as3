@@ -24,7 +24,7 @@ package org.smilkit.handler
 		protected var _completedResolving:Boolean = false;
 		
 		protected var _currentOffset:int;
-		protected var _intrinsicDuration:int = Time.UNRESOLVED;
+		protected var _duration:int = Time.UNRESOLVED;
 		
 		public function SMILKitHandler(element:IElement)
 		{
@@ -46,27 +46,27 @@ package org.smilkit.handler
 			return this._completedResolving;
 		}
 		
-		public function get intrinsicDuration():int
+		public function get duration():int
 		{
-			return this._intrinsicDuration;
+			return this._duration;
 		}
 		
-		public function get intrinsicWidth():uint
-		{
-			return 0;
-		}
-		
-		public function get intrinsicHeight():uint
+		public function get width():uint
 		{
 			return 0;
 		}
 		
-		public function get intrinsicSpatial():Boolean
+		public function get height():uint
+		{
+			return 0;
+		}
+		
+		public function get spatial():Boolean
 		{
 			return false;
 		}
 		
-		public function get intrinsicTemporal():Boolean
+		public function get temporal():Boolean
 		{
 			return false;
 		}
@@ -340,13 +340,13 @@ package org.smilkit.handler
 		 */
 		protected function resolved(resolvedDuration:int):void
 		{
-			this._intrinsicDuration = resolvedDuration;
+			this._duration = resolvedDuration;
 			this._completedResolving = true;
 			
 			// here we update the dom
 			if (this.element != null && this.element.dur == Time.UNRESOLVED)
 			{
-				this.element.dur = this._intrinsicDuration;
+				this.element.dur = this._duration;
 			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));
