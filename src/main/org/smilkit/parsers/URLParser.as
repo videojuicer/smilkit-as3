@@ -1,4 +1,4 @@
-package org.smilkit.util
+package org.smilkit.parsers
 {
 	/**
 	 * Parses a URL and provides helper properties for access to the different URL pieces.

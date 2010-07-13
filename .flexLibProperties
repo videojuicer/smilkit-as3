@@ -12,8 +12,8 @@
     <classEntry path="org.smilkit.handler.HTTPVideoHandler"/>
     <classEntry path="org.smilkit.parsers.BostonDOMParser"/>
     <classEntry path="org.smilkit.collections.Hashtable"/>
-    <classEntry path="org.smilkit.util.URLParser"/>
-    <classEntry path="org.smilkit.util.DataURIParser"/>
+    <classEntry path="org.smilkit.parsers.URLParser"/>
+    <classEntry path="org.smilkit.parsers.DataURIParser"/>
     <classEntry path="org.smilkit.view.Viewport"/>
     <classEntry path="org.smilkit.spec.tests.dom.BostonDOMParserTestCase"/>
     <classEntry path="org.smilkit.time.TimingGraph"/>

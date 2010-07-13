@@ -1,4 +1,4 @@
-package org.smilkit.util
+package org.smilkit.parsers
 {
 	
 	import org.smilkit.util.Base64;
