@@ -114,7 +114,6 @@ package org.smilkit.handler
 			this._video.smoothing = true;
 			this._video.deblocking = 1;
 			
-
 			this._video.attachNetStream(this._netStream as NetStream);
 			
 			// dont want to actually play it back right now
@@ -229,9 +228,7 @@ package org.smilkit.handler
 		}
 		
 		public function onMetaData(info:Object):void
-		{
-			this._netStream.pause();
-			
+		{	
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
@@ -242,8 +239,10 @@ package org.smilkit.handler
 			}
 			
 			Logger.info("Metadata recieved: "+this._metadata.toString());
-			
+				
 			this.resolved(this._metadata.duration);
+			
+			this._netStream.pause();
 		}
 		
 		public static function toHandlerMap():HandlerMap
