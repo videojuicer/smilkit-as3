@@ -284,7 +284,7 @@ package org.smilkit.view
 		}
 		
 		/**
-		 * Sets the URL location for the code>Viewport</code> location, will auto load the requested
+		 * Sets the URL location for the <code>Viewport</code> location, will auto load the requested
 		 * location unless <code>autoRefresh</code> is set to false. The location may be set as a regular
 		 * URL, or as a W3C data URI with the utf-8 character set. Data URIs may optionally be base64-encoded.
 		 * 
@@ -442,7 +442,7 @@ package org.smilkit.view
 		
 		/**
 		* Refreshes the viewport with a SMIL document contained within a Data URI. Data URIs are formed like so:
-		* data:[<MIME-type>][;charset="<encoding>"][;base64],<data>
+		* data:[{MIME-type}][;charset="{encoding}"][;base64],{data}
 		* for example with utf-8 escaped markup:
 		* data:application/smil;charset=utf-8,ESCAPED_SMIL
 		* or with Base64-encoded markup:

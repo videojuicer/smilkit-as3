@@ -223,6 +223,7 @@ package org.smilkit.render
 			for (var i:int = 0; i < this.elements.length; i++)
 			{
 				var node:TimingNode = this.elements[i];
+				// TODO include clip-begin into the equation
 				var offset:uint = (this._objectPool.viewport.offset - node.begin);
 				var nearestSyncPoint:Number = node.mediaElement.handler.findNearestSyncPoint(offset);
 				
@@ -430,12 +431,16 @@ package org.smilkit.render
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 							
+							// If the element is being introduced at a non-zero internal offset 
+							// (clip-begin attribute set, or element's begin time is >= 1 heartbeat tick in the past)
+							// we need to sync it up.
+							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
-							// already exists
 						else
 						{
+							// already exists
 							var previousTime:TimingNode = this._activeElements[previousIndex];
 							
 							if (time === previousTime && time != previousTime)
