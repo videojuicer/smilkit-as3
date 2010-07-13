@@ -8,6 +8,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -451,10 +452,17 @@ package org.smilkit.render
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 							
-							// If the element is being introduced at a non-zero internal offset 
-							// (clip-begin attribute set, or element's begin time is >= 1 heartbeat tick in the past)
-							// we need to sync it up.
-							// if(handler.intrinsicTemporal && ())
+							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
+							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
+							// viewport is currently playing.
+							if(!syncAfterUpdate && handler.seekable && this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+							{
+								var clipBeginParser:SMILTimeParser = new SMILTimeParser(time.element, time.element.clipBegin);
+								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (time.begin < offset )))
+								{
+									syncAfterUpdate = true;
+								}
+							}
 							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
@@ -476,10 +484,8 @@ package org.smilkit.render
 						newActiveElements.push(time);
 					}
 				}
-				
 				// swap with new list
 				this._activeElements = newActiveElements;
-				
 				// Perform the sync if we flagged up that one is needed
 				if(syncAfterUpdate) this.syncHandlersToViewportOffset();
 			}
