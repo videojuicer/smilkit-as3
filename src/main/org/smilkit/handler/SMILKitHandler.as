@@ -117,7 +117,7 @@ package org.smilkit.handler
 		}
 		
 		/**
-		 * The tolerance to use when finding the nearest sync point in miliseconds.
+		 * The tolerance to use when finding the nearest sync point in milliseconds.
 		 */
 		protected function get syncTolerance():Number
 		{
@@ -336,7 +336,7 @@ package org.smilkit.handler
 		 * Triggers the resolved event on the handler, the specified resolvedDuration
 		 * is used to update the DOM element assigned to this handler.
 		 * 
-		 * @param resolvedDuration The resolved duration in miliseconds.
+		 * @param resolvedDuration The resolved duration in milliseconds.
 		 */
 		protected function resolved(resolvedDuration:int):void
 		{

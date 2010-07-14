@@ -4,13 +4,13 @@ package org.smilkit.parsers
 	import org.smilkit.w3c.dom.INode;
 
 	/**
-	 * Parses a SMIL time string into a milisecond integer value and clock type.  
+	 * Parses a SMIL time string into a millisecond integer value and clock type.  
 	 */
 	public class SMILTimeParser
 	{
 		protected var _parentNode:INode;
 		
-		protected var _miliseconds:int = 0;
+		protected var _milliseconds:int = 0;
 		protected var _type:int = Time.SMIL_TIME_OFFSET;
 		protected var _timeString:String = null;
 		
@@ -25,11 +25,11 @@ package org.smilkit.parsers
 		}
 		
 		/**
-		 * The milisecond value of the parsed SMIL time.
+		 * The millisecond value of the parsed SMIL time.
 		 */
-		public function get miliseconds():int
+		public function get milliseconds():int
 		{
-			return this._miliseconds;
+			return this._milliseconds;
 		}
 		
 		/**
@@ -52,7 +52,7 @@ package org.smilkit.parsers
 		 * Parses the specified SMIL time string into the current <code>SMILTimeParser</code>
 		 * instance.
 		 * 
-		 * @param timeString The SMIL time string to parse into miliseconds.
+		 * @param timeString The SMIL time string to parse into milliseconds.
 		 */
 		public function parse(timeString:String):void
 		{
@@ -81,7 +81,7 @@ package org.smilkit.parsers
 					seconds = uint(split[2]);
 				}
 				
-				this._miliseconds = ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
+				this._milliseconds = ((hours * 60 * 60 * 1000) + (minutes * 60 * 1000) + (seconds * 1000));
 				
 				this._type = Time.SMIL_TIME_WALLCLOCK;
 			}
@@ -90,27 +90,27 @@ package org.smilkit.parsers
 				// hours
 				if (this._timeString.indexOf("h") != -1)
 				{
-					this._miliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 60 * 60 * 1000; 
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 60 * 60 * 1000; 
 				}
 				// minutes
 				else if (this._timeString.indexOf("min") != -1)
 				{
-					this._miliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("min"))) * 60 * 1000; 
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("min"))) * 60 * 1000; 
 				}
 				// seconds
 				else if (this._timeString.indexOf("s") != -1)
 				{
-					this._miliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 1000; 
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 1000; 
 				}
-				// miliseconds value
+				// milliseconds value
 				else if (this._timeString.indexOf("ms") != -1)
 				{
-					this._miliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("ms")));
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("ms")));
 				}
 				// assume the time is declared in seconds
 				else
 				{
-					this._miliseconds = parseInt(this._timeString) * 1000;
+					this._milliseconds = parseInt(this._timeString) * 1000;
 				}
 				
 				this._type = Time.SMIL_TIME_OFFSET;

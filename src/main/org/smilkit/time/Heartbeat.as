@@ -192,7 +192,7 @@ package org.smilkit.time
 		/**
 		 * Seeks the running offset to the specified offset.
 		 *
-		 * @param offset The offset in miliseconds to seek to.
+		 * @param offset The offset in milliseconds to seek to.
 		 */
 		public function seek(offset:Number):void
 		{

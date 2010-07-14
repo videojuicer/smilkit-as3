@@ -206,7 +206,7 @@ package org.smilkit.dom.smil
 		}
 		
 		/**
-		 * The clock value in miliseconds relative to the syncbase or event base.
+		 * The clock value in milliseconds relative to the syncbase or event base.
 		 */
 		public function get offset():Number
 		{

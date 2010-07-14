@@ -70,7 +70,7 @@ package org.smilkit.dom.smil
 				this._durationParser.parse(this.getAttribute("dur"));
 			}
 			
-			return this._durationParser.miliseconds;
+			return this._durationParser.milliseconds;
 		}
 		
 		public function set dur(dur:Number):void
