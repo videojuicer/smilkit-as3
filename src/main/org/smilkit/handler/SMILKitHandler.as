@@ -6,6 +6,7 @@ package org.smilkit.handler
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.Time;
@@ -13,6 +14,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
+	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
@@ -122,6 +124,18 @@ package org.smilkit.handler
 		protected function get syncTolerance():Number
 		{
 			return 10,000;
+		}
+		
+		public function get viewportObjectPool():ViewportObjectPool
+		{
+			var document:SMILDocument = (this.element.ownerDocument as SMILDocument)
+			
+			if (document != null)
+			{
+				return document.viewportObjectPool;
+			}
+				
+			return null;
 		}
 		
 		public function load():void
