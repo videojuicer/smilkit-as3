@@ -8,11 +8,13 @@ package org.smilkit.handler
 	import flash.events.IOErrorEvent;
 	import flash.events.NetStatusEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.events.TimerEvent;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	
+	import org.osmf.events.TimeEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
@@ -28,6 +30,8 @@ package org.smilkit.handler
 		protected var _soundTransformer:SoundTransform;
 		protected var _metadata:Metadata;
 		protected var _canvas:Sprite;
+		
+		protected var _loadReady:Boolean = false;
 		
 		public function HTTPVideoHandler(element:IElement)
 		{
@@ -122,6 +126,8 @@ package org.smilkit.handler
 			
 			this._startedLoading = true;
 			
+			this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
@@ -158,6 +164,8 @@ package org.smilkit.handler
 		
 		public override function cancel():void
 		{
+			this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			
 			this._netStream.close();
 			this._netConnection.close();
 			
@@ -167,6 +175,39 @@ package org.smilkit.handler
 			super.cancel();
 		}
 		
+		protected function onHeartbeatTick(e:TimeEvent):void
+		{
+			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
+			var durationLoaded:Number = (percentageLoaded / 100) * this.duration;
+			
+			// if were not already ready, check if we are
+			if (!this._loadReady)
+			{
+				if (durationLoaded >= (this._netStream.b * 1000))
+				{
+					// increase the buffer so we have more ready
+					this._netStream.bufferTime = 30;
+					
+					this._loadReady = true;
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				}
+			}
+			// if were ready, check if we need more
+			else
+			{
+				if ((this.currentOffset + 5) >= durationLoaded)
+				{
+					// reduce the buffer so we get ready quicker
+					this._netStream.bufferTime = 15;
+					
+					this._loadReady = false;
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+				}
+			}
+		}
+		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
 			Logger.debug("NetStatus Event on video: "+e.info.level+" "+e.info.code);
@@ -174,14 +215,14 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
-					this._netStream.bufferTime = 30; // expand buffer
+					//this._netStream.bufferTime = 30; // expand buffer
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					break;
 				case "NetStream.Buffer.Empty":
-					this._netStream.bufferTime = 8; // reduce buffer
+					//this._netStream.bufferTime = 8; // reduce buffer
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
 				case "NetStream.Play.Failed":
 				case "NetStream.Play.NoSupportedTrackFound":
