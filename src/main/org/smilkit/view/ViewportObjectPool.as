@@ -65,6 +65,9 @@ package org.smilkit.view
 		
 		public function reset():void
 		{
+			// link the object pool to the document
+			this._document.viewportObjectPool = this;
+			
 			this._timingGraph = new TimingGraph(this);
 
 			// make the first render tree!

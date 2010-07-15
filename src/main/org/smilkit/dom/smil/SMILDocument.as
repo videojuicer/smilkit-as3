@@ -3,6 +3,7 @@ package org.smilkit.dom.smil
 	import flash.errors.IllegalOperationError;
 	
 	import org.smilkit.dom.Document;
+	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
@@ -22,9 +23,21 @@ package org.smilkit.dom.smil
 		protected var _beginList:ITimeList;
 		protected var _endList:ITimeList;
 		
+		protected var _viewportObjectPool:ViewportObjectPool;
+		
 		public function SMILDocument(documentType:IDocumentType)
 		{
 			super(documentType);
+		}
+		
+		public function get viewportObjectPool():ViewportObjectPool
+		{
+			return this._viewportObjectPool;
+		}
+		
+		public function set viewportObjectPool(viewportObjectPool:ViewportObjectPool):void
+		{
+			this._viewportObjectPool = viewportObjectPool;
 		}
 		
 		public function get timeChildren():INodeList
