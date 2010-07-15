@@ -1,15 +1,17 @@
 package org.smilkit.util.logger
 {
+	import flash.system.Capabilities;
+	import flash.system.System;
+	
+	import org.smilkit.util.logger.renderers.BrowserConsoleRenderer;
 	import org.smilkit.util.logger.renderers.LogRenderer;
 	import org.smilkit.util.logger.renderers.TraceRenderer;
-	import org.smilkit.util.logger.renderers.BrowserConsoleRenderer;
 	
 	/**
 	 * Provides logging functionality with support for broadcasting via the web browsers error console.
 	 */
 	public class Logger
 	{
-		
 		/**
 		* A list of LogRenderer instances to which log output should be directed.
 		*/
@@ -43,7 +45,13 @@ package org.smilkit.util.logger
 		public static function defaultRenderers():void
 		{
 			Logger._logRenderers = new Vector.<LogRenderer>;
-			Logger.logRenderers.push(new TraceRenderer(), new BrowserConsoleRenderer());
+			
+			if (Capabilities.isDebugger)
+			{
+				Logger.logRenderers.push(new TraceRenderer());
+			}
+			
+			Logger.logRenderers.push(new BrowserConsoleRenderer());
 		}
 		
 		/**
@@ -100,6 +108,21 @@ package org.smilkit.util.logger
 		public static function debug(message:String, targetObject:Object = null):void
 		{
 			Logger.log(message, targetObject, LogLevel.DEBUG);
+		}
+		
+		/**
+		 * Create's a snapshot of the memory usage currently being used by SMILKit.
+		 * 
+		 * @return String Message with the current memory values of Megabytes and Kilobytes.
+		 */
+		public static function memorySnapshot():String
+		{
+			var totalMemory:uint = System.totalMemory;
+			
+			var memoryMB:Number = Math.round(totalMemory / 1024 / 1024 * 100) / 100;
+			var memorykB:Number = Math.round(totalMemory / 1024);
+			
+			return "Memory Snapshot: "+memoryMB+" MB ("+memorykB+" kB)";
 		}
 		
 		/**
