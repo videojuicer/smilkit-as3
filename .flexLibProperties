@@ -73,6 +73,9 @@
     <classEntry path="org.smilkit.events.HeartbeatEvent"/>
     <classEntry path="org.smilkit.util.Base64"/>
     <classEntry path="org.smilkit.parsers.SMILTimeParser"/>
+    <classEntry path="org.smilkit.util.logger.renderers.LogRenderer"/>
+    <classEntry path="org.smilkit.util.logger.renderers.BrowserConsoleRenderer"/>
+    <classEntry path="org.smilkit.util.logger.renderers.TraceRenderer"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
