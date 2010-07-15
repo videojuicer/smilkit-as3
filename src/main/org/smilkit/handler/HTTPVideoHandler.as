@@ -126,7 +126,10 @@ package org.smilkit.handler
 			
 			this._startedLoading = true;
 			
-			this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			if (this.viewportObjectPool != null)
+			{
+				this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
@@ -164,7 +167,10 @@ package org.smilkit.handler
 		
 		public override function cancel():void
 		{
-			this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			if (this.viewportObjectPool != null)
+			{
+				this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			}
 			
 			this._netStream.close();
 			this._netConnection.close();
