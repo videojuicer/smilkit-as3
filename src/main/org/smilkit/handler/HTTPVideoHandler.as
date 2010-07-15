@@ -109,7 +109,7 @@ package org.smilkit.handler
 			this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
 			
 			this._netStream.client = this;
-			this._netStream.bufferTime = 8;
+			this._netStream.bufferTime = 10;
 			this._netStream.soundTransform = this._soundTransformer;
 			
 			this._netStream.play(this.element.src);
@@ -183,10 +183,10 @@ package org.smilkit.handler
 			// if were not already ready, check if we are
 			if (!this._loadReady)
 			{
-				if (durationLoaded >= (this._netStream.b * 1000))
+				if (durationLoaded >= (this._netStream.bufferTime * 1000))
 				{
 					// increase the buffer so we have more ready
-					this._netStream.bufferTime = 30;
+					//this._netStream.bufferTime = 30;
 					
 					this._loadReady = true;
 					
@@ -199,7 +199,7 @@ package org.smilkit.handler
 				if ((this.currentOffset + 5) >= durationLoaded)
 				{
 					// reduce the buffer so we get ready quicker
-					this._netStream.bufferTime = 15;
+					//this._netStream.bufferTime = 15;
 					
 					this._loadReady = false;
 					
