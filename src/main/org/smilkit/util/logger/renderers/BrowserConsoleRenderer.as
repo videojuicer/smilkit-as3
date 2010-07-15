@@ -1,6 +1,7 @@
 package org.smilkit.util.logger.renderers
 {
 	import flash.external.ExternalInterface;
+	import flash.system.Capabilities;
 	
 	import org.smilkit.util.logger.LogLevel;
 	import org.smilkit.util.logger.LogMessage;
@@ -27,19 +28,22 @@ package org.smilkit.util.logger.renderers
 				switch (message.level)
 				{
 					case LogLevel.DEBUG:
-						ExternalInterface.call("window['console']['debug']('"+message.toString()+"')");
+						ExternalInterface.call("console.debug", message.toString());
 						break;
 					case LogLevel.ERROR:
-						ExternalInterface.call("window['console']['error']('"+message.toString()+"')");
+						ExternalInterface.call("console.error", message.toString());
 						break;
 					case LogLevel.FATAL:
-						ExternalInterface.call("window['console']['error']('"+message.toString()+"')");
+						ExternalInterface.call("console.error", message.toString());
 						break;
 					case LogLevel.INFORMATION:
-						ExternalInterface.call("window['console']['info']('"+message.toString()+"')");
+						ExternalInterface.call("console.info", message.toString());
 						break;
 					case LogLevel.WARNING:
-						ExternalInterface.call("window['console']['warn']('"+message.toString()+"')");
+						ExternalInterface.call("console.warn", message.toString());
+						break;
+					default:
+						ExternalInterface.call("console.log", message.toString());
 						break;
 				}
 			}
@@ -47,15 +51,18 @@ package org.smilkit.util.logger.renderers
 		
 		protected function checkForConsole():Boolean
 		{
+			var playerType:String = Capabilities.playerType.toLowerCase();
+			var browserAvailable:Boolean = (playerType == "plugin" || playerType == "activex");
+			
 			this._consoleAvailable = false;
 			
-			if (ExternalInterface.available)
+			if (browserAvailable && ExternalInterface.available)
 			{
-				var console:*;
+				var consoleAvailable:Boolean = false;
 				
 				try
 				{
-					console = ExternalInterface.call("window['console']");
+					consoleAvailable = ExternalInterface.call("function(){ return typeof window.console == 'object' && (typeof console.info == 'function' || typeof console.info == 'object'); }");
 				}
 				catch (e:Error)
 				{
@@ -63,7 +70,7 @@ package org.smilkit.util.logger.renderers
 				}
 				finally
 				{
-					if (console != undefined && console != null)
+					if (consoleAvailable)
 					{
 						this._consoleAvailable = true;
 					}
