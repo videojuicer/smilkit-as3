@@ -24,7 +24,7 @@ package org.smilkit.spec.tests.handler
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._document = (parser.parse(Fixtures.MP4_VIDEO_SMIL_XML) as ISMILDocument);
 			
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 			
 			this._rtmpElement = this._document.getElementById("video_rtmp") as ISMILMediaElement;
 			this._rtmpVideoHandler = (SMILKit.createElementHandlerFor(this._rtmpElement) as RTMPVideoHandler);

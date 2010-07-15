@@ -19,7 +19,7 @@ package org.smilkit.spec.tests.render
 		{
 			this._viewport = new Viewport();
 			
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 		}
 		
 		[After]

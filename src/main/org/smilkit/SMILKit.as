@@ -11,6 +11,7 @@ package org.smilkit
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
@@ -77,11 +78,23 @@ package org.smilkit
 		}
 		
 		/**
+		 * Register the default setup for SMILKit.
+	     */
+		public static function defaults():void
+		{
+			// load default logger renderers
+			Logger.defaultRenderers();
+			
+			// load the default smilkit handlers
+			SMILKit.defaultHandlers();
+		}
+		
+		/**
 		 * Register the default set of SMILKit handlers
 		 *
 		 * @see org.smilkit.handler.Handler
 		 * @see org.smilkit.handler.HandlerMap
-	     */
+		 */
 		public static function defaultHandlers():void
 		{
 			//SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());

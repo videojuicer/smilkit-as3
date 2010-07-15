@@ -26,7 +26,7 @@ package
 		public function SMILKitPlayer()
 		{
 			// use default asset handlers
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 			
 			var smil:String = this.root.loaderInfo.parameters.hasOwnProperty("smil") ? this.root.loaderInfo.parameters['smil'] : "http://sixty.im/demo.smil?v="+Math.random();
 			

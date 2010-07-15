@@ -20,7 +20,7 @@ package org.smilkit.spec.tests.handler
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._document = (parser.parse(Fixtures.MP4_VIDEO_SMIL_XML) as ISMILDocument);
 			
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 		}
 		
 		[After]

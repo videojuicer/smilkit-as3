@@ -24,7 +24,7 @@ package org.smilkit.spec.tests.handler
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._document = (parser.parse(Fixtures.MP4_VIDEO_SMIL_XML) as ISMILDocument);
 			
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 			
 			this._httpElement = this._document.getElementById("video_http") as ISMILMediaElement;
 			this._httpVideoHandler = (SMILKit.createElementHandlerFor(this._httpElement) as HTTPVideoHandler);

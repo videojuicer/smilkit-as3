@@ -23,7 +23,7 @@ package org.smilkit.spec.tests.time
 		{
 			this._viewport = new Viewport();
 			
-			SMILKit.defaultHandlers();
+			SMILKit.defaults();
 		}
 		
 		[After]
