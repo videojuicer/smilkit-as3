@@ -100,11 +100,11 @@ package org.smilkit.util
 		}
 		
 		/**
-		 * A number that specifies the duration of the FLV file, in seconds.
+		 * A number that specifies the duration of the FLV file, in milliseconds.
 		 */
 		public function get duration():Number
 		{
-			return this._internalInfo['duration'];
+			return this._internalInfo['duration'] * 1000;
 		}
 		
 		/**
