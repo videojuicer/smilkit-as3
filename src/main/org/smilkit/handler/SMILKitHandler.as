@@ -347,6 +347,8 @@ package org.smilkit.handler
 		 */
 		public function removedFromLoadScheduler():void
 		{
+			Logger.debug("Handler removed from load scheduler", this);
+			
 			if (this.startedLoading)
 			{
 				this.cancel();
