@@ -14,6 +14,7 @@ package org.smilkit.render
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.TimingNode;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	
@@ -91,6 +92,8 @@ package org.smilkit.render
 							{
 								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 								
+								Logger.debug("Adding Handler to region '"+regionId+"' on the DrawingBoard", handler);
+								
 								// place the element on to the region it belongs too
 								region.regionContainer.addAssetChild(handler);
 							}
@@ -137,6 +140,8 @@ package org.smilkit.render
 				{
 					this._canvas.addChild(this._regions[j]);
 				}
+				
+				Logger.debug("Re-drawn "+this._regions.length+" regions to the DrawingBoard's Canvas", this);
 			}
 		}
 		
@@ -153,6 +158,8 @@ package org.smilkit.render
 				
 				this._regions = new Vector.<RegionContainer>();
 			}
+			
+			Logger.debug("Removed drawn regions", this);
 		}
 		
 		/**
@@ -167,6 +174,8 @@ package org.smilkit.render
 				// we need to go through the regions and delete em
 				this.removeRegions();
 			}
+			
+			Logger.debug("Resetting the DrawingBoard and Canvas state", this);
 			
 			this._elements = new Vector.<TimingNode>();
 			this._canvas = new Sprite();
