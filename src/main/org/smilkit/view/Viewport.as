@@ -725,10 +725,11 @@ package org.smilkit.view
 			// See onRenderTreeReady for the deferred dispatch to this method.
 			// Note that when this method is called by setPlaybackState, the playbackState has already 
 			// been altered and it is only the post state-change operation itself that is deferred.
+			this.loadScheduler.start();
+
 			if(!this._waitingForRenderTree)
 			{
 				Logger.info("Playback state changed to PLAYBACK_PLAYING.", this);
-				this.loadScheduler.start();
 				this.heartbeat.resume();
 			}
 			else
@@ -771,12 +772,15 @@ package org.smilkit.view
 		protected function onRenderTreeReady(event:RenderTreeEvent):void
 		{
 			Logger.info("Ready to play.", this);
-			this._waitingForRenderTree = false;		
 			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
-			if(this._waitingForRenderTree && this._playbackState == Viewport.PLAYBACK_PLAYING) 
+			if(this._waitingForRenderTree)
 			{
-				Logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
-				this.onPlaybackStateChangedToPlaying();
+				this._waitingForRenderTree = false;
+				if(this._playbackState == Viewport.PLAYBACK_PLAYING)
+				{
+					Logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
+					this.onPlaybackStateChangedToPlaying();
+				}				
 			}				
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
