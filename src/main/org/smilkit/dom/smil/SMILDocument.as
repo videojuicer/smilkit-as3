@@ -3,6 +3,7 @@ package org.smilkit.dom.smil
 	import flash.errors.IllegalOperationError;
 	
 	import org.smilkit.dom.Document;
+	import org.smilkit.dom.Element;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
@@ -81,6 +82,13 @@ package org.smilkit.dom.smil
 		
 		public function get dur():Number
 		{
+			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
+			
+			if (body != null)
+			{
+				return body.dur;
+			}
+			
 			return 0;
 		}
 		

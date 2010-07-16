@@ -3,6 +3,7 @@ package org.smilkit.time
 	import flash.events.EventDispatcher;
 	
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
@@ -85,10 +86,18 @@ package org.smilkit.time
 		protected function iterateTree(node:INode):void
 		{
 			var nodes:INodeList = node.childNodes;
+			var containers:Vector.<ElementTimeContainer> = new Vector.<ElementTimeContainer>();
 			
 			for (var i:int = 0; i < nodes.length; i++)
 			{
 				var child:INode = nodes.item(i);
+				
+				if (child is ElementTimeContainer)
+				{
+					var container:ElementTimeContainer = (child as ElementTimeContainer);
+					
+					containers.push(container);
+				}
 				
 				if (child is ISMILMediaElement)
 				{
@@ -126,6 +135,16 @@ package org.smilkit.time
 				if (child.hasChildNodes())
 				{
 					this.iterateTree(child);
+				}
+			}
+			
+			if (containers.length > 0)
+			{
+				for (var j:int = containers.length-1; j >= 0; j--)
+				{
+					var timeContainer:ElementTimeContainer = containers[j];
+					
+					timeContainer.resolve();
 				}
 			}
 		}

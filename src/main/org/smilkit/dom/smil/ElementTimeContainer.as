@@ -59,7 +59,7 @@ package org.smilkit.dom.smil
 		}
 		
 		public function get dur():Number
-		{
+		{	
 			if (this._durationParser == null)
 			{
 				this._durationParser = new SMILTimeParser(this, this.getAttribute("dur"));

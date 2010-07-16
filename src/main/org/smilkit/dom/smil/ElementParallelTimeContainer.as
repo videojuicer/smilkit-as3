@@ -25,5 +25,35 @@ package org.smilkit.dom.smil
 		{
 			return 0;
 		}
+		
+		public override function get dur():Number
+		{
+			var duration:Number = super.dur;
+			
+			if (this.hasChildNodes() && duration == 0)
+			{
+				var childDuration:Number = 0;
+				
+				for (var i:int = 0; i < this.childNodes.length; i++)
+				{
+					if (this.childNodes.item(i) is ElementTimeContainer)
+					{
+						var container:ElementTimeContainer = (this.childNodes.item(i) as ElementTimeContainer);
+						
+						if (container.dur > childDuration)
+						{
+							childDuration = container.dur;
+						}
+					}
+				}
+				
+				if (childDuration != 0)
+				{
+					return childDuration;
+				}
+			}
+			
+			return duration;
+		}
 	}
 }

@@ -177,7 +177,7 @@ package org.smilkit.dom.smil
 			}
 			else
 			{
-				var dur:Number = (this._baseElement as ISMILMediaElement).dur;
+				var dur:Number = (this._baseElement as ElementTimeContainer).dur;
 				
 				this._resolved = true;
 				this._resolvedOffset = previousDuration + dur;
