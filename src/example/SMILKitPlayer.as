@@ -48,6 +48,8 @@ package
 			menu.hideBuiltInItems();
 			menu.customItems.push(this.createMenuItem("Resume", this.onResumeMenuItem));
 			menu.customItems.push(this.createMenuItem("Pause", this.onPauseMenuItem));
+			menu.customItems.push(this.createMenuItem("Mute", this.onMuteMenuItem, true));
+			menu.customItems.push(this.createMenuItem("Unmute", this.onUnmuteMenuItem));
 			menu.customItems.push(this.createMenuItem("Seek 0%", this.onSeek0MenuItem, true));
 			menu.customItems.push(this.createMenuItem("Seek 25%", this.onSeek25MenuItem));
 			menu.customItems.push(this.createMenuItem("Seek 50%", this.onSeek50MenuItem));
@@ -75,6 +77,16 @@ package
 		protected function onPauseMenuItem(e:ContextMenuEvent):void
 		{
 			this._viewport.pause();
+		}
+		
+		protected function onMuteMenuItem(e:ContextMenuEvent):void
+		{
+			this._viewport.mute();
+		}
+		
+		protected function onUnmuteMenuItem(e:ContextMenuEvent):void
+		{
+			this._viewport.unmute();
 		}
 		
 		protected function onSeek0MenuItem(e:ContextMenuEvent):void
