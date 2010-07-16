@@ -371,7 +371,7 @@ package org.smilkit.handler
 				this._completedResolving = true;
 				
 				// here we update the dom
-				if (this.element != null && this.element.dur == Time.UNRESOLVED)
+				if (this.element != null && (this.element.dur == Time.UNRESOLVED || this.element.dur == 0))
 				{
 					this.element.dur = this._duration;
 				}
