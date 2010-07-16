@@ -56,7 +56,7 @@ package org.smilkit.spec.tests.dom
 			contentTime.resolve();
 			contentEnd.resolve();
 			
-			Assert.assertEquals(70, contentEnd.resolvedOffset);
+			Assert.assertEquals(70000, contentEnd.resolvedOffset);
 		}
 		
 		[Test(description="Tests resolving a flat-packed set of parallel assets, i.e. all the times are defined in the SMIL")]
@@ -97,8 +97,8 @@ package org.smilkit.spec.tests.dom
 			contentTime.resolve();
 			contentEnd.resolve();
 			
-			Assert.assertEquals(10, prerollEnd.resolvedOffset);
-			Assert.assertEquals(60, contentEnd.resolvedOffset);
+			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
+			Assert.assertEquals(60000, contentEnd.resolvedOffset);
 			
 			//parentEnd.resolve();
 			//Assert.assertEquals(60, parentEnd.resolvedOffset);
