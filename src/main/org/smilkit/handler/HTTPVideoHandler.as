@@ -181,10 +181,10 @@ package org.smilkit.handler
 			super.cancel();
 		}
 		
-		protected function onHeartbeatTick(e:TimeEvent):void
+		protected function onHeartbeatTick(e:TimerEvent):void
 		{
 			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
-			var durationLoaded:Number = (percentageLoaded / 100) * this.duration;
+			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
 			
 			// if were not already ready, check if we are
 			if (!this._loadReady)

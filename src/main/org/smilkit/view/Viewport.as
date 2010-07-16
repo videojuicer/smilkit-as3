@@ -169,9 +169,13 @@ package org.smilkit.view
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
+			
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
 			this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			
 			this._drawingBoard = new DrawingBoard();
+			
+			this._heartbeat.start();
 			this.pause();
 		}
 		

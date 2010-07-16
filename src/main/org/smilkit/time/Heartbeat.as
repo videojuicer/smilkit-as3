@@ -56,12 +56,12 @@ package org.smilkit.time
 		{
 			super(delay, 0);
 			
-			this.addEventListener(TimerEvent.TIMER, this.onTimer, false);
+			this.addEventListener(TimerEvent.TIMER, this.onTimer);
 			
 			this._baseline = new Date();
 			this._offset = 0;
 			
-			super.start();
+			//this.start();
 		}
 		
 		/**
@@ -123,7 +123,10 @@ package org.smilkit.time
 		 */
 		public override function start():void
 		{
-			// no starting
+			if (!super.running)
+			{
+				super.start();
+			}
 		}
 		
 		/**
@@ -147,6 +150,7 @@ package org.smilkit.time
 			
 			super.stop();
 			super.reset();
+			super.start();
 		}
 		
 		/**
