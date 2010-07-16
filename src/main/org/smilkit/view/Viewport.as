@@ -559,6 +559,7 @@ package org.smilkit.view
 				// Register a basic state change
 				this._previousPlaybackState = this._playbackState;
 				this._playbackState = newState;
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
 				switch(this._playbackState)
 				{
 					case Viewport.PLAYBACK_PLAYING:
@@ -574,7 +575,6 @@ package org.smilkit.view
 						this.onPlaybackStateChangedToSeekingWithOffset(offset);
 						break;
 				}
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
 				return true;
 			}
 			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)

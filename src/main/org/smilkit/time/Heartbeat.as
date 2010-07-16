@@ -4,6 +4,7 @@ package org.smilkit.time
 	import flash.utils.Timer;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.events.HeartbeatEvent;
 	
 	/**
@@ -140,6 +141,7 @@ package org.smilkit.time
 		
 		public override function reset():void
 		{
+			Logger.debug("Heartbeat resetting.", this);
 			this.pause();
 			
 			this._baseline = new Date();
@@ -166,6 +168,7 @@ package org.smilkit.time
 			}
 			else
 			{
+				Logger.debug("Heartbeat resumed.", this);
 				this._running = true;
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RESUMED, this.runningOffset));
 				return true;
@@ -182,6 +185,7 @@ package org.smilkit.time
 		{
 			if(this.running)
 			{
+				Logger.debug("Heartbeat paused.", this);
 				this.onTimer(null);	// Run the timer one last time to set the current baseline time and ensure that all time increments are properly accounted for.		
 				this._running = false;
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.PAUSED, this.runningOffset));

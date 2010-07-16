@@ -307,11 +307,11 @@ package org.smilkit.load {
 		}
 		
 		protected function logInfo(msg:String):void {
-			Logger.info("Worker : "+this.loggerName+" : "+msg, {"self": this, "priorityWorker": this._priorityWorker});
+			Logger.info("Worker : "+this.loggerName+" : "+msg, this);
 		}
 		
 		protected function logDebug(msg:String):void {
-			Logger.debug("Worker : "+this.loggerName+" : "+msg, {"self": this, "priorityWorker": this._priorityWorker});
+			Logger.debug("Worker : "+this.loggerName+" : "+msg, this);
 		}
 		
 		

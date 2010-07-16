@@ -421,6 +421,8 @@ package org.smilkit.render
 					// remove non active, existing elements
 					if (!activeNow && alreadyExists)
 					{
+						Logger.debug("Handler removed from RenderTree during update at "+offset+"ms", handler);
+						
 						this._lastChangeOffset = offset;
 						
 						if (handler.hasEventListener(HandlerEvent.LOAD_WAITING))
@@ -437,8 +439,6 @@ package org.smilkit.render
 						// remove from load wait list
 						this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
 						
-						Logger.debug("Handler removed from RenderTree during update at "+offset+"ms", handler);
-						
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 						
@@ -450,6 +450,8 @@ package org.smilkit.render
 						// only add to the canvas, when the element hasnt existed before
 						if (!alreadyExists)
 						{
+							Logger.debug("Handler added to RenderTree during update at "+offset+"ms", handler);
+							
 							this._lastChangeOffset = offset;
 							
 							// we add our listeners for the dependancy management
@@ -467,9 +469,7 @@ package org.smilkit.render
 									syncAfterUpdate = true;
 								}
 							}
-							
-							Logger.debug("Handler added to RenderTree during update at "+offset+"ms", handler);
-							
+						
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
@@ -480,9 +480,9 @@ package org.smilkit.render
 							
 							if (time === previousTime && time != previousTime)
 							{
-								this._lastChangeOffset = offset;
-								
 								Logger.debug("Element modified on RenderTree during update at "+offset+"ms", handler);
+								
+								this._lastChangeOffset = offset;
 								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
