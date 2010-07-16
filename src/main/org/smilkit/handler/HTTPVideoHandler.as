@@ -293,9 +293,9 @@ package org.smilkit.handler
 			
 			Logger.info("Metadata recieved: "+this._metadata.toString());
 				
-			this.resolved(this._metadata.duration);
-			
 			this._netStream.pause();
+			
+			this.resolved(this._metadata.duration);
 		}
 		
 		public static function toHandlerMap():HandlerMap
