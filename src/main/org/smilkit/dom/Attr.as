@@ -63,12 +63,24 @@ package org.smilkit.dom
 		
 		public function set value(value:String):void
 		{
+			var oldValue:String = this.value;
+			var document:Document = (this.ownerDocument as Document);
+			
 			this._value = value;
+				
+			if (document.mutationEvents)
+			{
+				document.modifiedAttrValue(this, oldValue);
+			}
+			else
+			{
+				this.changed();
+			}
 		}
 		
 		public override function get nodeValue():String
 		{
-			return this.value.toString();
+			return this.value;
 		}
 		
 		public override function set nodeValue(nodeValue:String):void
