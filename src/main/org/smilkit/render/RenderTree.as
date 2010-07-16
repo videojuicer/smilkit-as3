@@ -280,12 +280,14 @@ package org.smilkit.render
 		*/
 		protected function cancelOffsetSync():void
 		{
-			Logger.debug("Cancelling sync operation.", this);
-			
-			this._waitingForSync = false;
-			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
-			this._offsetSyncOffsetList = new Vector.<uint>();
-			this.syncHandlersToViewportState();
+			if(this._waitingForSync)
+			{
+				Logger.debug("Cancelling a running sync operation.", this);
+				this._waitingForSync = false;
+				this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+				this._offsetSyncOffsetList = new Vector.<uint>();
+				this.syncHandlersToViewportState();
+			}
 		}
 		
 		/**
@@ -618,12 +620,13 @@ package org.smilkit.render
 			{
 				case Viewport.PLAYBACK_SEEKING:
 					this.cancelOffsetSync();
-					
+					Logger.debug("Scheduling a new sync wait cycle to begin on the next Viewport state change to PLAYBACK_PLAYING", this);
 					this._performOffsetSyncOnNextResume = true;
 					break;
 				case Viewport.PLAYBACK_PLAYING:
 					if (this._performOffsetSyncOnNextResume)
 					{
+						Logger.debug("About to run a scheduled sync wait cycle.", this);
 						this.syncHandlersToViewportOffset();
 						this._performOffsetSyncOnNextResume = false;
 					}
