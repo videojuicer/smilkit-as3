@@ -100,7 +100,7 @@ package org.smilkit.parsers
 				// seconds
 				else if (this._timeString.indexOf("s") != -1)
 				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 1000; 
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("s"))) * 1000; 
 				}
 				// milliseconds value
 				else if (this._timeString.indexOf("ms") != -1)
