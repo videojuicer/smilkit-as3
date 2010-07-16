@@ -121,7 +121,7 @@ package org.smilkit.handler
 			this._video.attachNetStream(this._netStream as NetStream);
 			
 			// dont want to actually play it back right now
-		
+			
 			this._canvas.addChild(this._video);
 			
 			this._startedLoading = true;
@@ -177,6 +177,11 @@ package org.smilkit.handler
 			
 			this._netConnection = null;
 			this._netStream = null;
+			
+			for (var i:int = 0; i < this._canvas.numChildren; i++)
+			{
+				this._canvas.removeChildAt(i);
+			}
 			
 			super.cancel();
 		}
