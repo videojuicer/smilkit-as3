@@ -11,6 +11,7 @@ package org.smilkit.render
 	
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
@@ -198,7 +199,8 @@ package org.smilkit.render
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
 				
-				this._renderTree.timingGraph.viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+				this._renderTree.timingGraph.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+				this._renderTree.timingGraph.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			}
 			
 			var parentWidth:Number = 0;
@@ -304,7 +306,12 @@ package org.smilkit.render
 			this.draw();
 		}
 		
-		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
+		protected function onHeartbeatPaused(e:HeartbeatEvent):void
+		{
+			this.draw();
+		}
+		
+		protected function onHeartbeatResumed(e:HeartbeatEvent):void
 		{
 			this.reset();
 			this.draw();
