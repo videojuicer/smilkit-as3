@@ -72,6 +72,11 @@ package org.smilkit.handler
 		
 		public override function get syncPoints():Vector.<int>
 		{
+			if (this._metadata == null)
+			{
+				return super.syncPoints;
+			}
+			
 			return this._metadata.syncPoints;
 		}
 
