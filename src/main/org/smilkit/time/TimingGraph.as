@@ -70,6 +70,8 @@ package org.smilkit.time
 		 */		
 		public function rebuild():void
 		{
+			this._elements = new Vector.<TimingNode>();
+			
 			// only go from the body, no point running through the other parts of a smil document
 			this.iterateTree(this.document.getElementsByTagName("body").item(0) as INode);
 			this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.REBUILD));
