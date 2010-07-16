@@ -4,19 +4,19 @@ package org.smilkit.render
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	
-	import org.smilkit.util.logger.Logger;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
-	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -405,6 +405,8 @@ package org.smilkit.render
 				var newActiveElements:Vector.<TimingNode> = new Vector.<TimingNode>();
 				var syncAfterUpdate:Boolean = false;
 				
+				// make a copy of the elements so we can update the list without causing loop issues
+				
 				for (var i:int = 0; i < elements.length; i++)
 				{
 					var time:TimingNode = elements[i];
@@ -430,6 +432,9 @@ package org.smilkit.render
 							handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 						}
+						
+						// remove from the list
+						this._activeElements.splice(previousIndex, 1);
 						
 						// pause playback, we let the loadScheduler handles cancelling the loading
 						handler.pause();
@@ -458,12 +463,15 @@ package org.smilkit.render
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 							
+							this._activeElements.push(time);
+							
 							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
 							// viewport is currently playing.
 							if(!syncAfterUpdate && handler.seekable && this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 							{
 								var clipBeginParser:SMILTimeParser = new SMILTimeParser(time.element, time.element.clipBegin);
+								
 								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (time.begin < offset )))
 								{
 									syncAfterUpdate = true;
@@ -484,18 +492,19 @@ package org.smilkit.render
 								
 								this._lastChangeOffset = offset;
 								
+								// dont add or remove the handler from the list
+								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
 						}
-						
-						// always add to the new active list
-						newActiveElements.push(time);
 					}
 				}
-				// swap with new list
-				this._activeElements = newActiveElements;
+
 				// Perform the sync if we flagged up that one is needed
-				if(syncAfterUpdate) this.syncHandlersToViewportOffset();
+				if(syncAfterUpdate) 
+				{
+					this.syncHandlersToViewportOffset();
+				}
 			}
 		}
 		
