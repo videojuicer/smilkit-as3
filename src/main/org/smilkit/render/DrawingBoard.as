@@ -12,6 +12,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.TimingNode;
 	import org.smilkit.util.logger.Logger;
@@ -76,6 +77,10 @@ package org.smilkit.render
 				
 				if (elements != null)
 				{
+					Logger.debug("Attempting to draw "+elements.length+" handlers to the Canvas", this);
+					
+					var drawnCount:int = 0;
+					
 					for (var i:int = 0; i < elements.length; i++)
 					{
 						var time:TimingNode = elements[i];
@@ -93,6 +98,7 @@ package org.smilkit.render
 								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 								
 								Logger.debug("Adding Handler to region '"+regionId+"' on the DrawingBoard", handler);
+								drawnCount++;
 								
 								// place the element on to the region it belongs too
 								region.regionContainer.addAssetChild(handler);
@@ -100,6 +106,11 @@ package org.smilkit.render
 							
 							this._elements.push(time);
 						}
+					}
+					
+					if (drawnCount > 0)
+					{
+						Logger.debug("Drawn "+drawnCount+" handlers to the Canvas", this);
 					}
 				}
 			}
@@ -186,6 +197,8 @@ package org.smilkit.render
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onRenderTreeElementRemoved);
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
+				
+				this._renderTree.timingGraph.viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
 			}
 			
 			var parentWidth:Number = 0;
@@ -270,7 +283,7 @@ package org.smilkit.render
 		
 		protected function onRenderTreeElementAdded(e:RenderTreeEvent):void
 		{
-			this.draw(); 
+			this.draw();
 		}
 		
 		protected function onRenderTreeElementRemoved(e:RenderTreeEvent):void
@@ -286,6 +299,12 @@ package org.smilkit.render
 		}
 		
 		protected function onRenderTreeElementReplaced(e:RenderTreeEvent):void
+		{
+			this.reset();
+			this.draw();
+		}
+		
+		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
 		{
 			this.reset();
 			this.draw();
