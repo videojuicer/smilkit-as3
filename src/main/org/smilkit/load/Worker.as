@@ -95,6 +95,7 @@ package org.smilkit.load {
 		public function start():Boolean {
 			if(!this.working) 
 			{
+				this.logDebug("Starting up.");
 				this._working = true;
 				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STARTED, this));
 				this.advance();
@@ -109,6 +110,7 @@ package org.smilkit.load {
 		public function stop():Boolean {
 			if(this.working) 
 			{
+				this.logDebug("Shutting down.");
 				this._working = false;
 				this._idleOnLastAdvance = false; // Reset idle event flag
 				this.dispatchEvent(new WorkerEvent(WorkerEvent.WORKER_STOPPED, this));
@@ -267,22 +269,22 @@ package org.smilkit.load {
 		}
 		
 		public function onPriorityWorkerStarted(e:WorkerEvent):void {
-			this.logInfo("Priority worker started up. Ceding priority and shutting down.");
+			this.logDebug("Priority worker started up. Ceding priority and shutting down.");
 			this.stop();
 		}
 		
 		public function onPriorityWorkerStopped(e:WorkerEvent):void {
-			this.logInfo("Priority worker shut down. Shutting down in turn.");
+			this.logDebug("Priority worker shut down. Shutting down in turn.");
 			this.stop();
 		}
 		
 		public function onPriorityWorkerIdle(e:WorkerEvent):void {
-			this.logInfo("Priority worker active but sitting idle. Starting up for opportunistic actions.");
+			this.logDebug("Priority worker active but sitting idle. Starting up for opportunistic actions.");
 			this.start();
 		}
 		
 		public function onPriorityWorkerResumed(e:WorkerEvent):void {
-			this.logInfo("Priority worker was idling but has now resumed. Ceding priority and shutting down.");
+			this.logDebug("Priority worker was idling but has now resumed. Ceding priority and shutting down.");
 			this.stop();
 		}
 		
@@ -305,11 +307,11 @@ package org.smilkit.load {
 		}
 		
 		protected function logInfo(msg:String):void {
-			Logger.info("Worker : "+this.loggerName+" "+msg, {"self": this, "priorityWorker": this._priorityWorker});
+			Logger.info("Worker : "+this.loggerName+" : "+msg, {"self": this, "priorityWorker": this._priorityWorker});
 		}
 		
 		protected function logDebug(msg:String):void {
-			Logger.debug("Worker : "+this.loggerName+" "+msg, {"self": this, "priorityWorker": this._priorityWorker});
+			Logger.debug("Worker : "+this.loggerName+" : "+msg, {"self": this, "priorityWorker": this._priorityWorker});
 		}
 		
 		

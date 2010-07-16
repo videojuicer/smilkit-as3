@@ -437,7 +437,7 @@ package org.smilkit.render
 						// remove from load wait list
 						this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
 						
-						Logger.debug("Handler removed from RenderTree", handler);
+						Logger.debug("Handler removed from RenderTree during update at "+offset+"ms", handler);
 						
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
@@ -468,7 +468,7 @@ package org.smilkit.render
 								}
 							}
 							
-							Logger.debug("Handler added to RenderTree", handler);
+							Logger.debug("Handler added to RenderTree during update at "+offset+"ms", handler);
 							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
@@ -482,7 +482,7 @@ package org.smilkit.render
 							{
 								this._lastChangeOffset = offset;
 								
-								Logger.debug("Element modified on RenderTree", handler);
+								Logger.debug("Element modified on RenderTree during update at "+offset+"ms", handler);
 								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
