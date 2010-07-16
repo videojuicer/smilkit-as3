@@ -6,6 +6,7 @@ package org.smilkit.handler
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
@@ -289,6 +290,8 @@ package org.smilkit.handler
 		 */
 		public function movedToJustInTimeWorkList():void
 		{
+			Logger.debug("Handler moved to just in time worker's worklist", this);
+			
 			if (!this.startedLoading)
 			{
 				this.load();
@@ -309,6 +312,8 @@ package org.smilkit.handler
 		 */
 		public function movedToPreloadWorkList():void
 		{
+			Logger.debug("Handler moved to preload worker's worklist", this);
+			
 			if (!this.startedLoading && this.preloadable)
 			{
 				this.load();
@@ -326,6 +331,8 @@ package org.smilkit.handler
 		 */
 		public function movedToResolveWorkList():void
 		{
+			Logger.debug("Handler moved to resolve worker's worklist", this);
+			
 			if (!this.startedLoading && this.resolvable)
 			{
 				this.load();
@@ -354,6 +361,8 @@ package org.smilkit.handler
 		 */
 		protected function resolved(resolvedDuration:int):void
 		{
+			Logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
+			
 			this._duration = resolvedDuration;
 			this._completedResolving = true;
 			

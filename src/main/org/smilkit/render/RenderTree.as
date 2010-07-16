@@ -361,6 +361,7 @@ package org.smilkit.render
 
 				if (index >= 0)
 				{
+					Logger.debug("Handler removed from RenderTree's sync wait list", handler);
 					this._offsetSyncHandlerList.splice(index, 1);
 					this._offsetSyncOffsetList.splice(index, 1);
 					this.checkSyncOperation();
@@ -379,6 +380,7 @@ package org.smilkit.render
 
 				if (index >= 0)
 				{
+					Logger.debug("Handler removed from RenderTree's load wait list", handler);
 					this._waitingForDataHandlerList.splice(index, 1);
 					this.checkLoadState();
 				}
@@ -435,9 +437,11 @@ package org.smilkit.render
 						// remove from load wait list
 						this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
 						
+						Logger.debug("Handler removed from RenderTree", handler);
+						
 						// remove from canvas
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
-	
+						
 						// dont add to new vector
 					}
 						// add active, non existant elements
@@ -464,6 +468,8 @@ package org.smilkit.render
 								}
 							}
 							
+							Logger.debug("Handler added to RenderTree", handler);
+							
 							// actually draw element to canvas ....
 							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
@@ -475,6 +481,8 @@ package org.smilkit.render
 							if (time === previousTime && time != previousTime)
 							{
 								this._lastChangeOffset = offset;
+								
+								Logger.debug("Element modified on RenderTree", handler);
 								
 								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 							}
