@@ -533,6 +533,7 @@ package org.smilkit.view
 		*/
 		public function commitSeek():Boolean
 		{
+			Logger.info("Seek operation committed. Reverting to previous playback state at offset: "+this.offset, this);
 			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
 			{
 				this.revertPlaybackState();
@@ -555,7 +556,7 @@ package org.smilkit.view
 		{
 			if(newState != this._playbackState)
 			{
-				Logger.info("About to change playback state to "+newState+".", this);
+				Logger.info("Playback state set to to "+newState+".", this);
 				// Register a basic state change
 				this._previousPlaybackState = this._playbackState;
 				this._playbackState = newState;
@@ -579,7 +580,7 @@ package org.smilkit.view
 			}
 			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
 			{
-				Logger.info("About to change playback state to "+newState+" (offset: "+offset+").", this);
+				Logger.info("Playback state set to "+newState+" (offset: "+offset+").", this);
 				// Register a special case for changing offset while seeking
 				this._previousUncommittedSeekOffset = offset;
 				this.onPlaybackStateChangedToSeekingWithOffset(offset);
@@ -729,7 +730,7 @@ package org.smilkit.view
 
 			if(!this._waitingForRenderTree)
 			{
-				Logger.info("Playback state changed to PLAYBACK_PLAYING.", this);
+				Logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
 				this.heartbeat.resume();
 			}
 			else
@@ -740,13 +741,13 @@ package org.smilkit.view
 		
 		protected function onPlaybackStateChangedToPaused():void
 		{
-			Logger.info("Playback state changed to PLAYBACK_PAUSED.", this);
+			Logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
 			this.heartbeat.pause();
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
-			Logger.info("Playback state changed to PLAYBACK_SEEKING with offset: "+offset+".", this);
+			Logger.info("Completed changing playback state to PLAYBACK_SEEKING with offset: "+offset+".", this);
 			this.loadScheduler.stop();
 			this.heartbeat.pause();
 			this.heartbeat.seek(offset);
