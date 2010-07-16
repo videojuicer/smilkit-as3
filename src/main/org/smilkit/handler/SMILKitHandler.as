@@ -363,18 +363,21 @@ package org.smilkit.handler
 		 */
 		protected function resolved(resolvedDuration:int):void
 		{
-			Logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
-			
-			this._duration = resolvedDuration;
-			this._completedResolving = true;
-			
-			// here we update the dom
-			if (this.element != null && this.element.dur == Time.UNRESOLVED)
+			if (!this._completedResolving)
 			{
-				this.element.dur = this._duration;
+				Logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
+				
+				this._duration = resolvedDuration;
+				this._completedResolving = true;
+				
+				// here we update the dom
+				if (this.element != null && this.element.dur == Time.UNRESOLVED)
+				{
+					this.element.dur = this._duration;
+				}
+				
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));
 			}
-			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));
 		}
 		
 		/**
