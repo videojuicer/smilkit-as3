@@ -207,10 +207,8 @@ package org.smilkit.render
 		* We sync either when resuming playback after a seek, or when adding an asset to the RenderTree that needs to start
 		* at a non-zero offset.
 		*
-		* The sync cycle is limited to handler instances that are known to have a limited set of seekable offsets.
-		* Each eligible handler is seeked to the nearest keyframe before the desired offset, and then allowed to play
-		* (while muted) to the requested arbitrary offset before being paused. When all eligible handlers have been
-		* synced to the desired offset, playback proper may resume.
+		* SMILKit considers every seek operation to be asynchronous; therefore all seekable assets are added to the wait list
+		* until they have finished their seek.
 		* 
 		* A sync cycle is a "wait" operation and holds playback in a similar manner to waiting for more data to load.
 		* A RenderTreeEvent.READY event will be dispatched when the sync cycle completes, if the render tree is not waiting
@@ -222,6 +220,8 @@ package org.smilkit.render
 		* The only exception to the sync cycle is made for video assets with extremely infrequent keyframes. If a handler's
 		* nearest prior seek point is outside of a predefined tolerance range, then we will settle for the nearest forward
 		* seek point, compromising sync accuracy for a speedy resume when a video asset is extremely heavily or poorly-compressed.
+		*
+		* @see org.smilkit.render.RenderTree.onHandlerSeekNotify
 		*/
 		public function syncHandlersToViewportOffset():void
 		{
@@ -238,40 +238,41 @@ package org.smilkit.render
 			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
 			this._offsetSyncOffsetList = new Vector.<uint>();
 			
+			// Loop over all handlers
 			for (var i:int = 0; i < this.elements.length; i++)
 			{
 				var node:TimingNode = this.elements[i];
-				// TODO include clip-begin into the equation
-				var offset:uint = (this._objectPool.viewport.offset - node.begin);
-				var nearestSyncPoint:Number = node.mediaElement.handler.findNearestSyncPoint(offset);
+				var handler:SMILKitHandler = (node.mediaElement.handler as SMILKitHandler);
 				
-				if (nearestSyncPoint < offset)
+				if(handler.seekable)
 				{
-					node.mediaElement.handler.seek(nearestSyncPoint);
+					// Only include seekable handlers in the sync
 					
-					node.mediaElement.handler.setVolume(0);
-					node.mediaElement.handler.resume();
+					// Calculate the destination seek offset
+					// TODO include clip-begin into the equation
+					var offset:uint = (this._objectPool.viewport.offset - node.begin);
+					var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
+					var destinationOffset:Number = (nearestSyncPoint < offset)? nearestSyncPoint : offset;
+
+					handler.seek(destinationOffset); // The SEEK_NOTIFY operation dispatched by this call will continue the sync for this handler.
+
+					this._offsetSyncHandlerList.push(handler);
+					this._offsetSyncOffsetList.push(offset);
 					
-					this._offsetSyncHandlerList.push(node.mediaElement.handler);
-					this._offsetSyncOffsetList.push(nearestSyncPoint);
 				}
-				else
-				{
-					node.mediaElement.handler.seek(offset);
-				}
+			}
+			
+			if (this._offsetSyncHandlerList.length > 0)
+			{
+				Logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
 				
-				if (this._offsetSyncHandlerList.length > 0)
-				{
-					Logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
-					
-					this._waitingForSync = true;
-					
-					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
-				} 
-				else
-				{
-					Logger.debug("No handlers require sync at this time.", this)
-				}
+				this._waitingForSync = true;
+				
+				this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+			} 
+			else
+			{
+				Logger.debug("No handlers require sync at this time.", this)
 			}
 		}
 		
@@ -304,31 +305,27 @@ package org.smilkit.render
 			{
 				Logger.debug("Checking sync operation...", this);
 				
-				var removeIndexes:Array = new Array();
+				var removeHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
 				
 				for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)
 				{
 					var waitHandler:SMILKitHandler = this._offsetSyncHandlerList[i];
 					var waitOffset:uint = this._offsetSyncOffsetList[i];
 					
-					if (waitHandler.currentOffset >= this._objectPool.viewport.offset)
+					if (waitHandler.currentOffset >= waitOffset)
 					{
+						Logger.debug("A handler is synced to "+waitHandler.currentOffset+" (target was "+waitOffset+"). Will remove from sync wait list.", this);
 						// Sync is complete on this handler.
-						
-						//
-						removeIndexes.push(i);
-						// 
-						waitHandler.pause();
-						
+						removeHandlers.push(waitHandler);
+						waitHandler.pause();						
 						// TODO add to stage here??
 					}
 				}
 				
 				// work backwards to avoid a fuck up with the indexes in mid-loop
-				for (var j:uint = removeIndexes.length - 1; j >= 0; j--)
+				for (var j:int = 0; j < removeHandlers.length; j++)
 				{
-					this._offsetSyncHandlerList.splice(j, 1);
-					this._offsetSyncOffsetList.splice(j, 1);
+					this.removeHandlerFromWaitingForSyncList(waitHandler);
 				}
 				
 				if (this._offsetSyncHandlerList.length < 1)
@@ -348,6 +345,31 @@ package org.smilkit.render
 				else
 				{
 					Logger.debug("Waiting on "+this._offsetSyncHandlerList.length+" handlers to sync before sync operation complete.", this);
+				}
+			}
+		}
+		
+		/**
+		* Called when any of the RenderTree's handlers completes an asynchronous seek event.
+		*/
+		protected function onHandlerSeekNotify(event:HandlerEvent):void
+		{
+			var waitHandler:SMILKitHandler = event.handler;
+			var index:int = this._offsetSyncHandlerList.indexOf(waitHandler);
+			if(index >= 0)
+			{
+				var waitOffset:uint = this._offsetSyncOffsetList[index];
+				if(waitHandler.currentOffset < waitOffset)
+				{
+					Logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation unacceptable - starting catchup playback.", this);
+					waitHandler.setVolume(0);
+					waitHandler.resume();
+				}
+				else
+				{
+					Logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation acceptable - removing from wait list.", this);
+					waitHandler.pause();
+					this.removeHandlerFromWaitingForSyncList(waitHandler);
 				}
 			}
 		}
@@ -434,6 +456,7 @@ package org.smilkit.render
 						{
 							handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+							handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 						}
 						
 						// remove from the list
@@ -465,6 +488,7 @@ package org.smilkit.render
 							// we add our listeners for the dependancy management
 							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+							handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 							
 							this._activeElements.push(time);
 							

@@ -143,6 +143,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
+				Logger.debug("Resuming playback.", this)
 				this._netStream.resume();
 			}
 		}
@@ -151,6 +152,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
+				Logger.debug("Pausing playback.", this)
 				this._netStream.pause();
 			}
 		}
@@ -159,6 +161,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
+				Logger.debug("Seeking internally to "+seekTo+"ms.", this);
 				this._netStream.seek(seekTo);
 			}
 		}

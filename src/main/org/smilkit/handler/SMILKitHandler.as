@@ -275,6 +275,8 @@ package org.smilkit.handler
 		 */
 		public function cancel():void
 		{
+			Logger.debug("Cancelling load operation.", this)
+			
 			this._completedLoading = false;
 			this._startedLoading = false;
 			
