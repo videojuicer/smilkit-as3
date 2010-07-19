@@ -203,8 +203,8 @@ package org.smilkit.handler
 		 */
 		public function findNearestSyncPoint(offset:Number):Number
 		{
-			var beforeSyncPoint:Number = offset;
-			var afterSyncPoint:Number = offset;
+			var beforeSyncPoint:Number = 0;
+			var afterSyncPoint:Number = Number.MAX_VALUE;
 			
 			if (this.syncable)
 			{
