@@ -28,7 +28,7 @@ package
 			// use default asset handlers
 			SMILKit.defaults();
 			
-			var smil:String = this.root.loaderInfo.parameters.hasOwnProperty("smil") ? this.root.loaderInfo.parameters['smil'] : "http://sixty.im/demo.smil?v="+Math.random();
+			var smil:String = this.root.loaderInfo.parameters.hasOwnProperty("smil") ? this.root.loaderInfo.parameters['smil'] : "http://sixty.im/regions.smil?v="+Math.random();
 			
 			this.stage.scaleMode = StageScaleMode.NO_SCALE;
 			this.stage.align = StageAlign.TOP_LEFT;
