@@ -171,8 +171,11 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Seeking internally to "+seekTo+"ms.", this);
-				this._netStream.seek(seekTo/1000);
+				var seconds:Number = (seekTo / 1000);
+				
+				Logger.debug("Seeking internally to "+seekTo+"ms ("+seconds+"s)", this);
+				
+				this._netStream.seek(seconds);
 			}
 		}
 		
