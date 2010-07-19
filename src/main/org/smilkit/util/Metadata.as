@@ -91,7 +91,7 @@ package org.smilkit.util
 				{
 					for (var i:int = 0; i < this.cuePoints.length; i++)
 					{
-						this._syncPoints.push(this.cuePoints[i][0]);
+						this._syncPoints.push(this.cuePoints[i].time * 1000);
 					}
 				}
 			}
