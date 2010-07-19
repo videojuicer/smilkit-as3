@@ -253,7 +253,16 @@ package org.smilkit.render
 					// TODO include clip-begin into the equation
 					var offset:uint = (this._objectPool.viewport.offset - node.begin);
 					var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
-					var destinationOffset:Number = (nearestSyncPoint < offset)? nearestSyncPoint : offset;
+					var destinationOffset:Number;
+					if(nearestSyncPoint < offset){
+						destinationOffset = nearestSyncPoint;
+						Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
+					}
+					else
+					{
+						destinationOffset = offset ;
+						Logger.debug("Syncing a handler using random access (since nearest syncpoint was "+nearestSyncPoint+"). Seeking handler to "+offset+"ms.", this);
+					};
 
 					handler.seek(destinationOffset); // The SEEK_NOTIFY operation dispatched by this call will continue the sync for this handler.
 
