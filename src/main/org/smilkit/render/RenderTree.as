@@ -67,6 +67,7 @@ package org.smilkit.render
 
 			// listener for every heart beat (so we recheck the timing graph)
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			this._objectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			
 			// listener for heartbeat stop/go events
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
@@ -303,8 +304,6 @@ package org.smilkit.render
 		{
 			if (this._waitingForSync)
 			{
-				Logger.debug("Checking sync operation...", this);
-				
 				var removeHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
 				
 				for (var i:int = 0; i < this._offsetSyncHandlerList.length; i++)

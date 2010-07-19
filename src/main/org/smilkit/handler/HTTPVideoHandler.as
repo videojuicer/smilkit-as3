@@ -162,7 +162,7 @@ package org.smilkit.handler
 			if (this._netStream != null)
 			{
 				Logger.debug("Seeking internally to "+seekTo+"ms.", this);
-				this._netStream.seek(seekTo);
+				this._netStream.seek(seekTo/1000);
 			}
 		}
 		
