@@ -254,6 +254,7 @@ package org.smilkit.load {
 		
 		public function onWorkUnitCompleted(e:HandlerEvent):void {
 			// dispatch WORK_UNIT_COMPLETED
+			this.logDebug("Work unit completed. About to remove handler from worklist.");
 			var h:SMILKitHandler = e.handler;
 			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_COMPLETED, h));
 			// removeHandler
@@ -262,6 +263,7 @@ package org.smilkit.load {
 		
 		public function onWorkUnitFailed(e:HandlerEvent):void {
 			// Dispatch WORK_UNIT_FAILED
+			this.logDebug("Work unit failed. About to remove handler from worklist.");
 			var h:SMILKitHandler = e.handler;
 			this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_FAILED, h));
 			// removeHandler

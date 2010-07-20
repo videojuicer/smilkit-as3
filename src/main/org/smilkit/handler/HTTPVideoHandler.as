@@ -286,23 +286,23 @@ package org.smilkit.handler
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
+			Logger.debug("Handler encountered an IO error during load.", this);
 			this.cancel();
-			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onSecurityErrorEvent(e:SecurityErrorEvent):void
 		{
-			this.cancel();
-			
+			Logger.debug("Handler encountered a security error during load.", this);
+			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			this.cancel();
-			
+			Logger.debug("Handler encountered an async error during load: "+e.error.name+", "+e.error.message, this);
+			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
