@@ -56,9 +56,14 @@ package org.smilkit.util
 			{
 				case "mp4a":
 					return "AAC";
+				default:
+					if (this.audioCodecId == null)
+					{
+						return "NON";
+					}
+					
+					return this.audioCodecId.toUpperCase();
 			}
-			
-			return this.audioCodecId.toUpperCase();
 		}
 		
 		/**
