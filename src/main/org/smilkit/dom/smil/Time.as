@@ -1,6 +1,5 @@
 package org.smilkit.dom.smil
 {
-	import org.osmf.events.TimeEvent;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
