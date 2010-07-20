@@ -254,7 +254,7 @@ package org.smilkit.render
 					var offset:uint = (this._objectPool.viewport.offset - node.begin);
 					var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
 					var destinationOffset:Number;
-					if(nearestSyncPoint < offset){
+					if(nearestSyncPoint <= offset){
 						destinationOffset = nearestSyncPoint;
 						Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
 					}
