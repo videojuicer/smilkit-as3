@@ -251,7 +251,7 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			Logger.debug("NetStatus Event on video: "+e.info.level+" "+e.info.code);
+			Logger.debug("NetStatus Event on video at internal offset "+this._netStream.time+"s: "+e.info.level+" "+e.info.code);
 			
 			switch (e.info.code)
 			{
