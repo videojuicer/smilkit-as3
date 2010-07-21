@@ -18,6 +18,7 @@ package
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.Viewport;
+	import org.smilkit.util.logger.Logger;
 	
 	public class SMILKitPlayer extends Sprite
 	{
@@ -134,7 +135,7 @@ package
 			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
 			this.graphics.endFill();
 			
-			trace("Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
+			Logger.info("SMILKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
 		}
 	}
 }
