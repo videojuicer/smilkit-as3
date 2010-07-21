@@ -211,6 +211,27 @@ package org.smilkit.handler
 			super.cancel();
 		}
 		
+		protected function readyToPlayAt(offset:int):Boolean
+		{
+			if (this.syncable)
+			{
+				offset = this.findNearestSyncPoint(offset);
+			}
+			
+			if (this._netStream != null)
+			{
+				var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
+				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
+				
+				if (durationLoaded <= offset)
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
 		protected function onHeartbeatTick(e:TimerEvent):void
 		{
 			if (this._netStream == null)
@@ -224,7 +245,7 @@ package org.smilkit.handler
 			// if were not already ready, check if we are
 			if (!this._loadReady)
 			{
-				if (durationLoaded >= (this._netStream.bufferTime * 1000))
+				if ((durationLoaded - this.currentOffset) >= (this._netStream.bufferTime * 1000))
 				{
 					// increase the buffer so we have more ready
 					//this._netStream.bufferTime = 30;
@@ -246,6 +267,15 @@ package org.smilkit.handler
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 				}
+			}
+			
+			if (percentageLoaded >= 100 && !this._completedLoading)
+			{
+				this._completedLoading = true;
+				
+				Logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
+				
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			}
 		}
 		
