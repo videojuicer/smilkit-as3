@@ -209,6 +209,12 @@ package org.smilkit.time
 			this._runningOffset = offset;
 			
 			this.onTimer(null);
+			
+			if(!this._running)
+			{
+				// If we're not running, the onTimer event will not dispatch this event. Seek is a special case that should dispatch it even when paused.
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.runningOffset));
+			}
 		}
 		
 		/**

@@ -31,6 +31,8 @@ package org.smilkit.handler
 		protected var _metadata:Metadata;
 		protected var _canvas:Sprite;
 		
+		protected var _resumed:Boolean = false;
+		
 		protected var _loadReady:Boolean = false;
 		
 		public function HTTPVideoHandler(element:IElement)
@@ -112,6 +114,8 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
+			this._resumed = false;
+			
 			this._netConnection = new NetConnection();
 			this._netConnection.connect(null);
 			
@@ -153,7 +157,8 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Resuming playback.", this)
+				Logger.debug("Resuming playback.", this);
+				this._resumed = true;
 				this._netStream.resume();
 			}
 		}
@@ -162,7 +167,8 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Pausing playback.", this)
+				Logger.debug("Pausing playback.", this);
+				this._resumed = false;
 				this._netStream.pause();
 			}
 		}
@@ -194,6 +200,8 @@ package org.smilkit.handler
 			{
 				this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
+			
+			this._resumed = false;
 			
 			this._netStream.close();
 			this._netConnection.close();
@@ -320,13 +328,16 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
-				
-				// since this is our first time, lets pause
-				this._netStream.pause();
 			}
 			else
 			{
 				this._metadata.update(info);
+			}
+			
+			if(!this._resumed)
+			{
+				Logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
+				this.pause();
 			}
 			
 			Logger.info("Metadata recieved: "+this._metadata.toString());
