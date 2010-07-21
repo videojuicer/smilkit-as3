@@ -171,6 +171,8 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
+				this._netStream.resume();
+				
 				var seconds:Number = (seekTo / 1000);
 				
 				Logger.debug("Seeking internally to "+seekTo+"ms ("+seconds+"s)", this);
@@ -199,6 +201,8 @@ package org.smilkit.handler
 			this._netConnection = null;
 			this._netStream = null;
 			
+			this._metadata = null;
+			
 			for (var i:int = 0; i < this._canvas.numChildren; i++)
 			{
 				this._canvas.removeChildAt(i);
@@ -209,6 +213,11 @@ package org.smilkit.handler
 		
 		protected function onHeartbeatTick(e:TimerEvent):void
 		{
+			if (this._netStream == null)
+			{
+				return;
+			}
+			
 			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
 			
@@ -311,6 +320,9 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
+				
+				// since this is our first time, lets pause
+				this._netStream.pause();
 			}
 			else
 			{
@@ -318,8 +330,6 @@ package org.smilkit.handler
 			}
 			
 			Logger.info("Metadata recieved: "+this._metadata.toString());
-				
-			this._netStream.pause();
 			
 			this.resolved(this._metadata.duration);
 		}
