@@ -507,8 +507,10 @@ package org.smilkit.render
 							{
 								var clipBeginParser:SMILTimeParser = new SMILTimeParser(time.element, time.element.clipBegin);
 								
-								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (time.begin < offset )))
+//								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (time.begin < offset )))
+								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (offset - time.begin > this._objectPool.viewport.heartbeat.delay*2 )))
 								{
+									Logger.debug("Added a handler with begin time "+time.begin+" and clipBegin "+clipBeginParser.milliseconds+" when offset is "+offset+". Scheduling a sync operation to occur after this rebuild.")
 									syncAfterUpdate = true;
 								}
 							}
@@ -538,6 +540,7 @@ package org.smilkit.render
 				// Perform the sync if we flagged up that one is needed
 				if(syncAfterUpdate) 
 				{
+					Logger.debug("About to run a sync operation scheduled for after the RenderTree has completed updating.")
 					this.syncHandlersToViewportOffset();
 				}
 			}
