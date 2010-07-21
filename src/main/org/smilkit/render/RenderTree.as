@@ -256,7 +256,7 @@ package org.smilkit.render
 					var destinationOffset:Number;
 					if(nearestSyncPoint <= offset){
 						destinationOffset = nearestSyncPoint;
-						Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
+						Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms. Node has begin time "+node.begin+"ms.", this);
 					}
 					else
 					{
@@ -328,6 +328,11 @@ package org.smilkit.render
 						waitHandler.pause();						
 						// TODO add to stage here??
 					}
+					// // Uncomment for ridiculous amounts of sync debug
+					//else
+					//{
+					//	Logger.debug("A handler is synced to "+waitHandler.currentOffset+" but the target is "+waitOffset+". Continuing sync operation.", this);
+					//}
 				}
 				
 				// work backwards to avoid a fuck up with the indexes in mid-loop
