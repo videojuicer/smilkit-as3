@@ -221,12 +221,7 @@ package org.smilkit.handler
 		
 		protected function readyToPlayAt(offset:int):Boolean
 		{
-			if (this.syncable)
-			{
-				offset = this.findNearestSyncPoint(offset);
-			}
-			
-			if (this._netStream != null)
+			if (this._netStream != null && this._startedLoading)
 			{
 				var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
