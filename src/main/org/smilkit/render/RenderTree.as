@@ -286,38 +286,41 @@ package org.smilkit.render
 		
 		protected function execSyncHandlerForViewportOffset(handler:SMILKitHandler):void
 		{
-			var index:int = this._offsetSyncHandlerList.indexOf(handler);
-			if(index >= 0)
+			if(this._offsetSyncHandlerList != null)
 			{
-				var offset:uint = this._offsetSyncOffsetList[index];
-				
-				if(handler.seekable)
+				var index:int = this._offsetSyncHandlerList.indexOf(handler);
+				if(index >= 0)
 				{
-					// Perform sync
-					var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
-					var destinationOffset:Number;
-					if(nearestSyncPoint <= offset){
-						destinationOffset = nearestSyncPoint;
-						Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
+					var offset:uint = this._offsetSyncOffsetList[index];
+				
+					if(handler.seekable)
+					{
+						// Perform sync
+						var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
+						var destinationOffset:Number;
+						if(nearestSyncPoint <= offset){
+							destinationOffset = nearestSyncPoint;
+							Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
+						}
+						else
+						{
+							destinationOffset = offset ;
+							Logger.debug("Syncing a handler using random access (since nearest syncpoint was "+nearestSyncPoint+"ms). Seeking handler to "+offset+"ms.", this);
+						};
+
+						handler.seek(destinationOffset); // The SEEK_NOTIFY operation dispatched by this call will continue the sync for this handler.
 					}
 					else
 					{
-						destinationOffset = offset ;
-						Logger.debug("Syncing a handler using random access (since nearest syncpoint was "+nearestSyncPoint+"ms). Seeking handler to "+offset+"ms.", this);
-					};
-
-					handler.seek(destinationOffset); // The SEEK_NOTIFY operation dispatched by this call will continue the sync for this handler.
-				}
+						// Remove from sync wait list
+						Logger.debug("About to begin a deferred sync on a handler, but the handler is no longer seekable. About to remove from wait list.", this);
+						this.removeHandlerFromWaitingForSyncList(handler);
+					}
+				}			
 				else
 				{
-					// Remove from sync wait list
-					Logger.debug("About to begin a deferred sync on a handler, but the handler is no longer seekable. About to remove from wait list.", this);
-					this.removeHandlerFromWaitingForSyncList(handler);
+					Logger.debug("Asked to begin a deferred sync for a handler, but the handler could not be found on the sync wait list.", this);
 				}
-			}			
-			else
-			{
-				Logger.debug("Asked to begin a deferred sync for a handler, but the handler could not be found on the sync wait list.", this);
 			}
 		}
 		
