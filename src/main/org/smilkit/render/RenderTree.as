@@ -212,7 +212,7 @@ package org.smilkit.render
 		* 2. Seek stage. The handler is seeked to offset determined by the findNearestSyncPoint method. We then wait until
 		*    the handler dispatches a SEEK_NOTIFY event.
 		* 3. Catchup stage. If the handler was seeked to a point before the desired offset, it is allowed to play silently
-		*    until that offset is reached.
+		*    until that offset is reached. The catchup phase will be skipped if playback is currently paused.
 		* 4. Event loop stage. The offset of each handler on the sync wait list is checked, and removed if it is satisfactory.
 		*    When no more handlers exist on the sync wait list, the sync loop exits.
 		* 
@@ -417,10 +417,12 @@ package org.smilkit.render
 		{
 			var waitHandler:SMILKitHandler = event.handler;
 			var index:int = this._offsetSyncHandlerList.indexOf(waitHandler);
+			var viewportPlaying:Boolean = (this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING);
+			
 			if(index >= 0)
 			{
 				var waitOffset:uint = this._offsetSyncOffsetList[index];
-				if(waitHandler.currentOffset < waitOffset)
+				if(waitHandler.currentOffset < waitOffset && viewportPlaying)
 				{
 					Logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation unacceptable - starting catchup playback.", this);
 					waitHandler.setVolume(0);
@@ -428,7 +430,10 @@ package org.smilkit.render
 				}
 				else
 				{
-					Logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation acceptable - removing from wait list.", this);
+					if(viewportPlaying)	Logger.debug("Got SEEK_NOTIFY from a syncing handler. Seek operation acceptable - removing from wait list.", this);
+					else Logger.debug("Got SEEK_NOTIFY from a syncing handler. Viewport is paused - skipping catchup phase and removing from wait list.", this);
+
+
 					waitHandler.pause();
 					this.removeHandlerFromWaitingForSyncList(waitHandler);
 				}
@@ -719,6 +724,13 @@ package org.smilkit.render
 						Logger.debug("About to run a scheduled sync wait cycle.", this);
 						this.syncHandlersToViewportOffset();
 						this._performOffsetSyncOnNextResume = false;
+					}
+					break;
+				case Viewport.PLAYBACK_PAUSED:
+					if(this._performOffsetSyncOnNextResume)
+					{
+						Logger.debug("Running interim quick sync cycle, leaving full cycle until next Viewport state change to PLAYBACK_PLAYING");
+						this.syncHandlersToViewportOffset();
 					}
 					break;
 			}
