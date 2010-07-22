@@ -218,7 +218,7 @@ package org.smilkit.handler
 			this._queuedSeek = false;
 			
 			// Execute seek
-			this._netStream.resume();
+			// this._netStream.resume();
 			var seconds:Number = (seekTo / 1000);
 			Logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
 			this._netStream.seek(seconds);
@@ -323,7 +323,9 @@ package org.smilkit.handler
 			if(this.readyToPlayAt(this._queuedSeekTarget))
 			{
 				Logger.debug("checkQueuedSeekLoadState: now ready to seek. About to execute deferred seek.", this);
+				
 				this.execQueuedSeek();
+				
 				if(!this._loadReady)
 				{
 					this._loadReady = true;
@@ -333,6 +335,7 @@ package org.smilkit.handler
 			else
 			{
 				Logger.debug("checkQueuedSeekLoadState: Not yet ready to seek to target "+this._queuedSeekTarget+"ms.", this);
+				
 				if(this._loadReady)
 				{
 					this._loadReady = false;
@@ -426,6 +429,11 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
+					if (!this._resumed)
+					{
+						this._netStream.pause();
+					}
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 					break;
 			}
