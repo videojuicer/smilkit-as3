@@ -89,7 +89,7 @@ package org.smilkit.render
 						// check if it doesnt exist yet
 						if (this._elements.indexOf(time) == -1)
 						{
-							time.element.resumeElement();
+							//time.element.resumeElement();
 							
 							var regionId:String = time.element.getAttribute("region");
 							var region:SMILRegionElement = (this.renderTree.document.getElementById(regionId) as SMILRegionElement);
