@@ -536,6 +536,7 @@ package org.smilkit.view
 			Logger.info("Seek operation committed. Reverting to previous playback state at offset: "+this.offset, this);
 			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
 			{
+				this.loadScheduler.start();
 				this.revertPlaybackState();
 				return true;
 			}
