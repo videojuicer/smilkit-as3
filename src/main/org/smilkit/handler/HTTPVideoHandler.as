@@ -282,6 +282,14 @@ package org.smilkit.handler
 				
 				Logger.debug("readyToPlayAt: Loaded "+percentageLoaded+"% of file, equating to "+durationLoaded+"ms of playtime. Desired offset is "+offset+"ms.", this);
 				
+				if (offset == 0)
+				{
+					if (percentageLoaded < 2)
+					{
+						return false;
+					}
+				}
+				
 				if (offset <= durationLoaded)
 				{
 					return true;
