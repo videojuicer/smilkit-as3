@@ -35,6 +35,13 @@ package org.smilkit.handler
 		
 		protected var _loadReady:Boolean = false;
 		
+		/**
+		* If a seek is issued when the handler is not ready to perform it (either before load or when not enough bytes are loaded to perform the seek)
+		* the seek offset will be stored here until the seek is available. Once the seek has completed the value will be nulled.
+		*/
+		protected var _queuedSeek:Boolean = false;
+		protected var _queuedSeekTarget:uint;
+		
 		public function HTTPVideoHandler(element:IElement)
 		{
 			super(element);
@@ -173,19 +180,66 @@ package org.smilkit.handler
 			}
 		}
 		
+		/** 
+		* Executes or queues a seek operation on this handler. Since seek availability within a progressive HTTP video is 
+		* limited by the amount of data currently loaded, the handler first checks the readiness of the requested seek offset
+		* and queues the seek operation if the handler is not ready to meet that demand.
+		*
+		* In the event of a seek being queued, the heartbeat subscriber method will start to check for the availability of
+		* the queued seek offset and execute the seek when it becomes available.
+		* 
+		* Issuing a new seek call to an offset that is available will clear any queued seek operations. Issuing a new seek call
+		* to an offset that is not available will overwrite any previously-queued seek operation.
+		* 
+		* @see org.smilkit.handler.HTTPVideoHandler.onHeartbeatTick
+		*/
 		public override function seek(seekTo:Number):void
 		{
-			if (this._netStream != null)
+			if(this.readyToPlayAt(seekTo))
 			{
-				this._netStream.resume();
-				
-				var seconds:Number = (seekTo / 1000);
-				
-				Logger.debug("Seeking internally to "+seekTo+"ms ("+seconds+"s)", this);
-				
-				this._netStream.seek(seconds);
+				// We're able to seek to that point. Execute the seek right away.
+				this.execSeek(seekTo);
+			}
+			else
+			{
+				// Stash the seek until we're able to do it.
+				Logger.debug("Seek to "+seekTo+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+				this._queuedSeek = true;
+				this._queuedSeekTarget = seekTo;
 			}
 		}
+		
+		/*
+		* Executes a seek operation on an offset that is available within this handler, clearing any queued seek operations in the process.
+		*/
+		protected function execSeek(seekTo:Number):void
+		{
+			// Cancel queued seek
+			this._queuedSeek = false;
+			
+			// Execute seek
+			this._netStream.resume();
+			var seconds:Number = (seekTo / 1000);
+			Logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			this._netStream.seek(seconds);
+		}
+		
+		/*
+		* Executes a queued seek operation, if one has been queued. If the seek is executed, the queued seek will be cleared.
+		*/
+		protected function execQueuedSeek():void
+		{
+			if(this._queuedSeek)
+			{
+				Logger.debug("About to execute a deferred seek operation to "+this._queuedSeekTarget+"ms.", this);
+				this.execSeek(this._queuedSeekTarget);
+			}
+			else
+			{
+				Logger.debug("Asked to execute any queued seek operation, but no seek operation is queued.", this);
+			}
+		}
+
 		
 		public override function merge(handlerState:HandlerState):Boolean
 		{
@@ -224,9 +278,11 @@ package org.smilkit.handler
 			if (this._netStream != null && this._startedLoading)
 			{
 				var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
-				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
+				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration);
 				
-				if (durationLoaded <= offset)
+				Logger.debug("readyToPlayAt: Loaded "+percentageLoaded+"% of file, equating to "+durationLoaded+"ms of playtime. Desired offset is "+offset+"ms.", this);
+				
+				if (offset <= durationLoaded)
 				{
 					return true;
 				}
@@ -235,6 +291,10 @@ package org.smilkit.handler
 			return false;
 		}
 		
+		/**
+		* Executed each time the heartbeat timer ticks, regardless of it's paused/resumed state.
+		* Checks the load status of this handler and emits LOAD_READY or LOAD_WAIT events on any state change.
+		*/
 		protected function onHeartbeatTick(e:TimerEvent):void
 		{
 			if (this._netStream == null)
@@ -242,6 +302,51 @@ package org.smilkit.handler
 				return;
 			}
 			
+			if(this._queuedSeek)
+			{
+				this.checkQueuedSeekLoadState();
+			}
+			else
+			{
+				this.checkPlaybackLoadState();
+			}
+			
+			
+		}
+		
+		/**
+		* Checks the handler's readiness to perform a deferred seek operation and executes the seek when enough data is available.
+		* Acts as a load state checker, and therefore emits LOAD_READY and LOAD_WAIT events.
+		*/
+		protected function checkQueuedSeekLoadState():void
+		{
+			if(this.readyToPlayAt(this._queuedSeekTarget))
+			{
+				Logger.debug("checkQueuedSeekLoadState: now ready to seek. About to execute deferred seek.", this);
+				this.execQueuedSeek();
+				if(!this._loadReady)
+				{
+					this._loadReady = true;
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				}
+			}
+			else
+			{
+				Logger.debug("checkQueuedSeekLoadState: Not yet ready to seek to target "+this._queuedSeekTarget+"ms.", this);
+				if(this._loadReady)
+				{
+					this._loadReady = false;
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+				}
+			}
+		}
+		
+		/**
+		* Checks the loaded bytes against the known file byte size and determines whether enough data has loaded for playback to continue at the current offset.
+		* Called on each heartbeat tick unless a seek operation is queued.
+		*/ 
+		protected function checkPlaybackLoadState():void
+		{
 			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
 			
