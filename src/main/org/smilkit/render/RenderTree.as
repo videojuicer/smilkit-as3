@@ -48,6 +48,8 @@ package org.smilkit.render
 		
 		protected var _performOffsetSyncOnNextResume:Boolean = false;
 		
+		protected var _performOffsetSyncAfterUpdate:Boolean = false;
+		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
 		 * 
@@ -300,7 +302,7 @@ package org.smilkit.render
 						var destinationOffset:Number;
 						if(nearestSyncPoint <= offset){
 							destinationOffset = nearestSyncPoint;
-							Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms with a target offset of "+offset+"ms.", this);
+							Logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms (selected from "+handler.syncPoints.length+" syncpoints: "+handler.syncPoints.join(", ")+") with a target offset of "+offset+"ms. completedResolving: "+handler.completedResolving+", completedLoading"+ handler.completedLoading, this);
 						}
 						else
 						{
@@ -563,9 +565,9 @@ package org.smilkit.render
 							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
 							// viewport is currently playing.
-							if(!syncAfterUpdate && handler.seekable && this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+							if(!syncAfterUpdate && handler.seekable)
 							{
-								Logger.debug("Added a seekable handler to the RenderTree during playback. Scheduling a sync for after this update operation.", this);
+								Logger.debug("Added a seekable handler to the RenderTree. Scheduling a sync for after this update operation.", this);
 								syncAfterUpdate = true;
 							}
 						
@@ -592,7 +594,7 @@ package org.smilkit.render
 				}
 
 				// Perform the sync if we flagged up that one is needed
-				if(syncAfterUpdate) 
+				if(syncAfterUpdate && this._performOffsetSyncAfterUpdate) 
 				{
 					Logger.debug("About to run a sync operation scheduled for after the RenderTree has completed updating.")
 					this.syncHandlersToViewportOffset();
@@ -719,6 +721,7 @@ package org.smilkit.render
 						this.syncHandlersToViewportOffset();
 						this._performOffsetSyncOnNextResume = false;
 					}
+					this._performOffsetSyncAfterUpdate = true;
 					break;
 				case Viewport.PLAYBACK_PAUSED:
 					if(this._performOffsetSyncOnNextResume)
