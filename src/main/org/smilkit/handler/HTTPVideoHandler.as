@@ -263,7 +263,8 @@ package org.smilkit.handler
 			this._netConnection = null;
 			this._netStream = null;
 			
-			this._metadata = null;
+			// Note that the cancel operation does NOT clear the metadata, if any has been loaded. This is to allow resolve jobs to
+			// retain their data payload. If the file is reloaded with new metadata, then the metadata object will be updated at that time.
 			
 			for (var i:int = 0; i < this._canvas.numChildren; i++)
 			{
@@ -486,7 +487,7 @@ package org.smilkit.handler
 				this.pause();
 			}
 			
-			Logger.info("Metadata recieved: "+this._metadata.toString());
+			Logger.info("Metadata received (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
 			
 			this.resolved(this._metadata.duration);
 		}

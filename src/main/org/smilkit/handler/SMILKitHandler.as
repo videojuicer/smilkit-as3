@@ -365,7 +365,7 @@ package org.smilkit.handler
 		 */
 		protected function resolved(resolvedDuration:int):void
 		{
-			if (!this._completedResolving)
+			if (!this._completedResolving || resolvedDuration != this._duration)
 			{
 				Logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
 				
