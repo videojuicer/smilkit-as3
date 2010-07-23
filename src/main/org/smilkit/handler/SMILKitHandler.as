@@ -375,7 +375,8 @@ package org.smilkit.handler
 				// here we update the dom
 				if (this.element != null && (this.element.dur == Time.UNRESOLVED || this.element.dur == 0))
 				{
-					this.element.dur = this._duration;
+					// parse the time as a millisecond time string
+					this.element.setAttribute("dur", this._duration.toString() + "ms");
 				}
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));
