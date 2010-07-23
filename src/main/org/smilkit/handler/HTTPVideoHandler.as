@@ -35,6 +35,8 @@ package org.smilkit.handler
 		
 		protected var _loadReady:Boolean = false;
 		
+		protected var _volume:uint;
+		
 		/**
 		* If a seek is issued when the handler is not ready to perform it (either before load or when not enough bytes are loaded to perform the seek)
 		* the seek offset will be stored here until the seek is available. Once the seek has completed the value will be nulled.
@@ -127,6 +129,10 @@ package org.smilkit.handler
 			this._netConnection.connect(null);
 			
 			this._soundTransformer = new SoundTransform(0.2, 0);
+			if(this._volume)
+			{
+				this.setVolume(this._volume);
+			}
 			
 			this._netStream = new NetStream(this._netConnection);
 			
@@ -158,6 +164,17 @@ package org.smilkit.handler
 			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+		}
+		
+		public override function setVolume(volume:uint):void
+		{
+			this._volume = volume;
+			if(this._soundTransformer != null && this._netStream != null)
+			{
+				Logger.debug("Handler volume set to "+volume+".", this);
+				this._soundTransformer.volume = volume/100;
+				this._netStream.soundTransform = this._soundTransformer;
+			}
 		}
 		
 		public override function resume():void
