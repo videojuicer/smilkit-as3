@@ -75,7 +75,7 @@ package org.smilkit.dom.smil
 		
 		public function set dur(dur:Number):void
 		{
-			this.setAttribute("dur", (dur as String));
+			this.setAttribute("dur", dur.toString());
 		}
 		
 		public function get restart():uint
