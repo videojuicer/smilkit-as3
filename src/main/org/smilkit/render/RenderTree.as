@@ -565,14 +565,8 @@ package org.smilkit.render
 							// viewport is currently playing.
 							if(!syncAfterUpdate && handler.seekable && this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 							{
-								var clipBeginParser:SMILTimeParser = new SMILTimeParser(time.element, time.element.clipBegin);
-								
-//								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (time.begin < offset )))
-								if((clipBeginParser.milliseconds > 0) || ((time.begin != Time.UNRESOLVED) && (offset - time.begin > this._objectPool.viewport.heartbeat.delay*2 )))
-								{
-									Logger.debug("Added a handler with begin time "+time.begin+" and clipBegin "+clipBeginParser.milliseconds+" when offset is "+offset+". Scheduling a sync operation to occur after this rebuild.")
-									syncAfterUpdate = true;
-								}
+								Logger.debug("Added a seekable handler to the RenderTree during playback. Scheduling a sync for after this update operation.", this);
+								syncAfterUpdate = true;
 							}
 						
 							// actually draw element to canvas ....
