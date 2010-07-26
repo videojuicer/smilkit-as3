@@ -17,6 +17,51 @@ package org.smilkit.util.logger
 		*/
 		protected static var _logRenderers:Vector.<LogRenderer>;
 		
+		/**
+		* If set to true, the Logger will retain all log messages in an array that may be accessed for pasting to the clipboard, 
+		* sent to an error reporting API, or whatever you'd like to use it for. Use Logger.logMessages to access the list of raw
+		* log message objects, or Logger.logHistory to pull a string containing the log output.
+		*/
+		protected static var _retainLogs:Boolean = true;
+		
+		/**
+		* Used to store a history of LogMessage objects if _retainLogs is set to true.
+		*/
+		protected static var _logMessages:Vector.<LogMessage>;
+		
+		/**
+		* Used to store a cached string render of the log history.
+		*/
+		protected static var _logHistory:String;
+		
+		
+		public static function get retainLogs():Boolean
+		{
+			return Logger._retainLogs;
+		}
+		
+		public static function set retainLogs(retain:Boolean):void
+		{
+			Logger.retainLogs = retain;
+		}
+		
+		public static function get logMessages():Vector.<LogMessage>
+		{
+			return Logger._logMessages;
+		}
+		
+		public static function get logHistory():String
+		{
+			if(Logger._logMessages != null)
+			{
+				return Logger._logMessages.join("\r\n");
+			}
+			else
+			{
+				return "";
+			}
+		}
+		
 		public static function set logRenderers(renderers:Vector.<LogRenderer>):void
 		{
 			Logger._logRenderers = renderers;
@@ -26,7 +71,7 @@ package org.smilkit.util.logger
 		{
 			return Logger._logRenderers;
 		}
-		
+			
 		public static function addRenderer(renderer:LogRenderer):void
 		{
 			Logger.removeRenderer(renderer);
@@ -137,7 +182,17 @@ package org.smilkit.util.logger
 			if(Logger._logRenderers != null)
 			{
 				var logMessage:LogMessage = new LogMessage(message, targetObject, level);
-
+				
+				// Stash in the history
+				if(Logger.retainLogs)
+				{
+					if(Logger._logMessages == null)
+					{
+						Logger._logMessages = new Vector.<LogMessage>;
+					}
+					Logger._logMessages.push(logMessage);
+				}
+				
 				// for now;
 				for(var i:uint = 0; i < Logger._logRenderers.length; i++)
 				{
