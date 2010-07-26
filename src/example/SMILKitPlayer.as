@@ -12,6 +12,8 @@ package
 	import flash.media.Video;
 	import flash.ui.ContextMenu;
 	import flash.ui.ContextMenuItem;
+	import flash.system.Capabilities;
+	import flash.system.System;
 	
 	import org.osmf.display.ScaleMode;
 	import org.smilkit.SMILKit;
@@ -56,6 +58,8 @@ package
 			menu.customItems.push(this.createMenuItem("Seek 50%", this.onSeek50MenuItem));
 			menu.customItems.push(this.createMenuItem("Seek 75%", this.onSeek75MenuItem));
 			menu.customItems.push(this.createMenuItem("Seek 100%", this.onSeek100MenuItem));
+			menu.customItems.push(this.createMenuItem("Copy Logger output", this.onLogCopyItem, true));
+			
 			
 			this.contextMenu = menu;
 			
@@ -136,6 +140,11 @@ package
 			this.graphics.endFill();
 			
 			Logger.info("SMILKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
+		}
+		
+		protected function onLogCopyItem(e:Event):void
+		{
+			System.setClipboard(Logger.logHistory);
 		}
 	}
 }
