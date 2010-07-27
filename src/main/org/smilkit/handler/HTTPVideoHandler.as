@@ -163,6 +163,8 @@ package org.smilkit.handler
 				this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
 			
+			this.drawClickShield(this._video);
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
@@ -288,6 +290,8 @@ package org.smilkit.handler
 				this._canvas.removeChildAt(i);
 			}
 			
+			this._shield = null;
+			
 			super.cancel();
 		}
 		
@@ -336,8 +340,6 @@ package org.smilkit.handler
 			{
 				this.checkPlaybackLoadState();
 			}
-			
-			
 		}
 		
 		/**
@@ -414,6 +416,13 @@ package org.smilkit.handler
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			}
+		}
+		
+		public override function resize():void
+		{
+			super.resize();
+		
+			this.drawClickShield(this._video);
 		}
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
