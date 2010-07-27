@@ -70,19 +70,20 @@ package org.smilkit.dom.smil
 			{
 				var time:Time = (this.item(i) as Time);
 				
-				if (!time.resolved)
-				{
+				// // Uncomment conditional block to enable caching.
+				//if (!time.resolved)
+				//{
 					time.resolve();
 					
 					if (time.resolved)
 					{
 						this._timesResolved++;
 					}
-				}
-				else
-				{
-					this._timesResolved++;
-				}
+				//}
+				//else
+				//{
+				//	this._timesResolved++;
+				//}
 			}
 			
 			return (oldCount < this._timesResolved);

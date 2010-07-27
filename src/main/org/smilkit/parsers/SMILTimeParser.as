@@ -97,15 +97,15 @@ package org.smilkit.parsers
 				{
 					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("min"))) * 60 * 1000; 
 				}
-				// seconds
-				else if (this._timeString.indexOf("s") != -1)
-				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("s"))) * 1000; 
-				}
 				// milliseconds value
 				else if (this._timeString.indexOf("ms") != -1)
 				{
 					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("ms")));
+				}				
+				// seconds
+				else if (this._timeString.indexOf("s") != -1)
+				{
+					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("s"))) * 1000; 
 				}
 				// assume the time is declared in seconds
 				else

@@ -5,6 +5,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
+	import org.smilkit.util.logger.Logger;
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
@@ -69,7 +70,6 @@ package org.smilkit.dom.smil
 			{
 				this._durationParser.parse(this.getAttribute("dur"));
 			}
-			
 			return this._durationParser.milliseconds;
 		}
 		
@@ -148,12 +148,12 @@ package org.smilkit.dom.smil
 			var begin:TimeList = (this.begin as TimeList);
 			var end:TimeList = (this.end as TimeList);
 			
-			if (begin != null && !begin.resolved)
+			if (begin != null)
 			{
 				begin.resolve();
 			}
 			
-			if (end != null && !end.resolved)
+			if (end != null)
 			{
 				end.resolve();
 			}

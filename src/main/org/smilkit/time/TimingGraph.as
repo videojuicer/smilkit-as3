@@ -14,6 +14,7 @@ package org.smilkit.time
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.util.logger.Logger;
 
 	/**
 	 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed
@@ -103,11 +104,7 @@ package org.smilkit.time
 				{
 					var el:SMILMediaElement = (child as SMILMediaElement);
 					
-					// or maybe we resolve everytime incase it needs to change?
-					if (!el.resolved)
-					{
-						el.resolve();
-					}
+					el.resolve();
 					
 					if (el.handler != null)
 					{
@@ -156,6 +153,7 @@ package org.smilkit.time
 		 */		
 		protected function onMutationEvent(e:MutationEvent):void
 		{
+			Logger.debug("Received mutation event of type "+e.type+". Attr name: "+e.attrName+", new value: "+e.newValue+" prev value: "+e.prevValue, this);
 			this.rebuild();
 		}
 		
