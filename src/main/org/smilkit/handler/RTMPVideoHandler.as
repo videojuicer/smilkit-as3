@@ -28,6 +28,7 @@ package org.smilkit.handler
 		protected var _soundTransformer:SoundTransform;
 		protected var _metadata:Metadata;
 		protected var _canvas:Sprite;
+		protected var _volume:uint;
 		
 		protected var _playOptions:NetStreamPlayOptions;
 		
@@ -134,6 +135,20 @@ package org.smilkit.handler
 			}
 			
 			return false;
+		}
+		
+		public override function setVolume(volume:uint):void
+		{
+			this._volume = volume;
+			
+			if(this._soundTransformer != null && this._netStream != null)
+			{
+				Logger.debug("Handler volume set to "+volume+".", this);
+				
+				this._soundTransformer.volume = volume/100;
+				
+				this._netStream.soundTransform = this._soundTransformer;
+			}
 		}
 		
 		public override function resume():void
