@@ -516,7 +516,7 @@ package org.smilkit.render
 					// remove non active, existing elements
 					if (!activeNow && alreadyExists)
 					{
-						Logger.debug("Handler removed from RenderTree during update at "+offset+"ms", handler);
+						Logger.debug("Handler removed from RenderTree during update at "+offset+"ms. Handler set to run "+time.begin+"-"+time.end+"ms.", handler);
 						
 						this._lastChangeOffset = offset;
 						
