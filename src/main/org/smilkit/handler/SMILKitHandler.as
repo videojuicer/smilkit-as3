@@ -449,7 +449,7 @@ package org.smilkit.handler
 				
 				this._shield.graphics.clear();
 				
-				this._shield.graphics.beginFill(0x333333, 0.1);
+				this._shield.graphics.beginFill(0xFFFFFF, 0.0);
 				this._shield.graphics.drawRect(0, 0, child.width, child.height);
 				this._shield.graphics.endFill();
 			}
