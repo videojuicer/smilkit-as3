@@ -6,7 +6,6 @@ package org.smilkit.handler
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
-	import org.smilkit.util.logger.Logger;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
@@ -15,6 +14,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
@@ -25,6 +25,7 @@ package org.smilkit.handler
 		protected var _startedLoading:Boolean = false;
 		protected var _completedLoading:Boolean = false;
 		protected var _completedResolving:Boolean = false;
+		protected var _shield:Sprite;
 		
 		protected var _currentOffset:int;
 		protected var _duration:int = Time.UNRESOLVED;
@@ -414,6 +415,43 @@ package org.smilkit.handler
 						this.displayObject.y = matrix.y;
 					}
 				}
+			}
+		}
+		
+		/**
+		 * Draw's a click shield over the specified child <code>Sprite</code> and inside the
+		 * <code>displayObject</code>, the shield is not automatically drawn and must be called 
+		 * when desired by the implementing handler. The shield draws a invisible sprite over
+		 * the specified child <code>Sprite</code>, this allows clicks (left and right) to be
+		 * caught over media assets that don't usually let you capture the clicks (like videos
+		 * and animations). For the shield to draw correctly the <code>displayObject</code>
+		 * property on the handler must be a valid sprite that allows children.
+		 * 
+		 * @param child The child <code>Sprite</code> to draw a click shield over.
+		 */
+		protected function drawClickShield(child:DisplayObject):void
+		{
+			if (this._startedLoading)
+			{
+				if (this._shield == null)
+				{
+					this._shield = new Sprite();
+					this._shield.x = 0;
+					this._shield.y = 0;
+					
+					var parent:Sprite = (this.displayObject as Sprite);
+					
+					parent.addChild(this._shield);
+					
+					parent.setChildIndex(child, 0);
+					parent.setChildIndex(this._shield, 1);
+				}
+				
+				this._shield.graphics.clear();
+				
+				this._shield.graphics.beginFill(0x333333, 0.1);
+				this._shield.graphics.drawRect(0, 0, child.width, child.height);
+				this._shield.graphics.endFill();
 			}
 		}
 		
