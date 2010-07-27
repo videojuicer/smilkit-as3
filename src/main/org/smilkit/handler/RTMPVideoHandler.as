@@ -104,6 +104,7 @@ package org.smilkit.handler
 			this._soundTransformer = new SoundTransform(0.2, 0);
 			
 			this._netConnection = new NetConnection();
+			
 			this._netConnection.addEventListener(NetStatusEvent.NET_STATUS, this.onConnectionNetStatusEvent);
 			this._netConnection.addEventListener(IOErrorEvent.IO_ERROR, this.onConnectionIOErrorEvent);
 			this._netConnection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onConnectionAsyncErrorEvent);
@@ -133,6 +134,34 @@ package org.smilkit.handler
 			}
 			
 			return false;
+		}
+		
+		public override function resume():void
+		{
+			if (this._netStream != null)
+			{
+				Logger.debug("Resuming playback.", this);
+
+				this._netStream.resume();
+			}
+		}
+		
+		public override function pause():void
+		{
+			if (this._netStream != null)
+			{
+				Logger.debug("Pausing playback.", this);
+
+				this._netStream.pause();
+			}
+		}
+		
+		public override function seek(seekTo:Number):void
+		{
+			var seconds:Number = (seekTo / 1000);
+			Logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			
+			this._netStream.seek(seconds);
 		}
 		
 		public override function cancel():void
@@ -170,6 +199,8 @@ package org.smilkit.handler
 					this._canvas.addChild(this._video);
 					
 					this._startedLoading = true;
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					
 					break;
 			}
@@ -216,6 +247,7 @@ package org.smilkit.handler
 					// playback has finished, important for live events (so we can continue)
 					break;
 				case "NetStream.Play.InsufficientBW":
+					// show drop down
 					break;
 				case "NetStream.Pause.Notify":
 					break;
