@@ -4,6 +4,9 @@ package org.smilkit.handler.state
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
+	
+	import org.smilkit.parsers.FMSURLParser;
+	import org.smilkit.parsers.URLParser;
 
 	public class VideoHandlerState extends HandlerState
 	{
@@ -11,6 +14,8 @@ package org.smilkit.handler.state
 		protected var _netStream:NetStream;
 		protected var _video:Video;
 		protected var _canvas:Sprite;
+		
+		protected var _fmsURLParser:FMSURLParser;
 		
 		public function VideoHandlerState(src:String, handlerOffset:int, netConnection:NetConnection, netStream:NetStream, video:Video, canvas:Sprite)
 		{
@@ -30,6 +35,16 @@ package org.smilkit.handler.state
 		public function get netStream():NetStream
 		{
 			return this._netStream;
+		}
+		
+		public function get fmsURL():FMSURLParser
+		{
+			if (this._fmsURLParser == null)
+			{
+				this._fmsURLParser = new FMSURLParser(this.src);
+			}
+			
+			return this._fmsURLParser;
 		}
 		
 		public function get video():Video

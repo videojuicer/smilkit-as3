@@ -31,7 +31,14 @@ package org.smilkit.parsers
 		
 		public function get hostname():String
 		{
-			return this.protocol+"://"+this.host+":"+this.port;
+			var hostname:String = this.protocol+"://"+this.host;
+			
+			if (this.port != "")
+			{
+				hostname += ":"+this.port;
+			}
+			
+			return hostname;
 		}
 		
 		/**
@@ -89,6 +96,16 @@ package org.smilkit.parsers
 			return null;
 		}
 		
+		public function getParamValue(param:String):String
+		{
+			if (this._parameters == null)
+			{
+				return "";
+			}
+			
+			return this._parameters[param];
+		}
+		
 		/**
 		 * Parses the specified URL <code>String</code> and populates the <code>URLParser</code>
 		 * instance with the extracted data. 
@@ -106,6 +123,11 @@ package org.smilkit.parsers
 			this._host = results.host;
 			this._port = results.port;
 			this._path = results.path;
+			
+			if (this._path.charAt(0) == "/")
+			{
+				this._path = this._path.substr(1, this._path.length);
+			}
 			
 			var params:String = results.parameters;
 			
