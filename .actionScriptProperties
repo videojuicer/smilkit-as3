@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<actionScriptProperties mainApplicationPath="smilkit-as3.as" projectUUID="ee05f95a-107d-42e8-ad0d-be529723d77e" version="6">
+<actionScriptProperties analytics="false" mainApplicationPath="smilkit-as3.as" projectUUID="ee05f95a-107d-42e8-ad0d-be529723d77e" version="6">
   <compiler additionalCompilerArguments="-locale en_US" autoRSLOrdering="true" copyDependentFiles="false" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="true" outputFolderPath="bin" sourceFolderPath="src/main" strict="true" targetPlayerVersion="10.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath>
       <compilerSourcePathEntry kind="1" linkType="1" path="src/test"/>

@@ -76,6 +76,7 @@
     <classEntry path="org.smilkit.util.logger.renderers.LogRenderer"/>
     <classEntry path="org.smilkit.util.logger.renderers.BrowserConsoleRenderer"/>
     <classEntry path="org.smilkit.util.logger.renderers.TraceRenderer"/>
+    <classEntry path="org.smilkit.parsers.FMSURLParser"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
