@@ -129,6 +129,7 @@ package org.smilkit.handler
 			this._netConnection.connect(null);
 			
 			this._soundTransformer = new SoundTransform(0.2, 0);
+			
 			if(this._volume)
 			{
 				this.setVolume(this._volume);
