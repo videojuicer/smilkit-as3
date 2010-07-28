@@ -59,6 +59,8 @@ package org.smilkit.handler
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderError);
 			
 			this._loader.load(new URLRequest(this.element.src), new LoaderContext(true));
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
 		public override function cancel():void
@@ -93,6 +95,8 @@ package org.smilkit.handler
 		
 		protected function onLoaderError(e:IOErrorEvent):void
 		{
+			this.cancel();
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
