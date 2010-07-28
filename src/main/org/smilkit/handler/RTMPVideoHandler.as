@@ -76,7 +76,7 @@ package org.smilkit.handler
 		
 		public override function get syncable():Boolean
 		{
-			return true;
+			return false;
 		}
 		
 		public override function get spatial():Boolean
@@ -94,24 +94,50 @@ package org.smilkit.handler
 			return (this._canvas as DisplayObject);
 		}
 		
+		public override function get currentOffset():int
+		{
+			if (this._netStream == null)
+			{
+				return super.currentOffset;
+			}
+			
+			return (this._netStream.time * 1000);
+		}
+		
 		public override function get handlerState():HandlerState
 		{
 			return new VideoHandlerState(this.element.src, 0, this._netConnection, this._netStream, this._video, this._canvas);	
 		}
 		
+		public function get videoHandlerState():VideoHandlerState
+		{
+			return (this.handlerState as VideoHandlerState);
+		}
+		
 		public override function load():void
 		{
 			this._playOptions = new NetStreamPlayOptions();
+			
 			this._soundTransformer = new SoundTransform(0.2, 0);
 			
+			if(this._volume)
+			{
+				this.setVolume(this._volume);
+			}
+			
 			this._netConnection = new NetConnection();
+			this._netConnection.client = this;
 			
 			this._netConnection.addEventListener(NetStatusEvent.NET_STATUS, this.onConnectionNetStatusEvent);
 			this._netConnection.addEventListener(IOErrorEvent.IO_ERROR, this.onConnectionIOErrorEvent);
 			this._netConnection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onConnectionAsyncErrorEvent);
 			this._netConnection.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onConnectionSecurityErrorEvent);
 			
-			this._netConnection.connect(this.handlerState.extractedSrc.hostname);	
+			this._startedLoading = true;
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+			
+			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
@@ -126,11 +152,11 @@ package org.smilkit.handler
 				this._video = videoHandlerState.video;
 				this._canvas = videoHandlerState.canvas;
 				
-				this._playOptions.streamName = this.handlerState.extractedSrc.path;
+				this._playOptions.streamName = this.videoHandlerState.fmsURL.streamName;
 				this._playOptions.transition = NetStreamPlayTransitions.SWITCH;
 				
 				this._netStream.play2(this._playOptions);
-				
+
 				return true;
 			}
 			
@@ -181,19 +207,53 @@ package org.smilkit.handler
 		
 		public override function cancel():void
 		{
-			this._netStream.close();
-			this._netConnection.close();
+			if (this._netStream != null)
+			{
+				this._netStream.close();
+			}
+			
+			if (this._netConnection != null)
+			{
+				this._netConnection.close();
+			}
 			
 			this._netConnection = null;
 			this._netStream = null;
 			
+			// Note that the cancel operation does NOT clear the metadata, if any has been loaded. This is to allow resolve jobs to
+			// retain their data payload. If the file is reloaded with new metadata, then the metadata object will be updated at that time.
+			
+			for (var i:int = 0; i < this._canvas.numChildren; i++)
+			{
+				this._canvas.removeChildAt(i);
+			}
+			
+			this._shield = null;
+			
 			super.cancel();
+		}
+		
+		public override function resize():void
+		{
+			super.resize();
+			
+			this.drawClickShield(this._video);
 		}
 		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
 		{
 			switch (e.info.code)
 			{
+				case "NetConnection.Connect.Failed":
+					Logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' failed: "+e.info.message, this);
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+					break;
+				case "NetConnection.Connect.Rejected":
+					Logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' rejected by Flash Media Server", this);
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+					break;
 				case "NetConnection.Connect.Success":
 					this._netStream = new NetStream(this._netConnection);
 					
@@ -203,7 +263,7 @@ package org.smilkit.handler
 
 					this._netStream.client = this;
 					
-					this._netStream.play(this.element.src);
+					this._netStream.play(this.videoHandlerState.fmsURL.streamName);
 					
 					this._video = new Video();
 					this._video.smoothing = true;
@@ -213,12 +273,15 @@ package org.smilkit.handler
 					
 					this._canvas.addChild(this._video);
 					
-					this._startedLoading = true;
-					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					this.drawClickShield(this._video);
 					
 					break;
 			}
+		}
+		
+		public function onBWDone(... rest):void
+		{
+			Logger.debug("Bandwidth received on NetConnection from Flash Media Server", this);	
 		}
 		
 		protected function onConnectionIOErrorEvent(e:IOErrorEvent):void
@@ -239,15 +302,17 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
+			Logger.debug("NetStatusEvent: "+e.info.code, e);
+			
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
-					this._netStream.bufferTime = 30; // expand buffer
+					//this._netStream.bufferTime = 30; // expand buffer
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					break;
 				case "NetStream.Buffer.Empty":
-					this._netStream.bufferTime = 8; // reduce buffer
+					//this._netStream.bufferTime = 8; // reduce buffer
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
