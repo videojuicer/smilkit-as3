@@ -10,6 +10,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ITime;
+	import org.smilkit.util.logger.Logger;
 	
 	public class Time implements ITime
 	{
@@ -91,10 +92,12 @@ package org.smilkit.dom.smil
 			
 			if (parent is IElementSequentialTimeContainer)
 			{
+				//Logger.debug("About to resolve times in a sequential syncbase for element with tagName: "+element.nodeName, this);
 				this.resolveSequentialSyncBased(parent as IElementSequentialTimeContainer);
 			}
 			else if (parent is IElementParallelTimeContainer)
 			{
+				//Logger.debug("About to resolve times in a parallel syncbase for element with tagName: "+element.nodeName, this);
 				this.resolveParallelSyncBased(parent as IElementParallelTimeContainer);
 			}
 		}

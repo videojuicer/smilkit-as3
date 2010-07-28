@@ -121,6 +121,8 @@ package org.smilkit.time
 							end = el.end.first.resolvedOffset;
 						}
 						
+						// Logger.debug("TimingGraph rebuild: Pushing new timing node to TimingGraph for a "+el.tagName+" element with src "+el.src+". Begin: "+begin+", end: "+end, this);
+						
 						var timeElement:TimingNode = new TimingNode(el, begin, end);
 						
 						this._elements.push(timeElement);

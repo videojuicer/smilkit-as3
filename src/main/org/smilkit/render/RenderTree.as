@@ -7,6 +7,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -32,7 +33,8 @@ package org.smilkit.render
 		 */		
 		protected var _objectPool:ViewportObjectPool;
 		
-		protected var _activeElements:Vector.<TimingNode>;
+		protected var _activeTimingNodes:Vector.<TimingNode>;
+		protected var _activeMediaElements:Vector.<SMILMediaElement>;
 		
 		protected var _nextChangeOffset:int = -1;
 		protected var _lastChangeOffset:int = -1;
@@ -81,12 +83,17 @@ package org.smilkit.render
 			// listener for changing volume levels
 			this._objectPool.viewport.addEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
 			
+			this._activeTimingNodes = new Vector.<TimingNode>();
+			this._activeMediaElements = new Vector.<SMILMediaElement>();
+			
+			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
+			
 			this.reset();
 		}
 		
 		public function get elements():Vector.<TimingNode>
 		{
-			return this._activeElements;
+			return this._activeTimingNodes;
 		}
 		
 		public function get nextChangeOffset():int
@@ -140,23 +147,7 @@ package org.smilkit.render
 			// reset
 			this._lastChangeOffset = -1;
 			this._nextChangeOffset = -1;
-			
-			this._activeElements = new Vector.<TimingNode>();
-			
-			if (this._waitingForDataHandlerList != null && this._waitingForDataHandlerList.length > 0)
-			{
-				for (var i:int = 0; i < this._waitingForDataHandlerList.length; i++)
-				{
-					var handler:SMILKitHandler = this._waitingForDataHandlerList[i];
-					
-					handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
-					handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
-				}
-			}
-			
-			this._waitingForDataHandlerList = null;
-			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
-			
+
 			// !!!!
 			this.update();
 		}
@@ -494,20 +485,29 @@ package org.smilkit.render
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
 			{
-				var elements:Vector.<TimingNode> = this.timingGraph.elements;
-				var newActiveElements:Vector.<TimingNode> = new Vector.<TimingNode>();
+				// Get the contents of the TimingGraph as a vector of TimingNodes
+				var timingNodes:Vector.<TimingNode> = this.timingGraph.elements;
+				
+				// Set the sync flag to false. It will be set to TRUE when adding a seekable handler to the RenderTree during a playing state.
 				var syncAfterUpdate:Boolean = false;
 				
 				// make a copy of the elements so we can update the list without causing loop issues
 				
-				for (var i:int = 0; i < elements.length; i++)
+				for (var i:int = 0; i < timingNodes.length; i++)
 				{
-					var time:TimingNode = elements[i];
-					var previousIndex:int = this._activeElements.indexOf(time);
+					var time:TimingNode = timingNodes[i];
+					var element:SMILMediaElement = (timingNodes[i].element as SMILMediaElement);
+					var handler:SMILKitHandler = element.handler;
+
+					var previousIndex:int = this._activeMediaElements.indexOf(element);
 					var alreadyExists:Boolean = (previousIndex != -1);
 					var activeNow:Boolean = time.activeAt(offset);
-					var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 					
+					// Have you ever looked at your console output and thought mournfully to yourself that it doesn't have enough ridiculously in-depth analysis of every RenderTree update?
+					// WE THINK THE SAME.
+					// Uncomment the lines below to fill your console with ludicrous amounts of RenderTree update diff debug!
+					// Logger.debug("RenderTree update ("+offset+"ms) "+(i+1)+"/"+timingNodes.length+" processing node with begin: "+time.begin+" and end: "+time.end, this);
+										
 					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1))
 					{
 						this._nextChangeOffset = time.begin;
@@ -529,9 +529,10 @@ package org.smilkit.render
 						}
 						
 						// remove from the list
-						this._activeElements.splice(previousIndex, 1);
+						this._activeTimingNodes.splice(previousIndex, 1);
+						this._activeMediaElements.splice(previousIndex, 1);
 						
-						// pause playback, we let the loadScheduler handles cancelling the loading
+						// pause playback
 						handler.pause();
 	
 						// remove from sync wait list
@@ -560,7 +561,8 @@ package org.smilkit.render
 							handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 							handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 							
-							this._activeElements.push(time);
+							this._activeTimingNodes.push(time);
+							this._activeMediaElements.push(element);
 							
 							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
@@ -577,11 +579,11 @@ package org.smilkit.render
 						else
 						{
 							// already exists
-							var previousTime:TimingNode = this._activeElements[previousIndex];
+							var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
 							
 							if (time === previousTime && time != previousTime)
 							{
-								Logger.debug("Element modified on RenderTree during update at "+offset+"ms", handler);
+								Logger.debug("Element modified on RenderTree during update at "+offset+"ms", this);
 								
 								this._lastChangeOffset = offset;
 								

@@ -10,7 +10,7 @@ package org.smilkit.time
 		private var _end:int;
 		private var _element:ISMILMediaElement;
 		
-		public function TimingNode(element:ISMILMediaElement, begin:uint, end:uint)
+		public function TimingNode(element:ISMILMediaElement, begin:int, end:int)
 		{
 			this._element = element;
 			
