@@ -9,6 +9,7 @@ package org.smilkit
 	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.ImageHandler;
+	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.util.logger.Logger;
@@ -97,7 +98,8 @@ package org.smilkit
 		 */
 		public static function defaultHandlers():void
 		{
-			//SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
 		}
 		
