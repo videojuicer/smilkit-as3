@@ -204,11 +204,11 @@ package org.smilkit.handler
 		 */
 		public function findNearestSyncPoint(offset:Number):Number
 		{
-			var beforeSyncPoint:Number = 0;
-			var afterSyncPoint:Number = Number.MAX_VALUE;
-			
 			if (this.syncable)
 			{
+				var beforeSyncPoint:Number = 0;
+				var afterSyncPoint:Number = Number.POSITIVE_INFINITY;
+				
 				for (var i:int = 0; i < this.syncPoints.length; i++)
 				{
 					if (this.syncPoints[i] <= offset && this.syncPoints[i] > beforeSyncPoint)
@@ -220,20 +220,22 @@ package org.smilkit.handler
 						afterSyncPoint = this.syncPoints[i];
 					}
 				}
+				
+				// is the before or after point closests?
+				var beforeDiff:Number = (offset - beforeSyncPoint);
+				var afterDiff:Number = (afterSyncPoint - offset);
+				
+				if (beforeDiff > this.syncTolerance && (afterDiff < beforeDiff && afterDiff <= this.syncTolerance))
+				{
+					return afterSyncPoint;
+				}
+				else
+				{
+					return beforeSyncPoint;
+				}
 			}
 			
-			// is the before or after point closests?
-			var beforeDiff:Number = (offset - beforeSyncPoint);
-			var afterDiff:Number = (afterSyncPoint - offset);
-				
-			if (beforeDiff > this.syncTolerance && (afterDiff < beforeDiff && afterDiff <= this.syncTolerance))
-			{
-				return afterSyncPoint;
-			}
-			else
-			{
-				return beforeSyncPoint;
-			}
+			return offset;
 		}
 		
 		/**

@@ -20,11 +20,6 @@ package org.smilkit.render
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	
-	import spark.components.Button;
-	import spark.components.Label;
-	import spark.components.supportClasses.DisplayLayer;
-
-
 	public class DrawingBoard extends Sprite
 	{
 		protected var _renderTree:RenderTree;
