@@ -60,6 +60,15 @@ package org.smilkit.dom.smil
 			return (this._timesResolved == this.length);
 		}
 		
+		public function invalidate():void
+		{
+			for (var i:int = 0; i < this.length; i++)
+			{
+				var time:Time = (this.item(i) as Time);
+				time.invalidate();
+			}
+		}
+		
 		public function resolve(force:Boolean=false):Boolean
 		{
 			var oldCount:int = this._timesResolved;
