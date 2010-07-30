@@ -24,7 +24,7 @@ package org.smilkit.dom.smil
 		{
 			if (this.length > 0)
 			{
-				return this.item(this.length);
+				return this.item(this.length - 1);
 			}
 			
 			return null;
@@ -60,8 +60,7 @@ package org.smilkit.dom.smil
 			return (this._timesResolved == this.length);
 		}
 		
-		// TODO: update with a cache so we dont need to loop every time ...
-		public function resolve():Boolean
+		public function resolve(force:Boolean=false):Boolean
 		{
 			var oldCount:int = this._timesResolved;
 			this._timesResolved = 0;
@@ -70,7 +69,7 @@ package org.smilkit.dom.smil
 			{
 				var time:Time = (this.item(i) as Time);
 				
-				time.resolve();
+				time.resolve(force);
 				
 				if (time.resolved)
 				{

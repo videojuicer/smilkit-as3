@@ -23,6 +23,15 @@ package org.smilkit.dom.smil
 		protected var _marker:String;
 		protected var _type:int = Time.SMIL_TIME_SYNC_BASED;
 		
+		/** NON-DOM:
+		* A flag used for caching purposes - each Time is processed only once during a single walk of the DOM. If <code>_validCache</code> is true, then
+		* <code>resolve()</code> will skip work and the already-processed values will be used. Call <code>invalidate()</code> to reset this variable and ensure that
+		* the next <code>resolve()</code> call fetches up-to-date values.
+		*
+		* @see org.smilkit.dom.smil.Time.invalidate
+		*/
+		protected var _validCache:Boolean = false;
+		
 		public static var SMIL_TIME_INDEFINITE:int = 0;
 		public static var SMIL_TIME_OFFSET:int = 1;
 		public static var SMIL_TIME_SYNC_BASED:int = 2;
@@ -38,8 +47,27 @@ package org.smilkit.dom.smil
 			this._type = type;
 		}
 		
-		public function resolve():void
+		/** NON-DOM:
+		* Invalidates any cached values on this <code>Time</code> object and ensures that the next call to <code>resolve()</code> refreshes the values on this object.
+		*/
+		public function invalidate():void
 		{
+			this._validCache = false;
+		}
+		
+		public function get validCache():Boolean
+		{
+			return this._validCache;
+		}
+		
+		public function resolve(force:Boolean=false):void
+		{
+			if(this._validCache && !force)
+			{
+				// Skip resolve as we have a valid cache and are not being told to force-reset the operation.
+				return;
+			}
+			
 			// resolve the time
 			switch (this.timeType)
 			{
@@ -72,6 +100,8 @@ package org.smilkit.dom.smil
 				case Time.SMIL_TIME_WALLCLOCK:
 					break;
 			}
+			
+			this._validCache = true;
 		}
 		
 		private function resolveSyncBased():void
