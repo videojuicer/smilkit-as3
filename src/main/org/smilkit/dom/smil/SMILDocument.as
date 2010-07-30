@@ -7,6 +7,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementExclusiveTimeContainer;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
@@ -200,6 +201,39 @@ package org.smilkit.dom.smil
 		public function createExclusiveElement(tagName:String = "excl"):IElementExclusiveTimeContainer
 		{
 			return null;
+		}
+		
+		/**
+		 * Invalidates all the cached resolution times that may exist on the child document
+		 * elements.
+		 */
+		public function invalidateCachedTimes():void
+		{
+			this.iterateAndInvalidateCachedTimes(this);
+		}
+		
+		/**
+		 * Iterates through the document tree invalidating the <code>TimeLists</code> on any <code>ElementTimeContainer</code>.
+		 * 
+		 * @param node <code>INodeList</code> to iterate from, every node in the document inherits <code>INodeList</code>.
+		 */
+		protected function iterateAndInvalidateCachedTimes(node:INodeList):void
+		{
+			for (var i:int = 0; i < node.length; i++)
+			{
+				var child:INode = node.item(i);
+				
+				if (child is ElementTimeContainer)
+				{
+					((child as ElementTimeContainer).begin as TimeList).invalidate();
+					((child as ElementTimeContainer).end as TimeList).invalidate();
+				}
+				
+				if (child.hasChildNodes())
+				{
+					this.iterateAndInvalidateCachedTimes(child as INodeList);
+				}
+			}
 		}
 	}
 }
