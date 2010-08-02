@@ -128,7 +128,8 @@ package org.smilkit.spec.tests.time
 		protected function handleHasSlowBeats(event:ViewportEvent, passThroughData:Object):void
 		{
 			var heartBeat:Heartbeat = this._viewport.heartbeat;
-			Assert.assertEquals(1, heartBeat.slowBeats);
+			
+			Assert.assertTrue((heartBeat.slowBeats > 0));
 		}
 		
 		protected function handleHasSlowBeatsSecondTimeOut(passThroughData:Object):void

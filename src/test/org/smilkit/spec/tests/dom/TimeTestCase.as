@@ -3,9 +3,11 @@ package org.smilkit.spec.tests.dom
 	import flexunit.framework.Assert;
 	
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
@@ -18,13 +20,99 @@ package org.smilkit.spec.tests.dom
 	{		
 		protected var _seqDocument:ISMILDocument;
 		protected var _parDocument:ISMILDocument;
+		protected var _unresolvedDocument:ISMILDocument;
+		
+		protected var _viewport:Viewport;
 		
 		[Before]
 		public function setUp():void
 		{
+			this._viewport = new Viewport();
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_UNRESOLVED_SMIL_XML;
+			
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._seqDocument = (parser.parse(Fixtures.BASIC_SEQ_SMIL_XML) as ISMILDocument);
 			this._parDocument = (parser.parse(Fixtures.BASIC_PAR_SMIL_XML) as ISMILDocument);
+		}
+		
+		private function get document():SMILDocument
+		{
+			return (this._viewport.document as SMILDocument);
+		}
+		
+		[Test(description="Tests a document is unresolved and that the elements can resolve over time.")]
+		public function unresolvedAssetsResolvedCorrectly():void
+		{
+			var prerollLeft:ISMILMediaElement = (this.document.getElementById("preroll_left") as ISMILMediaElement);
+			var contentLeft:ISMILMediaElement = (this.document.getElementById("content_left") as ISMILMediaElement);
+			var prerollRight:ISMILMediaElement = (this.document.getElementById("preroll_right") as ISMILMediaElement);
+			var contentRight:ISMILMediaElement = (this.document.getElementById("content_right") as ISMILMediaElement);
+			
+			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
+			Assert.assertEquals(0, prerollLeft.end.first.resolvedOffset);
+			Assert.assertEquals(false, prerollLeft.end.first.resolved);
+			
+			Assert.assertEquals(0, contentLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(false, contentLeft.begin.first.resolved);
+			Assert.assertEquals(0, contentLeft.end.first.resolvedOffset);
+			Assert.assertEquals(false, contentLeft.end.first.resolved);
+			
+			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.begin.first.resolved);
+			Assert.assertEquals(0, prerollRight.end.first.resolvedOffset);
+			Assert.assertEquals(false, prerollRight.end.first.resolved);
+			
+			Assert.assertEquals(0, contentRight.begin.first.resolvedOffset);
+			Assert.assertEquals(false, contentRight.begin.first.resolved);
+			Assert.assertEquals(0, contentRight.end.first.resolvedOffset);
+			Assert.assertEquals(false, contentRight.end.first.resolved);
+			
+			prerollLeft.dur = 10000;
+			prerollRight.dur = 10000;
+			
+			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
+			Assert.assertEquals(10000, prerollLeft.end.first.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.end.first.resolved);
+			
+			Assert.assertEquals(10000, contentLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.begin.first.resolved);
+			Assert.assertEquals(10000, contentLeft.end.first.resolvedOffset);
+			Assert.assertEquals(false, contentLeft.end.first.resolved);
+			
+			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.begin.first.resolved);
+			Assert.assertEquals(10000, prerollRight.end.first.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.end.first.resolved);
+			
+			Assert.assertEquals(10000, contentRight.begin.first.resolvedOffset);
+			Assert.assertEquals(true, contentRight.begin.first.resolved);
+			Assert.assertEquals(10000, contentRight.end.first.resolvedOffset);
+			Assert.assertEquals(false, contentRight.end.first.resolved);
+			
+			contentLeft.dur = 10000;
+			contentRight.dur = 10000;
+			
+			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
+			Assert.assertEquals(10000, prerollLeft.end.first.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.end.first.resolved);
+			
+			Assert.assertEquals(10000, contentLeft.begin.first.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.begin.first.resolved);
+			Assert.assertEquals(20000, contentLeft.end.first.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.end.first.resolved);
+			
+			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.begin.first.resolved);
+			Assert.assertEquals(10000, prerollRight.end.first.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.end.first.resolved);
+			
+			Assert.assertEquals(10000, contentRight.begin.first.resolvedOffset);
+			Assert.assertEquals(true, contentRight.begin.first.resolved);
+			Assert.assertEquals(20000, contentRight.end.first.resolvedOffset);
+			Assert.assertEquals(true, contentRight.end.first.resolved);
 		}
 		
 		[Test(description="Tests resolving a flat-packed sequence of assets, i.e. all the times are defined in the SMIL")]
