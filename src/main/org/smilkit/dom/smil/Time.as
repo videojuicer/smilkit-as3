@@ -165,74 +165,79 @@ package org.smilkit.dom.smil
 			{
 				if (this.baseBegin)
 				{
+				    // BEGIN time for a tag within a parallel container
+				
 					var beginTime:ITime = (parent as IElementParallelTimeContainer).begin.first;
-					
-					if (beginTime.resolved)
-					{
-						this._resolvedOffset = beginTime.resolvedOffset;
-						this._resolved = true;
-					}
-					else
-					{
-						this._resolved = false;
-					}
+				   // TODO take into account begin attribute on baseElement
+					this._resolvedOffset = beginTime.resolvedOffset;
+					this._resolved = beginTime.resolved;
 				}
 				else
 				{
-					var time:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
-					var begin:ITime = time.begin.first;
-					
-					if (begin.resolved)
-					{
-						this._resolvedOffset = begin.resolvedOffset + time.dur;	
-						this._resolved = true;
-					}
+				    // END time for a tag within a parallel container
+				
+					var timeContainer:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
+    
+				    var begin:ITime = timeContainer.begin.first;
+				   // TODO take into account begin attribute on baseElement
+					this._resolvedOffset = begin.resolvedOffset + timeContainer.dur;					
+					this._resolved = (begin.resolved && (timeContainer.durationResolved || this._resolveWithoutDuration));
 				}
 			}
 		}
 		
 		private function resolveSequentialSyncBased(parent:IElementSequentialTimeContainer):void
 		{
-			// add up the duration of previous children
-			var children:INodeList = (parent as INode).childNodes;
+			// add up the duration of previous siblings
+			var siblings:INodeList = (parent as INode).childNodes;
 			var previousDuration:Number = 0;
+			var previousSiblingEndTimesResolved:Boolean = true;
 			
-			for (var i:int = 0; i < children.length; i++)
+			for (var i:int = 0; i < siblings.length; i++)
 			{
-				var child:INode = children.item(i);
+				var sibling:INode = siblings.item(i);
 				
-				if (child == this._baseElement)
+				if (sibling == this._baseElement)
 				{
+				    // Exit the loop when we hit this Time's baseElement
 					break;
 				}
 				
-				var timeContainer:IElementTimeContainer = (child as IElementTimeContainer);
+				var timeContainer:IElementTimeContainer = (sibling as IElementTimeContainer);
 				
 				(timeContainer.end as TimeList).resolve();
 				
 				if (timeContainer.end.first.resolved)
 				{
-					previousDuration += (child as IElementTime).end.first.resolvedOffset;
+					previousDuration += (sibling as IElementTime).end.first.resolvedOffset;
 				}
 				else
 				{
-					this._resolved = false;
-					
+					previousSiblingEndTimesResolved = false;					
 					return;
 				}
 			}
 			
 			if (this.baseBegin)
 			{
-				this._resolved = true;
+			    // BEGIN time for a tag within a sequential container
+			
+				this._resolved = previousSiblingEndTimesResolved;
+				// TODO account for begin offset
 				this._resolvedOffset = previousDuration;
 			}
 			else
 			{
-				var dur:Number = (this._baseElement as ElementTimeContainer).dur;
-				
-				this._resolved = true;
+			    // END time for a tag within a sequential container
+			
+			    var baseElementTimeContainer:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
+				var dur:Number = baseElementTimeContainer.dur;
 				this._resolvedOffset = previousDuration + dur;
+				
+				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))
+				{
+				    this._resolved = true;
+				}
 			}
 		}
 		

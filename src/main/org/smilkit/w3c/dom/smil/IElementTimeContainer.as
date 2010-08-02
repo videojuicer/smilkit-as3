@@ -6,6 +6,7 @@ package org.smilkit.w3c.dom.smil
 	{
 		function get timeChildren():INodeList;
 		
+		function get durationResolved():Boolean;
 		function activeChildrenAt(instant:Number):INodeList;
 	}
 }

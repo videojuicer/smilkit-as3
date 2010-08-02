@@ -73,6 +73,21 @@ package org.smilkit.dom.smil
 			return this._durationParser.milliseconds;
 		}
 		
+		/**
+		* Indicates whether the current duration on this time container may be considered resolved.
+		* Since SMILKit's media handlers actually write a duration to their parent nodes when resolving
+		* assets with implicit durations, for most elements this simply means determining if a duration
+		* has been set on the node. See ElementSequentialTimeContainer and ElementParallelTimeContainer for
+		* more complex implementations.
+		*
+		* @see org.smilkit.dom.smil.ElementSequentialTimeContainer
+		* @see org.smilkit.dom.smil.ElementParallelTimeContainer
+		*/
+		public function get durationResolved():Boolean
+		{
+            return this.hasAttribute("dur");
+		}
+		
 		public function set dur(dur:Number):void
 		{
 			this.setAttribute("dur", dur.toString());

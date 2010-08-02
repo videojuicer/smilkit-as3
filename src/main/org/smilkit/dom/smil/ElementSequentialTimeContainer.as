@@ -12,6 +12,26 @@ package org.smilkit.dom.smil
 			super(owner, name);
 		}
 		
+		public override function get durationResolved():Boolean
+		{
+		    if(super.durationResolved)
+		    {
+		       return true;
+		    }
+		
+            for (var i:int = (this.childNodes.length-1); i >= 0; i--)
+            {
+                if (this.childNodes.item(i) is ElementTimeContainer)
+                {
+                    if(!(this.childNodes.item(i) as ElementTimeContainer).durationResolved)
+                    {
+                          return false;
+                    }
+                }
+            }
+            return true;
+		}
+		
 		public override function get dur():Number
 		{
 			var duration:Number = super.dur;
@@ -33,7 +53,6 @@ package org.smilkit.dom.smil
 					return childDuration;
 				}
 			}
-			
 			return duration;
 		}
 	}

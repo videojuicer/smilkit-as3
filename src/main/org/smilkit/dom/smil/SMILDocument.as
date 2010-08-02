@@ -93,6 +93,18 @@ package org.smilkit.dom.smil
 			return 0;
 		}
 		
+		public function get durationResolved():Boolean
+		{
+			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
+			
+			if (body != null)
+			{
+				return body.durationResolved;
+			}
+			
+			return false;
+		}
+		
 		public function set dur(dur:Number):void
 		{
 			throw new IllegalOperationError("Unable to write duration property on SMILDocument.");
