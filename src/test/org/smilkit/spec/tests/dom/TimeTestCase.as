@@ -2,7 +2,9 @@ package org.smilkit.spec.tests.dom
 {
 	import flexunit.framework.Assert;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.ElementSequentialTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.parsers.BostonDOMParser;
@@ -27,6 +29,8 @@ package org.smilkit.spec.tests.dom
 		[Before]
 		public function setUp():void
 		{
+			SMILKit.defaults();
+			
 			this._viewport = new Viewport();
 			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_UNRESOLVED_SMIL_XML;
 			
@@ -43,10 +47,18 @@ package org.smilkit.spec.tests.dom
 		[Test(description="Tests a document is unresolved and that the elements can resolve over time.")]
 		public function unresolvedAssetsResolvedCorrectly():void
 		{
+			var sequenceLeft:ElementSequentialTimeContainer = (this.document.getElementById("left") as ElementSequentialTimeContainer);
+			var sequenceRight:ElementSequentialTimeContainer = (this.document.getElementById("right") as ElementSequentialTimeContainer);
+			
 			var prerollLeft:ISMILMediaElement = (this.document.getElementById("preroll_left") as ISMILMediaElement);
 			var contentLeft:ISMILMediaElement = (this.document.getElementById("content_left") as ISMILMediaElement);
 			var prerollRight:ISMILMediaElement = (this.document.getElementById("preroll_right") as ISMILMediaElement);
 			var contentRight:ISMILMediaElement = (this.document.getElementById("content_right") as ISMILMediaElement);
+			
+			Assert.assertEquals(0, sequenceLeft.dur);
+			Assert.assertEquals(false, sequenceLeft.durationResolved);
+			Assert.assertEquals(0, sequenceRight.dur);
+			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
 			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
@@ -71,6 +83,11 @@ package org.smilkit.spec.tests.dom
 			prerollLeft.dur = 10000;
 			prerollRight.dur = 10000;
 			
+			Assert.assertEquals(10000, sequenceLeft.dur);
+			Assert.assertEquals(false, sequenceLeft.durationResolved);
+			Assert.assertEquals(10000, sequenceRight.dur);
+			Assert.assertEquals(false, sequenceRight.durationResolved);
+			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
 			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
 			Assert.assertEquals(10000, prerollLeft.end.first.resolvedOffset);
@@ -93,6 +110,11 @@ package org.smilkit.spec.tests.dom
 			
 			contentLeft.dur = 10000;
 			contentRight.dur = 10000;
+			
+			Assert.assertEquals(20000, sequenceLeft.dur);
+			Assert.assertEquals(true, sequenceLeft.durationResolved);
+			Assert.assertEquals(20000, sequenceRight.dur);
+			Assert.assertEquals(true, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
 			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
