@@ -9,6 +9,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.smil.ITime;
 	import org.smilkit.util.logger.Logger;
 	
@@ -22,6 +23,14 @@ package org.smilkit.dom.smil
 		protected var _event:String;
 		protected var _marker:String;
 		protected var _type:int = Time.SMIL_TIME_SYNC_BASED;
+		
+		/** NON-DOM:
+		* Determines whether this time should be considered resolved if the baseElement contains no duration attribute. This flag is used to 
+		* prevent the timing model from marking temporal media elements such as video, audio etc. as having a resolved duration of zero if the 
+		* handler has not yet resolved or if no duration is provided in the document. The default behaviour is to resolve all end times as zero
+		* if their baseElement has no content or duration.
+		*/
+		protected var _resolveWithoutDuration:Boolean = true;
 		
 		/** NON-DOM:
 		* A flag used for caching purposes - each Time is processed only once during a single walk of the DOM. If <code>_validCache</code> is true, then
@@ -66,6 +75,17 @@ package org.smilkit.dom.smil
 			{
 				// Skip resolve as we have a valid cache and are not being told to force-reset the operation.
 				return;
+			}
+			
+			// If this time represents the end of a SMILMediaElement, then we may need to 
+			if(!this.baseBegin && this.baseElement is SMILMediaElement)
+			{
+				var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
+				var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
+				if(baseMediaElementHandler.temporal)
+				{
+					this._resolveWithoutDuration = false;
+				}
 			}
 			
 			// resolve the time
