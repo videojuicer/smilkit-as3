@@ -82,7 +82,7 @@ package org.smilkit.dom.smil
 			{
 				var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
 				var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
-				if(baseMediaElementHandler.temporal)
+				if(baseMediaElementHandler != null && baseMediaElementHandler.temporal)
 				{
 					this._resolveWithoutDuration = false;
 				}
