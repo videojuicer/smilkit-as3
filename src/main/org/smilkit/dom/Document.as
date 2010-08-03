@@ -754,8 +754,14 @@ package org.smilkit.dom
 			}
 		}
 		
+		protected function beforeDispatchAggregateEvents():void {
+			// Available to be overridden on child classes
+		}
+		
 		internal function dispatchAggregateEvents(node:INode, enclosingAttr:IAttr, oldValue:String, change:int):void
 		{
+			this.beforeDispatchAggregateEvents();
+			
 			var owner:Node = null;
 			
 			if (enclosingAttr != null)

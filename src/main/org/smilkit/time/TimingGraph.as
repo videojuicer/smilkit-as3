@@ -121,7 +121,7 @@ package org.smilkit.time
 							end = el.end.first.resolvedOffset;
 						}
 						
-						Logger.debug("TimingGraph rebuild: Adding "+el.tagName+" element with src "+el.src+". Begin: "+
+						Logger.debug("TimingGraph rebuild: Adding "+el.tagName+" ("+el.src+") Begin: "+
 										((begin == Time.UNRESOLVED)? "UNRESOLVED" : ((begin == Time.INDEFINITE)? "INDEFINITE" : begin))+
 										", end: "+
 										((end == Time.UNRESOLVED)? "UNRESOLVED" : ((end == Time.INDEFINITE)? "INDEFINITE" : end)), 

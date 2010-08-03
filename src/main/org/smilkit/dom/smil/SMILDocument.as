@@ -215,6 +215,11 @@ package org.smilkit.dom.smil
 			return null;
 		}
 		
+		protected override function beforeDispatchAggregateEvents():void
+		{
+			this.invalidateCachedTimes();
+		}
+		
 		/**
 		 * Invalidates all the cached resolution times that may exist on the child document
 		 * elements.
