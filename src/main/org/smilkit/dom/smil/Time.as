@@ -82,7 +82,7 @@ package org.smilkit.dom.smil
 			{
 				var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
 				var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
-				if(baseMediaElementHandler != null && baseMediaElementHandler.temporal)
+				if(baseMediaElementHandler != null && baseMediaElementHandler.temporal == true)
 				{
 					this._resolveWithoutDuration = false;
 				}
@@ -156,10 +156,7 @@ package org.smilkit.dom.smil
 		{
 			var parentBeginList:TimeList = ((parent as IElementParallelTimeContainer).begin as TimeList);
 			
-			if (!parentBeginList.resolved)
-			{
-				parentBeginList.resolve();
-			}
+			parentBeginList.resolve();
 			
 			if (parentBeginList.resolved)
 			{
@@ -213,8 +210,7 @@ package org.smilkit.dom.smil
 				}
 				else
 				{
-					previousSiblingEndTimesResolved = false;					
-					return;
+					previousSiblingEndTimesResolved = false;
 				}
 			}
 			
@@ -236,6 +232,8 @@ package org.smilkit.dom.smil
 				
 				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))
 				{
+					Logger.debug("Break: "+previousSiblingEndTimesResolved+" "+baseElementTimeContainer.durationResolved+" "+this._resolveWithoutDuration, this);
+					
 				    this._resolved = true;
 				}
 			}

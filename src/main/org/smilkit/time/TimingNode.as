@@ -45,7 +45,7 @@ package org.smilkit.time
 				return false;
 			}
 			
-			return (offset >= this._begin && offset <= this._end);
+			return (offset >= this._begin && (this._end == Time.UNRESOLVED || this._end == Time.INDEFINITE || offset <= this._end));
 		}
 	}
 }

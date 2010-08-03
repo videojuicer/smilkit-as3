@@ -121,7 +121,11 @@ package org.smilkit.time
 							end = el.end.first.resolvedOffset;
 						}
 						
-						// Logger.debug("TimingGraph rebuild: Pushing new timing node to TimingGraph for a "+el.tagName+" element with src "+el.src+". Begin: "+begin+", end: "+end, this);
+						Logger.debug("TimingGraph rebuild: Adding "+el.tagName+" element with src "+el.src+". Begin: "+
+										((begin == Time.UNRESOLVED)? "UNRESOLVED" : ((begin == Time.INDEFINITE)? "INDEFINITE" : begin))+
+										", end: "+
+										((end == Time.UNRESOLVED)? "UNRESOLVED" : ((end == Time.INDEFINITE)? "INDEFINITE" : end)), 
+										this);
 						
 						var timeElement:TimingNode = new TimingNode(el, begin, end);
 						
