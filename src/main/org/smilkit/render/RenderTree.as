@@ -662,7 +662,7 @@ package org.smilkit.render
 					// we have nothing on our plate, so we are ready!
 					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
 				}
-				Logger.debug("Load wait cycle waiting for "+this._waitingForDataHandlerList.length+" handlers to dispatch LOAD_READY.", this);
+				Logger.debug("Load wait cycle waiting for "+this._waitingForDataHandlerList.length+" handlers to dispatch LOAD_READY. ("+this._waitingForDataHandlerList.join(", ")+")", this);
 			}
 		}
 		

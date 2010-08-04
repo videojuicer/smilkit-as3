@@ -8,7 +8,8 @@ package org.smilkit.handler
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
-	
+
+	import org.smilkit.util.logger.Logger;	
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.util.RedirectLoader;
 	import org.smilkit.w3c.dom.IElement;
@@ -53,14 +54,14 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+			
 			this._loader = new RedirectLoader();
 			
 			this._loader.addEventListener(Event.COMPLETE, this.onLoaderComplete);
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderError);
 			
 			this._loader.load(new URLRequest(this.element.src), new LoaderContext(true));
-			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
 		public override function cancel():void
@@ -89,14 +90,16 @@ package org.smilkit.handler
 			var bitmapData:BitmapData = (loaderInfo.content as BitmapData);
 			this._bitmap = new Bitmap(bitmapData, "auto", true);
 			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
+			Logger.debug("Finished loading image ("+this.element.src+")", this);
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 		}
 		
 		protected function onLoaderError(e:IOErrorEvent):void
 		{
-			this.cancel();
-			
+			Logger.debug("Failed to load image ("+this.element.src+")", this);
+			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		

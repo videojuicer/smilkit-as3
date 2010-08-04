@@ -253,7 +253,7 @@ package org.smilkit.dom.smil
 				    this._resolved = true;
 				}
 				
-				Logger.debug("END time for a "+this._baseElement.nodeName+" tag in a sequential sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
+				//Logger.debug("END time for a "+this._baseElement.nodeName+" tag in a sequential sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 			}
 		}
 		
