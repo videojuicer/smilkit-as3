@@ -54,6 +54,8 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
+			Logger.debug("Starting image loader for "+this.element.src, this);
+		
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 			
 			this._loader = new RedirectLoader();
