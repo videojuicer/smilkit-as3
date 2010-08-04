@@ -35,7 +35,7 @@ package org.smilkit.spec
 			"<video id=\"content_left\" src=\"http://media.smilkit.org/demo.mp4\" region=\"left\" />" +
 			"</seq>"+
 			"<seq id=\"right\">" +
-			"<img id=\"preroll_right\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"right\" />" +
+			"<img id=\"preroll_right\" src=\"http://sixty.im/DecodedBase64.jpg\" region=\"right\" />" +
 			"<video id=\"content_right\" src=\"http://media.smilkit.org/demo.mp4\" region=\"right\" />" +
 			"</seq>"+
 			"</par></body></smil>";

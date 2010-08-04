@@ -77,12 +77,22 @@ package org.smilkit.dom.smil
 				return;
 			}
 			
-			// If this time represents the end of a SMILMediaElement, then we may need to 
-			if(!this.baseBegin && this.baseElement is SMILMediaElement)
+			// If this time represents the end of a SMILMediaElement, ElementSequentialTimeContainer or ElementParallelTimeContainer 
+			// then we will set the _resolveWithoutDuration flag to FALSE, causing the end time to remain unresolved until the
+			// node's duration is resolved. In the case of SMILMediaElements, _resolveWithoutDuration is only set to false if the 
+			// element's handler is temporal in nature.
+			if(!this.baseBegin)
 			{
-				var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
-				var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
-				if(baseMediaElementHandler != null && baseMediaElementHandler.temporal == true)
+				if(this.baseElement is SMILMediaElement)
+				{
+					var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
+					var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
+					if(baseMediaElementHandler != null && baseMediaElementHandler.temporal == true)
+					{
+						this._resolveWithoutDuration = false;
+					}
+				}
+				else if(this.baseElement is ElementSequentialTimeContainer || this.baseElement is ElementParallelTimeContainer)
 				{
 					this._resolveWithoutDuration = false;
 				}
@@ -168,6 +178,8 @@ package org.smilkit.dom.smil
 				   // TODO take into account begin attribute on baseElement
 					this._resolvedOffset = beginTime.resolvedOffset;
 					this._resolved = beginTime.resolved;
+					
+					//Logger.debug("BEGIN time for a "+this._baseElement.nodeName+" tag in a parallel sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 				}
 				else
 				{
@@ -179,6 +191,8 @@ package org.smilkit.dom.smil
 				   // TODO take into account begin attribute on baseElement
 					this._resolvedOffset = begin.resolvedOffset + timeContainer.dur;					
 					this._resolved = (begin.resolved && (timeContainer.durationResolved || this._resolveWithoutDuration));
+					
+					//Logger.debug("END time for a "+this._baseElement.nodeName+" tag in a parallel sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 				}
 			}
 		}
@@ -221,6 +235,8 @@ package org.smilkit.dom.smil
 				this._resolved = previousSiblingEndTimesResolved;
 				// TODO account for begin offset
 				this._resolvedOffset = previousDuration;
+				
+				//Logger.debug("BEGIN time for a "+this._baseElement.nodeName+" tag in a sequential sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 			}
 			else
 			{
@@ -232,10 +248,12 @@ package org.smilkit.dom.smil
 				
 				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))
 				{
-					Logger.debug("Break: "+previousSiblingEndTimesResolved+" "+baseElementTimeContainer.durationResolved+" "+this._resolveWithoutDuration, this);
+					//Logger.debug("Break: "+previousSiblingEndTimesResolved+" "+baseElementTimeContainer.durationResolved+" "+this._resolveWithoutDuration, this);
 					
 				    this._resolved = true;
 				}
+				
+				Logger.debug("END time for a "+this._baseElement.nodeName+" tag in a sequential sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 			}
 		}
 		

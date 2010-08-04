@@ -76,7 +76,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(true, prerollRight.end.first.resolved);
 			
 			Assert.assertEquals(0, contentRight.begin.first.resolvedOffset);
-			Assert.assertEquals(false, contentRight.begin.first.resolved);
+			Assert.assertEquals(true, contentRight.begin.first.resolved);
 			Assert.assertEquals(0, contentRight.end.first.resolvedOffset);
 			Assert.assertEquals(false, contentRight.end.first.resolved);
 			

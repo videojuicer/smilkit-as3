@@ -719,6 +719,9 @@ package org.smilkit.view
 		protected function onHeartbeatRunningOffsetChanged(event:HeartbeatEvent):void
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
+			
+			// Check for end of document
+			
 		}
 		
 		protected function onPlaybackStateChangedToPlaying():void
