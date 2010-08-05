@@ -4,20 +4,22 @@ package org.smilkit.handler
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.LoaderInfo;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
-
-	import org.smilkit.util.logger.Logger;	
+	
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.util.RedirectLoader;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class ImageHandler extends SMILKitHandler
 	{
 		protected var _bitmap:Bitmap;
 		protected var _loader:RedirectLoader;
+		protected var _canvas:Sprite;
 		
 		protected var _intrinsicWidth:Number = 0;
 		protected var _intrinsicHeight:Number = 0;
@@ -25,6 +27,8 @@ package org.smilkit.handler
 		public function ImageHandler(element:IElement)
 		{
 			super(element);
+			
+			this._canvas = new Sprite();
 		}
 		
 		public override function get width():uint
@@ -78,19 +82,26 @@ package org.smilkit.handler
 					this._loader = null;
 				}
 				
+				for (var i:int = 0; i < this._canvas.numChildren; i++)
+				{
+					this._canvas.removeChildAt(i);
+				}
+				
 				super.cancel();
 			}
 		}
 		
 		protected function onLoaderComplete(e:Event):void
 		{
-			var loaderInfo:LoaderInfo = (e.target as LoaderInfo);
+			var loaderInfo:LoaderInfo = this._loader.currentLoader.contentLoaderInfo;
 			
 			this._intrinsicWidth = loaderInfo.width;
 			this._intrinsicHeight = loaderInfo.height;
 			
 			var bitmapData:BitmapData = (loaderInfo.content as BitmapData);
 			this._bitmap = new Bitmap(bitmapData, "auto", true);
+			
+			this._canvas.addChild(this._bitmap);
 			
 			Logger.debug("Finished loading image ("+this.element.src+")", this);
 			
