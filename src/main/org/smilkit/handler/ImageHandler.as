@@ -70,6 +70,13 @@ package org.smilkit.handler
 			this._loader.load(new URLRequest(this.element.src), new LoaderContext(true));
 		}
 		
+		public override function resize():void
+		{
+			super.resize();
+			
+			this.drawClickShield(this._bitmap);
+		}
+		
 		public override function cancel():void
 		{
 			// only cancel the image if we havent completed loading
@@ -98,10 +105,14 @@ package org.smilkit.handler
 			this._intrinsicWidth = loaderInfo.width;
 			this._intrinsicHeight = loaderInfo.height;
 			
-			var bitmapData:BitmapData = (loaderInfo.content as BitmapData);
+			var bitmapData:BitmapData = (loaderInfo.content as Bitmap).bitmapData;
 			this._bitmap = new Bitmap(bitmapData, "auto", true);
+			//this._bitmap.width = this.width;
+			//this._bitmap.height = this.height;
 			
 			this._canvas.addChild(this._bitmap);
+			
+			this.drawClickShield(this._bitmap);
 			
 			Logger.debug("Finished loading image ("+this.element.src+")", this);
 			
