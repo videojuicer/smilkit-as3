@@ -53,7 +53,7 @@ package org.smilkit.handler
 		
 		public override function get displayObject():DisplayObject
 		{
-			return (this._bitmap as DisplayObject);
+			return (this._canvas as DisplayObject);
 		}
 		
 		public override function load():void
