@@ -102,25 +102,25 @@ package
 		
 		protected function onSeek25MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.dur / 4);
+			this._viewport.seek(this._viewport.document.duration / 4);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek50MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.dur / 2);
+			this._viewport.seek(this._viewport.document.duration / 2);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek75MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek((this._viewport.document.dur / 4) * 3);
+			this._viewport.seek((this._viewport.document.duration / 4) * 3);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek100MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.dur);
+			this._viewport.seek(this._viewport.document.duration);
 			this._viewport.commitSeek();
 		}
 		

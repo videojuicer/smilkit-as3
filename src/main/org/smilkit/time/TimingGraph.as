@@ -107,7 +107,7 @@ package org.smilkit.time
 					el.resolve();
 					
 					if (el.handler != null)
-					{
+					{ 
 						var begin:int = Time.UNRESOLVED;
 						var end:int = Time.UNRESOLVED;
 						

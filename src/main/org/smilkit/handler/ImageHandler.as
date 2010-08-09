@@ -68,6 +68,8 @@ package org.smilkit.handler
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderError);
 			
 			this._loader.load(new URLRequest(this.element.src), new LoaderContext(true));
+			
+			this._startedLoading = true;
 		}
 		
 		public override function resize():void
@@ -109,6 +111,8 @@ package org.smilkit.handler
 			this._bitmap = new Bitmap(bitmapData, "auto", true);
 			//this._bitmap.width = this.width;
 			//this._bitmap.height = this.height;
+			
+			this._completedLoading = true;
 			
 			this._canvas.addChild(this._bitmap);
 			

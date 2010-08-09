@@ -1,11 +1,11 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.parsers.SMILTimeParser;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
-	import org.smilkit.util.logger.Logger;
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
@@ -59,7 +59,12 @@ package org.smilkit.dom.smil
 			this._endList = end;
 		}
 		
-		public function get dur():Number
+		public function get dur():String
+		{
+			return this.getAttribute("dur");
+		}
+		
+		public function get duration():Number
 		{	
 			if (this._durationParser == null)
 			{
@@ -70,6 +75,7 @@ package org.smilkit.dom.smil
 			{
 				this._durationParser.parse(this.getAttribute("dur"));
 			}
+			
 			return this._durationParser.milliseconds;
 		}
 		
@@ -88,7 +94,7 @@ package org.smilkit.dom.smil
             return this.hasAttribute("dur");
 		}
 		
-		public function set dur(dur:Number):void
+		public function set dur(dur:String):void
 		{
 			this.setAttribute("dur", dur.toString()+"ms");
 		}

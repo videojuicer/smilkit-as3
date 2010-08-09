@@ -5,6 +5,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
@@ -271,9 +272,18 @@ package org.smilkit.dom.smil
 		
 		private function updateHandler():void
 		{
-			this._handler = SMILKit.createElementHandlerFor(this);
+			if (this._handler != null)
+			{
+				this._handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+			}
 			
-			//(this.ownerDocument as Document).handlerModified(this, null, this._handler);
+			this._handler = SMILKit.createElementHandlerFor(this);
+			this._handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+		}
+		
+		private function onHandlerDurationResolved(e:HandlerEvent):void
+		{
+			//(this.ownerDocument as SMILDocument).invalidateCachedTimes();
 		}
 	}
 }

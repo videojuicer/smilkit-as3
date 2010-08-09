@@ -1,5 +1,7 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -9,9 +11,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.smil.ITime;
-	import org.smilkit.util.logger.Logger;
 	
 	public class Time implements ITime
 	{
@@ -76,7 +76,7 @@ package org.smilkit.dom.smil
 				// Skip resolve as we have a valid cache and are not being told to force-reset the operation.
 				return;
 			}
-			
+
 			// If this time represents the end of a SMILMediaElement, ElementSequentialTimeContainer or ElementParallelTimeContainer 
 			// then we will set the _resolveWithoutDuration flag to FALSE, causing the end time to remain unresolved until the
 			// node's duration is resolved. In the case of SMILMediaElements, _resolveWithoutDuration is only set to false if the 
@@ -97,6 +97,8 @@ package org.smilkit.dom.smil
 					this._resolveWithoutDuration = false;
 				}
 			}
+			
+			this._type = ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (this.baseElement as ElementTimeContainer), this.baseBegin);
 			
 			// resolve the time
 			switch (this.timeType)
@@ -125,7 +127,8 @@ package org.smilkit.dom.smil
 				case Time.SMIL_TIME_MEDIA_MARKER:
 					break;
 				case Time.SMIL_TIME_INDEFINITE:
-					//this._resolvedOffset = Number.POSITIVE_INFINITY;
+					this._resolvedOffset = Time.INDEFINITE;
+					this._resolved = true;
 					break;
 				case Time.SMIL_TIME_WALLCLOCK:
 					break;
@@ -189,7 +192,7 @@ package org.smilkit.dom.smil
     
 				    var begin:ITime = timeContainer.begin.first;
 				   // TODO take into account begin attribute on baseElement
-					this._resolvedOffset = begin.resolvedOffset + timeContainer.dur;					
+					this._resolvedOffset = begin.resolvedOffset + timeContainer.duration;					
 					this._resolved = (begin.resolved && (timeContainer.durationResolved || this._resolveWithoutDuration));
 					
 					//Logger.debug("END time for a "+this._baseElement.nodeName+" tag in a parallel sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
@@ -243,7 +246,7 @@ package org.smilkit.dom.smil
 			    // END time for a tag within a sequential container
 			
 			    var baseElementTimeContainer:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
-				var dur:Number = baseElementTimeContainer.dur;
+				var dur:Number = baseElementTimeContainer.duration;
 				this._resolvedOffset = previousDuration + dur;
 				
 				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))

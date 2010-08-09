@@ -80,12 +80,12 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(0, contentRight.end.first.resolvedOffset);
 			Assert.assertEquals(false, contentRight.end.first.resolved);
 			
-			prerollLeft.dur = 10000;
-			prerollRight.dur = 10000;
+			prerollLeft.dur = "10000ms";
+			prerollRight.dur = "10000ms";
 			
-			Assert.assertEquals(10000, sequenceLeft.dur);
+			Assert.assertEquals(10000, sequenceLeft.duration);
 			Assert.assertEquals(false, sequenceLeft.durationResolved);
-			Assert.assertEquals(10000, sequenceRight.dur);
+			Assert.assertEquals(10000, sequenceRight.duration);
 			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
@@ -108,12 +108,12 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(10000, contentRight.end.first.resolvedOffset);
 			Assert.assertEquals(false, contentRight.end.first.resolved);
 			
-			contentLeft.dur = 10000;
-			contentRight.dur = 10000;
+			contentLeft.dur = "10000ms";
+			contentRight.dur = "10000ms";
 			
-			Assert.assertEquals(20000, sequenceLeft.dur);
+			Assert.assertEquals(20000, sequenceLeft.duration);
 			Assert.assertEquals(true, sequenceLeft.durationResolved);
-			Assert.assertEquals(20000, sequenceRight.dur);
+			Assert.assertEquals(20000, sequenceRight.duration);
 			Assert.assertEquals(true, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);

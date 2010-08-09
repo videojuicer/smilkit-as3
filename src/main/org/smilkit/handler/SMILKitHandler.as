@@ -376,10 +376,17 @@ package org.smilkit.handler
 				this._completedResolving = true;
 				
 				// here we update the dom
-				if (this.element != null && (this.element.dur == Time.UNRESOLVED || this.element.dur == 0))
+				if (this.element != null && (this.element.duration == Time.UNRESOLVED || this.element.duration == 0))
 				{
-					// parse the time as a millisecond time string
-					this.element.setAttribute("dur", this._duration.toString() + "ms");
+					if (resolvedDuration == Time.INDEFINITE)
+					{
+						this.element.setAttribute("dur", "indefinite");
+					}
+					else
+					{
+						// parse the time as a millisecond time string
+						this.element.setAttribute("dur", this._duration.toString() + "ms");
+					}
 				}
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.DURATION_RESOLVED, this));

@@ -32,9 +32,9 @@ package org.smilkit.dom.smil
             return true;
 		}
 		
-		public override function get dur():Number
+		public override function get duration():Number
 		{
-			var duration:Number = super.dur;
+			var duration:Number = super.duration;
 			
 			if (this.hasChildNodes() && duration == 0)
 			{
@@ -44,7 +44,7 @@ package org.smilkit.dom.smil
 				{
 					if (this.childNodes.item(i) is ElementTimeContainer)
 					{
-						childDuration += (this.childNodes.item(i) as ElementTimeContainer).dur;
+						childDuration += (this.childNodes.item(i) as ElementTimeContainer).duration;
 					}
 				}
 				

@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayOptions;
 	import flash.net.NetStreamPlayTransitions;
 	
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
@@ -374,8 +375,15 @@ package org.smilkit.handler
 
 			Logger.info("Metadata recieved: "+this._metadata.toString());
 			
-			this.resolved(this._metadata.duration);
-		}
+			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
+			{
+				this.resolved(Time.INDEFINITE);
+			}
+			else
+			{
+				this.resolved(this._metadata.duration);
+			}
+		}	
 		
 		public static function toHandlerMap():HandlerMap
 		{

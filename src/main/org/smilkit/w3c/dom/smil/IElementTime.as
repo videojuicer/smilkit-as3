@@ -8,8 +8,10 @@ package org.smilkit.w3c.dom.smil
 		function get end():ITimeList;
 		function set end(end:ITimeList):void;
 		
-		function get dur():Number;
-		function set dur(dur:Number):void;
+		function get dur():String;
+		function set dur(dur:String):void;
+		
+		function get duration():Number;
 		
 		function get restart():uint;
 		function set restart(restart:uint):void;

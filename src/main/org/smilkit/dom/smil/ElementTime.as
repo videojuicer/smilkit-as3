@@ -14,6 +14,20 @@ package org.smilkit.dom.smil
 		public static var FILL_REMOVE:int = 0;
 		public static var FILL_FREEZE:int = 1;
 		
+		public static function timeAttributeToTimeType(value:String, baseElement:ElementTimeContainer, baseBegin:Boolean):int
+		{
+			var type:int = Time.SMIL_TIME_SYNC_BASED;
+			
+			// we only care if the duration is indefinite if were at the end, as the begin node will always
+			// follow its parent or previous sibling
+			if (baseElement.dur == "indefinite" && !baseBegin)
+			{
+				type = Time.SMIL_TIME_INDEFINITE;
+			}
+			
+			return type;
+		}
+		
 		public static function parseTimeAttribute(attributeValue:String, baseElement:INode, baseBegin:Boolean):ITimeList
 		{			
 			var list:TimeList = new TimeList();
@@ -22,7 +36,7 @@ package org.smilkit.dom.smil
 			{
 				// if theres no attribute value we still need a Timelist of each point
 				// as the timelist keeps everything in flow
-				var time:Time = new Time(Time.SMIL_TIME_SYNC_BASED);
+				var time:Time = new Time(ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (baseElement as ElementTimeContainer), baseBegin));
 				time.baseElement = baseElement;
 				time.baseBegin = baseBegin;
 				
@@ -36,7 +50,7 @@ package org.smilkit.dom.smil
 					{
 						if (container.repeatDur > 0)
 						{
-							container.repeatCount = container.repeatDur / container.dur;
+							container.repeatCount = container.repeatDur / container.duration;
 						}
 						
 						// make a new time element for reach repeat
@@ -59,9 +73,7 @@ package org.smilkit.dom.smil
 				{
 					var v:String = values[i];
 					
-					// work out what v is, wallclock, event, sync based time etc...
-					
-					var parsedTime:Time = new Time(Time.SMIL_TIME_SYNC_BASED);
+					var parsedTime:Time = new Time(ElementTime.timeAttributeToTimeType(v, (baseElement as ElementTimeContainer), baseBegin));
 					parsedTime.baseElement = baseElement;
 					parsedTime.baseBegin = baseBegin;
 					

@@ -4,6 +4,7 @@ package org.smilkit.dom.smil
 	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
+	import org.smilkit.util.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
@@ -81,13 +82,25 @@ package org.smilkit.dom.smil
 			throw new IllegalOperationError("Unable to write end property on SMILDocument.");
 		}
 		
-		public function get dur():Number
+		public function get dur():String
 		{
 			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
 			
 			if (body != null)
 			{
 				return body.dur;
+			}
+			
+			return "0";
+		}
+		
+		public function get duration():Number
+		{
+			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
+			
+			if (body != null)
+			{
+				return body.duration;
 			}
 			
 			return 0;
@@ -105,7 +118,7 @@ package org.smilkit.dom.smil
 			return false;
 		}
 		
-		public function set dur(dur:Number):void
+		public function set dur(dur:String):void
 		{
 			throw new IllegalOperationError("Unable to write duration property on SMILDocument.");
 		}
@@ -226,6 +239,8 @@ package org.smilkit.dom.smil
 		 */
 		public function invalidateCachedTimes():void
 		{
+			Logger.debug("Invalidating cached times on the SMILDocument children", this);
+			
 			this.iterateAndInvalidateCachedTimes(this);
 		}
 		
@@ -244,6 +259,11 @@ package org.smilkit.dom.smil
 				{
 					((child as ElementTimeContainer).begin as TimeList).invalidate();
 					((child as ElementTimeContainer).end as TimeList).invalidate();
+				}
+				
+				if (child is SMILMediaElement)
+				{
+					Logger.debug("SMILMediaElement invalidated with begin: "+(child as ElementTimeContainer).begin.first.resolvedOffset+" and end: "+(child as ElementTimeContainer).begin.first.resolvedOffset, this);
 				}
 				
 				if (child.hasChildNodes())
