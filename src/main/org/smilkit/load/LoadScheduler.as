@@ -1,7 +1,6 @@
 package org.smilkit.load {
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.util.logger.Logger;
 	import org.smilkit.handler.SMILKitHandler;	
 	
 	import org.smilkit.dom.smil.SMILMediaElement;	

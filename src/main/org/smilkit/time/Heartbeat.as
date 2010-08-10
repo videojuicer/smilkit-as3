@@ -4,7 +4,7 @@ package org.smilkit.time
 	import flash.utils.Timer;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.events.HeartbeatEvent;
 	
 	/**

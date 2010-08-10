@@ -19,7 +19,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.util.Metadata;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class HTTPVideoHandler extends SMILKitHandler

@@ -12,7 +12,7 @@ package org.smilkit.handler
 	
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.util.RedirectLoader;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class ImageHandler extends SMILKitHandler

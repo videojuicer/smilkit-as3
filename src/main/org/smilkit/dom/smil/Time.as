@@ -1,7 +1,7 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;

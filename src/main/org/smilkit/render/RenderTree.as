@@ -17,7 +17,7 @@ package org.smilkit.render
 	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;

@@ -14,7 +14,7 @@ package org.smilkit.time
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 
 	/**
 	 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed

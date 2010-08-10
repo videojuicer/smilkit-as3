@@ -49,10 +49,7 @@
     <classEntry path="org.smilkit.events.ViewportEvent"/>
     <classEntry path="org.smilkit.render.RenderTree"/>
     <classEntry path="org.smilkit.time.Heartbeat"/>
-    <classEntry path="org.smilkit.util.logger.Logger"/>
     <classEntry path="org.smilkit.events.TimingGraphEvent"/>
-    <classEntry path="org.smilkit.util.logger.LogMessage"/>
-    <classEntry path="org.smilkit.util.logger.LogLevel"/>
     <classEntry path="org.smilkit.events.RenderTreeEvent"/>
     <classEntry path="org.smilkit.render.DrawingBoard"/>
     <classEntry path="org.smilkit.dom.CharacterData"/>
@@ -71,11 +68,7 @@
     <classEntry path="org.smilkit.handler.state.VideoHandlerState"/>
     <classEntry path="org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase"/>
     <classEntry path="org.smilkit.events.HeartbeatEvent"/>
-    <classEntry path="org.smilkit.util.Base64"/>
     <classEntry path="org.smilkit.parsers.SMILTimeParser"/>
-    <classEntry path="org.smilkit.util.logger.renderers.LogRenderer"/>
-    <classEntry path="org.smilkit.util.logger.renderers.BrowserConsoleRenderer"/>
-    <classEntry path="org.smilkit.util.logger.renderers.TraceRenderer"/>
     <classEntry path="org.smilkit.parsers.FMSURLParser"/>
   </includeClasses>
   <includeResources/>

@@ -1,7 +1,7 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.parsers.SMILTimeParser;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;

@@ -1,7 +1,7 @@
 package org.smilkit.load {
 	
 	import flash.events.EventDispatcher;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.events.WorkerEvent;
 	import org.smilkit.events.WorkUnitEvent;

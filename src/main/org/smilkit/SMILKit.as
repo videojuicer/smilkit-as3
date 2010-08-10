@@ -12,7 +12,7 @@ package org.smilkit
 	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;

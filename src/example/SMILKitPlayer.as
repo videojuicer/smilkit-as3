@@ -20,7 +20,7 @@ package
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.Viewport;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	
 	public class SMILKitPlayer extends Sprite
 	{

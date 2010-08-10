@@ -4,7 +4,7 @@ package org.smilkit.dom.smil
 	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;

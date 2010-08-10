@@ -14,7 +14,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;

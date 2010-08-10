@@ -14,7 +14,7 @@ package org.smilkit.dom
 	import org.smilkit.events.ListenerCount;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.util.ObjectManager;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;

@@ -12,7 +12,7 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.util.logger.Logger;
+	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.parsers.DataURIParser;
