@@ -3,8 +3,8 @@
 	<property environment="env" />
 	
 	<property name="instrument.metadata" value="flexunit-instrument.cvm" />
-  <property name="instrument.report.flexcover" value="flexunit-instrument.cvr" />
-  <property name="instrument.report.cobertura" value="coverage.xml" />
+  	<property name="instrument.report.flexcover" value="flexunit-instrument.cvr" />
+  	<property name="instrument.report.cobertura" value="coverage.xml" />
 	
 	<property name="main.src.loc" location="${basedir}/src/main" />
 	<property name="test.src.loc" location="${basedir}/src/test" />
@@ -51,10 +51,10 @@
 	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
 	
 	<target name="usage" description="Displays main targets of the build recipe">
-	  <java classname="org.apache.tools.ant.Main">
-	    <arg value="-projecthelp" />
-    </java>
-  </target>
+	  	<java classname="org.apache.tools.ant.Main">
+	    	<arg value="-projecthelp" />
+    	</java>
+  	</target>
 	
 	<target name="clean" description="Cleans the generated build files from the target">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" /> <!-- when running the tests from flex builder, this file is created -->
@@ -86,6 +86,7 @@
 		<mxmlc file="${test.src.loc}/SpecRunner.mxml" output="${bin.loc}/smilkit-as3-specs.swf">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
+			<source-path dir="${util.src.loc}" />
 			<library-path dir="${lib.loc}" append="true">
 				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
 				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
@@ -111,7 +112,21 @@
 	  <exec executable="${flash.player.loc}" spawn="true">
 	   <arg line="${bin.loc}/smilkit-as3-player.swf" />
 	  </exec>
-  </target>
+  	</target>
+
+	<target name="update" description="Updates the SMILKit local repo and the submodules contained within">
+		<exec executable="git" spawn="false" dir="${basedir}">
+			<arg line="pull origin master" />
+		</exec>
+		<exec executable="git" spawn="false">
+			<arg line="submodule init" />
+		</exec>
+		<exec executable="git" spawn="false" dir="${util.loc}">
+			<arg line="pull origin master" />
+		</exec>
+	</target>
+	
+	<target name="up" depends="update" description="Alias for update" />
 	
 	<target name="asdocs" description="Generates asdocs from the SMILKit-as3 source">
 		<delete file="${main.src.loc}/FlexUnitApplication.mxml" />

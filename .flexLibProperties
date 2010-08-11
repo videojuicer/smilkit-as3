@@ -12,8 +12,6 @@
     <classEntry path="org.smilkit.handler.HTTPVideoHandler"/>
     <classEntry path="org.smilkit.parsers.BostonDOMParser"/>
     <classEntry path="org.smilkit.collections.Hashtable"/>
-    <classEntry path="org.smilkit.parsers.URLParser"/>
-    <classEntry path="org.smilkit.parsers.DataURIParser"/>
     <classEntry path="org.smilkit.view.Viewport"/>
     <classEntry path="org.smilkit.spec.tests.dom.BostonDOMParserTestCase"/>
     <classEntry path="org.smilkit.time.TimingGraph"/>
@@ -63,13 +61,11 @@
     <classEntry path="org.smilkit.events.WorkUnitEvent"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.handler.RTMPVideoHandler"/>
-    <classEntry path="org.smilkit.util.RedirectLoader"/>
     <classEntry path="org.smilkit.handler.state.HandlerState"/>
     <classEntry path="org.smilkit.handler.state.VideoHandlerState"/>
     <classEntry path="org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase"/>
     <classEntry path="org.smilkit.events.HeartbeatEvent"/>
     <classEntry path="org.smilkit.parsers.SMILTimeParser"/>
-    <classEntry path="org.smilkit.parsers.FMSURLParser"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
