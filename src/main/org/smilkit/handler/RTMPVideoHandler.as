@@ -75,9 +75,14 @@ package org.smilkit.handler
 			return false;
 		}
 		
-		public override function get syncable():Boolean
+		public override function get syncPoints():Vector.<int>
 		{
-			return false;
+			if (this._metadata == null)
+			{
+				return super.syncPoints;
+			}
+			
+			return this._metadata.syncPoints;
 		}
 		
 		public override function get spatial():Boolean
@@ -136,9 +141,9 @@ package org.smilkit.handler
 			
 			this._startedLoading = true;
 			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
-			
 			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
@@ -383,6 +388,9 @@ package org.smilkit.handler
 			{
 				this.resolved(this._metadata.duration);
 			}
+			
+			// were ready as soon as we have the metadata
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}	
 		
 		public static function toHandlerMap():HandlerMap
