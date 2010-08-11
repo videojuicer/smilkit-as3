@@ -4,7 +4,7 @@ package org.smilkit.dom
 	import flash.events.EventDispatcher;
 	import flash.events.IEventDispatcher;
 	
-	import org.smilkit.util.ObjectManager;
+	import org.utilkit.util.ObjectUtil;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INamedNodeMap;
@@ -188,7 +188,7 @@ package org.smilkit.dom
 		 */
 		public function cloneNode(deep:Boolean):INode
 		{
-			var newNode:INode = ObjectManager.clone(this) as INode;
+			var newNode:INode = ObjectUtil.clone(this) as INode;
 			// should fire NODE_CLONED event
 			
 			return newNode;

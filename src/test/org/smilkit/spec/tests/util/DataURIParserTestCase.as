@@ -4,7 +4,7 @@ package org.smilkit.spec.tests.util
 	import flexunit.framework.AsyncTestHelper;
 	import org.flexunit.async.Async;
 	
-	import org.smilkit.parsers.DataURIParser;
+	import org.utilkit.parser.DataURIParser;
 
 	public class DataURIParserTestCase
 	{		

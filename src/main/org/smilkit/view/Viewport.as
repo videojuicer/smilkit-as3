@@ -15,7 +15,7 @@ package org.smilkit.view
 	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.parsers.DataURIParser;
+	import org.utilkit.parser.DataURIParser;
 
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.TimingGraphEvent;

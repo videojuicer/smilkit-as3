@@ -11,7 +11,7 @@ package org.smilkit.handler
 	import flash.system.LoaderContext;
 	
 	import org.smilkit.events.HandlerEvent;
-	import org.smilkit.util.RedirectLoader;
+	import org.utilkit.net.RedirectLoader;
 	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	

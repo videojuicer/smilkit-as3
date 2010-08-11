@@ -2,8 +2,8 @@ package org.smilkit.handler
 {
 	import flash.net.URLRequest;
 	
-	import org.smilkit.util.ObjectManager;
-	import org.smilkit.parsers.URLParser;
+	import org.utilkit.util.ObjectUtil;
+	import org.utilkit.parser.URLParser;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 
 	public class HandlerMap
@@ -47,7 +47,7 @@ package org.smilkit.handler
 			var mergedMap:HandlerMap = new HandlerMap(null, null, null);
 			
 			mergedMap._protocols = this._protocols.concat(handlerMap._protocols);
-			mergedMap._mimeMap = ObjectManager.merge(this._mimeMap, handlerMap._mimeMap);
+			mergedMap._mimeMap = ObjectUtil.merge(this._mimeMap, handlerMap._mimeMap);
 			
 			return mergedMap;
 		}

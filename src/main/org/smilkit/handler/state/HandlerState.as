@@ -1,6 +1,6 @@
 package org.smilkit.handler.state
 {
-	import org.smilkit.parsers.URLParser;
+	import org.utilkit.parser.URLParser;
 
 	public class HandlerState
 	{
