@@ -72,7 +72,7 @@ package org.smilkit.dom.smil
 		{
 			if (this._endList == null)
 			{
-				this._endList = ElementTime.parseTimeAttribute(null, (this as IElement), false);
+				this._endList = ElementTime.parseTimeAttribute(null, this, false);
 			}
 			return this._endList;
 		}

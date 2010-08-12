@@ -55,9 +55,9 @@ package org.smilkit.spec.tests.dom
 			var prerollRight:ISMILMediaElement = (this.document.getElementById("preroll_right") as ISMILMediaElement);
 			var contentRight:ISMILMediaElement = (this.document.getElementById("content_right") as ISMILMediaElement);
 			
-			Assert.assertEquals(0, sequenceLeft.dur);
+			Assert.assertEquals(0, sequenceLeft.duration);
 			Assert.assertEquals(false, sequenceLeft.durationResolved);
-			Assert.assertEquals(0, sequenceRight.dur);
+			Assert.assertEquals(0, sequenceRight.duration);
 			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);

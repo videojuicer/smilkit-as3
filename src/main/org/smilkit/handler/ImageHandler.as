@@ -76,7 +76,11 @@ package org.smilkit.handler
 		{
 			super.resize();
 			
-			this.drawClickShield(this._bitmap);
+			// catches a rare bug where the stage is resized before the content has been loaded
+			if (this._bitmap != null)
+			{
+				this.drawClickShield(this._bitmap);
+			}
 		}
 		
 		public override function cancel():void

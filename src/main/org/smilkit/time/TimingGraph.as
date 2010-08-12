@@ -98,7 +98,7 @@ package org.smilkit.time
 				{
 					var container:ElementTimeContainer = (child as ElementTimeContainer);
 					
-					Logger.debug("Found ElementTimeContainer: "+(container as Element).id);
+					Logger.debug("Found ElementTimeContainer "+(container.hasAttribute("id") ? container.getAttribute("id") : ""));
 					
 					containers.push(container);
 				}

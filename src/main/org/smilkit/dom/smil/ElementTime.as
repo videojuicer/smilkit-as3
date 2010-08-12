@@ -2,6 +2,7 @@ package org.smilkit.dom.smil
 {
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
+	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 
@@ -14,9 +15,14 @@ package org.smilkit.dom.smil
 		public static var FILL_REMOVE:int = 0;
 		public static var FILL_FREEZE:int = 1;
 		
-		public static function timeAttributeToTimeType(value:String, baseElement:ElementTimeContainer, baseBegin:Boolean):int
+		public static function timeAttributeToTimeType(value:String, baseElement:IElementTimeContainer, baseBegin:Boolean):int
 		{
 			var type:int = Time.SMIL_TIME_SYNC_BASED;
+			
+			if (baseElement == null)
+			{
+				trace("null!?");
+			}
 			
 			// we only care if the duration is indefinite if were at the end, as the begin node will always
 			// follow its parent or previous sibling
@@ -36,7 +42,7 @@ package org.smilkit.dom.smil
 			{
 				// if theres no attribute value we still need a Timelist of each point
 				// as the timelist keeps everything in flow
-				var time:Time = new Time(ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (baseElement as ElementTimeContainer), baseBegin));
+				var time:Time = new Time(ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (baseElement as IElementTimeContainer), baseBegin));
 				time.baseElement = baseElement;
 				time.baseBegin = baseBegin;
 				
@@ -73,7 +79,7 @@ package org.smilkit.dom.smil
 				{
 					var v:String = values[i];
 					
-					var parsedTime:Time = new Time(ElementTime.timeAttributeToTimeType(v, (baseElement as ElementTimeContainer), baseBegin));
+					var parsedTime:Time = new Time(ElementTime.timeAttributeToTimeType(v, (baseElement as IElementTimeContainer), baseBegin));
 					parsedTime.baseElement = baseElement;
 					parsedTime.baseBegin = baseBegin;
 					

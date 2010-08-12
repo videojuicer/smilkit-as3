@@ -53,7 +53,7 @@ package org.smilkit.spec.tests.handler
 			Assert.assertEquals(210930, e.handler.duration);
 			
 			// check the dom is still using the defined smil ending
-			Assert.assertEquals(10000, e.handler.element.dur);
+			Assert.assertEquals(10000, e.handler.element.duration);
 		}
 		
 		protected function onHandlerResolveTimeout(passThru:Object):void
