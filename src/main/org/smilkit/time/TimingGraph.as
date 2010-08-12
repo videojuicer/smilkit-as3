@@ -2,6 +2,7 @@ package org.smilkit.time
 {
 	import flash.events.EventDispatcher;
 	
+	import org.smilkit.dom.Element;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
@@ -96,6 +97,8 @@ package org.smilkit.time
 				if (child is ElementTimeContainer)
 				{
 					var container:ElementTimeContainer = (child as ElementTimeContainer);
+					
+					Logger.debug("Found ElementTimeContainer: "+(container as Element).id);
 					
 					containers.push(container);
 				}

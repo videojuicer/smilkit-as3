@@ -2,19 +2,37 @@ package org.smilkit.spec.tests.dom
 {
 	import flexunit.framework.Assert;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.dom.Element;
+	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	
 	public class ElementTestCase
 	{
 		private var _document:IDocument;
+		private var _multiDocument:ISMILDocument;
 		
 		public function ElementTestCase()
 		{
 			this._document = new Document(new DocumentType(null, "smil"));
+		}
+		
+		
+		
+		[Before]
+		public function setUp():void
+		{
+			SMILKit.defaults();
+			
+			var parser:BostonDOMParser = new BostonDOMParser();
+			this._multiDocument = (parser.parse(Fixtures.MULTIPLE_CHILDREN_SMIL_XML) as ISMILDocument);
 		}
 		
 		[Test(description="Tests the creation of an Element on a Document.")]
@@ -93,6 +111,16 @@ package org.smilkit.spec.tests.dom
 			el.removeAttribute("hello");
 			
 			Assert.assertFalse(el.hasAttribute("hello"));
+		}
+		
+		[Test(description="Tests a DOM element can correctly store its children")]
+		public function domStoresChildren():void
+		{
+			var el:Element = (this._multiDocument.getElementById("holder") as Element);
+			
+			Assert.assertNotNull(el);
+			
+			Assert.assertEquals(4, el.length);
 		}
 	}
 }

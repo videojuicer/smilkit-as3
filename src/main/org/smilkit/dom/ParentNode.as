@@ -8,7 +8,7 @@ package org.smilkit.dom
 	public class ParentNode extends ChildNode
 	{
 		protected var _firstChild:INode = null;
-		protected var _nodes:Vector.<INode> = null;
+		protected var _childNodeCount:int = -1;
 		
 		public function ParentNode(owner:IDocument)
 		{
@@ -73,7 +73,6 @@ package org.smilkit.dom
 			var newNode:ParentNode = super.cloneNode(deep) as ParentNode;
 			newNode._ownerDocument = ownerDocument;
 			newNode._firstChild = null;
-			newNode._nodes = null;
 			
 			if (deep)
 			{
@@ -184,6 +183,9 @@ package org.smilkit.dom
 			
 			this.changed();
 			
+			// invalidate cache
+			this._childNodeCount = -1;
+			
 			(this._ownerDocument as Document).insertedNode(this, newInternal, false);
 			
 			// sent out changed event
@@ -229,6 +231,9 @@ package org.smilkit.dom
 			(oldChild as ChildNode).nextSibling = null;
 			(oldChild as ChildNode).previousSibling = null;
 			
+			// invalidate cache
+			this._childNodeCount = -1;
+			
 			if (oldChild is Element)
 			{
 				var oldElement:Element = (oldChild as Element);
@@ -262,24 +267,25 @@ package org.smilkit.dom
 			return oldChild;
 		}
 		
+		private function invalidateNodeCache():void
+		{
+			if (this._childNodeCount == -1)
+			{
+				var node:ChildNode = (this.firstChild as ChildNode);
+				this._childNodeCount = 0;
+				
+				for (; node != null; node = (node.nextSibling as ChildNode))
+				{
+					this._childNodeCount++;
+				}
+			}
+		}
+		
 		public override function get length():int
 		{
-			if (this.firstChild == null)
-			{
-				return 0;
-			}
+			this.invalidateNodeCache();
 			
-			if (this.firstChild == this.lastChild)
-			{
-				return 1;
-			}
-			
-			if (this._nodes == null)
-			{
-				return 2;
-			}
-			
-			return this._nodes.length + 2;
+			return this._childNodeCount;
 		}
 		
 		public override function item(index:int):INode
