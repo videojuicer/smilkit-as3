@@ -3,8 +3,9 @@ package org.smilkit.spec.tests.time
 	import flexunit.framework.Assert;
 	
 	import org.flexunit.async.Async;
-	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.SMILKit;
 	import org.smilkit.events.HeartbeatEvent;
+	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.view.Viewport;
 
@@ -17,6 +18,8 @@ package org.smilkit.spec.tests.time
 		[Before]
 		public function setUp():void
 		{
+			SMILKit.defaults();
+			
 			this._viewport = new Viewport();
 			this._resumeEventDispatched = false;
 			this._pauseEventDispatched = false;
