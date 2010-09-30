@@ -2,6 +2,7 @@ package org.smilkit.dom.smil
 {
 	import flash.errors.IllegalOperationError;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
 	import org.utilkit.logger.Logger;
@@ -239,7 +240,7 @@ package org.smilkit.dom.smil
 		 */
 		public function invalidateCachedTimes():void
 		{
-			Logger.debug("Invalidating cached times on the SMILDocument children", this);
+			SMILKit.logger.debug("Invalidating cached times on the SMILDocument children", this);
 			
 			this.iterateAndInvalidateCachedTimes(this);
 		}
@@ -263,7 +264,7 @@ package org.smilkit.dom.smil
 				
 				if (child is SMILMediaElement)
 				{
-					Logger.debug("SMILMediaElement invalidated with begin: "+(child as ElementTimeContainer).begin.first.resolvedOffset+" and end: "+(child as ElementTimeContainer).begin.first.resolvedOffset, this);
+					SMILKit.logger.debug("SMILMediaElement invalidated with begin: "+(child as ElementTimeContainer).begin.first.resolvedOffset+" and end: "+(child as ElementTimeContainer).begin.first.resolvedOffset, this);
 				}
 				
 				if (child.hasChildNodes())

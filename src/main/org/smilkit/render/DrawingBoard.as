@@ -9,6 +9,7 @@ package org.smilkit.render
 	import mx.controls.Button;
 	import mx.controls.Label;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.HeartbeatEvent;
@@ -73,7 +74,7 @@ package org.smilkit.render
 				
 				if (elements != null)
 				{
-					Logger.debug("Attempting to draw "+elements.length+" handlers to the Canvas", this);
+					SMILKit.logger.debug("Attempting to draw "+elements.length+" handlers to the Canvas", this);
 					
 					var drawnCount:int = 0;
 					
@@ -93,7 +94,7 @@ package org.smilkit.render
 							{
 								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 								
-								Logger.debug("Adding Handler to region '"+regionId+"' on the DrawingBoard", handler);
+								SMILKit.logger.debug("Adding Handler to region '"+regionId+"' on the DrawingBoard", handler);
 								drawnCount++;
 								
 								// place the element on to the region it belongs too
@@ -106,7 +107,7 @@ package org.smilkit.render
 					
 					if (drawnCount > 0)
 					{
-						Logger.debug("Drawn "+drawnCount+" handlers to the Canvas", this);
+						SMILKit.logger.debug("Drawn "+drawnCount+" handlers to the Canvas", this);
 					}
 				}
 			}
@@ -148,7 +149,7 @@ package org.smilkit.render
 					this._canvas.addChild(this._regions[j]);
 				}
 				
-				Logger.debug("Re-drawn "+this._regions.length+" regions to the DrawingBoard's Canvas", this);
+				SMILKit.logger.debug("Re-drawn "+this._regions.length+" regions to the DrawingBoard's Canvas", this);
 			}
 		}
 		
@@ -166,7 +167,7 @@ package org.smilkit.render
 				this._regions = new Vector.<RegionContainer>();
 			}
 			
-			Logger.debug("Removed drawn regions", this);
+			SMILKit.logger.debug("Removed drawn regions", this);
 		}
 		
 		/**
@@ -182,7 +183,7 @@ package org.smilkit.render
 				this.removeRegions();
 			}
 			
-			Logger.debug("Resetting the DrawingBoard and Canvas state", this);
+			SMILKit.logger.debug("Resetting the DrawingBoard and Canvas state", this);
 			
 			this._elements = new Vector.<TimingNode>();
 			this._canvas = new Sprite();

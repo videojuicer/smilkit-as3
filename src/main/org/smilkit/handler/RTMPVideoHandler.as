@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayOptions;
 	import flash.net.NetStreamPlayTransitions;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
@@ -175,7 +176,7 @@ package org.smilkit.handler
 			
 			if(this._soundTransformer != null && this._netStream != null)
 			{
-				Logger.debug("Handler volume set to "+volume+".", this);
+				SMILKit.logger.debug("Handler volume set to "+volume+".", this);
 				
 				this._soundTransformer.volume = volume/100;
 				
@@ -187,7 +188,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Resuming playback.", this);
+				SMILKit.logger.debug("Resuming playback.", this);
 
 				this._netStream.resume();
 			}
@@ -197,7 +198,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Pausing playback.", this);
+				SMILKit.logger.debug("Pausing playback.", this);
 
 				this._netStream.pause();
 			}
@@ -206,7 +207,7 @@ package org.smilkit.handler
 		public override function seek(seekTo:Number):void
 		{
 			var seconds:Number = (seekTo / 1000);
-			Logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
 			
 			this._netStream.seek(seconds);
 		}
@@ -251,12 +252,12 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetConnection.Connect.Failed":
-					Logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' failed: "+e.info.message, this);
+					SMILKit.logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' failed: "+e.info.message, this);
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
 				case "NetConnection.Connect.Rejected":
-					Logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' rejected by Flash Media Server", this);
+					SMILKit.logger.fatal("NetConnection to '"+this.videoHandlerState.fmsURL.hostname+"' rejected by Flash Media Server", this);
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
@@ -287,7 +288,7 @@ package org.smilkit.handler
 		
 		public function onBWDone(... rest):void
 		{
-			Logger.debug("Bandwidth received on NetConnection from Flash Media Server", this);	
+			SMILKit.logger.debug("Bandwidth received on NetConnection from Flash Media Server", this);	
 		}
 		
 		protected function onConnectionIOErrorEvent(e:IOErrorEvent):void
@@ -308,7 +309,7 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			Logger.debug("NetStatusEvent: "+e.info.code, e);
+			SMILKit.logger.debug("NetStatusEvent: "+e.info.code, e);
 			
 			switch (e.info.code)
 			{
@@ -378,7 +379,7 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 
-			Logger.info("Metadata recieved: "+this._metadata.toString());
+			SMILKit.logger.info("Metadata recieved: "+this._metadata.toString());
 			
 			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
 			{

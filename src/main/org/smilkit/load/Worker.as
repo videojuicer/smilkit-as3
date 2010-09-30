@@ -1,6 +1,8 @@
 package org.smilkit.load {
 	
 	import flash.events.EventDispatcher;
+	
+	import org.smilkit.SMILKit;
 	import org.utilkit.logger.Logger;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.events.WorkerEvent;
@@ -309,11 +311,11 @@ package org.smilkit.load {
 		}
 		
 		protected function logInfo(msg:String):void {
-			Logger.info("Worker : "+this.loggerName+" : "+msg, this);
+			SMILKit.logger.info("Worker : "+this.loggerName+" : "+msg, this);
 		}
 		
 		protected function logDebug(msg:String):void {
-			Logger.debug("Worker : "+this.loggerName+" : "+msg, this);
+			SMILKit.logger.debug("Worker : "+this.loggerName+" : "+msg, this);
 		}
 		
 		

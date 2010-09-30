@@ -2,6 +2,7 @@ package org.smilkit.time
 {
 	import flash.events.EventDispatcher;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.ElementTimeContainer;
@@ -98,7 +99,7 @@ package org.smilkit.time
 				{
 					var container:ElementTimeContainer = (child as ElementTimeContainer);
 					
-					Logger.debug("Found ElementTimeContainer "+(container.hasAttribute("id") ? container.getAttribute("id") : ""));
+					SMILKit.logger.debug("Found ElementTimeContainer "+(container.hasAttribute("id") ? container.getAttribute("id") : ""));
 					
 					containers.push(container);
 				}
@@ -124,7 +125,7 @@ package org.smilkit.time
 							end = el.end.first.resolvedOffset;
 						}
 						
-						Logger.debug("TimingGraph rebuild: Adding "+el.tagName+" ("+el.src+") Begin: "+
+						SMILKit.logger.debug("TimingGraph rebuild: Adding "+el.tagName+" ("+el.src+") Begin: "+
 										((begin == Time.UNRESOLVED)? "UNRESOLVED" : ((begin == Time.INDEFINITE)? "INDEFINITE" : begin))+
 										", end: "+
 										((end == Time.UNRESOLVED)? "UNRESOLVED" : ((end == Time.INDEFINITE)? "INDEFINITE" : end)), 
@@ -162,7 +163,7 @@ package org.smilkit.time
 		 */		
 		protected function onMutationEvent(e:MutationEvent):void
 		{
-			Logger.debug("Received mutation event of type "+e.type+". Attr name: "+e.attrName+", new value: "+e.newValue+" prev value: "+e.prevValue, this);
+			SMILKit.logger.debug("Received mutation event of type "+e.type+". Attr name: "+e.attrName+", new value: "+e.newValue+" prev value: "+e.prevValue, this);
 			this.rebuild();
 		}
 		

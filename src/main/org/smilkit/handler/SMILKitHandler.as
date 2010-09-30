@@ -6,6 +6,7 @@ package org.smilkit.handler
 	import flash.events.EventDispatcher;
 	import flash.geom.Rectangle;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
@@ -278,7 +279,7 @@ package org.smilkit.handler
 		 */
 		public function cancel():void
 		{
-			Logger.debug("Cancelling load operation.", this)
+			SMILKit.logger.debug("Cancelling load operation.", this)
 			
 			this._completedLoading = false;
 			this._startedLoading = false;
@@ -295,7 +296,7 @@ package org.smilkit.handler
 		 */
 		public function movedToJustInTimeWorkList():void
 		{
-			Logger.debug("Handler moved to just in time worker's worklist", this);
+			SMILKit.logger.debug("Handler moved to just in time worker's worklist", this);
 			
 			if (!this.startedLoading)
 			{
@@ -317,7 +318,7 @@ package org.smilkit.handler
 		 */
 		public function movedToPreloadWorkList():void
 		{
-			Logger.debug("Handler moved to preload worker's worklist", this);
+			SMILKit.logger.debug("Handler moved to preload worker's worklist", this);
 			
 			if (!this.startedLoading && this.preloadable)
 			{
@@ -336,7 +337,7 @@ package org.smilkit.handler
 		 */
 		public function movedToResolveWorkList():void
 		{
-			Logger.debug("Handler moved to resolve worker's worklist", this);
+			SMILKit.logger.debug("Handler moved to resolve worker's worklist", this);
 			
 			if (!this.startedLoading && this.resolvable)
 			{
@@ -352,7 +353,7 @@ package org.smilkit.handler
 		 */
 		public function removedFromLoadScheduler():void
 		{
-			Logger.debug("Handler removed from load scheduler", this);
+			SMILKit.logger.debug("Handler removed from load scheduler", this);
 			
 			if (this.startedLoading && !this.completedLoading)
 			{
@@ -370,7 +371,7 @@ package org.smilkit.handler
 		{
 			if (!this._completedResolving || resolvedDuration != this._duration)
 			{
-				Logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
+				SMILKit.logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
 				
 				this._duration = resolvedDuration;
 				this._completedResolving = true;

@@ -12,10 +12,11 @@ package org.smilkit
 	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.utilkit.logger.ApplicationLog;
+	import org.utilkit.logger.Logger;
 	
 	/**
 	 * SMILKit's main static API object, allows the creation, manipulation and browsing of SMIL3.0 DOM documents.
@@ -29,6 +30,7 @@ package org.smilkit
 	{
 		private static var __version:String = "0.1.0";
 		private static var __handlers:Hashtable = new Hashtable();
+		private static var __applicationLog:ApplicationLog = new ApplicationLog("smilkit-as3");
 		
 		/**
 		 * Retrieve's the current SMILKit version.
@@ -36,6 +38,11 @@ package org.smilkit
 		public static function get version():String
 		{
 			return SMILKit.__version;
+		}
+		
+		public static function get logger():ApplicationLog
+		{
+			return SMILKit.__applicationLog;
 		}
 		
 		/**

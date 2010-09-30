@@ -419,12 +419,12 @@ package org.smilkit.view
 			
 			if(this.location.indexOf("data:") == 0)
 			{
-				Logger.info("About to refresh with Data URI.", this);
+				SMILKit.logger.info("About to refresh with Data URI.", this);
 				this.refreshWithDataURI();
 			}
 			else
 			{
-				Logger.info("About to refresh with remote URL: "+this.location, this);
+				SMILKit.logger.info("About to refresh with remote URL: "+this.location, this);
 				this.refreshWithRemoteURI();
 			}
 		}
@@ -533,7 +533,7 @@ package org.smilkit.view
 		*/
 		public function commitSeek():Boolean
 		{
-			Logger.info("Seek operation committed. Reverting to previous playback state at offset: "+this.offset, this);
+			SMILKit.logger.info("Seek operation committed. Reverting to previous playback state at offset: "+this.offset, this);
 			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
 			{
 				this.loadScheduler.start();
@@ -557,7 +557,7 @@ package org.smilkit.view
 		{
 			if(newState != this._playbackState)
 			{
-				Logger.info("Playback state set to to "+newState+".", this);
+				SMILKit.logger.info("Playback state set to to "+newState+".", this);
 				// Register a basic state change
 				this._previousPlaybackState = this._playbackState;
 				this._playbackState = newState;
@@ -581,7 +581,7 @@ package org.smilkit.view
 			}
 			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
 			{
-				Logger.info("Playback state set to "+newState+" (offset: "+offset+").", this);
+				SMILKit.logger.info("Playback state set to "+newState+" (offset: "+offset+").", this);
 				// Register a special case for changing offset while seeking
 				this._previousUncommittedSeekOffset = offset;
 				this.onPlaybackStateChangedToSeekingWithOffset(offset);
@@ -599,7 +599,7 @@ package org.smilkit.view
 		*/
 		public function revertPlaybackState():void
 		{
-			Logger.debug("About to revert playback state to "+this._previousPlaybackState+".", this);	
+			SMILKit.logger.debug("About to revert playback state to "+this._previousPlaybackState+".", this);	
 			this.setPlaybackState(this._previousPlaybackState);
 		}
 		
@@ -656,15 +656,15 @@ package org.smilkit.view
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_VOLUME_CHANGED));
 				if(newVolume == 0 && !mutedBeforeChange)
 				{
-					Logger.info("Audio muted.", this);	
+					SMILKit.logger.info("Audio muted.", this);	
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_MUTED));
 				} 
 				if(newVolume > 0 && mutedBeforeChange) 
 				{
-					Logger.info("Audio unmuted.", this);
+					SMILKit.logger.info("Audio unmuted.", this);
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.AUDIO_UNMUTED));
 				}
-				Logger.info("Audio volume changed to "+newVolume+".", this);
+				SMILKit.logger.info("Audio volume changed to "+newVolume+".", this);
 				return true;
 			}
 			else
@@ -708,7 +708,7 @@ package org.smilkit.view
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 			
 			// Shout out REFRESH DONE LOL
-			Logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
+			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
 		
@@ -734,24 +734,24 @@ package org.smilkit.view
 
 			if(!this._waitingForRenderTree)
 			{
-				Logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
+				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
 				this.heartbeat.resume();
 			}
 			else
 			{
-				Logger.info("Playback state changed to PLAYBACK_PLAYING, but RenderTree is not ready. Waiting for RenderTree to become ready before resuming playback.", this);
+				SMILKit.logger.info("Playback state changed to PLAYBACK_PLAYING, but RenderTree is not ready. Waiting for RenderTree to become ready before resuming playback.", this);
 			}	
 		}
 		
 		protected function onPlaybackStateChangedToPaused():void
 		{
-			Logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
+			SMILKit.logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
 			this.heartbeat.pause();
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
-			Logger.info("Completed changing playback state to PLAYBACK_SEEKING with offset: "+offset+".", this);
+			SMILKit.logger.info("Completed changing playback state to PLAYBACK_SEEKING with offset: "+offset+".", this);
 			this.loadScheduler.stop();
 			this.heartbeat.pause();
 			this.heartbeat.seek(offset);
@@ -760,7 +760,7 @@ package org.smilkit.view
 		
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
-			Logger.info("Waiting for more data to load.", this);
+			SMILKit.logger.info("Waiting for more data to load.", this);
 			this._waitingForRenderTree = true;
 			this.heartbeat.pause();
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
@@ -768,7 +768,7 @@ package org.smilkit.view
 		
 		protected function onRenderTreeWaitingForSync(event:RenderTreeEvent):void
 		{
-			Logger.info("Waiting for sync before playback can resume.", this);
+			SMILKit.logger.info("Waiting for sync before playback can resume.", this);
 			this._waitingForRenderTree = true;
 			this.heartbeat.pause();
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
@@ -776,14 +776,14 @@ package org.smilkit.view
 		
 		protected function onRenderTreeReady(event:RenderTreeEvent):void
 		{
-			Logger.info("Ready to play.", this);
+			SMILKit.logger.info("Ready to play.", this);
 			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
 			if(this._waitingForRenderTree)
 			{
 				this._waitingForRenderTree = false;
 				if(this._playbackState == Viewport.PLAYBACK_PLAYING)
 				{
-					Logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
+					SMILKit.logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
 					this.onPlaybackStateChangedToPlaying();
 				}				
 			}				
@@ -792,7 +792,7 @@ package org.smilkit.view
 		
 		protected function onTimingGraphRebuild(event:TimingGraphEvent):void
 		{
-			Logger.debug("Document mutated.", this);
+			SMILKit.logger.debug("Document mutated.", this);
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
 		}
 		
@@ -803,12 +803,12 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
 		{
-			Logger.fatal("Could not load remote document because of an IO Error.", this);
+			SMILKit.logger.fatal("Could not load remote document because of an IO Error.", this);
 		}
 		
 		private function onRefreshWithRemoteURISecurityError(e:SecurityErrorEvent):void
 		{
-			Logger.fatal("Could not load remote document because of a Security Error.", this);
+			SMILKit.logger.fatal("Could not load remote document because of a Security Error.", this);
 		}
 	}
 }

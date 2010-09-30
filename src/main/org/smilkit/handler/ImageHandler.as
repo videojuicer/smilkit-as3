@@ -10,6 +10,7 @@ package org.smilkit.handler
 	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
 	import org.utilkit.net.RedirectLoader;
 	import org.utilkit.logger.Logger;
@@ -58,7 +59,7 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
-			Logger.debug("Starting image loader for "+this.element.src, this);
+			SMILKit.logger.debug("Starting image loader for "+this.element.src, this);
 		
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 			
@@ -122,7 +123,7 @@ package org.smilkit.handler
 			
 			this.drawClickShield(this._bitmap);
 			
-			Logger.debug("Finished loading image ("+this.element.src+")", this);
+			SMILKit.logger.debug("Finished loading image ("+this.element.src+")", this);
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
@@ -130,7 +131,7 @@ package org.smilkit.handler
 		
 		protected function onLoaderError(e:IOErrorEvent):void
 		{
-			Logger.debug("Failed to load image ("+this.element.src+")", this);
+			SMILKit.logger.debug("Failed to load image ("+this.element.src+")", this);
 			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}

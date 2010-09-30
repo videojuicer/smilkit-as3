@@ -139,7 +139,7 @@ package
 			this.graphics.drawRect(0, 0, this.stage.stageWidth, this.stage.stageHeight);
 			this.graphics.endFill();
 			
-			Logger.info("SMILKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
+			SMILKit.logger.info("SMILKitPlayer - Application Size: "+this.width+"/"+this.height+" Stage Size: "+this.stage.stageWidth+"/"+this.stage.stageHeight);	
 		}
 		
 		protected function onLogCopyItem(e:Event):void

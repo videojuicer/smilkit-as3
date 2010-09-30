@@ -14,7 +14,7 @@ package org.smilkit.handler
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	
-	import org.osmf.events.TimeEvent;
+	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
@@ -174,7 +174,7 @@ package org.smilkit.handler
 			this._volume = volume;
 			if(this._soundTransformer != null && this._netStream != null)
 			{
-				Logger.debug("Handler volume set to "+volume+".", this);
+				SMILKit.logger.debug("Handler volume set to "+volume+".", this);
 				this._soundTransformer.volume = volume/100;
 				this._netStream.soundTransform = this._soundTransformer;
 			}
@@ -184,7 +184,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Resuming playback.", this);
+				SMILKit.logger.debug("Resuming playback.", this);
 				this._resumed = true;
 				this._netStream.resume();
 			}
@@ -194,7 +194,7 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null)
 			{
-				Logger.debug("Pausing playback.", this);
+				SMILKit.logger.debug("Pausing playback.", this);
 				this._resumed = false;
 				this._netStream.pause();
 			}
@@ -223,7 +223,7 @@ package org.smilkit.handler
 			else
 			{
 				// Stash the seek until we're able to do it.
-				Logger.debug("Seek to "+seekTo+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+				SMILKit.logger.debug("Seek to "+seekTo+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
 				this._queuedSeek = true;
 				this._queuedSeekTarget = seekTo;
 			}
@@ -240,7 +240,7 @@ package org.smilkit.handler
 			// Execute seek
 			// this._netStream.resume();
 			var seconds:Number = (seekTo / 1000);
-			Logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
 			this._netStream.seek(seconds);
 		}
 		
@@ -251,12 +251,12 @@ package org.smilkit.handler
 		{
 			if(this._queuedSeek)
 			{
-				Logger.debug("About to execute a deferred seek operation to "+this._queuedSeekTarget+"ms.", this);
+				SMILKit.logger.debug("About to execute a deferred seek operation to "+this._queuedSeekTarget+"ms.", this);
 				this.execSeek(this._queuedSeekTarget);
 			}
 			else
 			{
-				Logger.debug("Asked to execute any queued seek operation, but no seek operation is queued.", this);
+				SMILKit.logger.debug("Asked to execute any queued seek operation, but no seek operation is queued.", this);
 			}
 		}
 
@@ -303,7 +303,7 @@ package org.smilkit.handler
 				var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration);
 				
-				Logger.debug("readyToPlayAt: Loaded "+percentageLoaded+"% of file, equating to "+durationLoaded+"ms of playtime. Desired offset is "+offset+"ms.", this);
+				SMILKit.logger.debug("readyToPlayAt: Loaded "+percentageLoaded+"% of file, equating to "+durationLoaded+"ms of playtime. Desired offset is "+offset+"ms.", this);
 				
 				if (offset == 0)
 				{
@@ -351,7 +351,7 @@ package org.smilkit.handler
 		{
 			if(this.readyToPlayAt(this._queuedSeekTarget))
 			{
-				Logger.debug("checkQueuedSeekLoadState: now ready to seek. About to execute deferred seek.", this);
+				SMILKit.logger.debug("checkQueuedSeekLoadState: now ready to seek. About to execute deferred seek.", this);
 				
 				this.execQueuedSeek();
 				
@@ -363,7 +363,7 @@ package org.smilkit.handler
 			}
 			else
 			{
-				Logger.debug("checkQueuedSeekLoadState: Not yet ready to seek to target "+this._queuedSeekTarget+"ms.", this);
+				SMILKit.logger.debug("checkQueuedSeekLoadState: Not yet ready to seek to target "+this._queuedSeekTarget+"ms.", this);
 				
 				if(this._loadReady)
 				{
@@ -413,7 +413,7 @@ package org.smilkit.handler
 			{
 				this._completedLoading = true;
 				
-				Logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
+				SMILKit.logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			}
@@ -428,7 +428,7 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			Logger.debug("NetStatus Event on video at internal offset "+this._netStream.time+"s: "+e.info.level+" "+e.info.code);
+			SMILKit.logger.debug("NetStatus Event on video at internal offset "+this._netStream.time+"s: "+e.info.level+" "+e.info.code);
 			
 			switch (e.info.code)
 			{
@@ -477,14 +477,14 @@ package org.smilkit.handler
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
-			Logger.debug("Handler encountered an IO error during load.", this);
+			SMILKit.logger.debug("Handler encountered an IO error during load.", this);
 			this.cancel();
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onSecurityErrorEvent(e:SecurityErrorEvent):void
 		{
-			Logger.debug("Handler encountered a security error during load.", this);
+			SMILKit.logger.debug("Handler encountered a security error during load.", this);
 			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
@@ -492,7 +492,7 @@ package org.smilkit.handler
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			Logger.debug("Handler encountered an async error during load: "+e.error.name+", "+e.error.message, this);
+			SMILKit.logger.debug("Handler encountered an async error during load: "+e.error.name+", "+e.error.message, this);
 			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
@@ -510,11 +510,11 @@ package org.smilkit.handler
 			
 			if(!this._resumed)
 			{
-				Logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
+				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				this.pause();
 			}
 			
-			Logger.info("Metadata received (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
+			SMILKit.logger.info("Metadata received (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
 			
 			this.resolved(this._metadata.duration);
 		}

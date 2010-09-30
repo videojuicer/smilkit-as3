@@ -5,6 +5,7 @@ package org.smilkit.dom
 	import mx.events.EventListenerRequest;
 	import mx.utils.ObjectUtil;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.collections.Hashtable;
 	import org.smilkit.collections.List;
 	import org.smilkit.collections.ListenerEntry;
@@ -331,7 +332,7 @@ package org.smilkit.dom
 								catch (e:Error)
 								{
 									// catch all
-									Logger.error("Failed to execute capturing listener: "+e.toString());
+									SMILKit.logger.error("Failed to execute capturing listener: "+e.toString());
 								}
 							}
 						}
@@ -364,7 +365,7 @@ package org.smilkit.dom
 							catch (e:Error)
 							{
 								// catch all
-								Logger.error("Failed to execute bubbling listener: "+e.toString());
+								SMILKit.logger.error("Failed to execute bubbling listener: "+e.toString());
 							}
 						}
 					}
@@ -401,7 +402,7 @@ package org.smilkit.dom
 									}
 									catch(e:Error)
 									{
-										Logger.error("Failed to execute bubble listener: "+e.toString());
+										SMILKit.logger.error("Failed to execute bubble listener: "+e.toString());
 									}
 								}
 							}
