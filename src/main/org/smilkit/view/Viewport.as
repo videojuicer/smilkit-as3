@@ -804,11 +804,15 @@ package org.smilkit.view
 		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
 		{
 			SMILKit.logger.fatal("Could not load remote document because of an IO Error.", this);
+			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_IOERROR));
 		}
 		
 		private function onRefreshWithRemoteURISecurityError(e:SecurityErrorEvent):void
 		{
 			SMILKit.logger.fatal("Could not load remote document because of a Security Error.", this);
+			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_SECURITY_ERROR));
 		}
 	}
 }

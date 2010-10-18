@@ -27,6 +27,10 @@ package org.smilkit.events
 		// Document changed internally
 		public static var DOCUMENT_MUTATED:String = "viewportDocumentMutated";
 		
+		// Loader errors
+		public static var LOADER_SECURITY_ERROR:String = "viewportLoaderSecurityError";
+		public static var LOADER_IOERROR:String = "viewportLoaderIOError";
+		
 		public function ViewportEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
