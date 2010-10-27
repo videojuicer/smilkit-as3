@@ -66,6 +66,8 @@
     <classEntry path="org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase"/>
     <classEntry path="org.smilkit.events.HeartbeatEvent"/>
     <classEntry path="org.smilkit.parsers.SMILTimeParser"/>
+    <classEntry path="org.smilkit.parsers.BostonDOMParserEvent"/>
+    <classEntry path="org.smilkit.handler.ReferenceHandler"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

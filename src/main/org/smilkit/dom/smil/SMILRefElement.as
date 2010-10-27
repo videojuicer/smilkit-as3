@@ -1,13 +1,77 @@
 package org.smilkit.dom.smil
 {
+	import flash.events.Event;
+	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
+	
+	import org.smilkit.SMILKit;
+	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.parsers.BostonDOMParserEvent;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILRefElement;
 	
 	public class SMILRefElement extends SMILMediaElement implements ISMILRefElement
 	{
+		protected var _parser:BostonDOMParser;
+		
 		public function SMILRefElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
+			
+			this._parser = new BostonDOMParser();
+			
+			this._parser.addEventListener(BostonDOMParserEvent.PARSER_COMPLETE, this.onParserComplete);
+			this._parser.addEventListener(IOErrorEvent.IO_ERROR, this.onParserIOError);
+			this._parser.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onParserSecurityError);
+			this._parser.addEventListener(Event.COMPLETE, this.onParserLoadComplete);
+		}
+		
+		public function get parser():BostonDOMParser
+		{
+			return this._parser;
+		}
+		
+		public function refresh():void
+		{
+			var smilURI:String = this.getAttribute("src");
+			
+			SMILKit.logger.debug("Reference element refreshing from "+smilURI);
+			
+			this._parser.load(smilURI, this);
+		}
+		
+		protected function onParserLoadComplete(e:Event):void
+		{
+			SMILKit.logger.debug("Reference element successfully loaded content, starting to parse");
+		}
+		
+		protected function onParserComplete(e:BostonDOMParserEvent):void
+		{
+			//this.appendChild(e.parsedNode);
+			
+			SMILKit.logger.debug("Parser completed loading reference document");
+		}
+		
+		protected function onParserIOError(e:IOErrorEvent):void
+		{
+			SMILKit.logger.debug("IO error occured whilst loading reference document");
+		}
+		
+		protected function onParserSecurityError(e:SecurityErrorEvent):void
+		{
+			SMILKit.logger.debug("Security error occured whilst loading reference document");
+		}
+
+		protected override function onDOMAttributeModified(e:MutationEvent):void
+		{
+			if (e.attrName == "src" || e.attrName == "type")
+			{
+				if (e.prevValue != e.newValue)
+				{
+					this.refresh();
+				}
+			}
 		}
 	}
 }

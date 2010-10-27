@@ -278,7 +278,11 @@ package org.smilkit.dom.smil
 			}
 			
 			this._handler = SMILKit.createElementHandlerFor(this);
-			this._handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+			
+			if (this._handler != null)
+			{
+				this._handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+			}
 		}
 		
 		private function onHandlerDurationResolved(e:HandlerEvent):void

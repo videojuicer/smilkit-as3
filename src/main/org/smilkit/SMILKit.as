@@ -80,7 +80,7 @@ package org.smilkit
 		public static function loadSMILDocument(smil:String):IDocument
 		{
 			var parser:BostonDOMParser = new BostonDOMParser();
-			var document:IDocument = parser.parse(smil);
+			var document:IDocument = parser.parse(smil) as IDocument;
 			
 			return document;
 		}

@@ -12,7 +12,7 @@ package org.smilkit.spec.tests.dom
 		public function parseSMILDocument():void
 		{
 			var parser:BostonDOMParser = new BostonDOMParser();
-			var doc:IDocument = parser.parse(Fixtures.BASIC_SMIL_XML);
+			var doc:IDocument = parser.parse(Fixtures.BASIC_SMIL_XML) as IDocument;
 			
 			Assert.assertNotNull(doc);
 		}

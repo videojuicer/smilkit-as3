@@ -2,7 +2,11 @@ package org.smilkit.parsers
 {
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.events.EventDispatcher;
+	import flash.events.IOErrorEvent;
+	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
+	import flash.net.URLRequest;
 	import flash.xml.XMLDocument;
 	
 	import org.smilkit.SMILKit;
@@ -18,29 +22,60 @@ package org.smilkit.parsers
 	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
-	public class BostonDOMParser
+	public class BostonDOMParser extends EventDispatcher
 	{
+		protected var _initialParent:INode = null;
+		protected var _loader:URLLoader;
+		
 		public function BostonDOMParser()
 		{
 			
 		}
 
-		public function load(systemId:String):void
+		public function load(systemID:String, parent:INode = null):void
 		{
-			var loader:URLLoader = new URLLoader();
-			loader.addEventListener(Event.COMPLETE, function(e:Event):void {
-				this.parse(loader.data);
-			});
+			this._initialParent = parent;
+			
+			this._loader = new URLLoader();
+			
+			this._loader.addEventListener(Event.COMPLETE, this.onLoaderComplete);
+			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderIOError);
+			this._loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onLoaderSecurityError);
+			
+			this._loader.load(new URLRequest(systemID));
+		}
+
+		protected function onLoaderComplete(e:Event):void
+		{
+			this.dispatchEvent(e.clone());
+			
+			this.parse(this._loader.data);
 		}
 		
-		public function parse(document:String):IDocument
+		protected function onLoaderIOError(e:IOErrorEvent):void
 		{
+			this.dispatchEvent(e.clone());
+		}
+		
+		protected function onLoaderSecurityError(e:SecurityErrorEvent):void
+		{
+			this.dispatchEvent(e.clone());
+		}
+		
+		public function parse(document:String, parent:INode = null):INode
+		{
+			if (parent == null && this._initialParent == null)
+			{
+				this._initialParent = new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
+			}
+			
 			var xml:XML = new XML(document);
-			var doc:IDocument = new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
+
+			this.parseNode(this._initialParent, xml);
 			
-			this.parseNode(doc, xml);
+			this.dispatchEvent(new BostonDOMParserEvent(BostonDOMParserEvent.PARSER_COMPLETE, this._initialParent));
 			
-			return doc;
+			return this._initialParent;
 		}
 		
 		protected function parseNode(parent:INode, node:XML):INode
@@ -105,12 +140,6 @@ package org.smilkit.parsers
 			}
 			
 			var el:IElement = (child as IElement);
-			
-			// stack the child on the node
-			if (parent != null)
-			{
-				parent.appendChild(child);
-			}
 
 			// parse attributes
 			if (node.attributes().length() > 0)
@@ -137,6 +166,12 @@ package org.smilkit.parsers
 			for each (var n:XML in node.children())
 			{
 				this.parseNode(child, n);
+			}
+			
+			// stack the child on the node
+			if (parent != null)
+			{
+				parent.appendChild(child);
 			}
 			
 			return child;

@@ -1,7 +1,7 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.SMILKit;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -12,6 +12,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ITime;
+	import org.utilkit.logger.Logger;
 	
 	public class Time implements ITime
 	{
@@ -141,6 +142,7 @@ package org.smilkit.dom.smil
 		{
 			var parent:IElementTimeContainer = null;
 			var element:INode = this._baseElement;
+			var i:int = 0;
 			
 			while (parent == null)
 			{
@@ -149,6 +151,15 @@ package org.smilkit.dom.smil
 					parent = (element.parentNode as IElementTimeContainer);
 					break;
 				}
+				
+				element = element.parentNode;
+				
+				if (i == 10)
+				{
+					SMILKit.logger.debug("OhKnow! Trying to resolve sync based assets, but dont seem to be able to find the parent higher than 10 stacks");
+				}
+				
+				i++;
 			}
 			
 			this._offset = parent.begin.item(0).offset;
