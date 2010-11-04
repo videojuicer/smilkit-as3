@@ -17,9 +17,9 @@ package org.smilkit.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.TimingNode;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.utilkit.logger.Logger;
 	
 	public class DrawingBoard extends Sprite
 	{
@@ -87,14 +87,14 @@ package org.smilkit.render
 						{
 							//time.element.resumeElement();
 							
-							var regionId:String = time.element.getAttribute("region");
-							var region:SMILRegionElement = (this.renderTree.document.getElementById(regionId) as SMILRegionElement);
+							var region:SMILRegionElement = ((time.element as SMILMediaElement).region as SMILRegionElement);
+							//var region:SMILRegionElement = (this.renderTree.document.getElementById(regionId) as SMILRegionElement);
 							
 							if (region != null)
 							{
 								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
 								
-								SMILKit.logger.debug("Adding Handler to region '"+regionId+"' on the DrawingBoard", handler);
+								SMILKit.logger.debug("Adding Handler to region '"+region.id+"' on the DrawingBoard", handler);
 								drawnCount++;
 								
 								// place the element on to the region it belongs too

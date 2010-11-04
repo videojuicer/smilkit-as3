@@ -14,13 +14,16 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayTransitions;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
+	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.Metadata;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
+	import org.utilkit.logger.Logger;
 	
 	public class RTMPVideoHandler extends SMILKitHandler
 	{
@@ -39,6 +42,8 @@ package org.smilkit.handler
 			super(element);
 			
 			this._canvas = new Sprite();
+			
+			var r:ISMILRegionElement = (element as SMILMediaElement).region;
 		}
 		
 		public override function get width():uint
@@ -159,7 +164,7 @@ package org.smilkit.handler
 				this._video = videoHandlerState.video;
 				this._canvas = videoHandlerState.canvas;
 				
-				this._playOptions.streamName = this.videoHandlerState.fmsURL.streamName;
+				this._playOptions.streamName = this.videoHandlerState.fmsURL.streamNameWithParameters;
 				this._playOptions.transition = NetStreamPlayTransitions.SWITCH;
 				
 				this._netStream.play2(this._playOptions);
@@ -270,7 +275,7 @@ package org.smilkit.handler
 
 					this._netStream.client = this;
 					
-					this._netStream.play(this.videoHandlerState.fmsURL.streamName);
+					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
 					
 					this._video = new Video();
 					this._video.smoothing = true;

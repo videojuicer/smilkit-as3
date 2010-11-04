@@ -312,6 +312,19 @@ package org.smilkit.dom
 			return (this._attributes.getNamedItemNS(namespaceURI, localName) != null);
 		}
 		
+		public override function hasAttributes():Boolean
+		{
+			if (this._attributes != null)
+			{
+				if (this._attributes.length > 0)
+				{
+					return true;
+				}
+			}
+			
+			return false;
+		}
+		
 		public function setIdAttribute(value:String):void
 		{
 			this.setAttribute("id", value);

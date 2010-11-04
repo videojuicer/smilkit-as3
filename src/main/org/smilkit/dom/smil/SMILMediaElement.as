@@ -4,11 +4,14 @@ package org.smilkit.dom.smil
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
+	import org.smilkit.dom.Element;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
+	import org.smilkit.w3c.dom.INode;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.smilkit.w3c.dom.smil.ISMILRegionInterface;
@@ -134,7 +137,30 @@ package org.smilkit.dom.smil
 		
 		public function get src():String
 		{
-			return this.getAttribute("src");
+			var src:String = this.getAttribute("src");
+			
+			if (src.indexOf("://") == -1)
+			{
+				// find src
+				var metas:INodeList = this.ownerDocument.getElementsByTagName("meta");
+				var base:String = "";
+				
+				for (var i:int = metas.length - 1; i > 0; i--)
+				{
+					var node:Element = (metas.item(i) as Element);
+					
+					if (node.hasAttributes() && node.attributes.getNamedItem("base") != null)
+					{
+						base = node.attributes.getNamedItem("base").nodeValue;
+						
+						break;
+					}
+				}
+				
+				src = base + "/" + src;
+			}
+			
+			return src;
 		}
 		
 		public function set src(src:String):void
@@ -184,9 +210,18 @@ package org.smilkit.dom.smil
 		
 		public function get region():ISMILRegionElement
 		{
-			if (this.hasAttribute("region") && this._region == null)
+			if (this._region == null)
 			{
-				var regionId:String = this.getAttribute("region");
+				var regionId:String = ""
+				
+				if (this.hasAttribute("region"))
+				{
+					regionId = this.getAttribute("region");
+				}
+				else
+				{
+					regionId = this.findParentRegionID();
+				}
 				
 				this._region = (this.ownerDocument.getElementById(regionId) as SMILRegionElement);
 			}
@@ -194,6 +229,26 @@ package org.smilkit.dom.smil
 			return this._region;
 		}
 		
+		protected function findParentRegionID():String
+		{
+			var parent:Element = (this.parentNode as Element);
+			var regionId:String = "";
+			
+			while ((regionId == null || regionId == "") && parent != null)
+			{
+				if (parent.hasAttribute("region"))
+				{
+					regionId = parent.getAttribute("region");
+				}
+				else
+				{
+					parent = (parent.parentNode as Element);
+				}
+			}
+			
+			return regionId;
+		}
+
 		public function set region(region:ISMILRegionElement):void
 		{
 			this.setAttribute("region", region.id);
