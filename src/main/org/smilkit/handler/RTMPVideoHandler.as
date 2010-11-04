@@ -42,8 +42,6 @@ package org.smilkit.handler
 			super(element);
 			
 			this._canvas = new Sprite();
-			
-			var r:ISMILRegionElement = (element as SMILMediaElement).region;
 		}
 		
 		public override function get width():uint
@@ -314,7 +312,7 @@ package org.smilkit.handler
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
-			SMILKit.logger.debug("NetStatusEvent: "+e.info.code, e);
+			SMILKit.logger.debug("NetStatusEvent: "+e.info.code+" "+e.info.description, e);
 			
 			switch (e.info.code)
 			{
