@@ -381,7 +381,7 @@ package org.smilkit.handler
 			{
 				this._metadata.update(info);
 			}
-
+			
 			SMILKit.logger.info("Metadata recieved: "+this._metadata.toString());
 			
 			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
