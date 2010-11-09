@@ -21,6 +21,7 @@ package org.smilkit.parsers
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
+	import org.utilkit.util.UrlUtil;
 
 	public class BostonDOMParser extends EventDispatcher
 	{
@@ -42,7 +43,7 @@ package org.smilkit.parsers
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderIOError);
 			this._loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onLoaderSecurityError);
 			
-			this._loader.load(new URLRequest(systemID));
+			this._loader.load(new URLRequest(UrlUtil.addCacheBlocking(systemID)));
 		}
 
 		protected function onLoaderComplete(e:Event):void
