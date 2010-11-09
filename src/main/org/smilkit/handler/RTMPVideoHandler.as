@@ -330,6 +330,8 @@ package org.smilkit.handler
 				case "NetStream.Play.Failed":
 				case "NetStream.Play.NoSupportedTrackFound":
 				case "NetStream.Play.FileStructureInvalid":
+					SMILKit.logger.debug("Failed to play NetStream: "+this.videoHandlerState.fmsURL.streamNameWithParameters+" - "+this.videoHandlerState.fmsURL.hostname);
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
 				case "NetStream.Unpublish.Success":
