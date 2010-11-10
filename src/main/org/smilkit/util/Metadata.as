@@ -147,6 +147,11 @@ package org.smilkit.util
 					return "H.264";
 			}
 			
+			if (this.videoCodecId == null)
+			{
+				return "UNKNOWN";
+			}
+			
 			return this.videoCodecId.toUpperCase();
 		}
 		
