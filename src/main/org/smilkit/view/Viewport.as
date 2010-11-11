@@ -110,6 +110,7 @@ package org.smilkit.view
 		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
 		public static var PLAYBACK_PAUSED:String = "playbackPaused";
 		public static var PLAYBACK_SEEKING:String = "playbackSeeking";
+		public static var PLAYBACK_STOPPED:String = "playbackStopped";
 		
 		public static var SEEK_UNCOMMITTED:String = "seekTransient";
 		public static var SEEK_COMMITTED:String = "seekCommitted";
@@ -561,7 +562,7 @@ package org.smilkit.view
 				// Register a basic state change
 				this._previousPlaybackState = this._playbackState;
 				this._playbackState = newState;
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
+				
 				switch(this._playbackState)
 				{
 					case Viewport.PLAYBACK_PLAYING:
@@ -572,11 +573,18 @@ package org.smilkit.view
 						this._previousUncommittedSeekOffset = -1;
 						this.onPlaybackStateChangedToPaused();
 						break;
+					case Viewport.PLAYBACK_STOPPED:
+						this._previousUncommittedSeekOffset = -1;
+						this.onPlaybackStateChangedToStopped();
+						break;
 					case Viewport.PLAYBACK_SEEKING:
 						this._previousUncommittedSeekOffset = offset;
 						this.onPlaybackStateChangedToSeekingWithOffset(offset);
 						break;
 				}
+				
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
+				
 				return true;
 			}
 			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
@@ -716,12 +724,17 @@ package org.smilkit.view
 		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
 		* during playback. Emits a public-facing viewport event.
 		*/ 
-		protected function onHeartbeatRunningOffsetChanged(event:HeartbeatEvent):void
+		protected function onHeartbeatRunningOffsetChanged(e:HeartbeatEvent):void
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			
 			// Check for end of document
-			
+			if (e.runningOffset >= this.document.duration)
+			{
+				SMILKit.logger.debug("Stopping at offset: "+e.runningOffset);
+				
+				this.setPlaybackState(Viewport.PLAYBACK_STOPPED);
+			}
 		}
 		
 		protected function onPlaybackStateChangedToPlaying():void
@@ -747,6 +760,14 @@ package org.smilkit.view
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
 			this.heartbeat.pause();
+		}
+		
+		protected function onPlaybackStateChangedToStopped():void
+		{
+			SMILKit.logger.info("Completed changing playback state to PLAYBACK_STOPPED.", this);
+			
+			this.heartbeat.pause();
+			this.heartbeat.seek(0);
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
