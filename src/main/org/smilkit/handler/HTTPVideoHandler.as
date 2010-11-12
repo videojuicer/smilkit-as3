@@ -307,7 +307,7 @@ package org.smilkit.handler
 				
 				if (offset == 0)
 				{
-					if (percentageLoaded < 2)
+					if (percentageLoaded < 6)
 					{
 						return false;
 					}
@@ -380,7 +380,7 @@ package org.smilkit.handler
 		protected function checkPlaybackLoadState():void
 		{
 			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
-			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration) * 1000;
+			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration);
 			
 			// if were not already ready, check if we are
 			if (!this._loadReady)
