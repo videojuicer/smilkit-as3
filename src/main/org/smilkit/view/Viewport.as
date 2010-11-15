@@ -729,7 +729,7 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			
 			// Check for end of document
-			if (e.runningOffset >= this.document.duration)
+			if (this.document != null && e.runningOffset >= this.document.duration)
 			{
 				SMILKit.logger.debug("Stopping at offset: "+e.runningOffset);
 				
