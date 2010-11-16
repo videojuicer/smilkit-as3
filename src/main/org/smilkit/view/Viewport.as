@@ -106,7 +106,6 @@ package org.smilkit.view
 
 	public class Viewport extends EventDispatcher
 	{
-		
 		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
 		public static var PLAYBACK_PAUSED:String = "playbackPaused";
 		public static var PLAYBACK_SEEKING:String = "playbackSeeking";

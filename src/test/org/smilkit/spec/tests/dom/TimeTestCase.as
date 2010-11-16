@@ -163,9 +163,12 @@ package org.smilkit.spec.tests.dom
 			Assert.assertNotNull(contentTime);
 			Assert.assertNotNull(contentEnd);
 			
-			contentTime.resolve();
-			contentEnd.resolve();
+			contentTime.resolve(true);
+			contentEnd.resolve(true);
 			
+			Assert.assertEquals(70000, this._seqDocument.duration);
+			
+			Assert.assertEquals(10000, contentTime.resolvedOffset);
 			Assert.assertEquals(70000, contentEnd.resolvedOffset);
 		}
 		
