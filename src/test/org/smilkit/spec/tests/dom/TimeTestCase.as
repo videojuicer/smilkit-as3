@@ -35,7 +35,11 @@ package org.smilkit.spec.tests.dom
 			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_UNRESOLVED_SMIL_XML;
 			
 			var parser:BostonDOMParser = new BostonDOMParser();
+			
 			this._seqDocument = (parser.parse(Fixtures.BASIC_SEQ_SMIL_XML) as ISMILDocument);
+			
+			parser = new BostonDOMParser();
+			
 			this._parDocument = (parser.parse(Fixtures.BASIC_PAR_SMIL_XML) as ISMILDocument);
 		}
 		
@@ -150,8 +154,8 @@ package org.smilkit.spec.tests.dom
 			Assert.assertNotNull(prerollTime);
 			Assert.assertNotNull(prerollEnd);
 			
-			prerollTime.resolve();
-			prerollEnd.resolve();
+			prerollTime.resolve(true);
+			prerollEnd.resolve(true);
 			
 			var content:ISMILMediaElement = (this._seqDocument.getElementById("content") as ISMILMediaElement);
 			
@@ -167,6 +171,9 @@ package org.smilkit.spec.tests.dom
 			contentEnd.resolve(true);
 			
 			Assert.assertEquals(70000, this._seqDocument.duration);
+			
+			Assert.assertEquals(00000, prerollTime.resolvedOffset);
+			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
 			
 			Assert.assertEquals(10000, contentTime.resolvedOffset);
 			Assert.assertEquals(70000, contentEnd.resolvedOffset);
