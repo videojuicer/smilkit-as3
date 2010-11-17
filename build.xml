@@ -75,6 +75,7 @@
 	<target name="compile" depends="init" description="Compiles the main SMILKit-as3 SWC">
 		<compc output="${bin.loc}/smilkit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
+			<source-path path-element="${util.src.loc}" />
 			<include-sources dir="${main.src.loc}" includes="*" />
 			<include-sources dir="${util.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
