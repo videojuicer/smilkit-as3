@@ -1,6 +1,6 @@
 package org.smilkit.dom.smil
 {
-	import org.smilkit.collections.List;
+	import org.utilkit.collection.List;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.ITime;
 	import org.smilkit.w3c.dom.smil.ITimeList;

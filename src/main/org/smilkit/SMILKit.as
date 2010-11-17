@@ -2,8 +2,8 @@ package org.smilkit
 {
 	import mx.core.ClassFactory;
 	
-	import org.smilkit.collections.Hashtable;
-	import org.smilkit.collections.List;
+	import org.utilkit.collection.Hashtable;
+	import org.utilkit.collection.List;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.handler.HTTPVideoHandler;

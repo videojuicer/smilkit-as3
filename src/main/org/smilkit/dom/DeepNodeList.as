@@ -1,6 +1,6 @@
 package org.smilkit.dom
 {
-	import org.smilkit.collections.List;
+	import org.utilkit.collection.List;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;

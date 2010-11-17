@@ -2,7 +2,7 @@ package org.smilkit.dom
 {
 	import flash.errors.IllegalOperationError;
 	
-	import org.smilkit.collections.Hashtable;
+	import org.utilkit.collection.Hashtable;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.ICDATASection;

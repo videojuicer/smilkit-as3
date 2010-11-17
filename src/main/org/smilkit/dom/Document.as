@@ -6,8 +6,8 @@ package org.smilkit.dom
 	import mx.utils.ObjectUtil;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.collections.Hashtable;
-	import org.smilkit.collections.List;
+	import org.utilkit.collection.Hashtable;
+	import org.utilkit.collection.List;
 	import org.smilkit.collections.ListenerEntry;
 	import org.smilkit.dom.events.DOMEvent;
 	import org.smilkit.dom.events.MutationEvent;

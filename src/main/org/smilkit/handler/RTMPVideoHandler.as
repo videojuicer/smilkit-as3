@@ -166,6 +166,8 @@ package org.smilkit.handler
 				this._playOptions.transition = NetStreamPlayTransitions.SWITCH;
 				
 				this._netStream.play2(this._playOptions);
+				
+				this.resize();
 
 				return true;
 			}
@@ -247,7 +249,10 @@ package org.smilkit.handler
 		{
 			super.resize();
 			
-			this.drawClickShield(this._video);
+			if (this._video != null)
+			{
+				this.drawClickShield(this._video);
+			}
 		}
 		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
@@ -283,7 +288,7 @@ package org.smilkit.handler
 					
 					this._canvas.addChild(this._video);
 					
-					this.drawClickShield(this._video);
+					this.resize();
 					
 					break;
 			}
@@ -318,6 +323,8 @@ package org.smilkit.handler
 			{
 				case "NetStream.Buffer.Full":
 					//this._netStream.bufferTime = 30; // expand buffer
+					
+					this.resize();
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					break;

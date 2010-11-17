@@ -12,21 +12,19 @@ package org.smilkit.view
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
-	import org.utilkit.logger.Logger;
-	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.utilkit.parser.DataURIParser;
-
 	import org.smilkit.events.HeartbeatEvent;
+	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.events.RenderTreeEvent;
-
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.TimingGraph;
+	import org.smilkit.w3c.dom.smil.ISMILDocument;
+	import org.utilkit.logger.Logger;
+	import org.utilkit.parser.DataURIParser;
 
 	/**
 	 * Dispatched when the <code>Viewport</code> instance has refreshed with a new document.
@@ -745,9 +743,17 @@ package org.smilkit.view
 			this.loadScheduler.start();
 
 			if(!this._waitingForRenderTree)
-			{
+			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
-				this.heartbeat.resume();
+				this.resume();
+				
+				if (this.heartbeat.runningOffset >= this.document.duration && this.document.duration > 0)
+				{
+					//this.seek(0);
+					//this.commitSeek();
+					
+					this.heartbeat.seek(0);
+				}
 			}
 			else
 			{
@@ -766,7 +772,7 @@ package org.smilkit.view
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_STOPPED.", this);
 			
 			this.heartbeat.pause();
-			this.heartbeat.seek(0);
+			//this.heartbeat.seek(0);
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
