@@ -19,11 +19,11 @@ package org.smilkit.dom.smil
 		       return true;
 		    }
 		
-            for (var i:int = (this.childNodes.length-1); i >= 0; i--)
+            for (var i:int = (this.timeDescendants.length-1); i >= 0; i--)
             {
-                if (this.childNodes.item(i) is ElementTimeContainer)
+                if (this.timeDescendants.item(i) is ElementTimeContainer)
                 {
-                    if(!(this.childNodes.item(i) as ElementTimeContainer).durationResolved)
+                    if(!(this.timeDescendants.item(i) as ElementTimeContainer).durationResolved)
                     {
                           return false;
                     }
@@ -40,11 +40,11 @@ package org.smilkit.dom.smil
 			{
 				var childDuration:Number = 0;
 				
-				for (var i:int = 0; i < this.childNodes.length; i++)
+				for (var i:int = 0; i < this.timeDescendants.length; i++)
 				{
-					if (this.childNodes.item(i) is ElementTimeContainer)
+					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
-						childDuration += (this.childNodes.item(i) as ElementTimeContainer).duration;
+						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).duration;
 					}
 				}
 				

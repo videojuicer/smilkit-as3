@@ -160,7 +160,7 @@ package org.smilkit.render
 		{
 			if (this._objectPool.viewport.heartbeat.running)
 			{
-				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is running - resuming all assets.", this);
+				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is running - resuming "+this.elements.length+" assets.", this);
 				// Sync everything to a running state by resuming playback.
 				for (var i:int = 0; i < this.elements.length; i++)
 				{
@@ -171,7 +171,7 @@ package org.smilkit.render
 			}
 			else
 			{
-				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is paused - pausing all non-syncing assets.", this);
+				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is paused - pausing "+this.elements.length+" non-syncing assets.", this);
 				// Sync to a paused heartbeat state by pausing everything EXCEPT handlers that are waiting for sync.
 				for (var j:int = 0; j < this.elements.length; j++)
 				{

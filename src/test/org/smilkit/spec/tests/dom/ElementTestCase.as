@@ -24,8 +24,6 @@ package org.smilkit.spec.tests.dom
 			this._document = new Document(new DocumentType(null, "smil"));
 		}
 		
-		
-		
 		[Before]
 		public function setUp():void
 		{

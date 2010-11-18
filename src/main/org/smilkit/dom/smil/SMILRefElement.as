@@ -51,6 +51,9 @@ package org.smilkit.dom.smil
 			//this.appendChild(e.parsedNode);
 			
 			SMILKit.logger.debug("Parser completed loading reference document");
+			
+			// unresolve the entire document
+			((this.ownerDocument as SMILDocument).timeChildren as ElementTimeNodeList).unresolve();
 		}
 		
 		protected function onParserIOError(e:IOErrorEvent):void
@@ -72,6 +75,50 @@ package org.smilkit.dom.smil
 					this.refresh();
 				}
 			}
+		}
+		
+		public override function get durationResolved():Boolean
+		{
+			if(super.durationResolved)
+			{
+				return true;
+			}
+			
+			for (var i:int = (this.timeDescendants.length-1); i >= 0; i--)
+			{
+				if (this.timeDescendants.item(i) is ElementTimeContainer)
+				{
+					if(!(this.timeDescendants.item(i) as ElementTimeContainer).durationResolved)
+					{
+						return false;
+					}
+				}
+			}
+			return true;
+		}
+		
+		public override function get duration():Number
+		{
+			var duration:Number = super.duration;
+			
+			if (this.hasChildNodes() && duration == 0)
+			{
+				var childDuration:Number = 0;
+				
+				for (var i:int = 0; i < this.timeDescendants.length; i++)
+				{
+					if (this.timeDescendants.item(i) is ElementTimeContainer)
+					{
+						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).duration;
+					}
+				}
+				
+				if (childDuration != 0)
+				{
+					return childDuration;
+				}
+			}
+			return duration;
 		}
 	}
 }

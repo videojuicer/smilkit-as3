@@ -15,6 +15,9 @@ package org.smilkit.events
 		// When the playhead's offset changes
 		public static var PLAYBACK_OFFSET_CHANGED:String = "viewportPlaybackOffsetChanged";
 		
+		// When playback has finished playing (aka stopped)
+		public static var PLAYBACK_COMPLETE:String = "viewportPlaybackComplete";
+		
 		// When the volume is adjusted
 		public static var AUDIO_MUTED:String = "viewportAudioMuted";
 		public static var AUDIO_UNMUTED:String = "viewportAudioUnmuted";

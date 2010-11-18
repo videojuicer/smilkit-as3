@@ -1,11 +1,11 @@
 package org.smilkit.dom.smil
 {
-	import org.utilkit.collection.List;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
+	import org.utilkit.collection.List;
 	
 	public class ElementTimeNodeList implements INodeList
 	{
@@ -24,6 +24,19 @@ package org.smilkit.dom.smil
 			this.item(int.MAX_VALUE);
 			
 			return this._nodes.length;
+		}
+		
+		public function unresolve():void
+		{
+			for (var i:int = 0; i < this.length; i++)
+			{
+				var node:ElementTimeContainer = (this.item(i) as ElementTimeContainer);
+				
+				if (node != null)
+				{
+					node.unresolve();
+				}
+			}
 		}
 		
 		public function item(index:int):INode

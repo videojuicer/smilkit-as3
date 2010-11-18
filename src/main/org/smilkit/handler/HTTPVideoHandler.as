@@ -511,6 +511,7 @@ package org.smilkit.handler
 			if(!this._resumed)
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
+				
 				this.pause();
 			}
 			

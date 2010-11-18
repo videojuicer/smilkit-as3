@@ -49,6 +49,11 @@ package org.smilkit.dom.smil
 			return new ElementTimeNodeList(this);
 		}
 		
+		public function get timeDescendants():INodeList
+		{
+			return new ElementTimeDescendantNodeList(this);
+		}
+		
 		public function activeChildrenAt(instant:Number):INodeList
 		{
 			return null;

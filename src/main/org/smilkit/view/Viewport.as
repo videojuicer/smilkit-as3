@@ -107,7 +107,6 @@ package org.smilkit.view
 		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
 		public static var PLAYBACK_PAUSED:String = "playbackPaused";
 		public static var PLAYBACK_SEEKING:String = "playbackSeeking";
-		public static var PLAYBACK_STOPPED:String = "playbackStopped";
 		
 		public static var SEEK_UNCOMMITTED:String = "seekTransient";
 		public static var SEEK_COMMITTED:String = "seekCommitted";
@@ -570,10 +569,6 @@ package org.smilkit.view
 						this._previousUncommittedSeekOffset = -1;
 						this.onPlaybackStateChangedToPaused();
 						break;
-					case Viewport.PLAYBACK_STOPPED:
-						this._previousUncommittedSeekOffset = -1;
-						this.onPlaybackStateChangedToStopped();
-						break;
 					case Viewport.PLAYBACK_SEEKING:
 						this._previousUncommittedSeekOffset = offset;
 						this.onPlaybackStateChangedToSeekingWithOffset(offset);
@@ -725,12 +720,15 @@ package org.smilkit.view
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			
+			trace("OFFSET->"+e.runningOffset+"/"+this.document.duration);
+			
 			// Check for end of document
 			if (this.document != null && e.runningOffset >= this.document.duration)
 			{
 				SMILKit.logger.debug("Stopping at offset: "+e.runningOffset);
 				
-				this.setPlaybackState(Viewport.PLAYBACK_STOPPED);
+				this.pause();
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_COMPLETE));
 			}
 		}
 		
@@ -745,7 +743,7 @@ package org.smilkit.view
 			if(!this._waitingForRenderTree)
 			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
-				this.resume();
+				this.heartbeat.resume();
 				
 				if (this.heartbeat.runningOffset >= this.document.duration && this.document.duration > 0)
 				{

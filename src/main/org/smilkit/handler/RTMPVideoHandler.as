@@ -35,6 +35,9 @@ package org.smilkit.handler
 		protected var _canvas:Sprite;
 		protected var _volume:uint;
 		
+		protected var _resumed:Boolean = false;
+		protected var _waiting:Boolean = false;
+		
 		protected var _playOptions:NetStreamPlayOptions;
 		
 		public function RTMPVideoHandler(element:IElement)
@@ -147,6 +150,7 @@ package org.smilkit.handler
 			
 			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
 			
+			this._waiting = true;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
@@ -195,6 +199,8 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Resuming playback.", this);
 
+				this._resumed = true;
+				
 				this._netStream.resume();
 			}
 		}
@@ -204,6 +210,8 @@ package org.smilkit.handler
 			if (this._netStream != null)
 			{
 				SMILKit.logger.debug("Pausing playback.", this);
+				
+				this._resumed = true;
 
 				this._netStream.pause();
 			}
@@ -326,11 +334,17 @@ package org.smilkit.handler
 					
 					this.resize();
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					if (this._waiting)
+					{
+						this._waiting = false;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					}
 					break;
 				case "NetStream.Buffer.Empty":
 					//this._netStream.bufferTime = 8; // reduce buffer
 					
+					this._waiting = true;
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
 				case "NetStream.Failed":
@@ -344,13 +358,13 @@ package org.smilkit.handler
 				case "NetStream.Unpublish.Success":
 				case "NetStream.Play.Stop":
 					// playback has finished, important for live events (so we can continue)
-					break;
-				case "NetStream.Play.InsufficientBW":
-					// show drop down
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					break;
 				case "NetStream.Pause.Notify":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 					break;
 				case "NetStream.Unpause.Notify":
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					break;
 				case "NetStream.Seek.Failed":
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_FAILED, this));
@@ -359,6 +373,11 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
+					if (!this._resumed)
+					{
+						this._netStream.pause();
+					}
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 					break;
 			}
@@ -391,6 +410,13 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
+			if(!this._resumed)
+			{
+				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
+				
+				this.pause();
+			}
+			
 			SMILKit.logger.info("Metadata recieved: "+this._metadata.toString());
 			
 			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
@@ -403,7 +429,7 @@ package org.smilkit.handler
 			}
 			
 			// were ready as soon as we have the metadata
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+			//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}	
 		
 		public static function toHandlerMap():HandlerMap

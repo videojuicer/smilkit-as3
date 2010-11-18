@@ -66,6 +66,8 @@
     <classEntry path="org.smilkit.events.HeartbeatEvent"/>
     <classEntry path="org.smilkit.parsers.SMILTimeParser"/>
     <classEntry path="org.smilkit.parsers.BostonDOMParserEvent"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTimeDescendantNodeList"/>
+    <classEntry path="org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

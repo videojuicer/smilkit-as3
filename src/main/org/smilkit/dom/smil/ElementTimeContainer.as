@@ -1,11 +1,11 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.parsers.SMILTimeParser;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
+	import org.utilkit.logger.Logger;
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
@@ -22,6 +22,11 @@ package org.smilkit.dom.smil
 		public function get timeChildren():INodeList
 		{
 			return new ElementTimeNodeList(this);
+		}
+		
+		public function get timeDescendants():INodeList
+		{
+			return new ElementTimeDescendantNodeList(this);
 		}
 		
 		public function activeChildrenAt(instant:Number):INodeList
@@ -178,6 +183,12 @@ package org.smilkit.dom.smil
 			{
 				end.resolve();
 			}
+		}
+		
+		public function unresolve():void
+		{
+			(this.begin as TimeList).invalidate();
+			(this.end as TimeList).invalidate();
 		}
 	}
 }

@@ -8,6 +8,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.BostonDOMParserTestCase;
 	import org.smilkit.spec.tests.dom.DocumentTestCase;
 	import org.smilkit.spec.tests.dom.ElementTestCase;
+	import org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase;
 	import org.smilkit.spec.tests.dom.EventTestCase;
 	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
@@ -35,6 +36,7 @@ package org.smilkit.spec
 		public var bostonDOMParserTest:BostonDOMParserTestCase;
 		public var eventTest:EventTestCase;
 		public var timeTest:TimeTestCase;
+		public var elementTimeDescendantNodeList:ElementTimeDescendantNodeListTestCase;
 		
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;
