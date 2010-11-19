@@ -220,6 +220,31 @@ package org.smilkit.spec.tests.view
 			Assert.assertEquals("http://smilkit.org/three.smil", this._viewport.location);
 		}
 		
+		[Test(async,description="Can fetch metadata from the document")]
+		public function canFetchDocumentMetadata():void
+		{
+			var asyncListener:Function = Async.asyncHandler(
+				this, 
+				this.testDocumentMetaDataOnLoad, 
+				2000, 
+				{}, 
+				this.testDocumentMetaDataTimeout);
+			
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncListener);
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.METADATA_SMIL_XML;
+			this._viewport.refresh();
+		}
+			protected function testDocumentMetaDataOnLoad(e:ViewportEvent, passthru:Object):void
+			{
+				Assert.assertNotNull(this._viewport.document);
+				Assert.assertEquals("foovalue", this._viewport.getDocumentMeta("fookey"));
+				Assert.assertEquals("barvalue", this._viewport.getDocumentMeta("barkey"));
+			}
+			protected function testDocumentMetaDataTimeout(passthru:Object):void
+			{
+				Assert.fail("Refresh timeout");
+			}
+		
 		[Test(async,timeout="3000",description="Tests loading a SMIL document across the network and through the viewport")]
 		public function attemptNetworkSMILLoad():void
 		{

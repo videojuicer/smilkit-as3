@@ -13,6 +13,8 @@ package org.smilkit.view
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.Element;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
@@ -453,6 +455,34 @@ package org.smilkit.view
 		{
 			var parser:DataURIParser = new DataURIParser(this.location);
 			this.refreshObjectPoolWithLoadedData(parser.data);
+		}
+		
+		/**
+		* Pulls a piece of metadata from the document by the given key.
+		* The metadata must be in a <meta /> tag with the appropriate name key.
+		*/
+		public function getDocumentMeta(key:String):String
+		{
+			if(this.document != null)
+			{
+				// Commented pending http://www.bugtails.com/projects/253/bugs/1000.html
+				//var headNode:Element = this.document.getElementsByTagName("head").item(0) as Element;
+				//if(headNode != null)
+				//{
+					var metaTagList:INodeList = this.document.getElementsByTagName("meta");
+
+					// Loop tags
+					for(var i:uint = 0; i < metaTagList.length; i++)
+					{
+						var metaTag:Element = metaTagList.item(i) as Element;
+							if(metaTag.getAttribute("name") == key)
+							{
+								return metaTag.getAttribute("content");
+							}
+					}
+				//}
+			}
+			return null;
 		}
 		
 		/**
