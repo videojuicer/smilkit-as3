@@ -1,9 +1,9 @@
 package org.smilkit.dom
 {
-	import org.utilkit.collection.List;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.utilkit.collection.List;
 	
 	/**
 	 * DeepNodeList represents a collection of Nodes for the <code>getElementsByTagName()</code>
@@ -36,7 +36,7 @@ package org.smilkit.dom
 		{
 			// preload list of nodes
 			this.item(int.MAX_VALUE);
-			
+
 			return this._nodes.length;
 		}
 		

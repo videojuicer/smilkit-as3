@@ -73,7 +73,7 @@ package org.smilkit.dom
 		 */
 		public function getElementsByTagName(name:String):INodeList
 		{
-			return new DeepNodeList(this, tagName) as INodeList;
+			return new DeepNodeList(this, name) as INodeList;
 		}
 		
 		public function getElementsByTagNameNS(namespaceURI:String, localName:String):INodeList

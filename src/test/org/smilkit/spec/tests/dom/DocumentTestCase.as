@@ -2,24 +2,41 @@ package org.smilkit.spec.tests.dom
 {
 	import flexunit.framework.Assert;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 
 	//import org.smilkit.w3c.dom.INodeList;
 	
 	public class DocumentTestCase
-	{
+	{	
+		protected var _document:SMILDocument;
+	
 		public function DocumentTestCase()
 		{
 			
 		}
 		
+		[Before]
+		public function setUp():void
+		{
+			SMILKit.defaults();
+			
+			var parser:BostonDOMParser = new BostonDOMParser();
+			this._document = (parser.parse(Fixtures.MULTIPLE_CHILDREN_SMIL_XML) as SMILDocument);
+		}
+		
 		[Test(description="Tests the creation of a Document")]
 		public function creation():void
-		{
+		{			
 			var document:IDocument = new Document(new DocumentType(null, "smil"));
 			
 			Assert.assertNotNull(document);
@@ -67,6 +84,22 @@ package org.smilkit.spec.tests.dom
 			var list:INodeList = document.getElementsByTagName("body");
 			Assert.assertNotNull(list);
 			Assert.assertEquals(2, list.length);
+		}
+		
+		[Test(description="Tests finding an element on a element that isnt the main document")]
+		public function findingAnElementFromANonDocument():void
+		{
+			var list:INodeList = this._document.getElementsByTagName("metadata");
+			
+			Assert.assertNotNull(list);
+			Assert.assertEquals(3, list.length);
+			
+			var head:INode = this._document.getElementsByTagName("head").item(0);
+			
+			var metas:INodeList = (head as Element).getElementsByTagName("metadata");
+			
+			Assert.assertNotNull(metas);
+			Assert.assertEquals(3, metas.length);
 		}
 	}
 }

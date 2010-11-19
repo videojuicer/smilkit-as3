@@ -140,9 +140,9 @@ package org.smilkit.dom
 		 * 
 		 * @see DeepNodeList
 		 */
-		public function getElementsByTagName(tagname:String):INodeList
+		public function getElementsByTagName(tagName:String):INodeList
 		{
-			return new DeepNodeList(this, tagname);
+			return new DeepNodeList(this, tagName);
 		}
 		
 		public function importNode(importedNode:INode, deep:Boolean):INode

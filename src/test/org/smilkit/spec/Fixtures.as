@@ -41,7 +41,11 @@ package org.smilkit.spec
 			"</par></body></smil>";
 		
 		public static var MULTIPLE_CHILDREN_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
-			"<head><layout><region xml:id=\"left\" width=\"50%\" height=\"100%\" /><region xml:id=\"right\" right=\"0\" width=\"50%\" height=\"100%\" /></layout></head>" +
+			"<head>"+
+			"<metadata name=\"title\" content=\"Hello World!\" />"+
+			"<metadata name=\"version\" content=\"2\" />"+
+			"<metadata name=\"count\" content=\"6\" />"+
+			"<layout><region xml:id=\"left\" width=\"50%\" height=\"100%\" /><region xml:id=\"right\" right=\"0\" width=\"50%\" height=\"100%\" /></layout></head>" +
 			"<body><par id=\"holder\">"+
 			"<seq id=\"left\">" +
 			"<video id=\"preroll_left\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"left\" />" +
