@@ -19,11 +19,6 @@ package org.smilkit.dom.smil
 		{
 			var type:int = Time.SMIL_TIME_SYNC_BASED;
 			
-			if (baseElement == null)
-			{
-				trace("null!?");
-			}
-			
 			// we only care if the duration is indefinite if were at the end, as the begin node will always
 			// follow its parent or previous sibling
 			if (baseElement.dur == "indefinite" && !baseBegin)

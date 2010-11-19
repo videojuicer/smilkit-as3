@@ -749,13 +749,11 @@ package org.smilkit.view
 		protected function onHeartbeatRunningOffsetChanged(e:HeartbeatEvent):void
 		{
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
-			
-			trace("OFFSET->"+e.runningOffset+"/"+this.document.duration);
-			
+
 			// Check for end of document
 			if (this.document != null && e.runningOffset >= this.document.duration)
 			{
-				SMILKit.logger.debug("Stopping at offset: "+e.runningOffset);
+				SMILKit.logger.info("Stopping at offset: "+e.runningOffset);
 				
 				this.pause();
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_COMPLETE));
