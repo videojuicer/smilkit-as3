@@ -68,6 +68,7 @@
     <classEntry path="org.smilkit.parsers.BostonDOMParserEvent"/>
     <classEntry path="org.smilkit.dom.smil.ElementTimeDescendantNodeList"/>
     <classEntry path="org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase"/>
+    <classEntry path="org.smilkit.handler.RTMPAudioHandler"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

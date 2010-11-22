@@ -2,19 +2,20 @@ package org.smilkit
 {
 	import mx.core.ClassFactory;
 	
-	import org.utilkit.collection.Hashtable;
-	import org.utilkit.collection.List;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.ImageHandler;
+	import org.smilkit.handler.RTMPAudioHandler;
 	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.utilkit.collection.Hashtable;
+	import org.utilkit.collection.List;
 	import org.utilkit.logger.ApplicationLog;
 	import org.utilkit.logger.Logger;
 	
@@ -108,6 +109,7 @@ package org.smilkit
 			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
 		}
 		
 		/**

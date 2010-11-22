@@ -73,13 +73,25 @@ package org.smilkit.handler
 				
 				if (this._protocols.indexOf(req.protocol) != -1)
 				{
+					var elementExtension:String = req.extension;
+					
+					if (elementExtension == null || elementExtension == "")
+					{
+						elementExtension = req.inlineExtension;
+						
+						if (elementExtension != null && elementExtension != "")
+						{
+							elementExtension = "."+elementExtension;
+						}
+					}
+					
 					for (var i:String in this._mimeMap)
 					{
 						var extensions:Array = this._mimeMap[i];
 						
 						for each (var ext:String in extensions)
 						{
-							if (ext == req.extension)
+							if (ext == elementExtension)
 							{
 								return true;
 							}
