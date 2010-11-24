@@ -422,6 +422,12 @@ package org.smilkit.handler
 			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
 			{
 				this.resolved(Time.INDEFINITE);
+				
+				SMILKit.logger.debug("Resolved duration as indefinite, must be handling live stream ....");
+				
+				// were a live stream, so were ready!
+				this._waiting = false;
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 			}
 			else
 			{
@@ -429,7 +435,7 @@ package org.smilkit.handler
 			}
 			
 			// were ready as soon as we have the metadata
-			//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+			//
 		}	
 		
 		public static function toHandlerMap():HandlerMap
