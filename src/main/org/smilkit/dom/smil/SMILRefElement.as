@@ -32,8 +32,21 @@ package org.smilkit.dom.smil
 			return this._parser;
 		}
 		
+		public override function resumeElement():void
+		{
+			SMILKit.logger.debug("RESUMED REF");
+		}
+		
 		public function refresh():void
 		{
+			if (this.hasChildNodes() && this.getElementsByTagName("smil").length > 0)
+			{
+				for (var i:int = 0; i < this.getElementsByTagName("smil").length; i++)
+				{
+					this.removeChild(this.getElementsByTagName("smil").item(i));
+				}
+			}
+			
 			var smilURI:String = this.getAttribute("src");
 			
 			SMILKit.logger.debug("Reference element refreshing from "+smilURI);
@@ -79,6 +92,8 @@ package org.smilkit.dom.smil
 		
 		public override function get durationResolved():Boolean
 		{
+			SMILKit.logger.debug("REF->DURATION->");
+			
 			if(super.durationResolved)
 			{
 				return true;

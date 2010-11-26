@@ -21,6 +21,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.Metadata;
+	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.utilkit.logger.Logger;
@@ -410,7 +411,7 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
-			if(!this._resumed)
+			if (this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED) //if(!this._resumed)
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				
