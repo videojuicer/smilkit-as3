@@ -91,7 +91,7 @@ package org.smilkit.handler
 						
 						for each (var ext:String in extensions)
 						{
-							if (ext == elementExtension)
+							if (ext == elementExtension || ext == "*")
 							{
 								return true;
 							}
