@@ -771,15 +771,18 @@ package org.smilkit.view
 			if(!this._waitingForRenderTree)
 			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
+				
 				this.heartbeat.resume();
 				
 				if (this.heartbeat.runningOffset >= this.document.duration && this.document.duration > 0)
 				{
-					//this.seek(0);
-					//this.commitSeek();
+					this.seek(0);
+					this.commitSeek();
 					
-					this.heartbeat.seek(0);
+					//this.heartbeat.seek(0);
 				}
+				
+				
 			}
 			else
 			{
