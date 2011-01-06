@@ -9,6 +9,7 @@ package org.smilkit
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.RTMPAudioHandler;
 	import org.smilkit.handler.RTMPVideoHandler;
+	import org.smilkit.handler.SMILReferenceHandler
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.view.Viewport;
@@ -110,6 +111,7 @@ package org.smilkit
 			SMILKit.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.SMILReferenceHandler, SMILReferenceHandler.toHandlerMap());
 		}
 		
 		/**

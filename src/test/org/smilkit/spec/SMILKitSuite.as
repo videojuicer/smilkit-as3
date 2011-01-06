@@ -14,6 +14,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
 	import org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase;
+	import org.smilkit.spec.tests.handler.SMILReferenceHandlerTestCase;
 	import org.smilkit.spec.tests.load.LoadSchedulerTestCase;
 	import org.smilkit.spec.tests.load.WorkerTestCase;
 	import org.smilkit.spec.tests.render.DrawingBoardTestClass;
@@ -41,6 +42,7 @@ package org.smilkit.spec
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;
 		public var httpVideoHandlerTest:HTTPVideoHandlerTestCase;
+		public var smilReferenceHandlerTest:SMILReferenceHandlerTestCase;
 		
 		// TODO: need a testable rtmp stream (not highwinds because of the url signing)
 		//public var rtmpVideoHandlerTest:RTMPVideoHandlerTestCase;
