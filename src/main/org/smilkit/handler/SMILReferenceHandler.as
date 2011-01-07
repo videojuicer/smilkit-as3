@@ -1,6 +1,8 @@
 package org.smilkit.handler
 {
 	import flash.display.LoaderInfo;
+	import flash.display.DisplayObject;
+	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
@@ -17,6 +19,7 @@ package org.smilkit.handler
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.Viewport;
+	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
@@ -73,15 +76,28 @@ package org.smilkit.handler
 		*/
 		protected var _invalidateOnNextResume:Boolean = false;
 		
+		/**
+		* A shim that gives the rendertree a virtual sprite to place for this handler.
+		*/
+		protected var _sprite:Sprite;
+		
 		public function SMILReferenceHandler(element:IElement)
 		{
 			super(element);
+			this._sprite = new Sprite();
 			
 			if(element != null)
 			{
 				this._referenceElement = (element as SMILRefElement);
-				this._viewport = (element.ownerDocument as SMILDocument).viewport;
-				this._renderTree = this._viewport.renderTree;
+				if(element.ownerDocument != null)
+				{
+					var objectPool:ViewportObjectPool = (element.ownerDocument as SMILDocument).viewportObjectPool;
+					if(objectPool != null)
+					{
+						this._viewport = objectPool.viewport;
+						this._renderTree = this._viewport.renderTree;
+					}
+				}
 			}
 			
 			
@@ -101,8 +117,13 @@ package org.smilkit.handler
 			if(this.element != null)
 			{
 				// Bind to element for mutations to src attribute
-				this.element.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onElementAttributeModified);
+				this.element.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onElementAttributeModified, false); // third argument is useCapture, not optional under w3c spec. See smilkit's Node class.
 			}
+		}
+		
+		public override function get displayObject():DisplayObject
+		{
+			return (this._sprite as DisplayObject);
 		}
 		
 		/** 
