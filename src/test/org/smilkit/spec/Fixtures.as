@@ -65,6 +65,21 @@ package org.smilkit.spec
 			"</seq>"+
 			"</par></body></smil>";
 		
+		public static var BASIC_REFERENCE_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>"+
+				"<ref id=\"reference_tag\" type=\"application/smil\" src=\"http://assets-fms.staging.videojuicer.net/demo/d07fc2a4-a21b-11de-a4ab-123139025d32.mp4.smil\" />"+
+			"</body></smil>";
+			
+		public static var REFERENCE_IN_SEQUENCE_SMIL_XML:String = 	"<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>"+
+				"<seq>"+
+					"<ref id=\"reference_tag\" type=\"application/smil\" src=\"http://assets-fms.staging.videojuicer.net/demo/d07fc2a4-a21b-11de-a4ab-123139025d32.mp4.smil\" />"+
+					"<video id=\"post_reference_video\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"root\" />"+
+				"</seq>"+
+			"</body></smil>";
+		
 		public static var TIME_CHILDREN_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"left\" width=\"50%\" height=\"100%\" /><region xml:id=\"right\" right=\"0\" width=\"50%\" height=\"100%\" /></layout></head>" +
 			"<body>"+

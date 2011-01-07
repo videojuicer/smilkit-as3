@@ -85,45 +85,17 @@ package org.smilkit.handler
 		{
 			super(element);
 			this._sprite = new Sprite();
-			
-			if(element != null)
-			{
-				this._referenceElement = (element as SMILRefElement);
-				if(element.ownerDocument != null)
-				{
-					var objectPool:ViewportObjectPool = (element.ownerDocument as SMILDocument).viewportObjectPool;
-					if(objectPool != null)
-					{
-						this._viewport = objectPool.viewport;
-						this._renderTree = this._viewport.renderTree;
-					}
-				}
-			}
-			
-			
-			// Bind to viewport
-			if(this._viewport != null)
-			{
-				this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
-			}
-			
-			// Bind to rendertree
-			if(this._renderTree != null)
-			{
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
-			}
-			
-			if(this.element != null)
-			{
-				// Bind to element for mutations to src attribute
-				this.element.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onElementAttributeModified, false); // third argument is useCapture, not optional under w3c spec. See smilkit's Node class.
-			}
+			this.bindInvalidationListeners();
 		}
 		
 		public override function get displayObject():DisplayObject
 		{
 			return (this._sprite as DisplayObject);
+		}
+		
+		public function get contentValid():Boolean
+		{
+			return this._contentValid;
 		}
 		
 		/** 
@@ -138,6 +110,7 @@ package org.smilkit.handler
 			}
 			else
 			{
+				this.bindInvalidationListeners();
 				var src:String = this.element.getAttribute("src").toString();
 				
 				SMILKit.logger.debug("Starting load of external SMIL document from "+src+" - content is invalid or unloaded.", this);
@@ -166,7 +139,57 @@ package org.smilkit.handler
 				
 				// Kickstart loader
 				this._parser.load(src, this.element);
+				this._startedLoading = true;
 				this.onDocumentLoadStarted();
+			}
+		}
+		
+		protected function bindInvalidationListeners():void
+		{
+			if(this.element != null)
+			{
+				this._referenceElement = (this.element as SMILRefElement);
+				if(this.element.ownerDocument != null)
+				{
+					var objectPool:ViewportObjectPool = (this.element.ownerDocument as SMILDocument).viewportObjectPool;
+					if(objectPool != null)
+					{
+						this._viewport = objectPool.viewport;
+						this._renderTree = this._viewport.renderTree;
+					}
+				}
+				else
+				{
+					SMILKit.logger.warn("Given element has no owning document - this reference will have problems invalidating.", this);
+				}
+			}
+			else
+			{
+				SMILKit.logger.error("Instantiated without a matching element, will be unable to perform DOM updates", this);
+			}
+			
+			
+			// Bind to viewport
+			if(this._viewport != null)
+			{
+				this._viewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+				this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			}
+			
+			// Bind to rendertree
+			if(this._renderTree != null)
+			{
+				this._renderTree.removeEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
+				this._renderTree.removeEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
+				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
+			}
+			
+			if(this.element != null)
+			{
+				// Bind to element for mutations to src attribute
+				this.element.removeEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onElementAttributeModified, false);
+				this.element.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onElementAttributeModified, false); // third argument is useCapture, not optional under w3c spec. See smilkit's Node class.
 			}
 		}
 		
@@ -231,10 +254,13 @@ package org.smilkit.handler
 		{
 			SMILKit.logger.debug("Finished parsing external SMIL document injecting new markup. Reference load completed.", this);
 			
+			this._contentValid = true; // validate the content
+			this._completedLoading = true;
+			
 			// Unresolve the entire document
 			if(this.element != null)
 			{
-				// REPLACE IF BORKEN ((this.element.ownerDocument as SMILDocument).timeChildren as ElementTimeNodeList).unresolve();
+				// REPLACE IF TIMING GRAPH IS FAILING TO INVALIDATE ((this.element.ownerDocument as SMILDocument).timeChildren as ElementTimeNodeList).unresolve();
 			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));

@@ -710,13 +710,14 @@ package org.smilkit.view
 			if (this._objectPool != null)
 			{
 				var objectPool:Object = { pool: this._objectPool };
-				this._objectPool = null;
 				
 				// Trash old event listeners just in case
 				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+				
+				this._objectPool = null;
 				
 				// we delete the object pool to avoid a memory leak when re-creating it,
 				delete objectPool.pool;

@@ -27,7 +27,7 @@ package org.smilkit.dom
 				return this.getAttributeNS("xml", "id").toString();
 			}
 			
-			return this.getAttribute("id").toString();
+			return this.getAttribute("id");//.toString();
 		}
 		
 		public function set id(id:String):void
