@@ -17,8 +17,6 @@ package org.smilkit.dom.smil
 		
 		public override function get durationResolved():Boolean
 		{
-			SMILKit.logger.debug("REF->DURATION->");
-			
 			if(super.durationResolved)
 			{
 				return true;

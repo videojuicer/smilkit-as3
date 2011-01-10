@@ -517,54 +517,19 @@ package org.smilkit.render
 					// remove non active, existing elements
 					if (!activeNow && alreadyExists)
 					{
-						SMILKit.logger.debug("Handler removed from RenderTree during update at "+offset+"ms. Handler set to run "+time.begin+"-"+time.end+"ms.", handler);
-						
+						SMILKit.logger.debug("Removing handler from RenderTree during update at "+offset+"ms. Handler set to run "+time.begin+"-"+time.end+"ms.", handler);
 						this._lastChangeOffset = offset;
-						
-						if (handler.hasEventListener(HandlerEvent.LOAD_WAITING))
-						{
-							handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
-							handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
-							handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
-							handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
-						}
-						
-						// remove from the list
-						this._activeTimingNodes.splice(previousIndex, 1);
-						this._activeMediaElements.splice(previousIndex, 1);
-						
-						// pause playback
-						handler.pause();
-	
-						// remove from sync wait list
-						this.removeHandlerFromWaitingForSyncList(handler); // checkSyncOperation
-						// remove from load wait list
-						this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
-						
-						// remove from canvas
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
-						
-						// dont add to new vector
+						this.removeTimingNodeHandlerFromActiveList(time);
 					}
-						// add active, non existant elements
+					// add active, non existant elements
 					else if (activeNow)
 					{
 						// only add to the canvas, when the element hasnt existed before
 						if (!alreadyExists)
 						{
 							SMILKit.logger.debug("Handler added to RenderTree during update at "+offset+"ms", handler);
-							
 							this._lastChangeOffset = offset;
-							
-							// we add our listeners for the dependancy management
-							handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
-							handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
-							handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
-							handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
-							
-							this._activeTimingNodes.push(time);
-							this._activeMediaElements.push(element);
-							
+							this.addTimingNodeHandlerToActiveList(time);							
 							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
 							// viewport is currently playing.
@@ -573,36 +538,98 @@ package org.smilkit.render
 								SMILKit.logger.debug("Added a seekable handler to the RenderTree. Scheduling a sync for after this update operation.", this);
 								syncAfterUpdate = true;
 							}
-						
-							// actually draw element to canvas ....
-							this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 						}
 						else
 						{
 							// already exists
 							var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
-							
 							if (time === previousTime && time != previousTime)
 							{
 								SMILKit.logger.debug("Element modified on RenderTree during update at "+offset+"ms", this);
-								
 								this._lastChangeOffset = offset;
-								
-								// dont add or remove the handler from the list
-								
-								this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
+								this.timingNodeModifiedOnActiveList(time);
 							}
 						}
 					}
+					
 				}
-
+				
+				// Remove anything no longer found on the timing graph
+				var deadTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
+				for(var p:uint = 0; p < this._activeTimingNodes.length; p++)
+				{
+					if(timingNodes.indexOf(this._activeTimingNodes[p]) < 0)
+					{
+						deadTimingNodes.push(this._activeTimingNodes[p]);
+					}
+				}
+				SMILKit.logger.debug("RenderTree update: about to remove "+deadTimingNodes.length+" TimingNodes that are no longer present on the TimingGraph", this);
+				for(var l:uint = 0; l < deadTimingNodes.length; l++)
+				{
+					this.removeTimingNodeHandlerFromActiveList(deadTimingNodes[l]);
+				}
+				
 				// Perform the sync if we flagged up that one is needed
 				if(syncAfterUpdate && this._performOffsetSyncAfterUpdate) 
 				{
 					SMILKit.logger.debug("About to run a sync operation scheduled for after the RenderTree has completed updating.")
+					this._performOffsetSyncAfterUpdate = false;
 					this.syncHandlersToViewportOffset();
 				}
 			}
+		}
+		
+		protected function addTimingNodeHandlerToActiveList(timingNode:TimingNode):void
+		{
+			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
+			var handler:SMILKitHandler = element.handler;
+			
+			// we add our listeners for the dependancy management
+			handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+			handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+			handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
+			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+			
+			this._activeTimingNodes.push(timingNode);
+			this._activeMediaElements.push(element);
+			
+			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
+		}
+		protected function removeTimingNodeHandlerFromActiveList(timingNode:TimingNode):void
+		{
+			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
+			var handler:SMILKitHandler = element.handler;
+			var listIndex:int = this._activeMediaElements.indexOf(element);
+			
+			if (handler.hasEventListener(HandlerEvent.LOAD_WAITING))
+			{
+				handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
+				handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+				handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+				handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
+			}
+			
+			// remove from the list
+			this._activeTimingNodes.splice(listIndex, 1);
+			this._activeMediaElements.splice(listIndex, 1);
+			
+			// pause playback
+			handler.pause();
+
+			// remove from sync wait list
+			this.removeHandlerFromWaitingForSyncList(handler); // checkSyncOperation
+			// remove from load wait list
+			this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
+			
+			// remove from canvas
+			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
+			
+		}
+		protected function timingNodeModifiedOnActiveList(timingNode:TimingNode):void
+		{
+			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
+			var handler:SMILKitHandler = element.handler;
+			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
 		}
 		
 		/**

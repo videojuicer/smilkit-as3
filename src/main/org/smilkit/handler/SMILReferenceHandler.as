@@ -88,6 +88,16 @@ package org.smilkit.handler
 			this.bindInvalidationListeners();
 		}
 		
+		public override function get resolvable():Boolean
+		{
+			return false;
+		}
+		
+		public override function get preloadable():Boolean
+		{
+			return false;
+		}
+		
 		public override function get displayObject():DisplayObject
 		{
 			return (this._sprite as DisplayObject);
