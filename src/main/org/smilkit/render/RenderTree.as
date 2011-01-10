@@ -555,20 +555,10 @@ package org.smilkit.render
 				}
 				
 				// Remove anything no longer found on the timing graph
-				var deadTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
-				for(var p:uint = 0; p < this._activeTimingNodes.length; p++)
-				{
-					if(timingNodes.indexOf(this._activeTimingNodes[p]) < 0)
-					{
-						deadTimingNodes.push(this._activeTimingNodes[p]);
-					}
-				}
-				SMILKit.logger.debug("RenderTree update: about to remove "+deadTimingNodes.length+" TimingNodes that are no longer present on the TimingGraph", this);
-				for(var l:uint = 0; l < deadTimingNodes.length; l++)
-				{
-					this.removeTimingNodeHandlerFromActiveList(deadTimingNodes[l]);
-				}
+				var orphanCount:uint = this.garbageCollectOrphanedHandlers();
+				if(orphanCount > 0) SMILKit.logger.debug("RenderTree update at "+offset+"ms garbage collected "+orphanCount+" dead handlers", this);
 				
+				// UPDATE COMPLETE
 				// Perform the sync if we flagged up that one is needed
 				if(syncAfterUpdate && this._performOffsetSyncAfterUpdate) 
 				{
@@ -577,6 +567,32 @@ package org.smilkit.render
 					this.syncHandlersToViewportOffset();
 				}
 			}
+		}
+		
+		protected function garbageCollectOrphanedHandlers():uint
+		{
+			// Get all handlers from the timing graph
+			var tgHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>();
+			for(var i:uint = 0; i < this.timingGraph.elements.length; i++)
+			{
+				tgHandlers.push(this.timingGraph.elements[i].mediaElement.handler);
+			}
+
+			var deadTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
+			for(var p:uint = 0; p < this._activeTimingNodes.length; p++)
+			{
+				if(tgHandlers.indexOf(this._activeTimingNodes[p].mediaElement.handler) < 0)
+				{
+					deadTimingNodes.push(this._activeTimingNodes[p]);
+				}
+			}
+			for(var l:uint = 0; l < deadTimingNodes.length; l++)
+			{
+				SMILKit.logger.debug("RenderTree GC: about to remove "+deadTimingNodes[l].mediaElement.handler+" as it is no longer present on the TimingGraph", this);
+				this.removeTimingNodeHandlerFromActiveList(deadTimingNodes[l]);
+			}
+			
+			return deadTimingNodes.length;
 		}
 		
 		protected function addTimingNodeHandlerToActiveList(timingNode:TimingNode):void
@@ -651,8 +667,7 @@ package org.smilkit.render
 		{
 			SMILKit.logger.debug("Handler dispatched LOAD_READY, checking load wait cycle status.", this);
 			// remove from waiting list
-			this.removeHandlerFromWaitingForDataList(e.handler);			
-			this.checkLoadState();
+			this.removeHandlerFromWaitingForDataList(e.handler);
 		}
 		
 		/**

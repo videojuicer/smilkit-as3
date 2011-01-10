@@ -84,6 +84,7 @@ package org.smilkit.handler
 		public function SMILReferenceHandler(element:IElement)
 		{
 			super(element);
+			SMILKit.logger.debug("A WILD REFERENCE HANDLER APPEARS!", this);
 			this._sprite = new Sprite();
 			this.bindInvalidationListeners();
 		}

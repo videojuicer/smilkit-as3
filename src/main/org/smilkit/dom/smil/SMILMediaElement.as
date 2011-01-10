@@ -26,7 +26,7 @@ package org.smilkit.dom.smil
 		{
 			super(owner, name);
 			
-			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMAttributeModified, false);
+			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMSubtreeModified, false);
 			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onDOMAttributeModified, false);
 		}
 		
@@ -277,6 +277,11 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
+		protected function onDOMSubtreeModified(e:MutationEvent):void
+		{
+			this.onDOMAttributeModified(e);
+		}
+
 		protected function onDOMAttributeModified(e:MutationEvent):void
 		{
 			if (e.attrName == "src" || e.attrName == "type")
