@@ -71,7 +71,7 @@ package org.smilkit.spec.tests.parsers
 			
 			var async:Function = Async.asyncHandler(this, this.onDOMNodeInserted, 5000, { ref: reference }, this.onDOMNodeInsertedTimeout);
 			
-			reference.parser.addEventListener(BostonDOMParserEvent.PARSER_COMPLETE, async);
+			//reference.parser.addEventListener(BostonDOMParserEvent.PARSER_COMPLETE, async);
 			//reference.addEventListener(MutationEvent.DOM_NODE_INSERTED, async, false);
 		}
 		

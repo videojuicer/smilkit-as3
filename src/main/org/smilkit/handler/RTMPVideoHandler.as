@@ -6,6 +6,7 @@ package org.smilkit.handler
 	import flash.events.IOErrorEvent;
 	import flash.events.NetStatusEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.events.TimerEvent;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
@@ -17,6 +18,7 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.RegionContainer;
@@ -297,6 +299,11 @@ package org.smilkit.handler
 					
 					this._canvas.addChild(this._video);
 					
+					if (this.viewportObjectPool != null)
+					{
+						this.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunning);
+					}
+					
 					this.resize();
 					
 					break;
@@ -331,8 +338,6 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
-					//this._netStream.bufferTime = 30; // expand buffer
-					
 					this.resize();
 					
 					if (this._waiting)
@@ -343,8 +348,6 @@ package org.smilkit.handler
 					}
 					break;
 				case "NetStream.Buffer.Empty":
-					//this._netStream.bufferTime = 8; // reduce buffer
-					
 					this._waiting = true;
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					break;
@@ -434,10 +437,18 @@ package org.smilkit.handler
 			{
 				this.resolved(this._metadata.duration);
 			}
-			
-			// were ready as soon as we have the metadata
-			//
 		}	
+		
+		protected function onHeartbeatRunning(e:HeartbeatEvent):void
+		{
+			if (this._netStream == null)
+			{
+				return;
+			}
+			
+			// here we need to look at the FPS of the Video and see if it drops
+			// as per; http://help.adobe.com/en_US/FlashMediaServer/3.5_Deving/WS5b3ccc516d4fbf351e63e3d11a0773d56e-7fea.html#WSEC11E19A-4AAC-41cc-96A3-7C93D4593F19
+		}
 		
 		public static function toHandlerMap():HandlerMap
 		{
