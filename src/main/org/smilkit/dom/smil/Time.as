@@ -218,23 +218,68 @@ package org.smilkit.dom.smil
 			var previousDuration:Number = 0;
 			var previousSiblingEndTimesResolved:Boolean = true;
 			
-			for (var i:int = 0; i < siblings.length; i++)
+			// Flatten the siblings into a list of timeSiblings
+			// For instance if a sibling is a simple wrapping element, we want to ignore it and expand its children.
+			var timeSiblings:Vector.<INode> = new Vector.<INode>();
+			for(var s:uint = 0; s < siblings.length; s++)
 			{
-				var sibling:INode = siblings.item(i);
+				timeSiblings.push(siblings.item(s));
+			}
+			for(var t:uint = 0; t < timeSiblings.length; t++)
+			{
+				if(timeSiblings[t] is IElementTimeContainer)
+				{
+					// Do nothing, this belongs here
+				}
+				else
+				{
+					// Oh gods, this one needs flattening.
+					// Do some ridiculous array slicing because the finite monkeys didn't give us a combined splice+concat method.
+					var flattenedTimeSiblings:Vector.<INode> = new Vector.<INode>();
+					// Start with everything up to but not including this timeSibling
+					flattenedTimeSiblings = timeSiblings.slice(0, t);
+					
+						// Build the list of nephew elements
+						var nephewNodes:INodeList = timeSiblings[t].childNodes;
+						var nephews:Vector.<INode> = new Vector.<INode>();
+						for(var n:uint = 0; n < nephewNodes.length; n++)
+						{
+							nephews.push(nephewNodes.item(n));
+						}
+					
+					// Append the nephew list
+					flattenedTimeSiblings = flattenedTimeSiblings.concat(nephews);
+					// If there's anything more at the end of the original list, concat it after the nephew elements.
+					if(t < timeSiblings.length-1)
+					{
+						flattenedTimeSiblings = flattenedTimeSiblings.concat(timeSiblings.slice(t+1));
+					}
+					// Now overwrite the original
+					timeSiblings = flattenedTimeSiblings;
+					
+					// Rewind the loop so the first injected element gets processed
+					t--;
+				}
+			}
+			
+			// Now count the durations of our timeSibling elements
+			for (var i:int = 0; i < timeSiblings.length; i++)
+			{
+				var timeSibling:INode = timeSiblings[i];
 				
-				if (sibling == this._baseElement)
+				if (timeSibling == this._baseElement)
 				{
 				    // Exit the loop when we hit this Time's baseElement
 					break;
 				}
 				
-				var timeContainer:IElementTimeContainer = (sibling as IElementTimeContainer);
+				var timeContainer:IElementTimeContainer = (timeSibling as IElementTimeContainer);
 				
 				(timeContainer.end as TimeList).resolve();
 				
 				if (timeContainer.end.first.resolved)
 				{
-					previousDuration += (sibling as IElementTime).end.first.resolvedOffset;
+					previousDuration += (timeSibling as IElementTime).end.first.resolvedOffset;
 				}
 				else
 				{

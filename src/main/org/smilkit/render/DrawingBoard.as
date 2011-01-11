@@ -10,6 +10,8 @@ package org.smilkit.render
 	import mx.controls.Label;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.SMILElement;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.HeartbeatEvent;
@@ -85,20 +87,29 @@ package org.smilkit.render
 						// check if it doesnt exist yet
 						if (this._elements.indexOf(time) == -1)
 						{
-							//time.element.resumeElement();
-							
 							var region:SMILRegionElement = ((time.element as SMILMediaElement).region as SMILRegionElement);
-							//var region:SMILRegionElement = (this.renderTree.document.getElementById(regionId) as SMILRegionElement);
 							
 							if (region != null)
 							{
-								var handler:SMILKitHandler = (time.element as SMILMediaElement).handler;
+								var mediaElement:SMILMediaElement = time.mediaElement;
+								var handler:SMILKitHandler = mediaElement.handler;
 								
 								SMILKit.logger.debug("Adding Handler to region '"+region.id+"' on the DrawingBoard", handler);
 								drawnCount++;
 								
 								// place the element on to the region it belongs too
 								region.regionContainer.addAssetChild(handler);
+								region.regionContainer.renderTree = this._renderTree;
+								
+								if(handler.spatial)
+								{
+									region.regionContainer.linkContextElement = mediaElement.linkContextElement;
+								}
+								// Examine the link context with element.linkParent
+								// Set link href and target on regioncontainer
+									// set pointerCursor if link context found
+									// set null if no link context
+									
 							}
 							
 							this._elements.push(time);

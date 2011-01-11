@@ -35,6 +35,19 @@ package org.smilkit.dom.smil
 			return this._handler;
 		}
 		
+		/**
+		* Returns the parent <a /> tag, if one exists.
+		*/
+		public function get linkContextElement():Element
+		{
+			var p:Element = (this.parentNode as Element);
+			while(p != null && p.nodeName.toLowerCase() != "a")
+			{
+				p = (p.parentNode as Element);
+			}
+			return p;
+		}
+		
 		public function get abstractAttr():String
 		{
 			return this.getAttribute("abstract");

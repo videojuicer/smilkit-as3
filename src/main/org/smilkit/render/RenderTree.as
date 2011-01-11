@@ -92,6 +92,11 @@ package org.smilkit.render
 			this.reset();
 		}
 		
+		public function get viewport():Viewport
+		{
+			return this._objectPool.viewport;
+		}
+		
 		public function get elements():Vector.<TimingNode>
 		{
 			return this._activeTimingNodes;

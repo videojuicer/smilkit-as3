@@ -79,6 +79,14 @@ package org.smilkit.spec
 					"<video id=\"post_reference_video\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"root\" />"+
 				"</seq>"+
 			"</body></smil>";
+			
+		public static var BASIC_LINK_CONTEXT_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>"+
+				"<a href=\"http://foo.com/direct\" id=\"directlink\"><video id=\"direct\" src=\"http://media.smilkit.org/demo.mp4\" /></a>"+
+				"<a href=\"http://foo.com/uptree\" id=\"uptreelink\"><seq><seq><video id=\"uptree\" src=\"http://media.smilkit.org/demo.mp4\" /></seq></seq></a>"+
+				"<video id=\"notwrapped\" src=\"http://media.smilkit.org/demo.mp4\" />"+
+			"</body></smil>";
 		
 		public static var TIME_CHILDREN_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"left\" width=\"50%\" height=\"100%\" /><region xml:id=\"right\" right=\"0\" width=\"50%\" height=\"100%\" /></layout></head>" +

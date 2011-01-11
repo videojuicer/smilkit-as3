@@ -6,12 +6,20 @@ package org.smilkit.render
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
+	import flash.net.navigateToURL;
+    import flash.net.URLRequest;
+    import flash.net.URLVariables;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.dom.Element;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.util.MathHelper;
+	import org.smilkit.view.Viewport;
+	import org.smilkit.render.RenderTree;
 
 	public class RegionContainer extends Sprite
 	{
@@ -19,6 +27,10 @@ package org.smilkit.render
 		protected var _region:SMILRegionElement;
 		protected var _matrix:Rectangle;
 		protected var _children:Vector.<SMILKitHandler>;
+		protected var _renderTree:RenderTree;
+
+		// Link context for managing click actions
+		protected var _linkContextElement:Element;
 		
 		public function RegionContainer(region:SMILRegionElement, drawingBoard:DrawingBoard = null)
 		{
@@ -30,6 +42,7 @@ package org.smilkit.render
 			this._children = new Vector.<SMILKitHandler>();
 			
 			this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+			this.addEventListener(MouseEvent.CLICK, this.onClick)
 		}
 		
 		public function get region():SMILRegionElement
@@ -45,6 +58,28 @@ package org.smilkit.render
 		public function set drawingBoard(drawingBoard:DrawingBoard):void
 		{
 			this._drawingBoard = drawingBoard;
+		}
+		
+		public function get linkContextElement():Element
+		{
+			return this._linkContextElement;
+		}
+		
+		public function set linkContextElement(e:Element):void
+		{
+			this._linkContextElement = e;
+			this.buttonMode = (e != null);
+			this.useHandCursor = (e != null);
+		}
+		
+		public function get renderTree():RenderTree
+		{
+			return this._renderTree;
+		}
+		
+		public function set renderTree(r:RenderTree):void
+		{
+			this._renderTree = r;
 		}
 		
 		public override function get width():Number
@@ -179,6 +214,58 @@ package org.smilkit.render
 				for (var i:int = 0; i < this._children.length; i++)
 				{
 					this._children[i].resize();
+				}
+			}
+		}
+		
+		protected function onClick(e:MouseEvent):void
+		{
+			var context:Element = this.linkContextElement;
+			if(context != null)
+			{
+				var viewport:Viewport;
+				if(this.renderTree != null)
+				{
+					viewport = this.renderTree.viewport;
+				}
+				 
+				var href:String = context.getAttribute("href");
+				var target:String = context.getAttribute("target");
+				if(target == null) target = "_blank";
+				var sourcePlaystate:String = context.getAttribute("sourcePlaystate");
+				if(sourcePlaystate == null) sourcePlaystate = "pause";
+				
+				if(href != null)
+				{
+					if(target == "_blank" && href.indexOf("http") == 0)
+					{
+						// Blank-targeted links navigate the browser
+						SMILKit.logger.debug("Region with link context about to launch web link with href '"+href+"'", this);
+						var req:URLRequest = new URLRequest(href);
+						navigateToURL(req);
+						
+						if(viewport != null)
+						{
+							if(sourcePlaystate == "pause")
+							{
+								SMILKit.logger.debug("Pausing viewport as a link with sourcePlaystate=pause was activated", this);
+								viewport.pause();
+							}
+						}
+					}
+					else if(href.indexOf("http") == 0)
+					{
+						// Self-targeted links spawn a new player session
+						SMILKit.logger.debug("Region with link context about to load new presentation with href '"+href+"'", this);
+						if(viewport != null)
+						{
+							viewport.location = href;
+							if(!viewport.autoRefresh)
+							{
+								viewport.refresh();
+							}
+						}
+					}
 				}
 			}
 		}
