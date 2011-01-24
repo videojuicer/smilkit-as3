@@ -48,6 +48,7 @@ package org.smilkit.handler
 			super(element);
 			
 			this._canvas = new Sprite();
+			this._soundTransformer = new SoundTransform(0.2, 0);
 		}
 		
 		public override function get width():uint
@@ -133,14 +134,7 @@ package org.smilkit.handler
 		public override function load():void
 		{
 			this._playOptions = new NetStreamPlayOptions();
-			
-			this._soundTransformer = new SoundTransform(0.2, 0);
-			
-			if(this._volume)
-			{
-				this.setVolume(this._volume);
-			}
-			
+									
 			this._netConnection = new NetConnection();
 			this._netConnection.client = this;
 			
@@ -175,6 +169,7 @@ package org.smilkit.handler
 				this._netStream.play2(this._playOptions);
 				
 				this.resize();
+				this.resetVolume();
 
 				return true;
 			}
@@ -186,14 +181,21 @@ package org.smilkit.handler
 		{
 			this._volume = volume;
 			
-			if(this._soundTransformer != null && this._netStream != null)
+			if(this._netStream != null)
 			{
-				SMILKit.logger.debug("Handler volume set to "+volume+".", this);
-				
-				this._soundTransformer.volume = volume/100;
-				
+				SMILKit.logger.debug("Handler volume set to "+volume+" ("+(volume/100)+").", this);
+	        
+				this._soundTransformer.volume = volume/100;				
 				this._netStream.soundTransform = this._soundTransformer;
 			}
+		}
+		
+		/** 
+		* Resets the volume to the known value. Use whenever a new NetStream object is created.
+		*/
+		protected function resetVolume():void
+		{
+			this.setVolume(this._volume);
 		}
 		
 		public override function resume():void
@@ -268,6 +270,7 @@ package org.smilkit.handler
 		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
 		{
+			
 			switch (e.info.code)
 			{
 				case "NetConnection.Connect.Failed":
@@ -281,6 +284,8 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
 				case "NetConnection.Connect.Success":
+					SMILKit.logger.debug("NetConnection to "+this.videoHandlerState.fmsURL.hostname+" successful, creating NetStream", this);
+				
 					this._netStream = new NetStream(this._netConnection);
 					
 					this._netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
@@ -305,6 +310,7 @@ package org.smilkit.handler
 					}
 					
 					this.resize();
+					this.resetVolume();
 					
 					break;
 			}
