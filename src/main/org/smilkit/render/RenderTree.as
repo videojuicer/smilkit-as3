@@ -439,6 +439,12 @@ package org.smilkit.render
 			}
 		}
 		
+		protected function onHandlerStopNotify(e:HandlerEvent):void
+		{
+			SMILKit.logger.debug("Got STOP_NOTIFY from "+e.handler+". About to request out-of-band heartbeat tick.", this);
+			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_STOPPED, e.handler));
+		}
+		
 		/**
 		* Removes a handler from the sync wait list. Called once the handler has synced to the desired offset.
 		*/
@@ -609,6 +615,7 @@ package org.smilkit.render
 			handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 			handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 			handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
+			handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 			
 			this._activeTimingNodes.push(timingNode);
@@ -628,6 +635,7 @@ package org.smilkit.render
 				handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 				handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 				handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
+				handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			}
 			
 			// remove from the list

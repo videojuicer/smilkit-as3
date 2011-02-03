@@ -231,6 +231,11 @@ package org.smilkit.time
 		
 		protected function onTimer(e:TimerEvent):void
 		{
+			this.beat();
+		}
+		
+		public function beat():void
+		{
 			var delta:Date = new Date();
 			var beatDuration:Number = (delta.getTime() - this._baseline.getTime());
 			

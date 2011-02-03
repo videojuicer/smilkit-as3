@@ -716,6 +716,7 @@ package org.smilkit.view
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+				this.renderTree.removeEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 				
 				this._objectPool = null;
 				
@@ -737,6 +738,7 @@ package org.smilkit.view
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
+			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
@@ -844,6 +846,12 @@ package org.smilkit.view
 				}				
 			}				
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
+		}
+		
+		protected function onRenderTreeElementStopped(event:RenderTreeEvent):void
+		{
+			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
+			this.heartbeat.beat();
 		}
 		
 		protected function onTimingGraphRebuild(event:TimingGraphEvent):void

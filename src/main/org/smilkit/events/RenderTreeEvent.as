@@ -9,7 +9,8 @@ package org.smilkit.events
 		public static var ELEMENT_REMOVED:String = "renderTreeElementRemoved";
 		public static var ELEMENT_ADDED:String = "renderTreeElementAdded";
 		public static var ELEMENT_REPLACED:String = "renderTreeElementReplaced";
-		public static var ELEMENT_MODIFIED:String = "renderTreeElementModified";
+		public static var ELEMENT_MODIFIED:String = "renderTreeElementModified";		
+		public static var ELEMENT_STOPPED:String = "renderTreeElementStopped";
 		
 		public static var READY:String = "renderTreeReady";
 		public static var WAITING_FOR_DATA:String = "renderTreeWaitingForData";
