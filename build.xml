@@ -31,6 +31,9 @@
 		<isset property="FLEX_HEADLESS" />
 	</condition>
 	
+	<echo>FLEX_HOME: ${FLEX_HOME}</echo>
+	<echo>FLEX_HEADLESS: ${FLEX_HEADLESS}</echo>
+	
 	<condition property="flash.player.loc" value="${env.FLASH_PLAYER}">
 	  <isset property="env.FLASH_PLAYER" />
   </condition>
