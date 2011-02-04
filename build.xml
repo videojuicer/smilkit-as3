@@ -25,7 +25,7 @@
 	
 	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
 	<property name="FLEX_COVER_VIEWER" location="${env.FLEX_COVER_VIEWER}" />
-	<property name="FLEX_HEADLESS" location="${env.headless}" />
+	<property name="FLEX_HEADLESS" value="${env.HEADLESS}" />
 	
 	<condition property="headless" value="${FLEX_HEADLESS}" else="false">
 		<isset property="FLEX_HEADLESS" />
