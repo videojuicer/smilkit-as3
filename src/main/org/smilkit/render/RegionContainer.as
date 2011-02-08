@@ -122,7 +122,9 @@ package org.smilkit.render
 				}
 				else
 				{
-					this._matrix.width = (width as uint);
+					var widhthUnitsIndex:uint = width.search(/[%a-z]+/i);
+					
+					this._matrix.width = parseFloat(width.substring(0, widhthUnitsIndex));
 				}
 				
 				if (MathHelper.isPercentage(height))
@@ -133,7 +135,9 @@ package org.smilkit.render
 				}
 				else
 				{
-					this._matrix.height = (height as uint);
+					var heightUnitsIndex:uint = height.search(/[%a-z]+/i);
+					
+					this._matrix.height = parseFloat(height.substring(0, heightUnitsIndex));
 				}
 				
 				if (this.region.top != null)
