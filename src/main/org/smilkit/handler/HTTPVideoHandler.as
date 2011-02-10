@@ -393,7 +393,7 @@ package org.smilkit.handler
 					
 					this._loadReady = true;
 					
-					if (this._metadata == null || !this._metadata.updated)
+					if (false) //this._metadata == null || !this._metadata.updated)
 					{
 						this._waitingForMetadataBeforeReady = true;
 					}
@@ -527,12 +527,12 @@ package org.smilkit.handler
 			
 			this.resolved(this._metadata.duration);
 			
-			if (this._waitingForMetadataBeforeReady)
+			/*if (this._waitingForMetadataBeforeReady)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 				
 				this._waitingForMetadataBeforeReady = false;
-			}
+			}*/
 		}
 		
 		public static function toHandlerMap():HandlerMap
