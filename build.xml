@@ -18,6 +18,12 @@
 	<property name="bin.loc" location="${output.loc}/bin" />
 	<property name="dist.loc" location="${output.loc}/dist" />
 	
+	<property name="util.edge.loc" location="${basedir}/../utilkit-as3" />
+	<property name="util.edge.src.loc" location="${basedir}/../utilkit-as3/src/main" />
+	
+	<property name="as3crypto.loc" location="${util.edge.loc}/libs/as3crypto" />
+	<property name="as3crypto.src.loc" location="${util.edge.loc}/libs/as3crypto/src" />
+	
 	<property name="report.loc" location="${output.loc}/report" />
 	<property name="report.asdocs.loc" location="${report.loc}/asdocs" />
 	<property name="report.flexcover.loc" location="${report.loc}/flexcover" />
@@ -79,6 +85,8 @@
 		<compc output="${bin.loc}/smilkit-as3.swc" fork="false">
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${util.src.loc}" />
+			<source-path path-element="${as3crypto.src.loc}" />
+			
 			<include-sources dir="${main.src.loc}" includes="*" />
 			<include-sources dir="${util.src.loc}" includes="*" />
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
@@ -91,6 +99,8 @@
 			<source-path path-element="${main.src.loc}" />
 			<source-path path-element="${test.src.loc}" />
 			<source-path path-element="${util.src.loc}" />
+			<source-path path-element="${as3crypto.src.loc}" />
+			
 			<library-path dir="${lib.loc}" append="true">
 				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
 				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
@@ -104,6 +114,7 @@
 	<target name="example" depends="compile" description="Compiles the example player using the SMILKit-as3 library">
 	  <mxmlc file="${example.src.loc}/SMILKitPlayer.as" output="${bin.loc}/smilkit-as3-player.swf" static-link-runtime-shared-libraries="true">
 	    <source-path path-element="${example.src.loc}" />
+	
 	    <library-path dir="${bin.loc}" append="true">
 	      <include name="smilkit-as3.swc" />
 	    </library-path>
