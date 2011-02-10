@@ -34,7 +34,7 @@ package org.smilkit.handler
 		protected var _resumed:Boolean = false;
 		
 		protected var _loadReady:Boolean = false;
-		protected var _waitingForMetadataBeforeReady:Boolean = false;
+		protected var _waitingForMetadataBeforeComplete:Boolean = false;
 		
 		protected var _volume:uint;
 		
@@ -386,21 +386,14 @@ package org.smilkit.handler
 			// if were not already ready, check if we are
 			if (!this._loadReady)
 			{
-				if ((durationLoaded - this.currentOffset) >= (this._netStream.bufferTime * 1000))
+				if ((durationLoaded - this.currentOffset) >= (this._netStream.bufferTime * 1000) && !this._waitingForMetadataBeforeComplete)
 				{
 					// increase the buffer so we have more ready
 					//this._netStream.bufferTime = 30;
 					
 					this._loadReady = true;
 					
-					if (false) //this._metadata == null || !this._metadata.updated)
-					{
-						this._waitingForMetadataBeforeReady = true;
-					}
-					else
-					{
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
-					}
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 				}
 			}
 			// if were ready, check if we need more
@@ -419,11 +412,18 @@ package org.smilkit.handler
 			
 			if (percentageLoaded >= 100 && !this._completedLoading)
 			{
-				this._completedLoading = true;
+				if (this._metadata == null || !this._metadata.updated)
+				{
+					this._waitingForMetadataBeforeComplete = true;
+				}
+				else
+				{
+					this._completedLoading = true;
 				
-				SMILKit.logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
+					SMILKit.logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
 				
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
+				}
 			}
 		}
 		
@@ -527,12 +527,16 @@ package org.smilkit.handler
 			
 			this.resolved(this._metadata.duration);
 			
-			/*if (this._waitingForMetadataBeforeReady)
+			if (this._waitingForMetadataBeforeComplete)
 			{
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				this._completedLoading = true;
 				
-				this._waitingForMetadataBeforeReady = false;
-			}*/
+				SMILKit.logger.debug("Handler has completed loading ("+this._netStream.bytesLoaded+"/"+this._netStream.bytesTotal+" bytes)", this);
+				
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
+				
+				this._waitingForMetadataBeforeComplete = false;
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap
