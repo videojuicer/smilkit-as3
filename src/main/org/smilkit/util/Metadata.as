@@ -10,6 +10,8 @@ package org.smilkit.util
 		protected var _internalInfo:Object;
 		protected var _syncPoints:Vector.<int> = new Vector.<int>();
 		
+		protected var _updated:Boolean = false;
+		
 		public function Metadata(info:Object)
 		{
 			this._internalInfo = info;
@@ -163,6 +165,11 @@ package org.smilkit.util
 			return this._internalInfo['width'];
 		}
 		
+		public function get updated():Boolean
+		{
+			return this._updated;
+		}
+		
 		/**
 		 * Updates the metadata properties available.
 		 * 
@@ -179,6 +186,8 @@ package org.smilkit.util
 					this._internalInfo[key] = value;
 				}
 			}
+			
+			this._updated = true;
 		}
 		
 		/**

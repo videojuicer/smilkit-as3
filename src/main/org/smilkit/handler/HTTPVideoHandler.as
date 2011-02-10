@@ -19,8 +19,8 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.util.Metadata;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.logger.Logger;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{
@@ -34,6 +34,7 @@ package org.smilkit.handler
 		protected var _resumed:Boolean = false;
 		
 		protected var _loadReady:Boolean = false;
+		protected var _waitingForMetadataBeforeReady:Boolean = false;
 		
 		protected var _volume:uint;
 		
@@ -392,7 +393,14 @@ package org.smilkit.handler
 					
 					this._loadReady = true;
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					if (this._metadata == null || !this._metadata.updated)
+					{
+						this._waitingForMetadataBeforeReady = true;
+					}
+					else
+					{
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					}
 				}
 			}
 			// if were ready, check if we need more
@@ -518,6 +526,13 @@ package org.smilkit.handler
 			SMILKit.logger.info("Metadata received (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
 			
 			this.resolved(this._metadata.duration);
+			
+			if (this._waitingForMetadataBeforeReady)
+			{
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				
+				this._waitingForMetadataBeforeReady = false;
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap
