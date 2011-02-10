@@ -414,27 +414,30 @@ package org.smilkit.render
 		*/
 		protected function onHandlerSeekNotify(event:HandlerEvent):void
 		{
-			var waitHandler:SMILKitHandler = event.handler;
-			var index:int = this._offsetSyncHandlerList.indexOf(waitHandler);
-			var viewportPlaying:Boolean = (this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING);
-			
-			if(index >= 0)
+			if(this._offsetSyncHandlerList != null)
 			{
-				var waitOffset:uint = this._offsetSyncOffsetList[index];
-				if(waitHandler.currentOffset < waitOffset && viewportPlaying)
+				var waitHandler:SMILKitHandler = event.handler;
+				var index:int = this._offsetSyncHandlerList.indexOf(waitHandler);
+				var viewportPlaying:Boolean = (this._objectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING);
+
+				if(index >= 0)
 				{
-					SMILKit.logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation unacceptable - starting catchup playback.", this);
-					waitHandler.setVolume(0);
-					waitHandler.resume();
-				}
-				else
-				{
-					if(viewportPlaying)	SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Seek operation acceptable - removing from wait list.", this);
-					else SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Viewport is paused - skipping catchup phase and removing from wait list.", this);
+					var waitOffset:uint = this._offsetSyncOffsetList[index];
+					if(waitHandler.currentOffset < waitOffset && viewportPlaying)
+					{
+						SMILKit.logger.debug("Got SEEK_NOTIFY from a handler that is waiting for sync. Seek operation unacceptable - starting catchup playback.", this);
+						waitHandler.setVolume(0);
+						waitHandler.resume();
+					}
+					else
+					{
+						if(viewportPlaying)	SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Seek operation acceptable - removing from wait list.", this);
+						else SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Viewport is paused - skipping catchup phase and removing from wait list.", this);
 
 
-					waitHandler.pause();
-					this.removeHandlerFromWaitingForSyncList(waitHandler);
+						waitHandler.pause();
+						this.removeHandlerFromWaitingForSyncList(waitHandler);
+					}
 				}
 			}
 		}
