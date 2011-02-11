@@ -63,7 +63,7 @@
   <echo>Flash Player: ${flash.player.loc}</echo>
 	
 	<taskdef resource="flexTasks.tasks" classpath="${FLEX_HOME}/ant/lib/flexTasks.jar" />
-	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0.53-sdk4.0.0.14159.jar" />
+	<taskdef resource="flexUnitTasks.tasks" classpath="${lib.loc}/flexUnitTasks-4.1.0_RC2-4.jar" />
 	
 	<target name="usage" description="Displays main targets of the build recipe">
 	  	<java classname="org.apache.tools.ant.Main">
@@ -110,8 +110,8 @@
 			<source-path path-element="${as3crypto.src.loc}" />
 			
 			<library-path dir="${lib.loc}" append="true">
-				<include name="flexunit-core-flex-4.0.0.53-sdk4.0.0.14159.swc" />
-				<include name="flexunit-cilistener-4.1.0.53-sdk4.0.0.14159.swc" />
+				<include name="flexunit-4.1.0_RC2-4-as3_4.1.0.16076.swc" />
+				<include name="flexunit-cilistener-4.1.0_RC2-4-4.1.0.16076.swc" />
 				<!--<include name="flexunit-flexcoverlistener-4.1.0.53-sdk4.0.0.14159.swc" />-->
 			</library-path>
 			<compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
@@ -245,17 +245,17 @@
 	</target>
 	
 	<target name="test-only" depends="test-compile">
-		<exec executable="vncserver" spawn="false">
+		<!--<exec executable="vncserver" spawn="false">
 			<arg line=":99" />
 		</exec>
-		<sleep seconds="10"/>
+		<sleep seconds="10"/>-->
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
 				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}"
 				timeout="40000" />
 		 <sleep seconds="10"/>
-		<exec executable="vncserver" spawn="false">
+		<!--><exec executable="vncserver" spawn="false">
 			<arg line="-kill :99" />
-		</exec>
+		</exec>-->
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
