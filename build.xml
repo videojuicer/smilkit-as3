@@ -246,7 +246,8 @@
 	
 	<target name="test-only" depends="test-compile">
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
-				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}" />
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}"
+				timeout="40000" />
 		 <sleep seconds="10"/>
 	</target>
 	
