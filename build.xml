@@ -238,14 +238,14 @@
 			<sequential>
             	<sleep seconds="30" />
             	<flexunit swf="${bin.loc}/SpecRunner.swf" toDir="${report.unit.loc}"
-						haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
+						haltonfailure="false" verbose="true" localTrusted="true" headless="${FLEX_HEADLESS}" />
 			</sequential>
 		</parallel>
 	</target>
 	
 	<target name="test-only" depends="test-compile">
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
-				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless_runner}" />
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}" />
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
