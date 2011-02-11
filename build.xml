@@ -31,14 +31,20 @@
 	
 	<property name="FLEX_HOME" location="${env.FLEX_HOME}" />
 	<property name="FLEX_COVER_VIEWER" location="${env.FLEX_COVER_VIEWER}" />
-	<property name="FLEX_HEADLESS" value="${env.HEADLESS}" />
+	<property name="FLEX_HEADLESS" value="${env.FLEX_HEADLESS}" />
+	<property name="FLASH_HEADLESS" value="${env.FLASH_HEADLESS}" />
 	
-	<condition property="headless" value="${FLEX_HEADLESS}" else="false">
+	<condition property="FLEX_HEADLESS" value="${FLEX_HEADLESS}" else="false">
 		<isset property="FLEX_HEADLESS" />
+	</condition>
+	
+	<condition property="FLASH_HEADLESS" value="${FLASH_HEADLESS}" else="false">
+		<isset property="FLASH_HEADLESS" />
 	</condition>
 	
 	<echo>FLEX_HOME: ${FLEX_HOME}</echo>
 	<echo>FLEX_HEADLESS: ${FLEX_HEADLESS}</echo>
+	<echo>FLASH_HEADLESS: ${FLASH_HEADLESS}</echo>
 	
 	<condition property="flash.player.loc" value="${env.FLASH_PLAYER}">
 	  <isset property="env.FLASH_PLAYER" />
@@ -239,7 +245,7 @@
 	
 	<target name="test-only" depends="test-compile">
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
-				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless}" />
+				haltonfailure="false" verbose="true" localTrusted="true" headless="${headless_runner}" />
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
