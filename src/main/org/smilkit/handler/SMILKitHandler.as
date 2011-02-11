@@ -1,9 +1,11 @@
 package org.smilkit.handler
 {
+	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.EventDispatcher;
+	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
@@ -15,10 +17,10 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.utilkit.logger.Logger;
 
 	public class SMILKitHandler extends EventDispatcher
 	{
@@ -77,6 +79,11 @@ package org.smilkit.handler
 		}
 		
 		public function get displayObject():DisplayObject
+		{
+			return null;
+		}
+		
+		public function get innerDisplayObject():DisplayObject
 		{
 			return null;
 		}
@@ -453,8 +460,8 @@ package org.smilkit.handler
 					
 					parent.addChild(this._shield);
 					
-					parent.setChildIndex(child, 0);
-					parent.setChildIndex(this._shield, 1);
+					parent.setChildIndex(child, 1);
+					parent.setChildIndex(this._shield, 0);
 				}
 				
 				this._shield.graphics.clear();
@@ -462,6 +469,43 @@ package org.smilkit.handler
 				this._shield.graphics.beginFill(0xFFFFFF, 0.0);
 				this._shield.graphics.drawRect(0, 0, child.width, child.height);
 				this._shield.graphics.endFill();
+			}
+		}
+		
+		public function enterSyncState():void
+		{
+			var parent:Sprite = (this.displayObject as Sprite);
+			
+			if (this.innerDisplayObject != null && parent.contains(this.innerDisplayObject))
+			{
+				SMILKit.logger.debug("Handler entering sync state");
+				
+				var bitmapData:BitmapData = new BitmapData(this.innerDisplayObject.width, this.innerDisplayObject.height, true);
+				var matrix:Matrix = new Matrix();
+				
+				bitmapData.draw(this.displayObject, matrix);
+				
+				parent.graphics.clear();
+				
+				parent.graphics.beginBitmapFill(bitmapData, matrix, false, true);
+				parent.graphics.drawRect(0, 0, this.innerDisplayObject.width, this.innerDisplayObject.height);
+				parent.graphics.endFill();
+				
+				parent.removeChild(this.innerDisplayObject);
+			}
+		}
+		
+		public function leaveSyncState():void
+		{
+			var parent:Sprite = (this.displayObject as Sprite);
+			
+			if (this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
+			{
+				SMILKit.logger.debug("Handler leaving sync state");
+
+				parent.graphics.clear();
+				
+				parent.addChild(this.innerDisplayObject);
 			}
 		}
 		

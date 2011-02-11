@@ -19,8 +19,8 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.util.Metadata;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.logger.Logger;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{
@@ -104,6 +104,11 @@ package org.smilkit.handler
 		public override function get displayObject():DisplayObject
 		{
 			return (this._canvas as DisplayObject);
+		}
+
+		public override function get innerDisplayObject():DisplayObject
+		{
+			return (this._video as DisplayObject);
 		}
 		
 		public override function get currentOffset():int

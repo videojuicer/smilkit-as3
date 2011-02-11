@@ -18,10 +18,10 @@ package org.smilkit.render
 	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.time.TimingGraph;
 	import org.smilkit.time.TimingNode;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
+	import org.utilkit.logger.Logger;
 	
 	/**
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements
@@ -273,6 +273,12 @@ package org.smilkit.render
 			
 			if (this._offsetSyncHandlerList.length > 0)
 			{
+				for (var k:int = 0; k < this._offsetSyncHandlerList.length; k++)
+				{
+					// Set the handler to a sync state
+					this._offsetSyncHandlerList[k].enterSyncState();
+				}
+				
 				SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);				
 				this._waitingForSync = true;				
 				this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
@@ -293,7 +299,7 @@ package org.smilkit.render
 					var offset:uint = this._offsetSyncOffsetList[index];
 				
 					if(handler.seekable)
-					{
+					{						
 						// Perform sync
 						var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
 						var destinationOffset:Number;
@@ -381,6 +387,12 @@ package org.smilkit.render
 				if (this._offsetSyncHandlerList.length < 1)
 				{
 					this._waitingForSync = false;
+					
+					// go through the handlers and remove them from a SYNC state
+					for (var k:int = 0; k < removeHandlers.length; k++)
+					{
+						removeHandlers[k].leaveSyncState();
+					}
 					
 					if (!this._waitingForData)
 					{
