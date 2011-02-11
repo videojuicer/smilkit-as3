@@ -245,10 +245,17 @@
 	</target>
 	
 	<target name="test-only" depends="test-compile">
+		<exec executable="vncserver" spawn="false">
+			<arg line=":99" />
+		</exec>
+		<sleep seconds="10"/>
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
 				haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}"
 				timeout="40000" />
 		 <sleep seconds="10"/>
+		<exec executable="vncserver" spawn="false">
+			<arg line="-kill :99" />
+		</exec>
 	</target>
 	
 	<target name="report" description="Generates HTML reports for the last ran test specs">
