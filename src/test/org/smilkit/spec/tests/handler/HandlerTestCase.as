@@ -1,5 +1,8 @@
 package org.smilkit.spec.tests.handler
 {
+	import flash.display.BitmapData;
+	import flash.media.Video;
+	
 	import flexunit.framework.Assert;
 	
 	import org.smilkit.SMILKit;
@@ -74,6 +77,25 @@ package org.smilkit.spec.tests.handler
 			Assert.assertNotNull(httpHandler);
 			
 			httpHandler.load();
+		}
+		
+		[Test(description="Tests that a handler can generate a correct bitmap snapshot of the current visible data")]
+		public function handlerGeneratesBitmapSnapshot():void
+		{
+			var httpElement:ISMILMediaElement = this._document.getElementById("video_http") as ISMILMediaElement;
+			
+			Assert.assertNotNull(httpElement);
+			
+			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			
+			Assert.assertNotNull(httpHandler);
+			
+			httpHandler.load();
+			
+			var snapshot:BitmapData = httpHandler.bitmapSnapshot;
+			
+			Assert.assertEquals(httpHandler.innerDisplayObject.width, snapshot.width);
+			Assert.assertEquals(httpHandler.innerDisplayObject.height, snapshot.height);
 		}
 	}
 }

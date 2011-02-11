@@ -148,6 +148,16 @@ package org.smilkit.handler
 			return null;
 		}
 		
+		public function get bitmapSnapshot():BitmapData
+		{
+			var bitmapData:BitmapData = new BitmapData(this.innerDisplayObject.width, this.innerDisplayObject.height, true);
+			var matrix:Matrix = new Matrix();
+			
+			bitmapData.draw(this.displayObject, matrix);
+			
+			return bitmapData;
+		}
+		
 		public function load():void
 		{
 			
@@ -480,14 +490,9 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Handler entering sync state");
 				
-				var bitmapData:BitmapData = new BitmapData(this.innerDisplayObject.width, this.innerDisplayObject.height, true);
-				var matrix:Matrix = new Matrix();
-				
-				bitmapData.draw(this.displayObject, matrix);
-				
 				parent.graphics.clear();
 				
-				parent.graphics.beginBitmapFill(bitmapData, matrix, false, true);
+				parent.graphics.beginBitmapFill(this.bitmapSnapshot, new Matrix(), false, true);
 				parent.graphics.drawRect(0, 0, this.innerDisplayObject.width, this.innerDisplayObject.height);
 				parent.graphics.endFill();
 				
