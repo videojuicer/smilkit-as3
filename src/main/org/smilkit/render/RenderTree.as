@@ -264,6 +264,14 @@ package org.smilkit.render
 					this._offsetSyncHandlerList.push(handler);
 					this._offsetSyncOffsetList.push(offset);
 					
+					if (!this._waitingForSync)
+					{
+						SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
+						
+						this._waitingForSync = true;				
+						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+					}
+					
 					if(handler.completedResolving || handler.completedLoading)
 					{
 						this.execSyncHandlerForViewportOffset(handler);
@@ -281,15 +289,15 @@ package org.smilkit.render
 				{
 					var syncHandler:SMILKitHandler = this._offsetSyncHandlerList[k];
 					
-					// Set the handler to a sync state
-					syncHandler.enterSyncState();
+					if (this._syncWaitingList.indexOf(syncHandler) == -1)
+					{
+						// Set the handler to a sync state
+						syncHandler.enterSyncState();
 					
-					this._syncWaitingList.push(syncHandler);
+						this._syncWaitingList.push(syncHandler);
+					}
 				}
 				
-				SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);				
-				this._waitingForSync = true;				
-				this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
 			} 
 			else
 			{
