@@ -146,6 +146,7 @@ package org.smilkit.handler
 			this._netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
 			this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
 			
+			this._netStream.checkPolicyFile = true;
 			this._netStream.client = this;
 			this._netStream.bufferTime = 10;
 			this._netStream.soundTransform = this._soundTransformer;

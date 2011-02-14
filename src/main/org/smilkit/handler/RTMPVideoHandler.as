@@ -292,6 +292,7 @@ package org.smilkit.handler
 					this._netStream.addEventListener(IOErrorEvent.IO_ERROR, this.onIOErrorEvent);
 					this._netStream.addEventListener(NetStatusEvent.NET_STATUS, this.onNetStatusEvent);
 
+					this._netStream.checkPolicyFile = true;
 					this._netStream.client = this;
 					
 					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
