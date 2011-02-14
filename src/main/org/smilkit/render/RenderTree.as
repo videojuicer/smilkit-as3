@@ -270,7 +270,7 @@ package org.smilkit.render
 					
 					if(handler.completedResolving || handler.completedLoading)
 					{
-						syncHandler.enterSyncState();
+						handler.enterSyncState();
 						
 						this.execSyncHandlerForViewportOffset(handler);
 					}
