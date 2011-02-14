@@ -53,8 +53,6 @@ package org.smilkit.render
 		
 		protected var _performOffsetSyncAfterUpdate:Boolean = false;
 		
-		protected var _syncWaitingList:Vector.<SMILKitHandler>;
-		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
 		 * 
@@ -90,8 +88,6 @@ package org.smilkit.render
 			this._activeMediaElements = new Vector.<SMILMediaElement>();
 			
 			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
-			
-			this._syncWaitingList = new Vector.<SMILKitHandler>(); 
 			
 			this.reset();
 		}
@@ -274,6 +270,8 @@ package org.smilkit.render
 					
 					if(handler.completedResolving || handler.completedLoading)
 					{
+						syncHandler.enterSyncState();
+						
 						this.execSyncHandlerForViewportOffset(handler);
 					}
 					else
@@ -283,23 +281,7 @@ package org.smilkit.render
 				}
 			}
 			
-			if (this._offsetSyncHandlerList.length > 0)
-			{
-				for (var k:int = 0; k < this._offsetSyncHandlerList.length; k++)
-				{
-					var syncHandler:SMILKitHandler = this._offsetSyncHandlerList[k];
-					
-					if (this._syncWaitingList.indexOf(syncHandler) == -1)
-					{
-						// Set the handler to a sync state
-						syncHandler.enterSyncState();
-					
-						this._syncWaitingList.push(syncHandler);
-					}
-				}
-				
-			} 
-			else
+			if (this._offsetSyncHandlerList.length == 0)
 			{
 				SMILKit.logger.debug("No handlers require sync at this time.", this);
 			}
@@ -478,14 +460,8 @@ package org.smilkit.render
 			if(this._offsetSyncHandlerList != null) 
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
-				var syncIndex:int = this._syncWaitingList.indexOf(handler);
 				
-				if (syncIndex >= 0)
-				{
-					this._syncWaitingList.splice(syncIndex, 1);
-					
-					handler.leaveSyncState();
-				}
+				handler.leaveSyncState();
 				
 				if (index >= 0)
 				{
