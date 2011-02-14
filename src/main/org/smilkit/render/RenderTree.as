@@ -53,6 +53,8 @@ package org.smilkit.render
 		
 		protected var _performOffsetSyncAfterUpdate:Boolean = false;
 		
+		protected var _syncWaitingList:Vector.<SMILKitHandler>;
+		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
 		 * 
@@ -88,6 +90,8 @@ package org.smilkit.render
 			this._activeMediaElements = new Vector.<SMILMediaElement>();
 			
 			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
+			
+			this._syncWaitingList = new Vector.<SMILKitHandler>(); 
 			
 			this.reset();
 		}
@@ -275,8 +279,12 @@ package org.smilkit.render
 			{
 				for (var k:int = 0; k < this._offsetSyncHandlerList.length; k++)
 				{
+					var syncHandler:SMILKitHandler = this._offsetSyncHandlerList[k];
+					
 					// Set the handler to a sync state
-					this._offsetSyncHandlerList[k].enterSyncState();
+					syncHandler.enterSyncState();
+					
+					this._syncWaitingList.push(syncHandler);
 				}
 				
 				SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);				
@@ -388,12 +396,6 @@ package org.smilkit.render
 				{
 					this._waitingForSync = false;
 					
-					// go through the handlers and remove them from a SYNC state
-					for (var k:int = 0; k < removeHandlers.length; k++)
-					{
-						removeHandlers[k].leaveSyncState();
-					}
-					
 					if (!this._waitingForData)
 					{
 						SMILKit.logger.debug("Sync operation completed. RenderTree now READY.", this);
@@ -446,7 +448,6 @@ package org.smilkit.render
 						if(viewportPlaying)	SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Seek operation acceptable - removing from wait list.", this);
 						else SMILKit.logger.debug("Got SEEK_NOTIFY from a syncing handler. Viewport is paused - skipping catchup phase and removing from wait list.", this);
 
-
 						waitHandler.pause();
 						this.removeHandlerFromWaitingForSyncList(waitHandler);
 					}
@@ -469,7 +470,15 @@ package org.smilkit.render
 			if(this._offsetSyncHandlerList != null) 
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
-
+				var syncIndex:int = this._syncWaitingList.indexOf(handler);
+				
+				if (syncIndex >= 0)
+				{
+					this._syncWaitingList.splice(syncIndex, 1);
+					
+					handler.leaveSyncState();
+				}
+				
 				if (index >= 0)
 				{
 					SMILKit.logger.debug("Handler removed from RenderTree's sync wait list", handler);
