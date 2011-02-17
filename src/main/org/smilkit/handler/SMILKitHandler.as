@@ -150,10 +150,13 @@ package org.smilkit.handler
 		
 		public function get bitmapSnapshot():BitmapData
 		{
-			var bitmapData:BitmapData = new BitmapData(this.innerDisplayObject.width, this.innerDisplayObject.height, true);
+			var bitmapData:BitmapData = new BitmapData(this.innerDisplayObject.width, this.innerDisplayObject.height, true, 0x000000);
 			var matrix:Matrix = new Matrix();
 			
-			bitmapData.draw(this.displayObject, matrix);
+			if (this.displayObject != null)
+			{
+				bitmapData.draw(this.displayObject, matrix);
+			}
 			
 			return bitmapData;
 		}
