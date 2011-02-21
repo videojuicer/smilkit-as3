@@ -1,11 +1,13 @@
 package org.smilkit.time
 {
+	import flash.errors.IllegalOperationError;
+	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
 	import org.smilkit.SMILKit;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.events.HeartbeatEvent;
+	import org.utilkit.logger.Logger;
 	
 	/**
 	 * Dispatched when the running offset is changed, this is either due to the <code>Heartbeat</code> ticking
@@ -24,7 +26,7 @@ package org.smilkit.time
 	 *  
 	 * 
 	 */	
-	public class Heartbeat extends Timer
+	public class Heartbeat extends EventDispatcher
 	{
 		protected var _timer:Timer;
 		protected var _baseline:Date = new Date();
@@ -33,6 +35,8 @@ package org.smilkit.time
 		protected var _running:Boolean = false;
 		protected var _previousOffset:Number = 0;
 		protected var _runningOffset:Number = 0;
+		
+		protected static var __timerInstance:Timer;
 		
 		public static var BPS_5:Number = 200;
 		public static var BPS_2:Number = 500;
@@ -55,14 +59,10 @@ package org.smilkit.time
 		 */		
 		public function Heartbeat(delay:Number)
 		{
-			super(delay, 0);
-			
-			this.addEventListener(TimerEvent.TIMER, this.onTimer);
+			SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onTimer);
 			
 			this._baseline = new Date();
 			this._offset = 0;
-			
-			//this.start();
 		}
 		
 		/**
@@ -88,58 +88,12 @@ package org.smilkit.time
 		 * 
 		 * @return True if the <code>Heartbeat</code> is updating the <code>runningOffset</code>, false otherwise.
 		 */
-		public override function get running():Boolean
+		public function get running():Boolean
 		{
 			return this._running;
 		}
 		
-		/**
-		 * The current number of beats per second the <code>Heartbeat</code> is running at.
-		 */
-		public function get beatsPerSecond():Number
-		{
-			return (1000 / this.delay);
-		}
-		
-		/**
-		 * A setter for the current number of beats per second the <code>Heartbeat</code> is running at.
-		 */
-		public function set beatsPerSecond(value:Number):void
-		{
-			this.delay = (1000 / value);
-		}
-		
-		/**
-		 * The current count of slow beats, a slow beat is counted
-		 * when it takes longer to process than the set beat delay.
-		 */
-		public function get slowBeats():int
-		{
-			return this._slowBeats;
-		}
-		
-		/**
-		 * Starting the <code>Heartbeat</code> is not possible as the heart always beats regardless
-		 * of the play state of the <code>Viewport</code>.
-		 */
-		public override function start():void
-		{
-			if (!super.running)
-			{
-				super.start();
-			}
-		}
-		
-		/**
-		 * Stopping the <code>Heartbeat</code> is not possible as the heart always beats regardless
-		 * of the play state of the <code>Viewport</code>.
-		 */
-		public override function stop():void
-		{
-			// no stopping
-		}
-		
-		public override function reset():void
+		public function reset():void
 		{
 			SMILKit.logger.debug("Heartbeat resetting.", this);
 			this.pause();
@@ -149,10 +103,6 @@ package org.smilkit.time
 			
 			this._runningOffset = 0;
 			this._previousOffset = 0;
-			
-			super.stop();
-			super.reset();
-			super.start();
 		}
 		
 		/**
@@ -238,21 +188,6 @@ package org.smilkit.time
 		{
 			var delta:Date = new Date();
 			var beatDuration:Number = (delta.getTime() - this._baseline.getTime());
-			
-			if (this.delay < beatDuration)
-			{
-				// too slow
-				this._slowBeats++;
-				
-				if (this._slowBeats > Heartbeat.SLOW_BEATS_LIMIT && this.delay < 1000)
-				{
-					// drop bps
-				}
-			}
-			else
-			{
-				this._slowBeats = 0;
-			}
 		
 			this._offset += beatDuration;
 			this._baseline = delta;

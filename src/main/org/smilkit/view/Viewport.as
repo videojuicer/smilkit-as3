@@ -176,7 +176,6 @@ package org.smilkit.view
 			this._drawingBoard = new DrawingBoard();
 			this.addChild(this._drawingBoard);
 			
-			this._heartbeat.start();
 			this.pause();
 		}
 		

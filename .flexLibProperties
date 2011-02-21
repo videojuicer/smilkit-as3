@@ -69,6 +69,7 @@
     <classEntry path="org.smilkit.dom.smil.ElementTimeDescendantNodeList"/>
     <classEntry path="org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase"/>
     <classEntry path="org.smilkit.handler.RTMPAudioHandler"/>
+    <classEntry path="org.smilkit.time.SharedTimer"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

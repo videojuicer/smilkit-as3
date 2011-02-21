@@ -99,46 +99,6 @@ package org.smilkit.spec.tests.time
 		protected function handleHasOffSetTimeOut(passThroughData:Object):void
 		{
 			Assert.fail( "Timeout reached before viewport refreshed: HeartbeatTestCase:handleHasOffset");
-		}	
-		
-		[Test(async, description="Tests that the Heartbeat has beatsPerSecond")]
-		public function hasBeatsPerSecond():void
-		{
-			var asyncHasBeatsPerSecondCheck:Function = Async.asyncHandler(this, handleHasBeatsPerSecond, 5000, null, handleHasBeatsPerSecond);
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncHasBeatsPerSecondCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
 		}
-		
-		protected function handleHasBeatsPerSecond(event:ViewportEvent, passThroughData:Object):void
-		{
-			var heartBeat:Heartbeat = this._viewport.heartbeat;
-			Assert.assertEquals(1000 / Heartbeat.BPS_5, heartBeat.beatsPerSecond);
-		}
-		
-		protected function handleHasBeatsPerSecondTimeOut(passThroughData:Object):void
-		{
-			Assert.fail( "Timeout reached before viewport refreshed: HeartbeatTestCase:handleHasBestsPerSecond");
-		}
-		
-		[Test(async, description="Tests that the Heartbeat has slowBeats")]
-		public function hasSlowBeats():void
-		{
-			var asyncHasSlowBeatsCheck:Function = Async.asyncHandler(this, handleHasSlowBeats, 5000, null, handleHasSlowBeats);
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncHasSlowBeatsCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
-		}
-		
-		protected function handleHasSlowBeats(event:ViewportEvent, passThroughData:Object):void
-		{
-			var heartBeat:Heartbeat = this._viewport.heartbeat;
-			
-			Assert.assertTrue((heartBeat.slowBeats > 0));
-		}
-		
-		protected function handleHasSlowBeatsSecondTimeOut(passThroughData:Object):void
-		{
-			Assert.fail( "Timeout reached before viewport refreshed: HeartbeatTestCase:handleHasSlowBeats");
-		}
-		
 	}
 }
