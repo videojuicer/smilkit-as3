@@ -1,6 +1,7 @@
 package org.smilkit.spec.tests.render
 {
 	import flash.display.Sprite;
+	import flash.geom.Rectangle;
 	
 	import flexunit.framework.Assert;
 	
@@ -68,6 +69,30 @@ package org.smilkit.spec.tests.render
 			Assert.fail( "Timeout reached before viewport refreshed: DrawingBoardTestCase:handleHasCanvas");
 		}
 		
-		
+		[Test(description="DrawingBoard resizes when triggered with boundingRect")]
+		public function resizesWhenBoundingRectSets():void
+		{
+			Assert.assertEquals(0, this._viewport.drawingBoard.canvas.width);
+			Assert.assertEquals(0, this._viewport.drawingBoard.canvas.height);
+			
+			Assert.assertEquals(0, this._viewport.drawingBoard.width);
+			Assert.assertEquals(0, this._viewport.drawingBoard.height);
+			
+			Assert.assertEquals(0, this._viewport.width);
+			Assert.assertEquals(0, this._viewport.height);
+			
+			var rect:Rectangle = new Rectangle(0, 0, 1000, 1000);
+			
+			this._viewport.boundingRect = rect;
+
+			Assert.assertEquals(1000, this._viewport.drawingBoard.canvas.width);
+			Assert.assertEquals(1000, this._viewport.drawingBoard.canvas.height);
+			
+			Assert.assertEquals(1000, this._viewport.drawingBoard.width);
+			Assert.assertEquals(1000, this._viewport.drawingBoard.height);
+			
+			Assert.assertEquals(1000, this._viewport.width);
+			Assert.assertEquals(1000, this._viewport.height);
+		}
 	}
 }

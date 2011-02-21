@@ -5,6 +5,7 @@ package org.smilkit.render
 	import flash.display.Stage;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
+	import flash.geom.Rectangle;
 	
 	import mx.controls.Button;
 	import mx.controls.Label;
@@ -26,21 +27,30 @@ package org.smilkit.render
 	public class DrawingBoard extends Sprite
 	{
 		protected var _renderTree:RenderTree;
-		protected var _applicationStage:Stage;
 		protected var _canvas:Sprite;
 		protected var _elements:Vector.<TimingNode>;
 		protected var _regions:Vector.<RegionContainer>;
+		
+		protected var _boundingRect:Rectangle = new Rectangle(0, 0, 0, 0);
+		protected var _boundingDisplayParent:Sprite = null;
 		
 		public function DrawingBoard()
 		{
 			this.reset();
 		}
 		
+		/**
+		 * The <code>RenderTree</code> instance used by this <code>DrawingBoard</code>.
+		 */
 		public function get renderTree():RenderTree
 		{
 			return this._renderTree;
 		}
 		
+		/**
+		 * Sets the <code>RenderTree</code> instance used by this <code>DrawingBoard</code>,
+		 * resets the current state of the DrawingBoard when this is set.
+		 */
 		public function set renderTree(value:RenderTree):void
 		{
 			this._renderTree = value;
@@ -48,21 +58,55 @@ package org.smilkit.render
 		}
 		
 		/**
-		 * Returns the <code>Sprite</code> canvas the <code>RenderTree</code> draws too.
+		 * Returns the <code>Sprite</code> canvas that the <code>RenderTree</code> draws too.
 		 */
 		public function get canvas():Sprite
 		{
 			return this._canvas;
 		}
 		
-		public function get applicationStage():Stage
+		/**
+		* <code>Rectangle</code> that specifies the size at which the <code>DrawingBoard</code> is drawn, the x + y params
+		* of <code>Rectangle</code> are ignored.
+		*/
+		public function get boundingRect():Rectangle
 		{
-			return this._applicationStage;
+			return this._boundingRect;
 		}
 		
-		public function set applicationStage(value:Stage):void
+		/**
+		* Sets the <code>Rectangle</code> that specifies the size at which the <code>DrawingBoard</code> is drawn,
+		* the x + y params of <code>Rectangle</code> are ignored.
+		*/
+		public function set boundingRect(rect:Rectangle):void
 		{
-			this._applicationStage = value;
+			this._boundingRect = rect;
+			
+			this.reset();
+		}
+		
+		/**
+		* The Sprite that the <code>DrawingBoard</code> exists inside of, automatically calls
+		* addChild on the Sprite and adds the <code>DrawingBoard</code> as a child. Using this
+		* still requires the update of <code>boundingRect</code> as Sprites dont issue 
+		* resize events. 
+		*/
+		public function get boundingDisplayParent():Sprite
+		{
+			return this._boundingDisplayParent;
+		}
+		
+		/**
+		* Sets the Sprite that the <code>DrawingBoard</code> exists inside of, automatically calls
+		* addChild on the Sprite and adds the <code>DrawingBoard</code> as a child. Using this
+		* still requires the update of <code>boundingRect</code> as Sprites dont issue 
+		* resize events. 
+		*/
+		public function set boundingDisplayParent(parent:Sprite):void
+		{
+			this._boundingDisplayParent = parent;
+
+			this._boundingDisplayParent.addChild(this);
 		}
 		
 		/**
@@ -210,22 +254,10 @@ package org.smilkit.render
 				this._renderTree.timingGraph.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			}
 			
-			var parentWidth:Number = 0;
-			var parentHeight:Number = 0;
-			
-			if (this.parent != null)
-			{
-				parentWidth = this.parent.width;
-				parentHeight = this.parent.height;
-				
-				this.applicationStage.removeEventListener(Event.RESIZE, this.onApplicationStageResize);
-				this.applicationStage.addEventListener(Event.RESIZE, this.onApplicationStageResize);
-			}
-			
 			this._canvas.graphics.clear();
 			
 			this._canvas.graphics.beginFill(0xFFFFFF, 0.0);
-			this._canvas.graphics.drawRect(0, 0, parentWidth, parentHeight);
+			this._canvas.graphics.drawRect(0, 0, this.boundingRect.width, this.boundingRect.height);
 			this._canvas.graphics.endFill();
 			
 			super.addChild(this._canvas);

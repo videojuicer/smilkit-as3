@@ -6,15 +6,15 @@ package org.smilkit.view
 	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
 	
 	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.Element;
-	import org.smilkit.w3c.dom.INodeList;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
@@ -24,6 +24,7 @@ package org.smilkit.view
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.TimingGraph;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.utilkit.logger.Logger;
 	import org.utilkit.parser.DataURIParser;
@@ -104,7 +105,7 @@ package org.smilkit.view
 	[Event(name="viewportAudioVolumeChanged", type="org.smilkit.events.ViewportEvent")]
 	
 
-	public class Viewport extends EventDispatcher
+	public class Viewport extends Sprite
 	{
 		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
 		public static var PLAYBACK_PAUSED:String = "playbackPaused";
@@ -173,6 +174,7 @@ package org.smilkit.view
 			this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			
 			this._drawingBoard = new DrawingBoard();
+			this.addChild(this._drawingBoard);
 			
 			this._heartbeat.start();
 			this.pause();
@@ -402,6 +404,46 @@ package org.smilkit.view
 		public function get muted():Boolean
 		{
 			return (this.volume <= 0);
+		}
+		
+		/**
+		* <code>Rectangle</code> that specifies the points at which the <code>Viewport</code> is drawn, the x + y params
+		* of <code>Rectangle</code> are ignored.
+		*/
+		public function get boundingRect():Rectangle
+		{
+			return this.drawingBoard.boundingRect;
+		}
+		
+		/**
+		* Sets the bounding <code>Rectangle</code> that specifies the points at which the Viewport is drawn
+		* too, the x + y params of <code>Rectangle</code> are ignored.
+		*/
+		public function set boundingRect(rect:Rectangle):void
+		{
+			this.drawingBoard.boundingRect = rect;
+		}
+		
+		/**
+		* The Sprite that the Viewport exists inside of, automatically calls
+		* addChild on the Sprite and adds the Viewport as a child. Using this
+		* still requires the update of <code>boundingRect</code> as Sprites dont issue 
+		* resize events. 
+		*/
+		public function get boundingDisplayPoint():Sprite
+		{
+			return this.drawingBoard.boundingDisplayParent;
+		}
+		
+		/**
+		* Sets the Sprite that the Viewport exists inside of, automatically calls
+		* addChild on the Sprite and adds the Viewport as a child. Using this
+		* still requires the update of <code>boundingRect</code> as Sprites dont issue 
+		* resize events. 
+		*/
+		public function set boundingDisplayPoint(parent:Sprite):void
+		{
+			this.drawingBoard.boundingDisplayParent = parent;
 		}
 		
 		/**

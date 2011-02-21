@@ -39,7 +39,6 @@ package
 			this._viewport = SMILKit.createEmptyViewport();
 			this._viewport.location = smil;
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onRefreshComplete);
-			this._viewport.drawingBoard.applicationStage = this.stage;
 			
 			this.graphics.clear();
 			
