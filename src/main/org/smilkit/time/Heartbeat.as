@@ -181,6 +181,10 @@ package org.smilkit.time
 		
 		protected function onTimer(e:TimerEvent):void
 		{
+			if(e != null)
+			{
+				this.dispatchEvent(e.clone());
+			}
 			this.beat();
 		}
 		
