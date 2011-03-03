@@ -279,12 +279,17 @@ package org.smilkit.dom.smil
 				
 				if (timeContainer.end.first.resolved)
 				{
-					previousDuration += (timeSibling as IElementTime).end.first.resolvedOffset;
+					previousDuration = (timeSibling as IElementTime).end.first.resolvedOffset;
 				}
 				else
 				{
 					previousSiblingEndTimesResolved = false;
 				}
+			}
+			
+			if (previousDuration < 0)
+			{
+				trace("AK");
 			}
 			
 			if (this.baseBegin)
