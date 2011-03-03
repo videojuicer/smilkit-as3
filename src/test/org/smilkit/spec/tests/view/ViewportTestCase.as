@@ -220,6 +220,26 @@ package org.smilkit.spec.tests.view
 			Assert.assertEquals("http://smilkit.org/three.smil", this._viewport.location);
 		}
 		
+		[Test(description="Tests that history is remembered correctly when using back and forward")]
+		public function historyIsManagedCorrectly():void
+		{
+			this._viewport.location = "http://smilkit.org/1.smil";
+			this._viewport.location = "http://smilkit.org/2.smil";
+			this._viewport.location = "http://smilkit.org/3.smil";
+			
+			this._viewport.back();
+			
+			Assert.assertEquals("http://smilkit.org/2.smil", this._viewport.location);
+			
+			this._viewport.location = "http://smilkit.org/4.smil";
+			
+			Assert.assertEquals("http://smilkit.org/4.smil", this._viewport.location);
+			
+			this._viewport.back();
+			
+			Assert.assertEquals("http://smilkit.org/2.smil", this._viewport.location);
+		}
+		
 		[Test(async,description="Can fetch metadata from the document")]
 		public function canFetchDocumentMetadata():void
 		{

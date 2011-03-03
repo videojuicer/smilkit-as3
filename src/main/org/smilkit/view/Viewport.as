@@ -305,7 +305,14 @@ package org.smilkit.view
 				throw new IllegalOperationError("Attempting to navigate to the same location.");
 			}
 			
-			this._history[this._history.length] = location;
+			var i:int = this._history.indexOf(location);
+			
+			if (this._history.length > 0 && (this._currentIndex < (this._history.length - 1)))
+			{
+				this._history = this._history.slice(0, this._currentIndex + 1);
+			}
+			
+			this._history.push(location);
 			this._currentIndex = this._history.length-1;
 			
 			if (this.autoRefresh)
