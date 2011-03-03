@@ -170,13 +170,31 @@ package org.smilkit.spec.tests.dom
 			contentTime.resolve(true);
 			contentEnd.resolve(true);
 			
-			Assert.assertEquals(70000, this._seqDocument.duration);
+			Assert.assertEquals(80000, this._seqDocument.duration);
 			
 			Assert.assertEquals(00000, prerollTime.resolvedOffset);
 			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
 			
 			Assert.assertEquals(10000, contentTime.resolvedOffset);
 			Assert.assertEquals(70000, contentEnd.resolvedOffset);
+			
+			var postroll:ISMILMediaElement = (this._seqDocument.getElementById("postroll") as ISMILMediaElement);
+			
+			Assert.assertNotNull(postroll)
+			
+			var postrollTime:Time = (postroll.begin.item(0) as Time);
+			var posrollEnd:Time = (postroll.end.item(0) as Time);
+			
+			Assert.assertNotNull(postrollTime);
+			Assert.assertNotNull(posrollEnd);
+			
+			postrollTime.resolve(true);
+			posrollEnd.resolve(true);
+			
+			Assert.assertEquals(80000, this._seqDocument.duration);
+			
+			Assert.assertEquals(70000, postrollTime.resolvedOffset);
+			Assert.assertEquals(80000, posrollEnd.resolvedOffset);
 		}
 		
 		[Test(description="Tests resolving a flat-packed set of parallel assets, i.e. all the times are defined in the SMIL")]
@@ -229,8 +247,8 @@ package org.smilkit.spec.tests.dom
 		{
 			var documentChildren:INodeList = this._seqDocument.timeChildren;
 			
-			// Fixtures.TIMED_SMIL_XML has 1 body, 1 seq, 2 video (4 children)
-			Assert.assertEquals(4, documentChildren.length);
+			// Fixtures.TIMED_SMIL_XML has 1 body, 1 seq, 3 video (6 children)
+			Assert.assertEquals(5, documentChildren.length);
 			
 			var seq:IElementSequentialTimeContainer = (this._seqDocument.getElementById("holder") as IElementSequentialTimeContainer);
 			
@@ -238,8 +256,8 @@ package org.smilkit.spec.tests.dom
 			
 			var seqChildren:INodeList = seq.timeChildren;
 			
-			// Seq in Fixtures.TIMED_SMIL_XML has 2 video (2 children)
-			Assert.assertEquals(2, seqChildren.length);
+			// Seq in Fixtures.TIMED_SMIL_XML has 3 video (3 children)
+			Assert.assertEquals(3, seqChildren.length);
 		}
 	}
 }
