@@ -91,7 +91,7 @@ package org.smilkit.handler
 						
 						for each (var ext:String in extensions)
 						{
-							if (ext == elementExtension || ext == "*")
+							if (ext == elementExtension.toString().toLowerCase() || ext == "*")
 							{
 								return true;
 							}
