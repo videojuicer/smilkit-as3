@@ -131,7 +131,9 @@ package org.smilkit.handler
 			this._resumed = false;
 			
 			this._netConnection = new NetConnection();
+			this._netConnection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
 			this._netConnection.connect(null);
+			
 			
 			this._soundTransformer = new SoundTransform(0.2, 0);
 			
@@ -498,9 +500,7 @@ package org.smilkit.handler
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			SMILKit.logger.debug("Handler encountered an async error during load: "+e.error.name+", "+e.error.message, this);
-			this.cancel();			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+			SMILKit.logger.debug("Handler encountered an async error during load: "+e.text+", "+e.error.name+", "+e.error.message, this);
 		}
 		
 		public function onMetaData(info:Object):void
