@@ -406,7 +406,7 @@ package org.smilkit.handler
 			// if were ready, check if we need more
 			else
 			{
-				if (!this._completedLoading && ((this.currentOffset + 5) >= durationLoaded))
+				if (!this._completedLoading && ((this.currentOffset) >= durationLoaded))
 				{
 					// reduce the buffer so we get ready quicker
 					//this._netStream.bufferTime = 15;
