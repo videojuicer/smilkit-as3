@@ -35,33 +35,21 @@ package org.smilkit.spec.tests.render
 			
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncElementsCheck, false, 0, true);
 			this._viewport.location = "http://sixty.im/demo.smil";	
-		}
-		
-		protected function handleHasElements(e:ViewportEvent, passThru:Object):void
-		{
-			var renderTree:RenderTree = this._viewport.renderTree;
-			var renderElements:Vector.<TimingNode> = renderTree.elements;
-			var elementsNum:int = renderElements.length;
-			var resolveTimeElement:TimingNode = renderElements[0];
+		}		
+			protected function handleHasElements(e:ViewportEvent, passThru:Object):void
+			{
+				var renderTree:RenderTree = this._viewport.renderTree;
+				var renderElements:Vector.<TimingNode> = renderTree.elements;
+				var elementsNum:int = renderElements.length;
+				var resolveTimeElement:TimingNode = renderElements[0];
 			
-			Assert.assertEquals(1, elementsNum);
-			Assert.assertEquals("video_http", resolveTimeElement.element.id);
-		}
-		
-		protected function onTimingGraphRebuild(e:TimingGraphEvent, passThru:Object):void
-		{
-
-		}
-		
-		protected function onTimingGraphRebuildTimeout(passThru:Object):void
-		{
-			Assert.fail("Timeout occured whilst waiting for the timing graph to rebuild.");
-		}
-		
-		protected function handleHasElementsTimeOut(passThroughData:Object):void
-		{
-			Assert.fail( "Timeout reached before viewport refreshed: handleHasElements");
-		}
+				Assert.assertEquals(1, elementsNum);
+				Assert.assertEquals("video_http", resolveTimeElement.element.id);
+			}
+			protected function handleHasElementsTimeOut(passThroughData:Object):void
+			{
+				Assert.fail( "Timeout reached before viewport refreshed: handleHasElements");
+			}
 		
 		[Test(async, description="Tests that the RenderTree has a last change offset")]
 		public function hasLastChangeOffSet():void

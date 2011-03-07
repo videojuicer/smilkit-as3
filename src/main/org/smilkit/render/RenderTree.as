@@ -137,6 +137,23 @@ package org.smilkit.render
 		}
 		
 		/**
+		* Detaches this RenderTree instance from the owning viewport - this RenderTree will no long sync to viewport state.
+		*/ 
+		public function detach():void
+		{
+			SMILKit.logger.debug("Detaching from object pool", this);
+			this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+
+			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			this._objectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+		
+			this._objectPool.viewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			this._objectPool.viewport.removeEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
+		}
+		
+		/**
 		 * Updates the RenderTree for the current point in time (according to the Viewport).
 		 */
 		public function update():void

@@ -463,6 +463,8 @@ package org.smilkit.view
 			{
 				throw new IllegalOperationError("Unable to navigate to null location.");
 			}
+
+			this.pause();
 			
 			if(this.location.indexOf("data:") == 0)
 			{
@@ -765,6 +767,8 @@ package org.smilkit.view
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
 				this.renderTree.removeEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
+				// Detach instances from this viewport
+				this.renderTree.detach();
 				
 				this._objectPool = null;
 				

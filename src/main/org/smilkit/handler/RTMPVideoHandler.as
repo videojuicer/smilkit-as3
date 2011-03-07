@@ -407,8 +407,19 @@ package org.smilkit.handler
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
+			SMILKit.logger.debug("Handler encountered an async error during load: "+e.text+", "+e.error.name+", "+e.error.message, this);
 		}
+		
+		public function onCuePoint(info:Object):void
+		{
+			// ignore
+		}
+		
+		public function onXMPData(info:Object):void
+		{
+			// ignore
+		}
+		
 		
 		public function onMetaData(info:Object):void
 		{
