@@ -9,17 +9,17 @@ package org.smilkit.render
 	import flash.events.MouseEvent;
 	import flash.geom.Matrix;
 	import flash.geom.Rectangle;
+	import flash.net.URLRequest;
+	import flash.net.URLVariables;
 	import flash.net.navigateToURL;
-    import flash.net.URLRequest;
-    import flash.net.URLVariables;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.Viewport;
-	import org.smilkit.render.RenderTree;
 
 	public class RegionContainer extends Sprite
 	{
@@ -304,6 +304,14 @@ package org.smilkit.render
 			
 			super.removeChild(handler.displayObject);
 			this._children = children;
+		}
+		
+		public function clear():void
+		{
+			for (var i:int = 0; i < this._children.length; i++)
+			{
+				this.removeAssetChild(this._children[i]);
+			}
 		}
 		
 		public override function addChild(child:DisplayObject):DisplayObject

@@ -215,7 +215,8 @@ package org.smilkit.render
 				for (var i:int = 0; i < this._regions.length; i++)
 				{
 					var regionContainer:RegionContainer = this._regions[i];
-
+					regionContainer.clear();
+					
 					this._canvas.removeChild(regionContainer);
 				}
 				

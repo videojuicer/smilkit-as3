@@ -44,7 +44,7 @@ package org.smilkit.dom.smil
 				{
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
-						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).duration;
+						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).end.first.resolvedOffset;
 					}
 				}
 				

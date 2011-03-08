@@ -60,9 +60,9 @@ package org.smilkit.dom.smil
 					{
 						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
 						
-						if (container.duration > childDuration)
+						if (container.end.first.resolvedOffset > childDuration)
 						{
-							childDuration = container.duration;
+							childDuration = container.end.first.resolvedOffset;
 						}
 					}
 				}
