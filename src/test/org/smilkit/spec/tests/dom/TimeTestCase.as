@@ -22,6 +22,7 @@ package org.smilkit.spec.tests.dom
 	{		
 		protected var _seqDocument:ISMILDocument;
 		protected var _parDocument:ISMILDocument;
+		protected var _beginDocument:ISMILDocument;
 		protected var _unresolvedDocument:ISMILDocument;
 		
 		protected var _viewport:Viewport;
@@ -41,6 +42,10 @@ package org.smilkit.spec.tests.dom
 			parser = new BostonDOMParser();
 			
 			this._parDocument = (parser.parse(Fixtures.BASIC_PAR_SMIL_XML) as ISMILDocument);
+			
+			parser = new BostonDOMParser();
+			
+			this._beginDocument = (parser.parse(Fixtures.BEGIN_TIME_SMIL_XML) as ISMILDocument);
 		}
 		
 		private function get document():SMILDocument
@@ -195,6 +200,23 @@ package org.smilkit.spec.tests.dom
 			
 			Assert.assertEquals(70000, postrollTime.resolvedOffset);
 			Assert.assertEquals(80000, posrollEnd.resolvedOffset);
+		}
+		
+		[Test(description="Tests that resolving a flat document with a begin= on an asset is calculated correctly")]
+		public function resolvesBeginTimesCorrectly():void
+		{
+		  var content:ISMILMediaElement = (this._beginDocument.getElementById("content") as ISMILMediaElement);
+		  
+		  Assert.assertNotNull(content);
+		  
+		  var begin:Time = (content.begin.item(0) as Time);
+		  var end:Time = (content.end.item(0) as Time);
+		  
+		  begin.resolve();
+		  end.resolve();
+		  
+		  Assert.assertEquals(5000, begin.resolvedOffset);
+		  Assert.assertEquals(15000, end.resolvedOffset);
 		}
 		
 		[Test(description="Tests resolving a flat-packed set of parallel assets, i.e. all the times are defined in the SMIL")]

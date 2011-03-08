@@ -1,5 +1,6 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
@@ -74,9 +75,15 @@ package org.smilkit.dom.smil
 				{
 					var v:String = values[i];
 					
+					// should parse v into a milliseconds
+					
+					var parser:SMILTimeParser = new SMILTimeParser(baseElement, v);
+					
+					
 					var parsedTime:Time = new Time(ElementTime.timeAttributeToTimeType(v, (baseElement as IElementTimeContainer), baseBegin));
 					parsedTime.baseElement = baseElement;
 					parsedTime.baseBegin = baseBegin;
+					parsedTime.baseBeginOffset = parser.milliseconds;
 					
 					list.add(parsedTime);
 				}

@@ -9,6 +9,8 @@ package org.smilkit.dom.smil
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
+		protected var _lastBeginAttributeValue:String = null;
+		
 		protected var _beginList:ITimeList;
 		protected var _endList:ITimeList;
 		
@@ -36,9 +38,13 @@ package org.smilkit.dom.smil
 		
 		public function get begin():ITimeList
 		{
-			if (this._beginList == null)
+			var beginAttributeValue:String = this.getAttribute("begin");
+			
+			if (this._beginList == null || this._lastBeginAttributeValue != beginAttributeValue)
 			{
-				this._beginList = ElementTime.parseTimeAttribute(this.getAttribute("begin"), this, true);
+				this._lastBeginAttributeValue = beginAttributeValue;
+				
+				this._beginList = ElementTime.parseTimeAttribute(this._lastBeginAttributeValue, this, true);
 			}
 			
 			return this._beginList;

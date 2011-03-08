@@ -116,5 +116,9 @@ package org.smilkit.spec
 			"<head><meta name=\"fookey\" content=\"foovalue\" /><meta name=\"barkey\" content=\"barvalue\" /><layout>"+
 			"<region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
 			"<body id=\"body\"><video id=\"content\" dur=\"10s\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
+			
+		public static var BEGIN_TIME_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+  		"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>"+
+  		"<body id=\"body\"><video id=\"content\" begin=\"5s\" dur=\"10s\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
 	}
 }

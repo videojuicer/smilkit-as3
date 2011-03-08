@@ -19,6 +19,7 @@ package org.smilkit.dom.smil
 		protected var _resolved:Boolean = false;
 		protected var _baseElement:INode = null;
 		protected var _baseBegin:Boolean = false;
+		protected var _baseBeginOffset:Number = 0;
 		protected var _offset:Number = 0;
 		protected var _resolvedOffset:Number = 0; //Time.UNRESOLVED;
 		protected var _event:String;
@@ -68,6 +69,16 @@ package org.smilkit.dom.smil
 		public function get validCache():Boolean
 		{
 			return this._validCache;
+		}
+		
+		public function get baseBeginOffset():Number
+		{
+			return this._baseBeginOffset;
+		}
+		
+		public function set baseBeginOffset(value:Number):void
+		{
+			this._baseBeginOffset = value;
 		}
 		
 		public function resolve(force:Boolean=false):void
@@ -173,6 +184,11 @@ package org.smilkit.dom.smil
 			{
 				//Logger.debug("About to resolve times in a parallel syncbase for element with tagName: "+element.nodeName, this);
 				this.resolveParallelSyncBased(parent as IElementParallelTimeContainer);
+			}
+			
+			if (this.baseBegin)
+			{
+				this._resolvedOffset += this.baseBeginOffset;
 			}
 		}
 		
@@ -308,7 +324,7 @@ package org.smilkit.dom.smil
 			
 			    var baseElementTimeContainer:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
 				var dur:Number = baseElementTimeContainer.duration;
-				this._resolvedOffset = previousDuration + dur;
+				this._resolvedOffset = (baseElementTimeContainer.begin.first.resolvedOffset + dur);
 				
 				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))
 				{
