@@ -45,9 +45,7 @@ package org.smilkit.dom.smil
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
 						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
-						
-						var timeDuration:Number = container.duration; //.end.first.resolvedOffset;
-						
+
 						if (container.end.first.resolvedOffset > childDuration)
 						{
 							childDuration = container.end.first.resolvedOffset;

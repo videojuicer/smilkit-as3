@@ -69,6 +69,8 @@ package org.smilkit.dom.smil
 				
 				if (childDuration != 0)
 				{
+					childDuration = (childDuration - this.begin.first.resolvedOffset);
+					
 					return childDuration;
 				}
 			}
