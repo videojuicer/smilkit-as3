@@ -142,22 +142,22 @@ package org.smilkit.render
 				
 				if (this.region.top != null)
 				{
-					this._matrix.y = (this.region.top as uint);
+					this._matrix.y = parseFloat(this.region.top);
 				}
 				
 				if (this.region.bottom != null)
 				{
-					this._matrix.y = (parentHeight - (this.region.bottom as uint) - this._matrix.height);
+					this._matrix.y = (parentHeight - parseFloat(this.region.bottom) - this._matrix.height);
 				}
 				
 				if (this.region.left != null)
 				{
-					this._matrix.x = (this.region.left as uint);
+					this._matrix.x = parseFloat(this.region.left);
 				}
 				
 				if (this.region.right != null)
 				{
-					this._matrix.x = (parentWidth - (this.region.right as uint) - this._matrix.width);
+					this._matrix.x = (parentWidth - parseFloat(this.region.right) - this._matrix.width);
 				}
 				
 				var backgroundColour:uint = 0xFFFFFF;
