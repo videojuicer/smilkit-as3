@@ -44,12 +44,21 @@ package org.smilkit.dom.smil
 				{
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
-						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).end.first.resolvedOffset;
+						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
+						
+						var timeDuration:Number = container.duration; //.end.first.resolvedOffset;
+						
+						if (container.end.first.resolvedOffset > childDuration)
+						{
+							childDuration = container.end.first.resolvedOffset;
+						}
 					}
 				}
 				
 				if (childDuration != 0)
 				{
+					childDuration = (childDuration - this.begin.first.resolvedOffset);
+					
 					return childDuration;
 				}
 			}

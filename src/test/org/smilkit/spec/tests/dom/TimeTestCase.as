@@ -5,6 +5,7 @@ package org.smilkit.spec.tests.dom
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
 	import org.smilkit.dom.smil.ElementSequentialTimeContainer;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.parsers.BostonDOMParser;
@@ -175,8 +176,6 @@ package org.smilkit.spec.tests.dom
 			contentTime.resolve(true);
 			contentEnd.resolve(true);
 			
-			Assert.assertEquals(80000, this._seqDocument.duration);
-			
 			Assert.assertEquals(00000, prerollTime.resolvedOffset);
 			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
 			
@@ -196,10 +195,12 @@ package org.smilkit.spec.tests.dom
 			postrollTime.resolve(true);
 			posrollEnd.resolve(true);
 			
-			Assert.assertEquals(80000, this._seqDocument.duration);
-			
 			Assert.assertEquals(70000, postrollTime.resolvedOffset);
 			Assert.assertEquals(80000, posrollEnd.resolvedOffset);
+			
+			(content.parentNode as ElementTimeContainer).resolve();
+			
+			Assert.assertEquals(80000, this._seqDocument.duration);
 		}
 		
 		[Test(description="Tests that resolving a flat document with a begin= on an asset is calculated correctly")]
