@@ -303,11 +303,6 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			if (previousDuration < 0)
-			{
-				trace("AK");
-			}
-			
 			if (this.baseBegin)
 			{
 			    // BEGIN time for a tag within a sequential container

@@ -1,7 +1,7 @@
 package org.smilkit.handler
 {
-	import flash.display.LoaderInfo;
 	import flash.display.DisplayObject;
+	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -10,20 +10,20 @@ package org.smilkit.handler
 	import flash.system.LoaderContext;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.w3c.dom.IElement;
-	import org.smilkit.w3c.dom.INodeList;
+	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.ElementTimeNodeList;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILRefElement;
-	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.view.Viewport;
-	import org.smilkit.view.ViewportObjectPool;
-	import org.smilkit.render.RenderTree;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
-	
+	import org.smilkit.render.RenderTree;
+	import org.smilkit.view.Viewport;
+	import org.smilkit.view.ViewportObjectPool;
+	import org.smilkit.w3c.dom.IElement;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.logger.Logger;
 
 	
@@ -270,7 +270,8 @@ package org.smilkit.handler
 			// Unresolve the entire document
 			if(this.element != null)
 			{
-				// REPLACE IF TIMING GRAPH IS FAILING TO INVALIDATE ((this.element.ownerDocument as SMILDocument).timeChildren as ElementTimeNodeList).unresolve();
+				// REPLACE IF TIMING GRAPH IS FAILING TO INVALIDATE 
+				// ((this.element.ownerDocument as SMILDocument).timeChildren as ElementTimeNodeList).unresolve();
 			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));

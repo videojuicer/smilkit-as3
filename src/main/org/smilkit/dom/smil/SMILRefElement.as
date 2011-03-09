@@ -6,15 +6,16 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.smilkit.w3c.dom.smil.IElementSequentialTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILRefElement;
 	
-	public class SMILRefElement extends SMILMediaElement implements ISMILRefElement
+	public class SMILRefElement extends SMILMediaElement implements ISMILRefElement, IElementSequentialTimeContainer
 	{
 		public function SMILRefElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
 		}
-		
+
 		protected override function onDOMSubtreeModified(e:MutationEvent):void
 		{
 			// DO NOTHING
@@ -23,7 +24,7 @@ package org.smilkit.dom.smil
 		
 		public override function get durationResolved():Boolean
 		{
-			if(super.durationResolved)
+			if (super.durationResolved)
 			{
 				return true;
 			}
@@ -53,12 +54,20 @@ package org.smilkit.dom.smil
 				{
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
-						childDuration += (this.timeDescendants.item(i) as ElementTimeContainer).duration;
+						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
+						container.resolve();
+						
+						if (container.end.first.resolvedOffset > childDuration)
+						{
+							childDuration = container.end.first.resolvedOffset;
+						}
 					}
 				}
 				
 				if (childDuration != 0)
 				{
+					childDuration = (childDuration - this.begin.first.resolvedOffset);
+					
 					return childDuration;
 				}
 			}

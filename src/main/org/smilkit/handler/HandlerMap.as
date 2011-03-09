@@ -67,7 +67,7 @@ package org.smilkit.handler
 		{
 			var req:URLParser = new URLParser();
 			
-			if (element.src != null || element.src != "")
+			if (element.src != null && element.src != "" && (element.src.indexOf("://") < 5 && element.src.indexOf("://") != -1))
 			{
 				req.parse(element.src);
 				
