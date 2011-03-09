@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
+	import flash.utils.ByteArray;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
@@ -523,6 +524,8 @@ package org.smilkit.handler
 			{
 				this._metadata.update(info);
 			}
+			
+			//this._netStream["appendBytes"](new ByteArray());
 
 			if(!this._resumed)
 			{
