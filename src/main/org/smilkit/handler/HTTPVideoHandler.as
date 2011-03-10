@@ -13,7 +13,6 @@ package org.smilkit.handler
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
-	import flash.utils.ByteArray;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
@@ -170,6 +169,7 @@ package org.smilkit.handler
 			
 			if (this.viewportObjectPool != null)
 			{
+				this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick); // remove then add to guarantee single binding only
 				this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
 			
@@ -519,24 +519,19 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
+				if(!this._resumed)
+				{
+					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
+					this.seek(0);
+					this.pause();
+				}
 			}
 			else
 			{
 				this._metadata.update(info);
 			}
 			
-			//this._netStream["appendBytes"](new ByteArray());
-
-			if(!this._resumed)
-			{
-				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
-				
-				this.seek(0);
-				this.pause();
-			}
-			
-			SMILKit.logger.info("Metadata received (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
-			
+			SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());			
 			this.resolved(this._metadata.duration);
 		}
 		
