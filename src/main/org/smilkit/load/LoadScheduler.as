@@ -4,6 +4,7 @@ package org.smilkit.load {
 	import org.smilkit.handler.SMILKitHandler;	
 	
 	import org.smilkit.dom.smil.SMILMediaElement;	
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.time.TimingNode;
 	
 	import org.smilkit.view.Viewport;
@@ -293,7 +294,7 @@ package org.smilkit.load {
 		protected function opportunisticWorkerForHandler(handler:SMILKitHandler):Worker 
 		{
 			if(this._justInTimeWorker.hasHandler(handler)) return null;
-			if(handler.resolvable && !handler.completedResolving)
+			if((handler.resolvable) && (handler.element != null) && !(handler.element as ElementTimeContainer).hasDuration())
 			{
 				return this._resolveWorker;
 			}

@@ -150,6 +150,15 @@ package org.smilkit.dom.smil
 			this.setAttribute("repeatDur", (repeatDur as String));
 		}
 		
+		/**
+		* Determine if this element has a duration based on attributes alone.
+		*/
+		public function hasDuration():Boolean
+		{
+			return (this.hasAttribute("dur") || this.hasAttribute("end") || this.hasAttribute("endsync"));
+		}
+		
+		
 		public function beginElement():Boolean
 		{
 			return false;
