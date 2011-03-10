@@ -646,6 +646,7 @@ package org.smilkit.render
 			this._activeTimingNodes.push(timingNode);
 			this._activeMediaElements.push(element);
 			
+			handler.addedToRenderTree(this);
 			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 		}
 		protected function removeTimingNodeHandlerFromActiveList(timingNode:TimingNode):void
@@ -675,6 +676,7 @@ package org.smilkit.render
 			// remove from load wait list
 			this.removeHandlerFromWaitingForDataList(handler); // checkLoadState();
 			
+			handler.removedFromRenderTree(this);
 			// remove from canvas
 			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 			

@@ -15,6 +15,7 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.ViewportObjectPool;
@@ -379,6 +380,22 @@ package org.smilkit.handler
 			{
 				this.cancel();
 			}
+		}
+		
+		/**
+		* Callback method for when this handler is added to the <code>RenderTree</code>'s active list.
+		*/
+		public function addedToRenderTree(r:RenderTree):void
+		{
+			// override me IF YOU DARE
+		}
+		
+		/**
+		* Callback method for when this handler is added to the <code>RenderTree</code>'s active list.
+		*/
+		public function removedFromRenderTree(r:RenderTree):void
+		{
+			// override me IF YOU'RE MAN ENOUGH
 		}
 		
 		/**
