@@ -18,6 +18,7 @@ package org.smilkit.handler
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
 	import org.utilkit.logger.Logger;
@@ -43,6 +44,8 @@ package org.smilkit.handler
 		*/
 		protected var _queuedSeek:Boolean = false;
 		protected var _queuedSeekTarget:uint;
+		
+		protected var _attachVideoDisplayDelayed:Boolean = false;
 		
 		public function HTTPVideoHandler(element:IElement)
 		{
@@ -134,7 +137,6 @@ package org.smilkit.handler
 			this._netConnection.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
 			this._netConnection.connect(null);
 			
-			
 			this._soundTransformer = new SoundTransform(0.2, 0);
 			
 			if(this._volume)
@@ -155,17 +157,11 @@ package org.smilkit.handler
 			
 			this._netStream.play(this.element.src);
 			
+			this._startedLoading = true;
+			
 			this._video = new Video();
 			this._video.smoothing = true;
 			this._video.deblocking = 1;
-			
-			this._video.attachNetStream(this._netStream as NetStream);
-			
-			// dont want to actually play it back right now
-			
-			this._canvas.addChild(this._video);
-			
-			this._startedLoading = true;
 			
 			if (this.viewportObjectPool != null)
 			{
@@ -173,7 +169,14 @@ package org.smilkit.handler
 				this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
 			
+			this._canvas.addChild(this._video);
+			
 			this.drawClickShield(this._video);
+			
+			if (this._attachVideoDisplayDelayed)
+			{
+				this.attachVideoDisplay();
+			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
@@ -433,6 +436,38 @@ package org.smilkit.handler
 			super.resize();
 		
 			this.drawClickShield(this._video);
+		}
+		
+		public override function addedToRenderTree(r:RenderTree):void
+		{
+			if (this._video == null)
+			{
+				this._attachVideoDisplayDelayed = true;
+			}
+			else
+			{
+				this._attachVideoDisplayDelayed = false;
+				
+				this.attachVideoDisplay();
+			}
+		}
+		
+		protected function attachVideoDisplay():void
+		{
+			this._video.attachNetStream(this._netStream as NetStream);
+		}
+		
+		protected function clearVideoDisplay():void
+		{
+			this._video.attachNetStream(null);
+			this._video.clear();
+		}
+		
+		public override function removedFromRenderTree(r:RenderTree):void
+		{
+			this.clearVideoDisplay();
+			
+			this._attachVideoDisplayDelayed = false;
 		}
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
