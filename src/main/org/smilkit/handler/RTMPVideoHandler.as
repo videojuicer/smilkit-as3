@@ -22,6 +22,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.RegionContainer;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
@@ -42,6 +43,8 @@ package org.smilkit.handler
 		protected var _waiting:Boolean = false;
 		
 		protected var _playOptions:NetStreamPlayOptions;
+		
+		protected var _attachVideoDisplayDelayed:Boolean = false;
 		
 		public function RTMPVideoHandler(element:IElement)
 		{
@@ -168,6 +171,8 @@ package org.smilkit.handler
 				
 				this._netStream.play2(this._playOptions);
 				
+				this.attachVideoDisplay();
+				
 				this.resize();
 				this.resetVolume();
 
@@ -268,6 +273,46 @@ package org.smilkit.handler
 			}
 		}
 		
+		public override function addedToRenderTree(r:RenderTree):void
+		{
+			if (this._video == null)
+			{
+				this._attachVideoDisplayDelayed = true;
+			}
+			else
+			{
+				this._attachVideoDisplayDelayed = false;
+				
+				this.attachVideoDisplay();
+			}
+		}
+		
+		protected function attachVideoDisplay():void
+		{
+			this.resetVolume();
+			
+			this._video.attachNetStream(this._netStream as NetStream);
+		}
+		
+		protected function clearVideoDisplay():void
+		{
+			if (this._netStream != null)
+			{
+				this._soundTransformer.volume = 0;		
+				this._netStream.soundTransform = this._soundTransformer;
+			}
+			
+			this._video.attachNetStream(null);
+			this._video.clear();
+		}
+		
+		public override function removedFromRenderTree(r:RenderTree):void
+		{
+			this.clearVideoDisplay();
+			
+			this._attachVideoDisplayDelayed = false;
+		}
+		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
 		{
 			
@@ -301,13 +346,16 @@ package org.smilkit.handler
 					this._video.smoothing = true;
 					this._video.deblocking = 1;
 					
-					this._video.attachNetStream(this._netStream);
-					
 					this._canvas.addChild(this._video);
 					
 					if (this.viewportObjectPool != null)
 					{
 						this.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunning);
+					}
+					
+					if (this._attachVideoDisplayDelayed)
+					{
+						this.attachVideoDisplay();
 					}
 					
 					this.resize();

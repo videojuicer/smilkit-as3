@@ -21,6 +21,11 @@ package org.smilkit.dom.smil
 		{
 			var next:INode = null;
 			
+			if (current.parentNode.nodeName == "a")
+			{
+				trace("he");
+			}
+			
 			while (current != null)
 			{
 				if (current.hasChildNodes())
@@ -48,9 +53,14 @@ package org.smilkit.dom.smil
 					current = next;
 				}
 				
+				if (current is SMILRefElement)
+				{
+					trace("-----> SMILRefElement");
+				}
+				
 				if (current != this._rootNode && current != null && current is IElementTimeContainer && (this._walkParent == null || this._walkParent == current.parentNode))
 				{
-					this._walkParent = current.parentNode;
+					//this._walkParent = current.parentNode;
 					
 					return current;
 				}

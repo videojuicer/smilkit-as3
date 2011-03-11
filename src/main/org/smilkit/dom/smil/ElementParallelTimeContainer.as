@@ -61,6 +61,11 @@ package org.smilkit.dom.smil
 						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
 						container.resolve();
 						
+						if (!(container.end as TimeList).resolved)
+						{
+							return Time.UNRESOLVED;
+						}
+						
 						if (container.end.first.resolvedOffset > childDuration)
 						{
 							childDuration = container.end.first.resolvedOffset;

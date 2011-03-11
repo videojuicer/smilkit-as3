@@ -150,6 +150,8 @@ package org.smilkit.dom.smil
 					break;
 			}
 			
+			SMILKit.logger.info("Resolve complete: "+this.resolved+" begin: "+this.baseBegin+" offset: "+this.resolvedOffset+" element: "+this.baseElement.nodeName);
+			
 			this._validCache = true;
 		}
 		
