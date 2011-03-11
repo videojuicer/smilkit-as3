@@ -29,6 +29,11 @@ package org.smilkit.dom.smil
 				return true;
 			}
 			
+			if (this.timeDescendants.length == 0)
+			{
+				return false;
+			}
+			
 			for (var i:int = (this.timeDescendants.length-1); i >= 0; i--)
 			{
 				if (this.timeDescendants.item(i) is ElementTimeContainer)

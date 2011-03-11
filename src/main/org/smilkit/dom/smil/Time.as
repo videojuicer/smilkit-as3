@@ -95,7 +95,11 @@ package org.smilkit.dom.smil
 			// element's handler is temporal in nature.
 			if(!this.baseBegin)
 			{
-				if(this.baseElement is SMILMediaElement)
+				if (this.baseElement is SMILRefElement)
+				{
+					this._resolveWithoutDuration = false;
+				}
+				else if(this.baseElement is SMILMediaElement)
 				{
 					var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
 					var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
@@ -104,7 +108,7 @@ package org.smilkit.dom.smil
 						this._resolveWithoutDuration = false;
 					}
 				}
-				else if(this.baseElement is ElementSequentialTimeContainer || this.baseElement is ElementParallelTimeContainer)
+				else if(this.baseElement is IElementSequentialTimeContainer || this.baseElement is IElementParallelTimeContainer)
 				{
 					this._resolveWithoutDuration = false;
 				}
