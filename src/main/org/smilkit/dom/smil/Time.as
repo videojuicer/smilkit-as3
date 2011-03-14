@@ -114,7 +114,7 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			this._type = ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (this.baseElement as ElementTimeContainer), this.baseBegin);
+			this._type = ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (this.baseElement as IElementTimeContainer), this.baseBegin);
 			
 			// resolve the time
 			switch (this.timeType)
@@ -179,7 +179,7 @@ package org.smilkit.dom.smil
 				i++;
 			}
 			
-			this._offset = parent.begin.item(0).offset;
+			this._offset = parent.begin.item(0).resolvedOffset;
 			
 			if (parent is IElementSequentialTimeContainer)
 			{
@@ -194,7 +194,21 @@ package org.smilkit.dom.smil
 			
 			if (this.baseBegin)
 			{
-				this._resolvedOffset += this.baseBeginOffset;
+				this._resolvedOffset += this._offset + this.baseBeginOffset;
+			}
+			else
+			{
+				if ((parent as ElementTimeContainer).hasDuration())
+				{
+					// were calculating the end, we might want to trim this if an parent is limiting us
+					var duration:Number = (this.baseElement as IElementTimeContainer).duration;
+					var parentDuration:Number = parent.end.first.resolvedOffset;
+					
+					if (parent.duration > 0 && duration > parent.duration)
+					{
+						this._resolvedOffset = parent.duration;
+					}
+				}
 			}
 		}
 		
