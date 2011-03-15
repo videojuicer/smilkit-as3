@@ -48,6 +48,11 @@ package org.smilkit.parsers
 			return this._timeString;
 		}
 		
+		public function reset():void
+		{
+			this.parse(null);
+		}
+		
 		/**
 		 * Parses the specified SMIL time string into the current <code>SMILTimeParser</code>
 		 * instance.
@@ -58,8 +63,13 @@ package org.smilkit.parsers
 		{
 			this._timeString = timeString;
 			
+			if (this._timeString == null || this._timeString == "")
+			{
+				this._milliseconds = Time.UNRESOLVED;
+				this._type = Time.SMIL_TIME_OFFSET;
+			}
 			// parse clock values
-			if (this._timeString.indexOf(":") != -1)
+			else if (this._timeString.indexOf(":") != -1)
 			{
 				var split:Array = this._timeString.split(":");
 				

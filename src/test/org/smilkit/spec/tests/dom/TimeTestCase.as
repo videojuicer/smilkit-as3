@@ -70,6 +70,39 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(60000, video2.end.first.resolvedOffset);
 		}
 		
+		[Test(description="Elements can unresolved when resolved.")]
+		public function elementsCanUnresolveWhenResolved():void
+		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var document:SMILDocument = (parser.parse(Fixtures.BASIC_SEQ_SMIL_XML) as SMILDocument);
+			
+			var container:ElementTimeContainer = (document.getElementsByTagName("seq").item(0) as ElementTimeContainer);
+			var video1:SMILMediaElement = (document.getElementById("preroll") as SMILMediaElement);
+			var video2:SMILMediaElement = (document.getElementById("content") as SMILMediaElement);
+			var video3:SMILMediaElement = (document.getElementById("postroll") as SMILMediaElement);
+			
+			video1.resolve();
+			video2.resolve();
+			video3.resolve();
+			container.resolve();
+			
+			Assert.assertEquals(10000, video1.end.first.resolvedOffset);
+			Assert.assertEquals(70000, video2.end.first.resolvedOffset);
+			Assert.assertEquals(80000, video3.end.first.resolvedOffset);
+			Assert.assertEquals(80000, container.end.first.resolvedOffset);
+			
+			video1.setAttribute("dur", null);
+
+			video1.resolve();
+			video2.resolve();
+			video3.resolve();
+			container.resolve();
+			
+			Assert.assertEquals(Time.UNRESOLVED, video1.end.first.resolvedOffset);
+			Assert.assertFalse(video1.end.first.resolved);
+			Assert.assertFalse(video1.resolved);
+		}
+		
 		[Test(description="Child sets the duration in a par. The parent should have the greatest duration selected from the children == 35s")]
 		public function parentParCalculatesDurationFromChildren():void
 		{

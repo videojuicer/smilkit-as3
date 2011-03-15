@@ -152,6 +152,11 @@ package org.smilkit.dom.smil
 					break;
 			}
 			
+			if (this._resolvedOffset == Time.UNRESOLVED)
+			{
+				this._resolved = false;
+			}
+			
 			if (!this.resolved)
 			{
 				this._resolvedOffset = Time.UNRESOLVED;
