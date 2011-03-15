@@ -232,7 +232,10 @@ package org.smilkit.handler
 			var seconds:Number = (seekTo / 1000);
 			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
 			
-			this._netStream.seek(seconds);
+			if(this._netStream != null)
+			{
+				this._netStream.seek(seconds);
+			}
 		}
 		
 		public override function cancel():void
