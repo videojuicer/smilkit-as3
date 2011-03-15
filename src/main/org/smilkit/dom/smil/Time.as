@@ -88,6 +88,8 @@ package org.smilkit.dom.smil
 				// Skip resolve as we have a valid cache and are not being told to force-reset the operation.
 				return;
 			}
+			
+			this._resolved = false;
 
 			// If this time represents the end of a SMILMediaElement, ElementSequentialTimeContainer or ElementParallelTimeContainer 
 			// then we will set the _resolveWithoutDuration flag to FALSE, causing the end time to remain unresolved until the
