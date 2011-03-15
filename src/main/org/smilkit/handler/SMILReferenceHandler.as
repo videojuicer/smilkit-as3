@@ -63,7 +63,6 @@ package org.smilkit.handler
 		protected var _contentValid:Boolean = false;
 		protected var _referenceElement:SMILRefElement;
 		protected var _viewport:Viewport;
-		protected var _renderTree:RenderTree;
 		protected var _parser:BostonDOMParser;
 		
 		/**
@@ -165,7 +164,6 @@ package org.smilkit.handler
 					if(objectPool != null)
 					{
 						this._viewport = objectPool.viewport;
-						this._renderTree = this._viewport.renderTree;
 					}
 				}
 				else
@@ -184,15 +182,6 @@ package org.smilkit.handler
 			{
 				this._viewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
 				this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
-			}
-			
-			// Bind to rendertree
-			if(this._renderTree != null)
-			{
-				this._renderTree.removeEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
-				this._renderTree.removeEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
 			}
 			
 			if(this.element != null)
@@ -278,18 +267,15 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 		}
 		
-		protected function onHandlerAddedToRenderTree(e:RenderTreeEvent):void
+		public override function addedToRenderTree(r:RenderTree):void
 		{
 			this._activeOnRenderTree = true;
 		}
 		
-		protected function onHandlerRemovedFromRenderTree(e:RenderTreeEvent):void
+		public override function removedFromRenderTree(r:RenderTree):void
 		{
-			if(e.handler == this)
-			{
-				this._activeOnRenderTree = false;
-				this.invalidate();
-			}
+			this._activeOnRenderTree = false;
+			this.invalidate();
 		}
 		
 		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
