@@ -302,8 +302,11 @@ package org.smilkit.handler
 				this._netStream.soundTransform = this._soundTransformer;
 			}
 			
-			this._video.attachNetStream(null);
-			this._video.clear();
+			if (this._video != null)
+			{
+				this._video.attachNetStream(null);
+				this._video.clear();
+			}
 		}
 		
 		public override function removedFromRenderTree(r:RenderTree):void
