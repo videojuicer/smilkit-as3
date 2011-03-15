@@ -1,7 +1,9 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.SMILKit;
 	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.w3c.dom.IDocument;
+	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
@@ -158,6 +160,72 @@ package org.smilkit.dom.smil
 			return (this.hasAttribute("dur") || this.hasAttribute("end") || this.hasAttribute("endsync"));
 		}
 		
+		/**
+		 * Checks up the tree of parents and determines if this element is limited by the duration.
+		 */
+		public function hasDurationRestriction():Boolean
+		{
+			if (this.hasDuration())
+			{
+				return true;
+			}
+			
+			var parent:IElementTimeContainer = this.parentTimeContainer;
+			
+			if (parent is SMILDocument)
+			{
+				return false;
+			}
+			
+			var container:ElementTimeContainer = (parent as ElementTimeContainer);
+			
+			return container.hasDurationRestriction();
+		}
+		
+		public function get durationRestriction():Number
+		{
+			if (this.hasDurationRestriction())
+			{
+				if (this.hasDuration())
+				{
+					return this.duration;
+				}
+				
+				var parent:IElementTimeContainer = this.parentTimeContainer;
+				var container:ElementTimeContainer = (parent as ElementTimeContainer);
+				
+				return container.durationRestriction;
+			}
+			
+			return Number.NaN;
+		}
+		
+		public function get parentTimeContainer():IElementTimeContainer
+		{
+			var parent:IElementTimeContainer = null;
+			var element:INode = this;
+			var i:int = 0;
+			
+			while (parent == null)
+			{
+				if (element.parentNode != null && element.parentNode is IElementTimeContainer)
+				{
+					parent = (element.parentNode as IElementTimeContainer);
+					break;
+				}
+				
+				element = element.parentNode;
+				
+				if (i == 20)
+				{
+					SMILKit.logger.debug("OhKnow! Tried to find a parent ElementTimeContainer but ran up 20 stacks and couldnt find anything.");
+				}
+				
+				i++;
+			}
+			
+			return parent;
+		}
 		
 		public function beginElement():Boolean
 		{

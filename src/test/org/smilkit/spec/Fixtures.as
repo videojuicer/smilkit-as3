@@ -76,7 +76,7 @@ package org.smilkit.spec
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
 			"<body>"+
 				"<seq>"+
-					"<ref id=\"reference_tag\" type=\"application/smil\" src=\"http://assets-fms.staging.videojuicer.net/demo/d07fc2a4-a21b-11de-a4ab-123139025d32.mp4.smil\" />"+
+					"<ref id=\"reference_tag\" type=\"application/smil\" dur=\"10s\" src=\"http://assets-fms.staging.videojuicer.net/demo/d07fc2a4-a21b-11de-a4ab-123139025d32.mp4.smil\" />"+
 					"<video id=\"post_reference_video\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"root\" />"+
 				"</seq>"+
 			"</body></smil>";
@@ -118,7 +118,61 @@ package org.smilkit.spec
 			"<body id=\"body\"><video id=\"content\" dur=\"10s\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
 			
 		public static var BEGIN_TIME_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
-  		"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>"+
-  		"<body id=\"body\"><video id=\"content\" begin=\"5s\" dur=\"10s\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
+  			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>"+
+  			"<body id=\"body\"><video id=\"content\" begin=\"5s\" dur=\"10s\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" region=\"root\" /></body></smil>";
+	
+		public static var RESOLVED_VIDEOS_IN_A_SEQ_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<seq>                                       " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" dur=\"30s\" src=\"2.mp4\" />" +
+			"</seq>                                      " +
+			"</body></smil>";
+		
+		public static var RESOLVED_VIDEOS_IN_A_PAR_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<par>                                       " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" dur=\"35s\" src=\"2.mp4\" />" +
+			"</par>                                      " +
+			"</body></smil>";
+		
+		public static var PARENT_SEQ_SETS_DURATION_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<seq dur=\"40s\">                             " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" dur=\"30s\" src=\"2.mp4\" />" +
+			"</seq>                                      " +
+			"</body></smil>";
+		
+		public static var PARENT_PAR_SETS_DURATION_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<par dur=\"40s\">                             " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" dur=\"60s\" src=\"2.mp4\" />" +
+			"</par>                                      " +
+			"</body></smil>";
+		
+		public static var UNRESOLVED_CHILD_SETS_DUR_IN_SEQ_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<seq>                                       " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" src=\"2.mp4\" />          " +
+			"</seq>                                      " +
+			"</body></smil>";
+		
+		public static var UNRESOLVED_CHILD_SETS_DUR_IN_PAR_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<par>                                       " +
+				"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+				"<video id=\"video_2\" src=\"2.mp4\" />          " +
+			"</par>                                      " +
+			"</body></smil>";
 	}
 }

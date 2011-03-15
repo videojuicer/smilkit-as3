@@ -4,19 +4,19 @@ package org.smilkit.spec.tests.handler
 	
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
-	import org.smilkit.view.Viewport;
-	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.SMILReferenceHandler;
-	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.Viewport;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.w3c.dom.INodeList;
 	
 	public class SMILReferenceHandlerTestCase
 	{
@@ -127,7 +127,7 @@ package org.smilkit.spec.tests.handler
 					10000,
 					this.async_invalidatedWhenRemovedFromRenderTree_viewportRefreshCompleted_viewportReadyTimeout
 				);
-				this._viewport.addEventListener(ViewportEvent.READY, asyncViewportReadyHandler)
+				this._viewport.addEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, asyncViewportReadyHandler)
 				// Play the viewport
 				this._viewport.resume();
 			}
@@ -136,6 +136,7 @@ package org.smilkit.spec.tests.handler
 				{
 					// get element and attached handler
 					var handler:SMILReferenceHandler = ((this._viewport.document.getElementById("reference_tag") as SMILMediaElement).handler as SMILReferenceHandler);
+					
 					Assert.assertNotNull(handler);
 					
 					Assert.assertTrue(handler.contentValid);
@@ -143,6 +144,7 @@ package org.smilkit.spec.tests.handler
 					this._viewport.commitSeek();
 					Assert.assertFalse(handler.contentValid);
 				}
+				
 				protected function async_invalidatedWhenRemovedFromRenderTree_viewportRefreshCompleted_viewportReadyTimeout(passthru:Object):void
 				{
 					Assert.fail("Timed out waiting for viewport to get ready to rumble");

@@ -103,7 +103,7 @@ package org.smilkit.dom.smil
 				{
 					var baseMediaElement:SMILMediaElement = (this.baseElement as SMILMediaElement);
 					var baseMediaElementHandler:SMILKitHandler = baseMediaElement.handler;
-					if(baseMediaElementHandler != null && baseMediaElementHandler.temporal == true)
+					if(baseMediaElementHandler == null || baseMediaElementHandler.temporal == true)
 					{
 						this._resolveWithoutDuration = false;
 					}
@@ -150,6 +150,11 @@ package org.smilkit.dom.smil
 					break;
 			}
 			
+			if (!this.resolved)
+			{
+				this._resolvedOffset = Time.UNRESOLVED;
+			}
+			
 			SMILKit.logger.info("Resolve complete: "+this.resolved+" begin: "+this.baseBegin+" offset: "+this.resolvedOffset+" element: "+this.baseElement.nodeName);
 			
 			this._validCache = true;
@@ -171,9 +176,9 @@ package org.smilkit.dom.smil
 				
 				element = element.parentNode;
 				
-				if (i == 10)
+				if (i == 20)
 				{
-					SMILKit.logger.debug("OhKnow! Trying to resolve sync based assets, but dont seem to be able to find the parent higher than 10 stacks");
+					SMILKit.logger.debug("OhKnow! Trying to resolve sync based assets, but dont seem to be able to find the parent higher than 20 stacks");
 				}
 				
 				i++;
@@ -198,15 +203,19 @@ package org.smilkit.dom.smil
 			}
 			else
 			{
-				if ((parent as ElementTimeContainer).hasDuration())
+				var container:ElementTimeContainer = (parent as ElementTimeContainer);
+				
+				if (container.hasDurationRestriction())
 				{
 					// were calculating the end, we might want to trim this if an parent is limiting us
-					var duration:Number = (this.baseElement as IElementTimeContainer).duration;
-					var parentDuration:Number = parent.end.first.resolvedOffset;
+					var containerDuration:Number = (this._resolvedOffset - (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset);
+					var parentDuration:Number = container.durationRestriction;
 					
-					if (parent.duration > 0 && duration > parent.duration)
+					var endLimit:Number = (parentDuration - (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset);
+					
+					if (parentDuration > 0 && containerDuration > endLimit)
 					{
-						this._resolvedOffset = parent.duration;
+						this._resolvedOffset = (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset + endLimit;
 					}
 				}
 			}
@@ -236,7 +245,7 @@ package org.smilkit.dom.smil
 				    // END time for a tag within a parallel container
 				
 					var timeContainer:IElementTimeContainer = (this._baseElement as IElementTimeContainer);
-    
+    				
 				    var begin:ITime = timeContainer.begin.first;
 				   // TODO take into account begin attribute on baseElement
 					this._resolvedOffset = begin.resolvedOffset + timeContainer.duration;					

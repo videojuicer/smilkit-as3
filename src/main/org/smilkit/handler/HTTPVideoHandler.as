@@ -459,8 +459,11 @@ package org.smilkit.handler
 		
 		protected function clearVideoDisplay():void
 		{
-			this._video.attachNetStream(null);
-			this._video.clear();
+			if (this._video != null)
+			{
+				this._video.attachNetStream(null);
+				this._video.clear();
+			}
 		}
 		
 		public override function removedFromRenderTree(r:RenderTree):void
