@@ -132,6 +132,10 @@ package org.smilkit.handler
 				this._parser.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onDocumentLoadSecurityError);
 				this._parser.addEventListener(Event.COMPLETE, this.onDocumentLoadCompleted);
 				
+				// Dispatch the load event
+				this._startedLoading = true;
+				this.onDocumentLoadStarted();
+				
 				// Flush element children
 				if(this.element != null)
 				{
@@ -148,8 +152,6 @@ package org.smilkit.handler
 				
 				// Kickstart loader
 				this._parser.load(src, this.element);
-				this._startedLoading = true;
-				this.onDocumentLoadStarted();
 			}
 		}
 		
