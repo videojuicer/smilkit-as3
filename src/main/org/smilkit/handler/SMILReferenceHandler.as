@@ -201,14 +201,22 @@ package org.smilkit.handler
 		*/
 		public function invalidate(hardInvalidation:Boolean = false):void
 		{
+			var hadStartedLoading:Boolean = this._startedLoading;
+			var hadCompletedLoading:Boolean = this._completedLoading;
 			
 			this._contentValid = false;
 			this._startedLoading = false;
 			this._completedLoading = false;
 			
-			if(this._activeOnRenderTree || hardInvalidation)
+			if((this._activeOnRenderTree || hardInvalidation) && ((!hadStartedLoading) || (hadStartedLoading && hadCompletedLoading)))
 			{
-				SMILKit.logger.debug("Performing hard invalidation+reload on SMILReferenceHandler as it is currently active on the RenderTree", this);
+				var msg:String = "Performing hard invalidate+reload as ref handler is ";
+				if(this._activeOnRenderTree) msg += "[active on the RenderTree]";
+				if(hardInvalidation) msg += "[explicitly hard-invalidating]";
+				if(!hadStartedLoading) msg += "[not already loaded]";
+				if(hadStartedLoading && hadCompletedLoading) msg += "[already completed loading]";
+				
+				SMILKit.logger.debug(msg, this);
 				this.load();
 			}
 			else
