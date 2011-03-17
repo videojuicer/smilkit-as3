@@ -626,6 +626,7 @@ package org.smilkit.render
 			{
 				SMILKit.logger.debug("RenderTree GC: about to remove "+deadTimingNodes[l].mediaElement.handler+" as it is no longer present on the TimingGraph", this);
 				this.removeTimingNodeHandlerFromActiveList(deadTimingNodes[l]);
+				deadTimingNodes[l].mediaElement.handler.cancel();
 			}
 			
 			return deadTimingNodes.length;
