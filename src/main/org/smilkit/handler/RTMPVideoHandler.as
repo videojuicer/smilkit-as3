@@ -333,7 +333,7 @@ package org.smilkit.handler
 		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
 		{
-			
+			SMILKit.logger.debug("NetConnection NetStatusEvent: "+e.info.code+" "+e.info.description, e);
 			switch (e.info.code)
 			{
 				case "NetConnection.Connect.Failed":
