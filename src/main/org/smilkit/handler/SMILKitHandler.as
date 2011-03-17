@@ -15,8 +15,8 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
-	import org.smilkit.render.RenderTree;
 	import org.smilkit.render.RegionContainer;
+	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -478,7 +478,7 @@ package org.smilkit.handler
 		 */
 		protected function drawClickShield(child:DisplayObject):void
 		{
-			if (this._startedLoading)
+			if (this._startedLoading && child != null)
 			{
 				if (this._shield == null)
 				{
@@ -490,8 +490,11 @@ package org.smilkit.handler
 					
 					parent.addChild(this._shield);
 					
-					parent.setChildIndex(child, 1);
-					parent.setChildIndex(this._shield, 0);
+					if (parent.getChildIndex(child) != -1)
+					{
+						parent.setChildIndex(child, 1);
+						parent.setChildIndex(this._shield, 0);
+					}
 				}
 				
 				this._shield.graphics.clear();
