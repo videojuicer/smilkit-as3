@@ -160,6 +160,39 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(40000, container.end.first.resolvedOffset);
 		}
 		
+		[Test(description="Parent sets the duration on a block and crops the last video")]
+		public function parentCropsLastChild():void
+		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var document:SMILDocument = (parser.parse(Fixtures.PARENT_CROPS_LAST_CHILD_SMIL_XML) as SMILDocument);
+			
+			var container:ElementTimeContainer = (document.getElementsByTagName("par").item(0) as ElementTimeContainer);
+			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
+			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
+			
+			video1.resolve();
+			video2.resolve();
+			container.resolve();
+			
+			Assert.assertEquals(00000, container.begin.first.resolvedOffset);
+			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
+			Assert.assertEquals(40000, video2.end.first.resolvedOffset);
+			Assert.assertEquals(40000, container.end.first.resolvedOffset);
+			
+			var secondContainer:ElementTimeContainer = (document.getElementsByTagName("par").item(1) as ElementTimeContainer);
+			var video3:SMILMediaElement = (document.getElementById("video_3") as SMILMediaElement);
+			var video4:SMILMediaElement = (document.getElementById("video_4") as SMILMediaElement);
+			
+			video3.resolve();
+			video4.resolve();
+			secondContainer.resolve();
+			
+			Assert.assertEquals(40000, secondContainer.begin.first.resolvedOffset);
+			Assert.assertEquals(70000, video3.end.first.resolvedOffset);
+			Assert.assertEquals(80000, video4.end.first.resolvedOffset);
+			Assert.assertEquals(80000, secondContainer.end.first.resolvedOffset);
+		}
+		
 		[Test(description="Unresolved child sets the duration in a seq. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
 		public function parentSeqStaysUnresolved():void
 		{

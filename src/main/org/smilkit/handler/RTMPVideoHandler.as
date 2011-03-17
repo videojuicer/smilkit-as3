@@ -136,6 +136,8 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> load");
+			
 			this._playOptions = new NetStreamPlayOptions();
 									
 			this._netConnection = new NetConnection();
@@ -156,6 +158,8 @@ package org.smilkit.handler
 		
 		public override function merge(handlerState:HandlerState):Boolean
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> merge");
+			
 			if (super.merge(handlerState))
 			{
 				// we know we can do this because its of the same type
@@ -205,6 +209,8 @@ package org.smilkit.handler
 		
 		public override function resume():void
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> resume");
+			
 			if (this._netStream != null)
 			{
 				SMILKit.logger.debug("Resuming playback.", this);
@@ -217,6 +223,8 @@ package org.smilkit.handler
 		
 		public override function pause():void
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> pause");
+			
 			if (this._netStream != null)
 			{
 				SMILKit.logger.debug("Pausing playback.", this);
@@ -229,6 +237,8 @@ package org.smilkit.handler
 		
 		public override function seek(seekTo:Number):void
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> seek");
+			
 			var seconds:Number = (seekTo / 1000);
 			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
 			
@@ -240,6 +250,8 @@ package org.smilkit.handler
 		
 		public override function cancel():void
 		{
+			trace("RTMP -> "+this.handlerState.src+" -> cancel");
+			
 			if (this._netStream != null)
 			{
 				this._netStream.close();
@@ -346,7 +358,6 @@ package org.smilkit.handler
 					this._netStream.checkPolicyFile = true;
 					this._netStream.client = this;
 					
-					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
 					
 					this._video = new Video();
 					this._video.smoothing = true;
@@ -363,6 +374,9 @@ package org.smilkit.handler
 					{
 						this.attachVideoDisplay();
 					}
+					
+					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
+					
 					
 					this.resize();
 					this.resetVolume();
@@ -473,7 +487,11 @@ package org.smilkit.handler
 		{
 			// ignore
 		}
-		
+
+		public function onPlayStatus(info:Object):void
+		{
+			// ignore
+		}
 		
 		public function onMetaData(info:Object):void
 		{

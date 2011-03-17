@@ -218,12 +218,18 @@ package org.smilkit.dom.smil
 					var containerDuration:Number = (this._resolvedOffset - (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset);
 					var parentDuration:Number = container.durationRestriction;
 					
-					var endLimit:Number = (parentDuration - (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset);
+					var endLimit:Number = (container.begin.first.resolvedOffset + parentDuration);
 					
-					if (parentDuration > 0 && containerDuration > endLimit)
+					if (parentDuration > 0 && this._resolvedOffset > endLimit)
 					{
-						this._resolvedOffset = (this._baseElement as ElementTimeContainer).begin.first.resolvedOffset + endLimit;
+						this._resolvedOffset = endLimit;
 					}
+					
+					trace(" ");
+					trace(" ");
+					trace(" >> begin: "+(this._baseElement as ElementTimeContainer).begin.first.resolvedOffset+" limit: "+endLimit+" offset: "+this._resolvedOffset+" <<");
+					trace(" ");
+					trace(" ");
 				}
 			}
 		}

@@ -897,6 +897,7 @@ package org.smilkit.view
 					this.onPlaybackStateChangedToPlaying();
 				}				
 			}				
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
