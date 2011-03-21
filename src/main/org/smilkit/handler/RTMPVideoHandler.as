@@ -136,7 +136,7 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> load");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> load");
 			
 			this._playOptions = new NetStreamPlayOptions();
 									
@@ -158,7 +158,7 @@ package org.smilkit.handler
 		
 		public override function merge(handlerState:HandlerState):Boolean
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> merge");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> merge");
 			
 			if (super.merge(handlerState))
 			{
@@ -209,7 +209,7 @@ package org.smilkit.handler
 		
 		public override function resume():void
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> resume");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> resume");
 			
 			if (this._netStream != null)
 			{
@@ -223,7 +223,7 @@ package org.smilkit.handler
 		
 		public override function pause():void
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> pause");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> pause");
 			
 			if (this._netStream != null)
 			{
@@ -237,7 +237,7 @@ package org.smilkit.handler
 		
 		public override function seek(seekTo:Number):void
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> seek");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> seek");
 			
 			var seconds:Number = (seekTo / 1000);
 			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
@@ -250,7 +250,7 @@ package org.smilkit.handler
 		
 		public override function cancel():void
 		{
-			trace("RTMP -> "+this.handlerState.src+" -> cancel");
+			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> cancel");
 			
 			if (this._netStream != null)
 			{

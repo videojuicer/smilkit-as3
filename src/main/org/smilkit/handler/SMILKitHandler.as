@@ -25,6 +25,9 @@ package org.smilkit.handler
 
 	public class SMILKitHandler extends EventDispatcher
 	{
+		public static var __idCounter:int = 0;
+		
+		protected var _handlerId:int;
 		protected var _element:IElement;
 		protected var _startedLoading:Boolean = false;
 		protected var _completedLoading:Boolean = false;
@@ -37,6 +40,13 @@ package org.smilkit.handler
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
+			SMILKitHandler.__idCounter++;
+			this._handlerId = SMILKitHandler.__idCounter;
+		}
+		
+		public function get handlerId():int
+		{
+			return this._handlerId;
 		}
 		
 		public function get startedLoading():Boolean
@@ -300,7 +310,7 @@ package org.smilkit.handler
 		 */
 		public function cancel():void
 		{
-			SMILKit.logger.debug("Cancelling load operation.", this)
+			SMILKit.logger.debug("Handler "+this.handlerId+" cancelling load operation.", this)
 			
 			this._completedLoading = false;
 			this._startedLoading = false;
@@ -317,7 +327,7 @@ package org.smilkit.handler
 		 */
 		public function movedToJustInTimeWorkList():void
 		{
-			SMILKit.logger.debug("Handler moved to just in time worker's worklist", this);
+			SMILKit.logger.debug("Handler "+this.handlerId+" moved to just in time worker's worklist", this);
 			
 			if (!this.startedLoading)
 			{
@@ -339,7 +349,7 @@ package org.smilkit.handler
 		 */
 		public function movedToPreloadWorkList():void
 		{
-			SMILKit.logger.debug("Handler moved to preload worker's worklist", this);
+			SMILKit.logger.debug("Handler "+this.handlerId+" moved to preload worker's worklist", this);
 			
 			if (!this.startedLoading && this.preloadable)
 			{
@@ -358,7 +368,7 @@ package org.smilkit.handler
 		 */
 		public function movedToResolveWorkList():void
 		{
-			SMILKit.logger.debug("Handler moved to resolve worker's worklist", this);
+			SMILKit.logger.debug("Handler "+this.handlerId+" moved to resolve worker's worklist", this);
 			
 			if (!this.startedLoading && this.resolvable)
 			{
@@ -374,8 +384,7 @@ package org.smilkit.handler
 		 */
 		public function removedFromLoadScheduler():void
 		{
-			SMILKit.logger.debug("Handler removed from load scheduler", this);
-			
+			SMILKit.logger.debug("Handler "+this.handlerId+" removed from load scheduler (startedLoading: "+this.startedLoading+", completedLoading: "+this.completedLoading+")", this);			
 			if (this.startedLoading && !this.completedLoading)
 			{
 				this.cancel();
@@ -408,7 +417,7 @@ package org.smilkit.handler
 		{
 			if (!this._completedResolving || resolvedDuration != this._duration)
 			{
-				SMILKit.logger.debug("Handler resolved own intrinsic duration ("+resolvedDuration+")", this);
+				SMILKit.logger.debug("Handler "+this.handlerId+" resolved own intrinsic duration ("+resolvedDuration+")", this);
 				
 				this._duration = resolvedDuration;
 				this._completedResolving = true;
@@ -511,7 +520,7 @@ package org.smilkit.handler
 			
 			if (this.innerDisplayObject != null && parent.contains(this.innerDisplayObject))
 			{
-				SMILKit.logger.debug("Handler entering sync state");
+				SMILKit.logger.debug("Handler "+this.handlerId+" entering sync state");
 				
 				parent.graphics.clear();
 				
@@ -529,7 +538,7 @@ package org.smilkit.handler
 			
 			if (this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
 			{
-				SMILKit.logger.debug("Handler leaving sync state");
+				SMILKit.logger.debug("Handler "+this.handlerId+" leaving sync state");
 
 				parent.graphics.clear();
 				

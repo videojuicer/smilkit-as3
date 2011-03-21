@@ -197,15 +197,15 @@ package org.smilkit.load {
 
 		protected function onHandlerMovedToJustInTimeWorkerWorkList(event:WorkUnitEvent):void 
 		{
-			event.handler.movedToJustInTimeWorkList();
+			if(this._justInTimeWorker.hasHandler(event.handler)) event.handler.movedToJustInTimeWorkList();
 		}
 		protected function onHandlerMovedToResolveWorkerWorkList(event:WorkUnitEvent):void 
 		{
-			event.handler.movedToResolveWorkList();
+			if(this._resolveWorker.hasHandler(event.handler)) event.handler.movedToResolveWorkList();
 		}
 		protected function onHandlerMovedToPreloadWorkerWorkList(event:WorkUnitEvent):void 
 		{
-			event.handler.movedToPreloadWorkList();
+			if(this._preloadWorker.hasHandler(event.handler)) event.handler.movedToPreloadWorkList();
 		}
 		protected function onHandlerRemovedFromWorker(event:WorkUnitEvent):void
 		{
@@ -271,6 +271,7 @@ package org.smilkit.load {
 				timingGraphHandlers.push((timingGraphElements[i].element as SMILMediaElement).handler);
 			}
 			// Scan workers
+			SMILKit.logger.debug("Purging orphaned handlers ("+timingGraphHandlers.length+" exist on the timing graph)", this);
 			for(var j:uint=0; j<this._workers.length; j++)
 			{
 				var worker:Worker = this._workers[j];
@@ -279,7 +280,11 @@ package org.smilkit.load {
 				for(var k:uint=0; k<workerHandlers.length; k++)
 				{
 					var h:SMILKitHandler = workerHandlers[k];
-					if(timingGraphHandlers.indexOf(h) < 0) worker.removeHandler(h);
+					if(timingGraphHandlers.indexOf(h) < 0) 
+					{
+						SMILKit.logger.debug("Purging orphaned handler "+h+" (id: "+h.handlerId+") from "+worker.loggerName, this);
+						worker.removeHandler(h);
+					}
 				}
 			}
 		}

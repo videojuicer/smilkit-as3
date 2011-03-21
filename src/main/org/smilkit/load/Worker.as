@@ -132,7 +132,7 @@ package org.smilkit.load {
 			if(this.hasHandler(handler)) return false;
 			this._workQueue.push(handler);
 			// TODO bind generic "done" listener
-			
+			SMILKit.logger.debug("Handler added to work queue on worker: "+this.loggerName, handler);
 			// bind specific event listeners
 			handler.addEventListener(this._completionEventType, this.onWorkUnitCompleted);
 			handler.addEventListener(this._failureEventType, this.onWorkUnitFailed);
@@ -153,7 +153,7 @@ package org.smilkit.load {
 			} 
 			if(this.hasHandlerInWorkQueue(handler)) 
 			{
-				this._workQueue.splice(this._workList.indexOf(handler), 1);
+				this._workQueue.splice(this._workQueue.indexOf(handler), 1);
 				res = true;
 			}
 			if(res) this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_REMOVED, handler));
@@ -204,6 +204,9 @@ package org.smilkit.load {
 			{
 				var limit:uint = this.advanceCapacity();
 				var moved:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
+				
+				SMILKit.logger.debug(this.loggerName+" about to shift "+limit+" items from queue ("+this._workQueue.join(",")+") to list ("+this._workList.join(",")+").", this);
+				
 				for(var i:uint=0; i < limit; i++) {
 					//throw new Error(this.loggerName+" wQ size: "+this._workQueue.length+" wL size: "+this._workList.length);
 					var h:SMILKitHandler = this._workQueue[i];
@@ -213,12 +216,14 @@ package org.smilkit.load {
 				}
 				// Splice the moved items from the workQueue
 				this._workQueue.splice(0, moved.length);
+				SMILKit.logger.debug(this.loggerName+" finished shifting items from queue ("+this._workQueue.join(",")+") to list ("+this._workList.join(",")+").", this);
 				// Dispatch LISTED event on moved items
 				for(var j:uint=0; j < moved.length; j++)
 				{
 					var movedHandler:SMILKitHandler = moved[j];
 					this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_LISTED, movedHandler));					
 				}
+				
 				
 				// Check idle state and transmit idle event if transitioning to idle 
 				if(this._idleOnLastAdvance && !this.idle) {
