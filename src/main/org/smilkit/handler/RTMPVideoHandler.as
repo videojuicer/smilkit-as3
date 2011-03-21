@@ -284,6 +284,8 @@ package org.smilkit.handler
 			
 			if (this._video != null)
 			{
+				this.attachVideoDisplay();
+				
 				this.drawClickShield(this._video);
 			}
 		}

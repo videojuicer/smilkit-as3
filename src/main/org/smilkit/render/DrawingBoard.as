@@ -83,6 +83,7 @@ package org.smilkit.render
 			this._boundingRect = rect;
 			
 			this.reset();
+			this.draw();
 		}
 		
 		/**
@@ -264,11 +265,6 @@ package org.smilkit.render
 			super.addChild(this._canvas);
 			
 			this.drawRegions();
-		}
-		
-		protected function onApplicationStageResize(e:Event):void
-		{
-			this.reset();
 		}
 		
 		public override function get width():Number
