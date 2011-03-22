@@ -289,8 +289,14 @@ package org.smilkit.handler
 			
 			this._resumed = false;
 			
-			this._netStream.close();
-			this._netConnection.close();
+			if(this._netStream != null)
+			{
+				this._netStream.close();
+			}
+			if(this._netConnection != null)
+			{
+				this._netConnection.close();
+			}
 			
 			this._netConnection = null;
 			this._netStream = null;
