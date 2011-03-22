@@ -154,11 +154,13 @@ package org.smilkit.dom.smil
 			
 			if (src.indexOf("://") == -1)
 			{
+				var root:Element = this.getClosestParentElementByTagName("smil") as Element;
+				
 				// find src
-				var metas:INodeList = this.ownerDocument.getElementsByTagName("meta");
+				var metas:INodeList = root.getElementsByTagName("meta");
 				var base:String = "";
 				
-				for (var i:int = metas.length - 1; i > 0; i--)
+				for (var i:int = 0; i < metas.length; i++)
 				{
 					var node:Element = (metas.item(i) as Element);
 					
@@ -174,6 +176,25 @@ package org.smilkit.dom.smil
 			}
 			
 			return src;
+		}
+		
+		protected function getClosestParentElementByTagName(tagName:String):INode
+		{
+			var parent:INode = this.parentNode;
+			var found:INode = null;
+			
+			while (parent != null)
+			{
+				if (parent.nodeName == tagName)
+				{
+					found = parent;
+					break;
+				}
+				
+				parent = parent.parentNode;
+			}
+			
+			return found;
 		}
 		
 		public function set src(src:String):void
