@@ -4,14 +4,15 @@ package org.smilkit.spec.tests.dom.smil
 	
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.Viewport;
+	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.w3c.dom.INodeList;
 	
 	public class SMILMediaElementTestCase
 	{
@@ -30,6 +31,26 @@ package org.smilkit.spec.tests.dom.smil
 		{
 			this._document = null;
 			SMILKit.removeHandlers();
+		}
+
+		[Test(description="Tests that a media element in a ref with multiple base tags uses the correct one")]
+		public function mediaElementSrcUsesCorrectBase():void
+		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var document:SMILDocument = (parser.parse(Fixtures.REF_AND_BASE_TAGS_SMIL_XML) as SMILDocument);
+
+			var videos:INodeList = document.getElementsByTagName("video");
+			
+			Assert.assertEquals(2, videos.length);
+			
+			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
+			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
+			
+			Assert.assertNotNull(video1);
+			Assert.assertNotNull(video2);
+			
+			Assert.assertEquals("http://hello/1.mp4", video1.src);
+			Assert.assertEquals("http://world/2.mp4", video2.src);
 		}
 		
 		[Test(description="Ensures that the link context is correctly recognised on each of the three test elements")]
