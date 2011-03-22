@@ -41,7 +41,7 @@ package org.smilkit.spec.tests.handler
 		[Test(async,descriptions="Tests resolving a HTTP video")]
 		public function ableToResolveVideo():void
 		{
-			var asyncResolveCheck:Function = Async.asyncHandler(this, this.onHandlerResolved, 5000, this.onHandlerResolveTimeout);
+			var asyncResolveCheck:Function = Async.asyncHandler(this, this.onHandlerResolved, 15000, this.onHandlerResolveTimeout);
 			
 			this._httpVideoHandler.addEventListener(HandlerEvent.DURATION_RESOLVED, asyncResolveCheck);
 			this._httpVideoHandler.load();

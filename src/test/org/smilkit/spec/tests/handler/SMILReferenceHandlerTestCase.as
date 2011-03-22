@@ -63,7 +63,7 @@ package org.smilkit.spec.tests.handler
 			var asyncViewportRefreshHandler:Function = Async.asyncHandler(
 				this, 
 				this.async_documentContentInjectedAfterLoad_viewportRefreshComplete, 
-				5000, 
+				15000, 
 				this.async_documentContentInjectedAfterLoad_viewportRefreshTimeout
 			);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncViewportRefreshHandler);
@@ -76,7 +76,7 @@ package org.smilkit.spec.tests.handler
 				var asyncViewportReadyHandler:Function = Async.asyncHandler(
 					this,
 					this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportReady,
-					10000,
+					15000,
 					this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportWaitTimeout
 				);
 				this._viewport.addEventListener(ViewportEvent.READY, asyncViewportReadyHandler)
@@ -162,7 +162,7 @@ package org.smilkit.spec.tests.handler
 			var asyncViewportRefreshHandler:Function = Async.asyncHandler(
 				this, 
 				this.async_invalidatedWhenViewportPaused_viewportRefreshCompleted, 
-				5000, 
+				15000, 
 				this.async_invalidatedWhenViewportPaused_viewportRefreshTimeout
 			);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncViewportRefreshHandler);
@@ -173,7 +173,7 @@ package org.smilkit.spec.tests.handler
 				var asyncViewportReadyHandler:Function = Async.asyncHandler(
 					this,
 					this.async_invalidatedWhenViewportPaused_viewportRefreshCompleted_viewportReady,
-					10000,
+					15000,
 					this.async_invalidatedWhenViewportPaused_viewportRefreshCompleted_viewportReadyTimeout
 				);
 				this._viewport.addEventListener(ViewportEvent.READY, asyncViewportReadyHandler)
