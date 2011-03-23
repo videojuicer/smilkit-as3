@@ -396,14 +396,14 @@ package org.smilkit.dom
 								
 								if (!tle.useCapture && tle.type == e.type && (nodeListeners.indexOf(tle) != -1))
 								{
-									try
-									{
+									//try
+									//{
 										tle.listener(e);
-									}
-									catch(e:Error)
-									{
-										SMILKit.logger.error("Failed to execute bubble listener: "+e.toString());
-									}
+									//}
+									//catch(ex:Error)
+									//{
+										//SMILKit.logger.error("Failed to execute bubble listener: "+ex.toString());
+									//}
 								}
 							}
 						}

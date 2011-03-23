@@ -220,7 +220,7 @@ package org.smilkit.dom.smil
 					
 					var endLimit:Number = (container.begin.first.resolvedOffset + parentDuration);
 					
-					if (parentDuration > 0 && this._resolvedOffset > endLimit)
+					if (parentDuration >= 0 && this._resolvedOffset > endLimit)
 					{
 						this._resolvedOffset = endLimit;
 					}
