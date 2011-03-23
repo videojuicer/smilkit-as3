@@ -358,15 +358,15 @@ package org.smilkit.dom
 						
 						if (!le.useCapture && le.type == e.type && (nodeListeners.indexOf(le) != -1))
 						{
-							try
-							{
+							//try
+							//{
 								le.listener(e);
-							}
-							catch (e:Error)
-							{
+							//}
+							//catch (e:Error)
+							//{
 								// catch all
 								SMILKit.logger.error("Failed to execute bubbling listener: "+e.toString());
-							}
+							//}
 						}
 					}
 				}
@@ -396,14 +396,14 @@ package org.smilkit.dom
 								
 								if (!tle.useCapture && tle.type == e.type && (nodeListeners.indexOf(tle) != -1))
 								{
-									//try
-									//{
+									try
+									{
 										tle.listener(e);
-									//}
-									//catch(ex:Error)
-									//{
-										//SMILKit.logger.error("Failed to execute bubble listener: "+ex.toString());
-									//}
+									}
+									catch(ex:Error)
+									{
+										SMILKit.logger.error("Failed to execute bubble listener: "+ex.toString());
+									}
 								}
 							}
 						}

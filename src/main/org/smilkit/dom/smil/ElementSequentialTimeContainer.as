@@ -36,7 +36,7 @@ package org.smilkit.dom.smil
 		{
 			var duration:Number = super.duration;
 			
-			if (this.hasChildNodes() && duration < 0)
+			if (this.hasChildNodes() && (duration == 0 && !this.hasDuration()))
 			{
 				var childDuration:Number = 0;
 				
