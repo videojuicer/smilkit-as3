@@ -315,6 +315,7 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
+		/*
 		public override function ancestorChanged(newAncestor:ParentNode=null):void
 		{
 			// ancestor was removed, so were now an orphan?
@@ -338,6 +339,7 @@ package org.smilkit.dom.smil
 				}
 			}
 		}
+		*/
 		
 		protected function onDOMSubtreeModified(e:MutationEvent):void
 		{
