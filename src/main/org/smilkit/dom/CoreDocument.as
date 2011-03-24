@@ -50,6 +50,11 @@ package org.smilkit.dom
 			return null;
 		}
 		
+		public override function get orphaned():Boolean
+		{
+			return false;
+		}
+		
 		public override function get nodeType():int
 		{
 			return Node.DOCUMENT_NODE;
@@ -232,6 +237,11 @@ package org.smilkit.dom
 			}
 			
 			this._identifiers.setItem(id, element);
+		}
+		
+		public override function ancestorChanged(newAncestor:ParentNode = null):void
+		{
+			return;
 		}
 	}
 }

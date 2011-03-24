@@ -10,8 +10,6 @@ package org.smilkit.dom
 		protected var _firstChild:INode = null;
 		protected var _childNodeCount:int = -1;
 		
-		protected var _orphaned:Boolean = true;
-		
 		public function ParentNode(owner:IDocument)
 		{
 			super(owner);
@@ -334,23 +332,43 @@ package org.smilkit.dom
 		
 		public function ancestorChanged(newAncestor:ParentNode = null):void
 		{
+			var updateChildren:Boolean = false;
+			
 			if (newAncestor != null)
 			{
-				
-			}
-			
-			// update the children
-			var child:ParentNode = (this.firstChild as ParentNode);
-			
-			if (child != null)
-			{
-				for (var i:int = 0; i < this.childNodes.length; i++)
+				// Tree was attached
+				if(this.orphaned && !newAncestor.orphaned)
 				{
-					child = (this.childNodes.item(i) as ParentNode);
-					
-					child.ancestorChanged(newAncestor);
+					this._orphaned = false;
+					updateChildren = true;
 				}
 			}
+			else
+			{
+				// Tree detached
+				if(!this.orphaned)
+				{
+					this._orphaned = true;
+					updateChildren = true;
+				}
+			}
+			
+			
+			if(updateChildren)
+			{
+				var child:ParentNode = (this.firstChild as ParentNode);
+
+				if (child != null)
+				{
+					for (var i:int = 0; i < this.childNodes.length; i++)
+					{
+						child = (this.childNodes.item(i) as ParentNode);
+
+						child.ancestorChanged(newAncestor);
+					}
+				}
+			}
+
 		}
 	}
 }

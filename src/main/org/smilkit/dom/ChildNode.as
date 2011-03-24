@@ -15,10 +15,16 @@ package org.smilkit.dom
 		protected var _previousSibling:ChildNode;
 		protected var _nextSibling:ChildNode;
 		protected var _parentNode:INode = null;
+		protected var _orphaned:Boolean = true;
 		
 		public function ChildNode(owner:IDocument)
 		{
 			super(owner);
+		}
+		
+		public function get orphaned():Boolean
+		{
+			return this._orphaned;
 		}
 		
 		public override function get parentNode():INode
