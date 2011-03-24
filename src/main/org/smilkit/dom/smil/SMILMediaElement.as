@@ -5,6 +5,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.ParentNode;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.SMILKitHandler;
@@ -28,7 +29,6 @@ package org.smilkit.dom.smil
 			
 			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMSubtreeModified, false);
 			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onDOMAttributeModified, false);
-			this.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this.onDOMNodeInsertedIntoDocument, false);
 		}
 		
 		public function get handler():SMILKitHandler
@@ -315,11 +315,28 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
-		protected function onDOMNodeInsertedIntoDocument(e:MutationEvent):void
+		public override function ancestorChanged(newAncestor:ParentNode=null):void
 		{
-			this.updateHandler();
-		
-			(this.ownerDocument as Document).handlerModified(this, null, this._handler);
+			// ancestor was removed, so were now an orphan?
+			if (newAncestor == null)
+			{
+				if (this._handler != null)
+				{
+					this._handler.cancel();
+				}
+				
+				this._handler = null;
+			}
+			// ancestor was added
+			else
+			{
+				this.updateHandler();
+				
+				if (this.handler != null)
+				{
+					(this.ownerDocument as Document).handlerModified(this, null, this._handler);
+				}
+			}
 		}
 		
 		protected function onDOMSubtreeModified(e:MutationEvent):void
