@@ -26,7 +26,7 @@ package org.smilkit.dom
 		{
 			super.parentNode = value;
 			
-			this.ancestorChanged(value);
+			this.ancestorChanged((value as ParentNode));
 		}
 		
 		public override function get childNodes():INodeList
@@ -339,13 +339,13 @@ package org.smilkit.dom
 			}
 			
 			// update the children
-			var child:ChildNode = (this.firstChild as ChildNode);
+			var child:ParentNode = (this.firstChild as ParentNode);
 			
 			if (child != null)
 			{
-				for (var i:int = 0; i < index && child != null; i++)
+				for (var i:int = 0; i < this.childNodes.length; i++)
 				{
-					child = (child.nextSibling as ChildNode);
+					child = (this.childNodes.item(i) as ParentNode);
 					
 					child.ancestorChanged(newAncestor);
 				}
