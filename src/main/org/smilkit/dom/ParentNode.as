@@ -236,7 +236,7 @@ package org.smilkit.dom
 				}
 			}
 			
-			(oldChild as ParentNode)._ownerDocument = null;
+			//(oldChild as ParentNode)._ownerDocument = null;
 			(oldChild as ChildNode).nextSibling = null;
 			(oldChild as ChildNode).previousSibling = null;
 			(oldChild as ChildNode).parentNode = null;
