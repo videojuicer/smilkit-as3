@@ -156,23 +156,26 @@ package org.smilkit.dom.smil
 			{
 				var root:Element = this.getClosestParentElementByTagName("smil") as Element;
 				
-				// find src
-				var metas:INodeList = root.getElementsByTagName("meta");
-				var base:String = "";
-				
-				for (var i:int = 0; i < metas.length; i++)
+				if (root != null)
 				{
-					var node:Element = (metas.item(i) as Element);
-					
-					if (node.hasAttributes() && node.attributes.getNamedItem("base") != null)
-					{
-						base = node.attributes.getNamedItem("base").nodeValue;
-						
-						break;
-					}
-				}
+					// find src
+					var metas:INodeList = root.getElementsByTagName("meta");
+					var base:String = "";
 				
-				src = base + "/" + src;
+					for (var i:int = 0; i < metas.length; i++)
+					{
+						var node:Element = (metas.item(i) as Element);
+					
+						if (node.hasAttributes() && node.attributes.getNamedItem("base") != null)
+						{
+							base = node.attributes.getNamedItem("base").nodeValue;
+						
+							break;
+						}
+					}
+				
+					src = base + "/" + src;
+				}
 			}
 			
 			return src;
