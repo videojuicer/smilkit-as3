@@ -28,6 +28,7 @@ package org.smilkit.dom.smil
 			
 			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMSubtreeModified, false);
 			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onDOMAttributeModified, false);
+			this.addEventListener(MutationEvent.DOM_NODE_INSERTED_INTO_DOCUMENT, this.onDOMNodeInsertedIntoDocument, false);
 		}
 		
 		public function get handler():SMILKitHandler
@@ -156,8 +157,8 @@ package org.smilkit.dom.smil
 			{
 				var root:Element = this.getClosestParentElementByTagName("smil") as Element;
 				
-				if (root != null)
-				{
+				//if (root != null)
+				//{
 					// find src
 					var metas:INodeList = root.getElementsByTagName("meta");
 					var base:String = "";
@@ -175,7 +176,7 @@ package org.smilkit.dom.smil
 					}
 				
 					src = base + "/" + src;
-				}
+				//}
 			}
 			
 			return src;
@@ -312,6 +313,13 @@ package org.smilkit.dom.smil
 			}
 			
 			return true;
+		}
+		
+		protected function onDOMNodeInsertedIntoDocument(e:MutationEvent):void
+		{
+			this.updateHandler();
+		
+			(this.ownerDocument as Document).handlerModified(this, null, this._handler);
 		}
 		
 		protected function onDOMSubtreeModified(e:MutationEvent):void

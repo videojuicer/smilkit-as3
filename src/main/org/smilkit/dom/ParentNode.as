@@ -10,6 +10,8 @@ package org.smilkit.dom
 		protected var _firstChild:INode = null;
 		protected var _childNodeCount:int = -1;
 		
+		protected var _orphaned:Boolean = true;
+		
 		public function ParentNode(owner:IDocument)
 		{
 			super(owner);
@@ -18,6 +20,13 @@ package org.smilkit.dom
 		public override function get ownerDocument():IDocument
 		{
 			return this._ownerDocument;
+		}
+		
+		public override function set parentNode(value:INode):void
+		{
+			super.parentNode = value;
+			
+			this.ancestorChanged(value);
 		}
 		
 		public override function get childNodes():INodeList
@@ -319,6 +328,27 @@ package org.smilkit.dom
 				child.normalize();
 				
 				child = child.nextSibling;
+			}
+		}
+		
+		public function ancestorChanged(newAncestor:ParentNode = null):void
+		{
+			if (newAncestor != null)
+			{
+				
+			}
+			
+			// update the children
+			var child:ChildNode = (this.firstChild as ChildNode);
+			
+			if (child != null)
+			{
+				for (var i:int = 0; i < index && child != null; i++)
+				{
+					child = (child.nextSibling as ChildNode);
+					
+					child.ancestorChanged(newAncestor);
+				}
 			}
 		}
 	}
