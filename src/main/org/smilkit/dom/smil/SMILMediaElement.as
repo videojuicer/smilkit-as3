@@ -153,12 +153,12 @@ package org.smilkit.dom.smil
 		{
 			var src:String = this.getAttribute("src");
 			
-			if (src.indexOf("://") == -1)
+			if (src != null && src != "" && src.indexOf("://") == -1)
 			{
 				var root:Element = this.getClosestParentElementByTagName("smil") as Element;
 				
-				//if (root != null)
-				//{
+				if (root != null)
+				{
 					// find src
 					var metas:INodeList = root.getElementsByTagName("meta");
 					var base:String = "";
@@ -176,7 +176,7 @@ package org.smilkit.dom.smil
 					}
 				
 					src = base + "/" + src;
-				//}
+				}
 			}
 			
 			return src;
@@ -315,9 +315,10 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
-		/*
 		public override function ancestorChanged(newAncestor:ParentNode=null):void
 		{
+			super.ancestorChanged(newAncestor);
+			
 			// ancestor was removed, so were now an orphan?
 			if (newAncestor == null)
 			{
@@ -329,7 +330,7 @@ package org.smilkit.dom.smil
 				this._handler = null;
 			}
 			// ancestor was added
-			else
+			else if (!this.orphaned)
 			{
 				this.updateHandler();
 				
@@ -339,7 +340,6 @@ package org.smilkit.dom.smil
 				}
 			}
 		}
-		*/
 		
 		protected function onDOMSubtreeModified(e:MutationEvent):void
 		{
@@ -350,7 +350,7 @@ package org.smilkit.dom.smil
 		{
 			if (e.attrName == "src" || e.attrName == "type")
 			{
-				if (e.prevValue != e.newValue)
+				if (!this.orphaned && e.prevValue != e.newValue)
 				{
 					this.updateHandler();
 				

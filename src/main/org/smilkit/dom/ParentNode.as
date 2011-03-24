@@ -237,7 +237,7 @@ package org.smilkit.dom
 			//(oldChild as ParentNode)._ownerDocument = null;
 			(oldChild as ChildNode).nextSibling = null;
 			(oldChild as ChildNode).previousSibling = null;
-			(oldChild as ChildNode).parentNode = null;
+			//(oldChild as ChildNode).parentNode = null;
 			
 			// invalidate cache
 			this._childNodeCount = -1;

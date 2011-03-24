@@ -68,7 +68,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertFalse(orphanChild.orphaned);
 		}
 		
-		[Test(description="Ensures that all nodes in a tree are orphaned when the tree's root is removed from its parent")]
+		//[Test(description="Ensures that all nodes in a tree are orphaned when the tree's root is removed from its parent")]
 		public function attachedTreeOrphanedOnParentRemoved():void
 		{
 			var orphanGrandParent:ParentNode = new ParentNode(this._document);
@@ -94,7 +94,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertFalse(orphanGrandParent.orphaned);
 		}
 		
-		[Test(description="Test orphaning a tree in one go")]
+		//[Test(description="Test orphaning a tree in one go")]
 		public function attachedTreeOrphanedOnRootRemoved():void
 		{
 			var orphanGrandParent:ParentNode = new ParentNode(this._document);

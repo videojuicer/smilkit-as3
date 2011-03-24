@@ -72,5 +72,22 @@ package org.smilkit.spec.tests.dom.smil
 			mediaElement = (this._document.getElementById("notwrapped") as SMILMediaElement);
 			Assert.assertNull(mediaElement.linkContextElement);
 		}
+		
+		[Test(description="Tests that a SMILMediaElement has its handler replaced when it gets ancestor changes")]
+		public function elementChangesAnsectorCorrectly():void
+		{
+			var element:SMILMediaElement = (this._document.createMediaElement("video") as SMILMediaElement);
+			element.src = "http://sixty.im/test.mp4";
+			
+			Assert.assertNull(element.handler);
+			
+			this._document.appendChild(element);
+			
+			Assert.assertNotNull(element.handler);
+			
+			this._document.removeChild(element);
+			
+			//Assert.assertNull(element.handler);
+		}
 	}
 }
