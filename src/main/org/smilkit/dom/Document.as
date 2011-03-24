@@ -358,15 +358,15 @@ package org.smilkit.dom
 						
 						if (!le.useCapture && le.type == e.type && (nodeListeners.indexOf(le) != -1))
 						{
-							//try
-							//{
+							try
+							{
 								le.listener(e);
-							//}
-							//catch (e:Error)
-							//{
+							}
+							catch (e:Error)
+							{
 								// catch all
 								SMILKit.logger.error("Failed to execute bubbling listener: "+e.toString());
-							//}
+							}
 						}
 					}
 				}
