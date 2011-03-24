@@ -92,14 +92,22 @@ package org.smilkit.spec.tests.dom
 			Assert.assertTrue(orphanChild.orphaned);
 			Assert.assertTrue(orphanParent.orphaned);
 			Assert.assertFalse(orphanGrandParent.orphaned);
+		}
+		
+		[Test(description="Test orphaning a tree in one go")]
+		public function attachedTreeOrphanedOnRootRemoved():void
+		{
+			var orphanGrandParent:ParentNode = new ParentNode(this._document);
+			var orphanParent:ParentNode = new ParentNode(this._document);
+			var orphanChild:ParentNode = new ParentNode(this._document);
 			
-			// Now re-add and try orphaning the tree in one go
 			orphanGrandParent.appendChild(orphanParent);
 			orphanParent.appendChild(orphanChild);
+			this._document.appendChild(orphanGrandParent);
 			
-			Assert.assertFalse(orphanChild.orphaned);
-			Assert.assertFalse(orphanParent.orphaned);
 			Assert.assertFalse(orphanGrandParent.orphaned);
+			Assert.assertFalse(orphanParent.orphaned);
+			Assert.assertFalse(orphanChild.orphaned);
 			
 			this._document.removeChild(orphanGrandParent);
 			
