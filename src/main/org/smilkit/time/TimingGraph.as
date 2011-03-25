@@ -74,6 +74,8 @@ package org.smilkit.time
 		 */		
 		public function rebuild():void
 		{
+			SMILKit.logger.debug("Starting TimingGraph rebuild", this);
+			
 			this._elements = new Vector.<TimingNode>();
 			
 			// only go from the body, no point running through the other parts of a smil document
@@ -169,6 +171,7 @@ package org.smilkit.time
 		
 		protected function onHandlerModified(e:MutationEvent):void
 		{
+			SMILKit.logger.debug("A handler was modified - about to rebuild TimingGraph", this);
 			this.rebuild();
 		}
 	}
