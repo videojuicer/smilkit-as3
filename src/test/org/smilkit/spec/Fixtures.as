@@ -196,5 +196,23 @@ package org.smilkit.spec
 				"</body></smil>" +
 			"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
 			"</body></smil>";
+			
+		public static var REF_SEQUENCE_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+				"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+				"<body>"+
+					"<seq>"+
+						"<ref id=\"reference_one\" type=\"application/smil\" src=\"http://foo.com/one.smil\" />"+
+						"<ref id=\"reference_bar\" type=\"application/smil\" src=\"http://foo.com/two.smil\" />"+
+					"</seq>"+
+				"</body></smil>";
+				
+		public static var REF_SEQUENCE_INNER_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+				"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+				"<body>"+
+					"<seq>"+
+						"<video src=\"http://foo.com/video.mp4\" />"+
+					"</seq>"+
+				"</body></smil>";
+				
 	}
 }

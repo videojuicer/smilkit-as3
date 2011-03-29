@@ -65,7 +65,7 @@ package org.smilkit.spec.tests.dom
 			container.resolve();
 			
 			// DA FUCK?
-			//Assert.assertEquals(60000, container.end.first.resolvedOffset);
+			Assert.assertEquals(60000, container.end.first.resolvedOffset);
 			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
 			Assert.assertEquals(60000, video2.end.first.resolvedOffset);
 		}

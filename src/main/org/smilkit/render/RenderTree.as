@@ -523,10 +523,14 @@ package org.smilkit.render
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
 			{
 				// Get the contents of the TimingGraph as a vector of TimingNodes
-				var timingNodes:Vector.<TimingNode> = this.timingGraph.elements;
-				
+				var timingNodes:Vector.<TimingNode> = this.timingGraph.elements;				
 				// Set the sync flag to false. It will be set to TRUE when adding a seekable handler to the RenderTree during a playing state.
 				var syncAfterUpdate:Boolean = false;
+				// Set up the action vectors
+				var actionableChanges:Boolean = false;
+				var removedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
+				var addedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
+				var modifiedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
 				
 				// make a copy of the elements so we can update the list without causing loop issues
 				
@@ -553,9 +557,9 @@ package org.smilkit.render
 					// remove non active, existing elements
 					if (!activeNow && alreadyExists)
 					{
-						SMILKit.logger.debug("Removing handler from RenderTree during update at "+offset+"ms. Handler set to run "+time.begin+"-"+time.end+"ms.", handler);
 						this._lastChangeOffset = offset;
-						this.removeTimingNodeHandlerFromActiveList(time);
+						actionableChanges = true;
+						removedTimingNodes.push(time);
 					}
 					// add active, non existant elements
 					else if (activeNow)
@@ -563,15 +567,14 @@ package org.smilkit.render
 						// only add to the canvas, when the element hasnt existed before
 						if (!alreadyExists)
 						{
-							SMILKit.logger.debug("Handler added to RenderTree during update at "+offset+"ms", handler);
 							this._lastChangeOffset = offset;
-							this.addTimingNodeHandlerToActiveList(time);							
+							actionableChanges = true;
+							addedTimingNodes.push(time);
 							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
 							// viewport is currently playing.
 							if(!syncAfterUpdate && handler.seekable)
 							{
-								SMILKit.logger.debug("Added a seekable handler to the RenderTree. Scheduling a sync for after this update operation.", this);
 								syncAfterUpdate = true;
 							}
 						}
@@ -581,13 +584,49 @@ package org.smilkit.render
 							var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
 							if (time === previousTime && time != previousTime)
 							{
-								SMILKit.logger.debug("Element modified on RenderTree during update at "+offset+"ms", this);
 								this._lastChangeOffset = offset;
-								this.timingNodeModifiedOnActiveList(time);
+								actionableChanges = true;
+								modifiedTimingNodes.push(time);
 							}
 						}
 					}
 					
+				}
+				
+				// Action the update changes
+				if(actionableChanges)
+				{
+					SMILKit.logger.debug("RenderTree.updateAt("+offset+"): actioning changes. "+addedTimingNodes.length+" added, "+removedTimingNodes.length+" removed, "+modifiedTimingNodes.length+" modified.", this);
+					
+					var actionTime:TimingNode;
+					var actionHandler:SMILKitHandler;
+					// Additions
+					for(var a:int=0; a<addedTimingNodes.length; a++)
+					{
+						actionTime = addedTimingNodes[a];
+						actionHandler = (actionTime.element as SMILMediaElement).handler;
+						
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): ADD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						this.addTimingNodeHandlerToActiveList(actionTime);
+					}
+					// Removals
+					for(var r:int=0; r<removedTimingNodes.length; r++)
+					{
+						actionTime = removedTimingNodes[r];
+						actionHandler = (actionTime.element as SMILMediaElement).handler;
+						
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): REMOVE "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						this.removeTimingNodeHandlerFromActiveList(actionTime);
+					}
+					// Modifications
+					for(var m:int=0; m<modifiedTimingNodes.length; m++)
+					{
+						actionTime = modifiedTimingNodes[m];
+						actionHandler = (actionTime.element as SMILMediaElement).handler;
+						
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): MOD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						this.timingNodeModifiedOnActiveList(actionTime);
+					}
 				}
 				
 				// Remove anything no longer found on the timing graph

@@ -224,12 +224,6 @@ package org.smilkit.dom.smil
 					{
 						this._resolvedOffset = endLimit;
 					}
-					
-					trace(" ");
-					trace(" ");
-					trace(" >> begin: "+(this._baseElement as ElementTimeContainer).begin.first.resolvedOffset+" limit: "+endLimit+" offset: "+this._resolvedOffset+" <<");
-					trace(" ");
-					trace(" ");
 				}
 			}
 		}

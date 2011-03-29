@@ -210,7 +210,7 @@ package org.smilkit.handler
 			
 			if((this._activeOnRenderTree || hardInvalidation) && ((!hadStartedLoading) || (hadStartedLoading && hadCompletedLoading)))
 			{
-				var msg:String = "Performing hard invalidate+reload as ref handler is ";
+				var msg:String = "Performing hard invalidation with reload as ref handler is ";
 				if(this._activeOnRenderTree) msg += "[active on the RenderTree]";
 				if(hardInvalidation) msg += "[explicitly hard-invalidating]";
 				if(!hadStartedLoading) msg += "[not already loaded]";
@@ -221,7 +221,7 @@ package org.smilkit.handler
 			}
 			else
 			{
-				SMILKit.logger.debug("Performing soft invalidation on SMILReferenceHandler load flags", this);
+				SMILKit.logger.debug("Performing soft invalidation on SMILReferenceHandler load flags (active: "+this._activeOnRenderTree+" hadStarted: "+hadStartedLoading+", hadCompleted: "+hadCompletedLoading+")", this);
 			}
 		}
 		

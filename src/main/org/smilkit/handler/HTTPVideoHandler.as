@@ -318,22 +318,36 @@ package org.smilkit.handler
 		{
 			if (this._netStream != null && this._startedLoading)
 			{
+				var minPercentageForReset:int = 6;
 				var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 				var durationLoaded:Number = ((percentageLoaded / 100) * this.duration);
 				
-				SMILKit.logger.debug("readyToPlayAt: Loaded "+percentageLoaded+"% of file, equating to "+durationLoaded+"ms of playtime. Desired offset is "+offset+"ms.", this);
-				
-				if (offset == 0)
+				if(durationLoaded >= 0)
 				{
-					if (percentageLoaded < 6)
+					SMILKit.logger.debug("readyToPlayAt("+offset+"): Loaded "+percentageLoaded+"% of file, first "+durationLoaded+"ms available.", this);
+					if (offset == 0)
 					{
-						return false;
+						if (percentageLoaded < minPercentageForReset)
+						{
+							return false;
+						}
+					}
+
+					if (offset <= durationLoaded)
+					{
+						return true;
 					}
 				}
-				
-				if (offset <= durationLoaded)
+				else
 				{
-					return true;
+					if(offset == 0 && percentageLoaded >= minPercentageForReset)
+					{
+						return true;
+					}
+					else
+					{
+						SMILKit.logger.debug("readyToPlayAt("+offset+"): Loaded "+percentageLoaded+"% of file, but duration is unknown.", this);
+					}
 				}
 			}
 			
@@ -530,14 +544,14 @@ package org.smilkit.handler
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
-			SMILKit.logger.debug("Handler encountered an IO error during load.", this);
+			SMILKit.logger.error("Handler encountered an IO error during load.", this);
 			this.cancel();
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
 		protected function onSecurityErrorEvent(e:SecurityErrorEvent):void
 		{
-			SMILKit.logger.debug("Handler encountered a security error during load.", this);
+			SMILKit.logger.error("Handler encountered a security error during load.", this);
 			this.cancel();			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
@@ -545,7 +559,7 @@ package org.smilkit.handler
 		
 		protected function onAsyncErrorEvent(e:AsyncErrorEvent):void
 		{
-			SMILKit.logger.debug("Handler encountered an async error during load: "+e.text+", "+e.error.name+", "+e.error.message, this);
+			SMILKit.logger.error("Handler encountered an async error during load: "+e.text+", "+e.error.name+", "+e.error.message, this);
 		}
 		
 		public function onCuePoint(info:Object):void
@@ -563,6 +577,7 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
+				SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
@@ -574,8 +589,6 @@ package org.smilkit.handler
 			{
 				this._metadata.update(info);
 			}
-			
-			SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());			
 			this.resolved(this._metadata.duration);
 		}
 		
