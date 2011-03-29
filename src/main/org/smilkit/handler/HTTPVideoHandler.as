@@ -181,6 +181,17 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
+		public override function movedToJustInTimeWorkList():void
+		{
+			if (this.completedLoading)
+			{
+				SMILKit.logger.debug("HTTPVideoHandler "+this.handlerId+" moved to JIT worker. Will reset play head before calling super", this);
+				this.seek(0);
+				// were ready since load has finished!
+			}
+			super.movedToJustInTimeWorkList();
+		}
+		
 		public override function setVolume(volume:uint):void
 		{
 			this._volume = volume;

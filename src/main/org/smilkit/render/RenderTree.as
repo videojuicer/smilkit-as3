@@ -627,6 +627,7 @@ package org.smilkit.render
 						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): MOD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
 						this.timingNodeModifiedOnActiveList(actionTime);
 					}
+					this.syncHandlersToViewportState();
 				}
 				
 				// Remove anything no longer found on the timing graph
