@@ -10,7 +10,7 @@ package org.smilkit.time
 		
 		public function SharedTimer(blocker:SharedTimerBlocker)
 		{
-			super(delay, repeatCount);
+			super(SharedTimer.DELAY, 0);
 			
 			// start automatically
 			super.start();
