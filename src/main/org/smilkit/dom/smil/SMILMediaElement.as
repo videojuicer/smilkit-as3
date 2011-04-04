@@ -319,6 +319,8 @@ package org.smilkit.dom.smil
 		{
 			super.ancestorChanged(newAncestor);
 			
+			SMILKit.logger.error("AncestorChanged: "+newAncestor);
+			
 			// ancestor was removed, so were now an orphan?
 			if (newAncestor == null)
 			{
@@ -330,7 +332,7 @@ package org.smilkit.dom.smil
 				this._handler = null;
 			}
 			// ancestor was added
-			else if (!this.orphaned)
+			else
 			{
 				this.updateHandler();
 				

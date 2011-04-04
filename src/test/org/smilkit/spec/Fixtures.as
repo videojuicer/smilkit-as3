@@ -188,6 +188,15 @@ package org.smilkit.spec
 			"</par>                                      " +
 			"</body></smil>";
 		
+		public static var UNRESOLVED_CHILD_SETS_DUR_IN_REF_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<ref>                                       " +
+			"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
+			"<video id=\"video_2\" src=\"2.mp4\" />          " +
+			"</ref>                                      " +
+			"</body></smil>";
+		
 		public static var REF_AND_BASE_TAGS_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout><meta base=\"http://hello\" /></head>" +
 			"<body>" +

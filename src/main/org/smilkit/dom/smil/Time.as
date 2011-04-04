@@ -357,6 +357,13 @@ package org.smilkit.dom.smil
 				var dur:Number = baseElementTimeContainer.duration;
 				this._resolvedOffset = (baseElementTimeContainer.begin.first.resolvedOffset + dur);
 				
+				if (dur == 0 && (this._baseElement as ElementTimeContainer).id == "video-223_usage-2")
+				{
+					trace("here");
+					
+					var d:Number = baseElementTimeContainer.duration;
+				}
+				
 				if (previousSiblingEndTimesResolved && (baseElementTimeContainer.durationResolved || this._resolveWithoutDuration))
 				{
 					//Logger.debug("Break: "+previousSiblingEndTimesResolved+" "+baseElementTimeContainer.durationResolved+" "+this._resolveWithoutDuration, this);

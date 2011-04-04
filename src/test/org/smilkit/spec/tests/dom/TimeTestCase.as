@@ -210,6 +210,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
 			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
 			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
+			Assert.assertEquals(Time.UNRESOLVED, container.duration);
 		}
 		
 		[Test(description="Unresolved child sets the duration in a par. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
@@ -229,6 +230,27 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
 			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
 			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
+			Assert.assertEquals(Time.UNRESOLVED, container.duration);
+		}
+		
+		[Test(description="Unresolved child sets the duration in a ref. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
+		public function parentRefStaysUnresolved():void
+		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var document:SMILDocument = (parser.parse(Fixtures.UNRESOLVED_CHILD_SETS_DUR_IN_REF_SMIL_XML) as SMILDocument);
+			
+			var container:ElementTimeContainer = (document.getElementsByTagName("ref").item(0) as ElementTimeContainer);
+			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
+			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
+			
+			video1.resolve();
+			video2.resolve();
+			container.resolve();
+			
+			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
+			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
+			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
+			Assert.assertEquals(Time.UNRESOLVED, container.duration);
 		}
 		
 		private function get document():SMILDocument

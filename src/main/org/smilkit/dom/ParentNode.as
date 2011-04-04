@@ -146,7 +146,7 @@ package org.smilkit.dom
 			var newInternal:ChildNode = (newChild as ChildNode);
 			var refInternal:ChildNode = (refChild as ChildNode);
 			
-			newInternal.parentNode = this;
+			(newInternal as ParentNode).parentNode = this;
 
 			// first + only child
 			if (this.firstChild == null)
