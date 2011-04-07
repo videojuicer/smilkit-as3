@@ -173,11 +173,6 @@ package org.smilkit.handler
 			
 			this.drawClickShield(this._video);
 			
-			if (this._attachVideoDisplayDelayed)
-			{
-				this.attachVideoDisplay();
-			}
-			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
@@ -486,6 +481,9 @@ package org.smilkit.handler
 		protected function attachVideoDisplay():void
 		{
 			this._video.attachNetStream(this._netStream as NetStream);
+			this._attachVideoDisplayDelayed = false;
+			
+			this.resize();
 		}
 		
 		protected function clearVideoDisplay():void
@@ -600,7 +598,13 @@ package org.smilkit.handler
 			{
 				this._metadata.update(info);
 			}
+
 			this.resolved(this._metadata.duration);
+			
+			if (this._attachVideoDisplayDelayed)
+			{
+				this.attachVideoDisplay();
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap
