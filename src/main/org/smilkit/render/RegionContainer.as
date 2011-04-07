@@ -4,6 +4,7 @@ package org.smilkit.render
 	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
+	import flash.display.StageDisplayState;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
 	import flash.events.MouseEvent;
@@ -20,6 +21,7 @@ package org.smilkit.render
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.Viewport;
+	import org.utilkit.util.Environment;
 
 	public class RegionContainer extends Sprite
 	{
@@ -246,7 +248,8 @@ package org.smilkit.render
 						// Blank-targeted links navigate the browser
 						SMILKit.logger.debug("Region with link context about to launch web link with href '"+href+"'", this);
 						var req:URLRequest = new URLRequest(href);
-						navigateToURL(req);
+						
+						Environment.openWindow(req);
 						
 						if(viewport != null)
 						{
