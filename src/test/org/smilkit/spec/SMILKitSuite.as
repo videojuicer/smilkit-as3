@@ -10,8 +10,9 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.ElementTestCase;
 	import org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase;
 	import org.smilkit.spec.tests.dom.EventTestCase;
-	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.dom.ParentNodeTestCase;
+	import org.smilkit.spec.tests.dom.TimeTestCase;
+	import org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILMediaElementTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
@@ -42,6 +43,7 @@ package org.smilkit.spec
 		public var elementTimeDescendantNodeList:ElementTimeDescendantNodeListTestCase;
 		public var smilMediaElementTest:SMILMediaElementTestCase;		
 		public var parentNodeTest:ParentNodeTestCase;
+		public var elementTestContainer:ElementTestContainerTestCase;
 		
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;

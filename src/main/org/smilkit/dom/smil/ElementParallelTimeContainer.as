@@ -5,7 +5,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	
-	public class ElementParallelTimeContainer extends ElementTimeContainer implements IElementParallelTimeContainer
+	public class ElementParallelTimeContainer extends ElementTestContainer implements IElementParallelTimeContainer
 	{
 		public function ElementParallelTimeContainer(owner:IDocument, name:String)
 		{

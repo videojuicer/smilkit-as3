@@ -70,6 +70,12 @@
     <classEntry path="org.smilkit.spec.tests.dom.ElementTimeDescendantNodeListTestCase"/>
     <classEntry path="org.smilkit.handler.RTMPAudioHandler"/>
     <classEntry path="org.smilkit.time.SharedTimer"/>
+    <classEntry path="org.smilkit.dom.smil.SMILDocumentVariables"/>
+    <classEntry path="org.smilkit.dom.smil.events.SMILMutationEvent"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTest"/>
+    <classEntry path="org.smilkit.dom.smil.ElementTestContainer"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

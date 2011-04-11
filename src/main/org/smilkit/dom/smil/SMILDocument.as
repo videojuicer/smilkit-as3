@@ -5,7 +5,6 @@ package org.smilkit.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
@@ -21,17 +20,27 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.smilkit.w3c.dom.smil.ISMILSwitchElement;
 	import org.smilkit.w3c.dom.smil.ITimeList;
+	import org.utilkit.logger.Logger;
 	
 	public class SMILDocument extends Document implements ISMILDocument
 	{
 		protected var _beginList:ITimeList;
 		protected var _endList:ITimeList;
 		
+		protected var _variables:SMILDocumentVariables;
+		
 		protected var _viewportObjectPool:ViewportObjectPool;
 		
 		public function SMILDocument(documentType:IDocumentType)
 		{
 			super(documentType);
+			
+			this._variables = new SMILDocumentVariables(this);
+		}
+		
+		public function get variables():SMILDocumentVariables
+		{
+			return this._variables;
 		}
 		
 		public function get viewportObjectPool():ViewportObjectPool

@@ -18,7 +18,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILRegionInterface;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	
-	public class SMILMediaElement extends ElementTimeContainer implements ISMILMediaElement, ISMILRegionInterface
+	public class SMILMediaElement extends ElementTestContainer implements ISMILMediaElement, ISMILRegionInterface
 	{
 		protected var _handler:SMILKitHandler;
 		protected var _region:SMILRegionElement;
