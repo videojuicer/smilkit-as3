@@ -21,7 +21,7 @@ package org.smilkit.spec.tests.dom.smil
 			
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_AUDIO_DESC, "off");
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_BASE_PROFILE, "");
-			this._document.variables.set(SMILDocumentVariables.SYSTEM_BITRATE, "58000");
+			this._document.variables.set(SMILDocumentVariables.SYSTEM_BITRATE, 58000);
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_CAPTIONS, "off");
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_COMPONENT, "");
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_CONTENT_LOCATION, "");
@@ -33,7 +33,7 @@ package org.smilkit.spec.tests.dom.smil
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_REQUIRED, "");
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_DEPTH, "32");
 			this._document.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_SIZE, "1680x1520");
-			this._document.variables.set(SMILDocumentVariables.SYSTEM_VERSION, "3.0");
+			this._document.variables.set(SMILDocumentVariables.SYSTEM_VERSION, 3.0);
 		}
 		
 		[After]

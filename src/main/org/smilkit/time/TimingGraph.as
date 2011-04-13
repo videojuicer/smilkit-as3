@@ -8,10 +8,13 @@ package org.smilkit.time
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.SMILSwitchElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.dom.smil.TimeList;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.view.ViewportObjectPool;
+	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -52,6 +55,11 @@ package org.smilkit.time
 			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED, this.onMutationEvent, false);
 			this.document.addEventListener(MutationEvent.DOM_NODE_REMOVED_FROM_DOCUMENT, this.onMutationEvent, false);
 			this.document.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onMutationEvent, false);
+		
+			// smil dom mutation events
+			this.document.addEventListener(SMILMutationEvent.DOM_VARIABLES_INSERTED, this.onDocumentVariablesModified, false);
+			this.document.addEventListener(SMILMutationEvent.DOM_VARIABLES_MODIFIED, this.onDocumentVariablesModified, false);
+			this.document.addEventListener(SMILMutationEvent.DOM_VARIABLES_REMOVED, this.onDocumentVariablesModified, false);
 		}
 		
 		public function get elements():Vector.<TimingNode>
@@ -97,54 +105,7 @@ package org.smilkit.time
 			{
 				var child:INode = nodes.item(i);
 				
-				if (child is ElementTimeContainer)
-				{
-					var container:ElementTimeContainer = (child as ElementTimeContainer);
-					
-					SMILKit.logger.debug("Found ElementTimeContainer "+(container.hasAttribute("id") ? container.getAttribute("id") : ""));
-					
-					containers.push(container);
-				}
-				
-				if (child is ISMILMediaElement)
-				{
-					var el:SMILMediaElement = (child as SMILMediaElement);
-					
-					el.resolve();
-					
-					if (el.handler != null)
-					{ 
-						var begin:int = Time.UNRESOLVED;
-						var end:int = Time.UNRESOLVED;
-						
-						if ((el.begin as TimeList).resolved)
-						{
-							begin = el.begin.first.resolvedOffset;
-						}
-						
-						if ((el.end as TimeList).resolved)
-						{
-							end = el.end.first.resolvedOffset;
-						}
-						
-						SMILKit.logger.debug("TimingGraph rebuild: Adding "+el.tagName+" ("+el.src+") Begin: "+
-										((begin == Time.UNRESOLVED)? "UNRESOLVED" : ((begin == Time.INDEFINITE)? "INDEFINITE" : begin))+
-										", end: "+
-										((end == Time.UNRESOLVED)? "UNRESOLVED" : ((end == Time.INDEFINITE)? "INDEFINITE" : end)), 
-										this);
-						
-						var timeElement:TimingNode = new TimingNode(el, begin, end);
-						
-						this._elements.push(timeElement);
-						
-						this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
-					}
-				}
-				
-				if (child.hasChildNodes())
-				{
-					this.iterateTree(child);
-				}
+				containers = this.processNode(containers, child);
 			}
 			
 			if (containers.length > 0)
@@ -156,6 +117,72 @@ package org.smilkit.time
 					timeContainer.resolve();
 				}
 			}
+		}
+		
+		protected function processNode(containers:Vector.<ElementTimeContainer>, child:INode):Vector.<ElementTimeContainer>
+		{
+			if (child is ElementTimeContainer)
+			{
+				var container:ElementTimeContainer = (child as ElementTimeContainer);
+				
+				SMILKit.logger.debug("Found ElementTimeContainer "+(container.hasAttribute("id") ? container.getAttribute("id") : ""));
+				
+				containers.push(container);
+			}
+			
+			if (child is ISMILMediaElement)
+			{
+				var el:SMILMediaElement = (child as SMILMediaElement);
+				
+				el.resolve();
+				
+				if (el.handler != null)
+				{ 
+					var begin:int = Time.UNRESOLVED;
+					var end:int = Time.UNRESOLVED;
+					
+					if ((el.begin as TimeList).resolved)
+					{
+						begin = el.begin.first.resolvedOffset;
+					}
+					
+					if ((el.end as TimeList).resolved)
+					{
+						end = el.end.first.resolvedOffset;
+					}
+					
+					SMILKit.logger.debug("TimingGraph rebuild: Adding "+el.tagName+" ("+el.src+") Begin: "+
+						((begin == Time.UNRESOLVED)? "UNRESOLVED" : ((begin == Time.INDEFINITE)? "INDEFINITE" : begin))+
+						", end: "+
+						((end == Time.UNRESOLVED)? "UNRESOLVED" : ((end == Time.INDEFINITE)? "INDEFINITE" : end)), 
+						this);
+					
+					var timeElement:TimingNode = new TimingNode(el, begin, end);
+					
+					this._elements.push(timeElement);
+					
+					this.dispatchEvent(new TimingGraphEvent(TimingGraphEvent.ELEMENT_ADDED));
+				}
+			}
+			
+			if (child is SMILSwitchElement)
+			{
+				var switchElement:SMILSwitchElement = (child as SMILSwitchElement);
+				var selectedElement:IElement = switchElement.selectedElement;
+				
+				if (selectedElement != null)
+				{
+					(selectedElement as ElementTimeContainer).resolve();
+					
+					containers = this.processNode(containers, selectedElement);
+				}
+			}
+			else if (child.hasChildNodes())
+			{
+				this.iterateTree(child);
+			}
+			
+			return containers;
 		}
 		
 		/**
@@ -172,6 +199,12 @@ package org.smilkit.time
 		protected function onHandlerModified(e:MutationEvent):void
 		{
 			SMILKit.logger.debug("A handler was modified - about to rebuild TimingGraph", this);
+			this.rebuild();
+		}
+		
+		protected function onDocumentVariablesModified(e:SMILMutationEvent):void
+		{
+			SMILKit.logger.debug("Received SMIL Mutation event of type "+e.type+". Attr name: "+e.attrName+", new value: "+e.newValue+" prev value: "+e.prevValue, this);
 			this.rebuild();
 		}
 	}

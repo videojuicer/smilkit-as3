@@ -31,26 +31,7 @@ package org.smilkit.dom.smil
 		
 		public function get systemBitrate():uint
 		{
-			var attributeValue:String = this.getAttribute(SMILDocumentVariables.SYSTEM_BITRATE);
-			
-			if (attributeValue != null && attributeValue != null)
-			{
-				var documentValue:String = (this.variables.get(SMILDocumentVariables.SYSTEM_BITRATE) as String);
-				
-				var attributeBitrate:uint = new uint(attributeValue);
-				var documentBitrate:uint = new uint(documentValue);
-				
-				if (attributeBitrate <= documentBitrate)
-				{
-					return ElementTestContainer.TEST_PASSED;
-				}
-			}
-			else
-			{
-				return ElementTestContainer.TEST_SKIPPED;
-			}
-			
-			return ElementTestContainer.TEST_FAILED;
+			return this.testAttribute(SMILDocumentVariables.SYSTEM_BITRATE);
 		}
 		
 		public function get systemCaptions():uint
@@ -170,7 +151,7 @@ package org.smilkit.dom.smil
 			
 			if (attributeValue != null)
 			{
-				var documentValue:String = (this.variables.get(attributeName) as String);
+				var documentValue:Object = (this.variables.get(attributeName) as Object);
 				
 				// set a null value to an empty string so we can still validate
 				if (documentValue == null)
@@ -178,9 +159,19 @@ package org.smilkit.dom.smil
 					documentValue = "";
 				}
 				
-				if (attributeValue == documentValue)
+				if (documentValue is Number)
 				{
-					return ElementTestContainer.TEST_PASSED;
+					if (attributeValue <= documentValue)
+					{
+						return ElementTestContainer.TEST_PASSED;
+					}
+				}
+				else
+				{
+					if (attributeValue == documentValue)
+					{
+						return ElementTestContainer.TEST_PASSED;
+					}
 				}
 			}
 			else

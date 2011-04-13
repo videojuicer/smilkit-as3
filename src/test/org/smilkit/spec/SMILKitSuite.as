@@ -15,6 +15,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILMediaElementTestCase;
+	import org.smilkit.spec.tests.dom.smil.SMILSwitchElementTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
 	import org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase;
@@ -46,6 +47,7 @@ package org.smilkit.spec
 		public var parentNodeTest:ParentNodeTestCase;
 		public var elementTestContainerTest:ElementTestContainerTestCase;
 		public var smilDocumentVariablesTest:SMILDocumentVariablesTestCase;
+		public var smilSwitchElementTest:SMILSwitchElementTestCase;
 		
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;

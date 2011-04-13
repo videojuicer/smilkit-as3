@@ -1,10 +1,12 @@
 package org.smilkit.dom.smil
 {
 	import flash.errors.IllegalOperationError;
+	import flash.system.Capabilities;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
@@ -21,6 +23,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILSwitchElement;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	import org.utilkit.logger.Logger;
+	import org.utilkit.util.Environment;
 	
 	public class SMILDocument extends Document implements ISMILDocument
 	{
@@ -35,7 +38,7 @@ package org.smilkit.dom.smil
 		{
 			super(documentType);
 			
-			this._variables = new SMILDocumentVariables(this);
+			this.setupDocumentVariables();
 		}
 		
 		public function get variables():SMILDocumentVariables
@@ -243,6 +246,31 @@ package org.smilkit.dom.smil
 			return null;
 		}
 		
+		public function setupDocumentVariables():void
+		{
+			this._variables = new SMILDocumentVariables(this);
+			
+			// SMIL 3.0 default system variables
+			this.variables.set(SMILDocumentVariables.SYSTEM_AUDIO_DESC, "off");
+			this.variables.set(SMILDocumentVariables.SYSTEM_BASE_PROFILE, "");
+			this.variables.set(SMILDocumentVariables.SYSTEM_BITRATE, 0);
+			this.variables.set(SMILDocumentVariables.SYSTEM_CAPTIONS, "off");
+			this.variables.set(SMILDocumentVariables.SYSTEM_COMPONENT, "");
+			this.variables.set(SMILDocumentVariables.SYSTEM_CONTENT_LOCATION, "");
+			this.variables.set(SMILDocumentVariables.SYSTEM_CPU, Environment.cpuArchitecture);
+			this.variables.set(SMILDocumentVariables.SYSTEM_LANGUAGE, Environment.language);
+			this.variables.set(SMILDocumentVariables.SYSTEM_OPERATING_SYSTEM, Environment.operatingSystem);
+			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_CAPTION, "overdub");
+			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_SUBTITLE, "overdub");
+			this.variables.set(SMILDocumentVariables.SYSTEM_REQUIRED, "");
+			this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_DEPTH, 0);
+			this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_SIZE, Environment.screenSize);
+			this.variables.set(SMILDocumentVariables.SYSTEM_VERSION, 3.0);
+			
+			// magic SMILKit variables
+			this.variables.set("smilkitVersion", SMILKit.version);
+		}
+
 		protected override function beforeDispatchAggregateEvents():void
 		{
 			this.invalidateCachedTimes();

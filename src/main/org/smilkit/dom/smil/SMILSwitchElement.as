@@ -5,11 +5,37 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.ISMILSwitchElement;
 	
-	public class SMILSwitchElement extends SMILElement implements ISMILSwitchElement
+	public class SMILSwitchElement extends ElementParallelTimeContainer implements ISMILSwitchElement
 	{
 		public function SMILSwitchElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
+		}
+		
+		public override function get durationResolved():Boolean
+		{
+			var selected:IElement = this.selectedElement;
+			
+			if (selected != null)
+			{
+				return (selected as ElementTimeContainer).durationResolved;
+			}
+			
+			return true;
+		}
+		
+		public override function get duration():Number
+		{
+			var selected:ElementTimeContainer = (this.selectedElement as ElementTimeContainer);
+			
+			if (selected != null)
+			{
+				selected.resolve();
+				
+				return selected.duration;
+			}
+			
+			return 0;
 		}
 		
 		public function get selectedElement():IElement
@@ -30,7 +56,6 @@ package org.smilkit.dom.smil
 					}
 				}
 			}
-			
 			
 			return (selected as IElement);
 		}

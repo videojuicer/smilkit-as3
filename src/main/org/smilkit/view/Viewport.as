@@ -15,6 +15,7 @@ package org.smilkit.view
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
@@ -796,7 +797,7 @@ package org.smilkit.view
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 		}
-		
+
 		/**
 		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
 		* during playback. Emits a public-facing viewport event.
