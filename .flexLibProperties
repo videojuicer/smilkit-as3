@@ -77,6 +77,9 @@
     <classEntry path="org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.SMILSwitchElementTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.ElementExclusiveTimeContainer"/>
+    <classEntry path="org.smilkit.parsers.SMILEventParser"/>
+    <classEntry path="org.smilkit.parsers.tokenizer.ITokenContext"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

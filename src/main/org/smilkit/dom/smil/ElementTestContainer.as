@@ -2,12 +2,20 @@ package org.smilkit.dom.smil
 {
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.IElementTest;
+	import org.utilkit.expressions.ExpressionEngine;
+	import org.utilkit.expressions.parsers.BooleanExpressionParser;
 	
 	public class ElementTestContainer extends ElementTimeContainer implements IElementTest
 	{	
 		public static const TEST_PASSED:uint = 1;
 		public static const TEST_SKIPPED:uint = 2;
 		public static const TEST_FAILED:uint = 0;
+		
+		public static const RENDER_STATE_HIDDEN:uint = 0;
+		public static const RENDER_STATE_ACTIVE:uint = 1;
+		public static const RENDER_STATE_DISABLED:uint = 2;
+		
+		protected var _renderState:uint = ElementTestContainer.RENDER_STATE_ACTIVE;
 		
 		public function ElementTestContainer(owner:IDocument, name:String)
 		{
@@ -101,6 +109,45 @@ package org.smilkit.dom.smil
 			return ElementTestContainer.TEST_SKIPPED;
 		}
 		
+		public function get expression():uint
+		{
+			var expr:String = this.getAttribute("expr");
+			
+			if (expr != null && expr != "")
+			{
+				   var parser:ExpressionEngine = new ExpressionEngine();
+				   var result:Number = parser.begin(expr);
+				   
+				   if (result >= 1)
+				   {
+					   return ElementTestContainer.TEST_PASSED;
+				   }
+				   
+				   return ElementTestContainer.TEST_FAILED;
+			}
+			
+			return ElementTestContainer.TEST_SKIPPED;
+		}
+		
+		public function get renderState():uint
+		{
+			return this._renderState;
+		}
+		
+		public function updateRenderState():void
+		{
+			if (!this.test())
+			{
+				this._renderState = ElementTestContainer.RENDER_STATE_HIDDEN;
+			}
+			else
+			{
+				// do some stuff to determine if its disabled or not
+				
+				this._renderState = ElementTestContainer.RENDER_STATE_ACTIVE;
+			}
+		}
+		
 		public function test():Boolean
 		{
 			var results:Vector.<uint> = new Vector.<uint>();
@@ -120,6 +167,7 @@ package org.smilkit.dom.smil
 			results.push(this.systemScreenSize);
 			results.push(this.systemVersion);
 			results.push(this.customTest);
+			results.push(this.expression);
 			
 			// run the tests on the Element
 			var skips:uint = 0;

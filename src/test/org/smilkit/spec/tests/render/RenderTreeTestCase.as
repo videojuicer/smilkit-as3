@@ -7,6 +7,7 @@ package org.smilkit.spec.tests.render
 	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.RenderTree;
+	import org.smilkit.spec.Fixtures;
 	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
 
@@ -91,6 +92,24 @@ package org.smilkit.spec.tests.render
 		protected function handleHasNextChangeOffSetTimeOut(passThroughData:Object):void
 		{
 			Assert.fail( "Timeout reached before viewport refreshed: hasNextChangeOffSet");
+		}
+		
+		[Test(async, description="Tests that elements with a render state are kept off the render tree")]
+		public function elementsWithFailingTestsHide():void
+		{
+			var asyncElementsCheck:Function = Async.asyncHandler(this, this.elementsWithFailingTestsHide_refreshed, 2000, null, this.elementsWithFailingTestsHide_refreshedTimeout);
+			
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncElementsCheck, false, 0, true);
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.ELEMENT_BASIC_TEST_SMIL_XML;
+		}		
+		protected function elementsWithFailingTestsHide_refreshed(e:ViewportEvent, passThru:Object):void
+		{
+			Assert.assertEquals(3, this._viewport.renderTree.elements.length);
+			Assert.assertEquals(13, this._viewport.timingGraph.elements.length);
+		}
+		protected function elementsWithFailingTestsHide_refreshedTimeout(passThroughData:Object):void
+		{
+			Assert.fail( "Timeout reached before viewport refreshed: elementsWithFailingTestsHide");
 		}
 	}
 }

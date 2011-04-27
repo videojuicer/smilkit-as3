@@ -42,7 +42,38 @@ package org.smilkit.spec.tests.dom.smil
 			this._document = null;
 		}
 		
-		[Test(description="Tests than an element can match against systemAudioDesc")]
+		[Test(description="Tests that the renderState is set correctly during tests")]
+		public function testRenderState():void
+		{
+			var element:ElementTestContainer = (this._document.getElementById("booleanExpression") as ElementTestContainer);
+			
+			element.updateRenderState();
+			
+			Assert.assertEquals(ElementTestContainer.RENDER_STATE_ACTIVE, element.renderState);
+			
+			element = (this._document.getElementById("fail_booleanExpression") as ElementTestContainer);
+			
+			element.updateRenderState();
+			
+			Assert.assertEquals(ElementTestContainer.RENDER_STATE_HIDDEN, element.renderState);
+		}
+		
+		[Test(description="Tests that an element can match against a custom boolean expression")]
+		public function testAgainstBooleanExpression():void
+		{
+			var element:ElementTestContainer = (this._document.getElementById("booleanExpression") as ElementTestContainer);
+			var failed:ElementTestContainer = (this._document.getElementById("fail_booleanExpression") as ElementTestContainer);
+			var empty:ElementTestContainer = (this._document.getElementById("empty") as ElementTestContainer);
+			
+			Assert.assertEquals(ElementTestContainer.TEST_PASSED, element.expression);
+			Assert.assertEquals(ElementTestContainer.TEST_SKIPPED, empty.expression);
+			Assert.assertEquals(ElementTestContainer.TEST_FAILED, failed.expression);
+			
+			Assert.assertTrue(element.test());
+			Assert.assertFalse(failed.test());
+		}
+		
+		[Test(description="Tests that an element can match against systemAudioDesc")]
 		public function testAgainstSystemAudioDesc():void
 		{
 			var element:ElementTestContainer = (this._document.getElementById("systemAudioDesc") as ElementTestContainer);

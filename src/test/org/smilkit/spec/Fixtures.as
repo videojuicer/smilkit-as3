@@ -248,43 +248,68 @@ package org.smilkit.spec
 		public static var ELEMENT_TEST_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
 			"<body>"+
-				"<seq>"+
-					"<video id=\"empty\" />"+
+				"<par>"+
+					"<video dur=\"5s\" id=\"empty\" src=\"http://smilkit.org/demo.mp4\" />"+
 				
-					"<video id=\"systemAudioDesc\" systemAudioDesc=\"off\" />"+
-					"<video id=\"systemBaseProfile\" systemBaseProfile=\"\" />"+
-					"<video id=\"systemBitrate\" systemBitrate=\"56000\" />"+
-					"<video id=\"systemCaptions\" systemCaptions=\"off\" />"+
-					"<video id=\"systemComponent\" systemComponent=\"\" />"+
-					"<video id=\"systemContentLocation\" systemContentLocation=\"\" />"+
-					"<video id=\"systemCPU\" systemCPU=\"x64\" />"+
-					"<video id=\"systemLanguage\" systemLanguage=\"\" />"+
-					"<video id=\"systemOperatingSystem\" systemOperatingSystem=\"linux\" />"+
-					"<video id=\"systemOverdubOrCaption\" systemOverdubOrCaption=\"caption\" />"+
-					"<video id=\"systemOverdubOrSubtitle\" systemOverdubOrSubtitle=\"subtitle\" />"+
-					"<video id=\"systemRequired\" systemRequired=\"\" />"+
-					"<video id=\"systemScreenDepth\" systemScreenDepth=\"32\" />"+
-					"<video id=\"systemScreenSize\" systemScreenSize=\"1680x1520\" />"+
-					"<video id=\"systemVersion\" systemVersion=\"3.0\" />"+
+					"<video dur=\"5s\" id=\"systemAudioDesc\" systemAudioDesc=\"off\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemBaseProfile\" systemBaseProfile=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemBitrate\" systemBitrate=\"56000\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemCaptions\" systemCaptions=\"off\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemComponent\" systemComponent=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemContentLocation\" systemContentLocation=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemCPU\" systemCPU=\"x64\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemLanguage\" systemLanguage=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemOperatingSystem\" systemOperatingSystem=\"linux\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemOverdubOrCaption\" systemOverdubOrCaption=\"caption\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemOverdubOrSubtitle\" systemOverdubOrSubtitle=\"subtitle\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemRequired\" systemRequired=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemScreenDepth\" systemScreenDepth=\"32\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemScreenSize\" systemScreenSize=\"1680x1520\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"systemVersion\" systemVersion=\"3.0\" src=\"http://smilkit.org/demo.mp4\" />"+
 					
-					"<video id=\"double_test\" systemVersion=\"\" systemCPU=\"\" />"+
+					"<video dur=\"5s\" id=\"double_test\" systemVersion=\"\" systemCPU=\"\" src=\"http://smilkit.org/demo.mp4\" />"+
 					
-					"<video id=\"fail_systemAudioDesc\" systemAudioDesc=\"on\" />"+
-					"<video id=\"fail_systemBaseProfile\" systemBaseProfile=\"Daisy\" />"+
-					"<video id=\"fail_systemBitrate\" systemBitrate=\"5600000\" />"+
-					"<video id=\"fail_systemCaptions\" systemCaptions=\"on\" />"+
-					"<video id=\"fail_systemComponent\" systemComponent=\"booooom\" />"+
-					"<video id=\"fail_systemContentLocation\" systemContentLocation=\"STORAGE\" />"+
-					"<video id=\"fail_systemCPU\" systemCPU=\"arm\" />"+
-					"<video id=\"fail_systemLanguage\" systemLanguage=\"fr\" />"+
-					"<video id=\"fail_systemOperatingSystem\" systemOperatingSystem=\"windows\" />"+
-					"<video id=\"fail_systemOverdubOrCaption\" systemOverdubOrCaption=\"overdub\" />"+
-					"<video id=\"fail_systemOverdubOrSubtitle\" systemOverdubOrSubtitle=\"overdub\" />"+
-					"<video id=\"fail_systemRequired\" systemRequired=\"DaisyChain\" />"+
-					"<video id=\"fail_systemScreenDepth\" systemScreenDepth=\"64\" />"+
-					"<video id=\"fail_systemScreenSize\" systemScreenSize=\"10240x51020\" />"+
-					"<video id=\"fail_systemVersion\" systemVersion=\"4.0\" />"+
-				"</seq>"+
+					"<video dur=\"5s\" id=\"fail_systemAudioDesc\" systemAudioDesc=\"on\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemBaseProfile\" systemBaseProfile=\"Daisy\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemBitrate\" systemBitrate=\"5600000\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemCaptions\" systemCaptions=\"on\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemComponent\" systemComponent=\"booooom\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemContentLocation\" systemContentLocation=\"STORAGE\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemCPU\" systemCPU=\"arm\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemLanguage\" systemLanguage=\"fr\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemOperatingSystem\" systemOperatingSystem=\"windows\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemOverdubOrCaption\" systemOverdubOrCaption=\"overdub\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemOverdubOrSubtitle\" systemOverdubOrSubtitle=\"overdub\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemRequired\" systemRequired=\"DaisyChain\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemScreenDepth\" systemScreenDepth=\"64\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemScreenSize\" systemScreenSize=\"10240x51020\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_systemVersion\" systemVersion=\"4.0\" src=\"http://smilkit.org/demo.mp4\" />"+
+					
+					"<video dur=\"5s\" id=\"booleanExpression\" expr=\"10.0 == 10.0\" src=\"http://smilkit.org/demo.mp4\" />"+
+					"<video dur=\"5s\" id=\"fail_booleanExpression\" expr=\"4 == 3\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"</par>"+
+			"</body></smil>";
+		
+		public static var ELEMENT_BASIC_TEST_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>"+
+			"<par>"+
+				"<video dur=\"5s\" id=\"systemAudioDesc\" systemAudioDesc=\"off\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"systemVersion\" systemVersion=\"3.0\" src=\"http://smilkit.org/demo.mp4\" />"+
+
+				"<video dur=\"5s\" id=\"fail_systemCaptions\" systemCaptions=\"on\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemComponent\" systemComponent=\"booooom\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemContentLocation\" systemContentLocation=\"STORAGE\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemCPU\" systemCPU=\"arm\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemLanguage\" systemLanguage=\"fr\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemRequired\" systemRequired=\"DaisyChain\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemScreenDepth\" systemScreenDepth=\"64\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemScreenSize\" systemScreenSize=\"10240x51020\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_systemVersion\" systemVersion=\"4.0\" src=\"http://smilkit.org/demo.mp4\" />"+
+			
+				"<video dur=\"5s\" id=\"booleanExpression\" expr=\"10.0 == 10.0\" src=\"http://smilkit.org/demo.mp4\" />"+
+				"<video dur=\"5s\" id=\"fail_booleanExpression\" expr=\"4 == 3\" src=\"http://smilkit.org/demo.mp4\" />"+
+			"</par>"+
 			"</body></smil>";
 	}
 }

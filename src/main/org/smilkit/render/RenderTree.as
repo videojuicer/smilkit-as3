@@ -5,6 +5,7 @@ package org.smilkit.render
 	import flash.events.TimerEvent;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
@@ -566,29 +567,34 @@ package org.smilkit.render
 					// add active, non existant elements
 					else if (activeNow)
 					{
-						// only add to the canvas, when the element hasnt existed before
-						if (!alreadyExists)
+						element.updateRenderState();
+						
+						if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
 						{
-							this._lastChangeOffset = offset;
-							actionableChanges = true;
-							addedTimingNodes.push(time);
-							// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
-							// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
-							// viewport is currently playing.
-							if(!syncAfterUpdate && handler.seekable)
-							{
-								syncAfterUpdate = true;
-							}
-						}
-						else
-						{
-							// already exists
-							var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
-							if (time === previousTime && time != previousTime)
+							// only add to the canvas, when the element hasnt existed before
+							if (!alreadyExists)
 							{
 								this._lastChangeOffset = offset;
 								actionableChanges = true;
-								modifiedTimingNodes.push(time);
+								addedTimingNodes.push(time);
+								// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
+								// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
+								// viewport is currently playing.
+								if(!syncAfterUpdate && handler.seekable)
+								{
+									syncAfterUpdate = true;
+								}
+							}
+							else
+							{
+								// already exists
+								var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
+								if (time === previousTime && time != previousTime)
+								{
+									this._lastChangeOffset = offset;
+									actionableChanges = true;
+									modifiedTimingNodes.push(time);
+								}
 							}
 						}
 					}
