@@ -30,7 +30,7 @@ package org.smilkit
 	 */
 	public class SMILKit
 	{
-		private static var __version:String = "0.1.0";
+		private static var __version:String = "0.3.0";
 		private static var __handlers:Hashtable = new Hashtable();
 		private static var __applicationLog:ApplicationLog = new ApplicationLog("smilkit-as3");
 		

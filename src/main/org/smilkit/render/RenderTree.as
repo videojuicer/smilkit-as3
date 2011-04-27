@@ -518,6 +518,8 @@ package org.smilkit.render
 		 */		
 		public function updateAt(offset:Number):void
 		{
+			trace("updateAt -> "+offset);
+			
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
@@ -549,7 +551,7 @@ package org.smilkit.render
 					// Uncomment the lines below to fill your console with ludicrous amounts of RenderTree update diff debug!
 					// Logger.debug("RenderTree update ("+offset+"ms) "+(i+1)+"/"+timingNodes.length+" processing node with begin: "+time.begin+" and end: "+time.end, this);
 										
-					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1))
+					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1) && time.begin < this.nextChangeOffset)
 					{
 						this._nextChangeOffset = time.begin;
 					}
