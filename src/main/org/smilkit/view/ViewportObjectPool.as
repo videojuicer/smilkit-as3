@@ -2,7 +2,6 @@ package org.smilkit.view
 {
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.render.RenderTree;
-	import org.smilkit.time.TimingGraph;
 	import org.smilkit.load.LoadScheduler;
 
 	public dynamic class ViewportObjectPool
@@ -13,11 +12,6 @@ package org.smilkit.view
 		 * Holds the DOM - data Representation of the loaded SMIL XML 
 		 */		
 		protected var _document:SMILDocument;
-		
-		/**
-		 * An instance of TimingGraph is used to store the timings of the elements that are to be displayed 
-		 */
-		protected var _timingGraph:TimingGraph;
 		
 		/**
 		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
@@ -48,11 +42,6 @@ package org.smilkit.view
 			return this._document;
 		}
 		
-		public function get timingGraph():TimingGraph
-		{
-			return this._timingGraph;
-		}
-		
 		public function get renderTree():RenderTree
 		{
 			return this._renderTree;
@@ -67,8 +56,6 @@ package org.smilkit.view
 		{
 			// link the object pool to the document
 			this._document.viewportObjectPool = this;
-			
-			this._timingGraph = new TimingGraph(this);
 
 			// make the first render tree!
 			this._renderTree = new RenderTree(this);
@@ -80,9 +67,6 @@ package org.smilkit.view
 			// drawingboard is always around, and renderTree is constantly destroyed
 			// and recreated, so we have to make the link.
 			this.viewport.drawingBoard.renderTree = this.renderTree;
-			
-			// Build the timing graph and set off the whole machine
-			this._timingGraph.rebuild();
 		}
 	}
 }

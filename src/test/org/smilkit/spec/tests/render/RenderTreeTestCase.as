@@ -8,7 +8,7 @@ package org.smilkit.spec.tests.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.spec.Fixtures;
-	import org.smilkit.time.TimingNode;
+	import org.smilkit.dom.smil.SMILTimeInstance;
 	import org.smilkit.view.Viewport;
 
 	public class RenderTreeTestCase
@@ -40,11 +40,13 @@ package org.smilkit.spec.tests.render
 			protected function handleHasElements(e:ViewportEvent, passThru:Object):void
 			{
 				var renderTree:RenderTree = this._viewport.renderTree;
-				var renderElements:Vector.<TimingNode> = renderTree.elements;
+				var renderElements:Vector.<SMILTimeInstance> = renderTree.elements;
 				var elementsNum:int = renderElements.length;
-				var resolveTimeElement:TimingNode = renderElements[0];
-			
+				
 				Assert.assertEquals(1, elementsNum);
+				
+				var resolveTimeElement:SMILTimeInstance = renderElements[0];
+
 				Assert.assertEquals("video_http", resolveTimeElement.element.id);
 			}
 			protected function handleHasElementsTimeOut(passThroughData:Object):void
@@ -65,7 +67,7 @@ package org.smilkit.spec.tests.render
 		{
 			var renderTree:RenderTree = this._viewport.renderTree;
 			
-			Assert.assertEquals(0,renderTree.lastChangeOffset);
+			Assert.assertEquals(0, renderTree.lastChangeOffset);
 		}
 		
 		protected function handleHasLastChangeOffSetTimeOut(passThroughData:Object):void
@@ -105,7 +107,7 @@ package org.smilkit.spec.tests.render
 		protected function elementsWithFailingTestsHide_refreshed(e:ViewportEvent, passThru:Object):void
 		{
 			Assert.assertEquals(3, this._viewport.renderTree.elements.length);
-			Assert.assertEquals(13, this._viewport.timingGraph.elements.length);
+			Assert.assertEquals(13, this._viewport.document.timeGraph.mediaElements.length);
 		}
 		protected function elementsWithFailingTestsHide_refreshedTimeout(passThroughData:Object):void
 		{

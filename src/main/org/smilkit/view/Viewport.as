@@ -24,7 +24,6 @@ package org.smilkit.view
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
-	import org.smilkit.time.TimingGraph;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.utilkit.logger.Logger;
@@ -211,21 +210,10 @@ package org.smilkit.view
 		 * 
 		 * @see org.smilkit.dom.smil.SMILDocument
 		 */
-		public function get document():ISMILDocument
+		public function get document():SMILDocument
 		{
 			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.document;
-		}
-		
-		/**
-		 * Returns the current <code>TimingGraph</code> object for the active document.
-		 * 
-		 * @see org.smilkit.time.TimingGraph
-		 */
-		public function get timingGraph():TimingGraph
-		{
-			if(!this.viewportObjectPool) return null;
-			return this.viewportObjectPool.timingGraph;
 		}
 		
 		/**
@@ -763,7 +751,6 @@ package org.smilkit.view
 				var objectPool:Object = { pool: this._objectPool };
 				
 				// Trash old event listeners just in case
-				this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
@@ -787,7 +774,8 @@ package org.smilkit.view
 			this._objectPool = new ViewportObjectPool(this, document);
 			
 			// Bind events to the newly-created object pool contents
-			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
+			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
+		
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
@@ -892,9 +880,11 @@ package org.smilkit.view
 			if(this._waitingForRenderTree)
 			{
 				this._waitingForRenderTree = false;
+				
 				if(this._playbackState == Viewport.PLAYBACK_PLAYING)
 				{
 					SMILKit.logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
+					
 					this.onPlaybackStateChangedToPlaying();
 				}				
 			}				
@@ -905,12 +895,14 @@ package org.smilkit.view
 		protected function onRenderTreeElementStopped(event:RenderTreeEvent):void
 		{
 			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
+			
 			this.heartbeat.beat();
 		}
 		
-		protected function onTimingGraphRebuild(event:TimingGraphEvent):void
+		protected function onTimingGraphRebuild(event:SMILMutationEvent):void
 		{
 			SMILKit.logger.debug("Document mutated.", this);
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
 		}
 		

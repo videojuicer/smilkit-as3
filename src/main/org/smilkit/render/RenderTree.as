@@ -6,10 +6,13 @@ package org.smilkit.render
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementTestContainer;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.SMILTimeInstance;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.dom.smil.TimeList;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -17,8 +20,6 @@ package org.smilkit.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.SMILTimeParser;
-	import org.smilkit.time.TimingGraph;
-	import org.smilkit.time.TimingNode;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -35,7 +36,7 @@ package org.smilkit.render
 		 */		
 		protected var _objectPool:ViewportObjectPool;
 		
-		protected var _activeTimingNodes:Vector.<TimingNode>;
+		protected var _activeTimingNodes:Vector.<SMILTimeInstance>;
 		protected var _activeMediaElements:Vector.<SMILMediaElement>;
 		
 		protected var _nextChangeOffset:int = -1;
@@ -69,7 +70,7 @@ package org.smilkit.render
 			this._objectPool = objectPool;
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
-			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
 			// listener for every heart beat (so we recheck the timing graph)
 			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
@@ -85,7 +86,7 @@ package org.smilkit.render
 			// listener for changing volume levels
 			this._objectPool.viewport.addEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
 			
-			this._activeTimingNodes = new Vector.<TimingNode>();
+			this._activeTimingNodes = new Vector.<SMILTimeInstance>();
 			this._activeMediaElements = new Vector.<SMILMediaElement>();
 			
 			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
@@ -98,7 +99,7 @@ package org.smilkit.render
 			return this._objectPool.viewport;
 		}
 		
-		public function get elements():Vector.<TimingNode>
+		public function get elements():Vector.<SMILTimeInstance>
 		{
 			return this._activeTimingNodes;
 		}
@@ -113,19 +114,14 @@ package org.smilkit.render
 			return this._lastChangeOffset;
 		}
 		
-		public function get timingGraph():TimingGraph
-		{
-			return this._objectPool.timingGraph;
-		}
-		
-		public function get document():ISMILDocument
+		public function get document():SMILDocument
 		{
 			return this._objectPool.document;
 		}
 		
 		public function get hasDocumentAttached():Boolean
 		{
-			return (this.timingGraph != null && this.document != null);
+			return (this.document != null);
 		}
 		
 		/** 
@@ -143,7 +139,8 @@ package org.smilkit.render
 		public function detach():void
 		{
 			SMILKit.logger.debug("Detaching from object pool", this);
-			this.timingGraph.removeEventListener(TimingGraphEvent.REBUILD, this.onTimeGraphRebuild);
+			
+			this.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
 			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			this._objectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
@@ -187,8 +184,17 @@ package org.smilkit.render
 				// Sync everything to a running state by resuming playback.
 				for (var i:int = 0; i < this.elements.length; i++)
 				{
-					var node:TimingNode = this.elements[i];
-					node.mediaElement.handler.resume();
+					var node:SMILTimeInstance = this.elements[i];
+					
+					if (node.mediaElement.playbackState == ElementTimeContainer.PLAYBACK_STATE_PAUSED)
+					{
+						node.mediaElement.handler.pause();
+					}
+					else
+					{
+						node.mediaElement.handler.resume();
+					}
+					
 					node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
 				}
 			}
@@ -198,7 +204,7 @@ package org.smilkit.render
 				// Sync to a paused heartbeat state by pausing everything EXCEPT handlers that are waiting for sync.
 				for (var j:int = 0; j < this.elements.length; j++)
 				{
-					var pauseNode:TimingNode = this.elements[j];
+					var pauseNode:SMILTimeInstance = this.elements[j];
 					var pauseHandler:SMILKitHandler = pauseNode.mediaElement.handler;
 					var inSyncWaitList:Boolean = (this._offsetSyncHandlerList && this._offsetSyncHandlerList.indexOf(pauseHandler) > -1);
 					
@@ -265,14 +271,14 @@ package org.smilkit.render
 			// Loop over all handlers
 			for (var i:int = 0; i < this.elements.length; i++)
 			{
-				var node:TimingNode = this.elements[i];
+				var node:SMILTimeInstance = this.elements[i];
 				var handler:SMILKitHandler = (node.mediaElement.handler as SMILKitHandler);
 				
 				if(handler.seekable)
 				{
 					// Calculate the target offset for this handler
 					// TODO include clip-begin into the equation
-					var offset:uint = (this._objectPool.viewport.offset - node.begin);
+					var offset:uint = (this._objectPool.viewport.offset - node.currentBegin);
 					
 					// Push the handler onto the sync wait list
 					this._offsetSyncHandlerList.push(handler);
@@ -524,39 +530,101 @@ package org.smilkit.render
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)
-			{
-				// Get the contents of the TimingGraph as a vector of TimingNodes
-				var timingNodes:Vector.<TimingNode> = this.timingGraph.elements;				
+			{			
 				// Set the sync flag to false. It will be set to TRUE when adding a seekable handler to the RenderTree during a playing state.
 				var syncAfterUpdate:Boolean = false;
+				
 				// Set up the action vectors
 				var actionableChanges:Boolean = false;
-				var removedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
-				var addedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
-				var modifiedTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
+				var removedTimingNodes:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
+				var addedTimingNodes:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
+				var modifiedTimingNodes:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
 				
 				// make a copy of the elements so we can update the list without causing loop issues
+				var nodes:Vector.<SMILTimeInstance> = this.document.timeGraph.activeElementsAt(offset);
 				
-				for (var i:int = 0; i < timingNodes.length; i++)
+				for (var i:int = 0; i < nodes.length; i++)
 				{
-					var time:TimingNode = timingNodes[i];
-					var element:SMILMediaElement = (timingNodes[i].element as SMILMediaElement);
-					var handler:SMILKitHandler = element.handler;
+					var time:SMILTimeInstance = nodes[i];
+					var element:SMILMediaElement = (time.element as SMILMediaElement);
+					
+					// skip time containers
+					if (element != null)
+					{
+						var handler:SMILKitHandler = element.handler;
+						
+						var previousIndex:int = this._activeMediaElements.indexOf(element);
+						var alreadyExists:Boolean = (previousIndex != -1);
+						
+						element.updateRenderState();
+						
+						// hidden things skip the render tree and dont playback
+						if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
+						{
+							if (alreadyExists)
+							{
+								actionableChanges = true;
+								modifiedTimingNodes.push(time);
+								
+								this._lastChangeOffset = offset;
+							}
+							else
+							{
+								actionableChanges = true;
+								addedTimingNodes.push(time);
+								
+								this._lastChangeOffset = offset;
+								
+								// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
+								// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
+								// viewport is currently playing.
+								if(!syncAfterUpdate && handler.seekable)
+								{
+									syncAfterUpdate = true;
+								}
+							}
+						}
+						else
+						{
+							// remove if we used to exist and were now hidden
+							if (alreadyExists)
+							{
+								actionableChanges = true;
+								removedTimingNodes.push(time);
+								
+								this._lastChangeOffset = offset;
+							}
+						}
+					}
+				}
+				
+				for (var k:int = 0; k < this.elements.length; k++)
+				{
+					var node:SMILTimeInstance = this.elements[k];
+					
+					if (modifiedTimingNodes.indexOf(node) != -1 || addedTimingNodes.indexOf(node) != -1 || removedTimingNodes.indexOf(node) != -1)
+					{
+						continue;
+					}
+					
+					// doesnt exist on any list so must of been dropped off the active time graph
+					removedTimingNodes.push(node);
+				}
 
-					var previousIndex:int = this._activeMediaElements.indexOf(element);
-					var alreadyExists:Boolean = (previousIndex != -1);
-					var activeNow:Boolean = time.activeAt(offset);
+					
 					
 					// Have you ever looked at your console output and thought mournfully to yourself that it doesn't have enough ridiculously in-depth analysis of every RenderTree update?
 					// WE THINK THE SAME.
 					// Uncomment the lines below to fill your console with ludicrous amounts of RenderTree update diff debug!
 					// Logger.debug("RenderTree update ("+offset+"ms) "+(i+1)+"/"+timingNodes.length+" processing node with begin: "+time.begin+" and end: "+time.end, this);
 										
-					if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1) && time.begin < this.nextChangeOffset)
-					{
-						this._nextChangeOffset = time.begin;
-					}
-					
+
+					/*
+				if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1) && time.begin < this.nextChangeOffset)
+				{
+				this._nextChangeOffset = time.begin;
+				}
+				
 					// remove non active, existing elements
 					if (!activeNow && alreadyExists)
 					{
@@ -566,7 +634,7 @@ package org.smilkit.render
 					}
 					// add active, non existant elements
 					else if (activeNow)
-					{
+					{						
 						element.updateRenderState();
 						
 						if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
@@ -588,7 +656,7 @@ package org.smilkit.render
 							else
 							{
 								// already exists
-								var previousTime:TimingNode = this._activeTimingNodes[previousIndex];
+								var previousTime:SMILTimeInstance = this._activeTimingNodes[previousIndex];
 								if (time === previousTime && time != previousTime)
 								{
 									this._lastChangeOffset = offset;
@@ -599,15 +667,16 @@ package org.smilkit.render
 						}
 					}
 					
-				}
+				}*/
 				
 				// Action the update changes
 				if(actionableChanges)
 				{
 					SMILKit.logger.debug("RenderTree.updateAt("+offset+"): actioning changes. "+addedTimingNodes.length+" added, "+removedTimingNodes.length+" removed, "+modifiedTimingNodes.length+" modified.", this);
 					
-					var actionTime:TimingNode;
+					var actionTime:SMILTimeInstance;
 					var actionHandler:SMILKitHandler;
+					
 					// Additions
 					for(var a:int=0; a<addedTimingNodes.length; a++)
 					{
@@ -615,8 +684,10 @@ package org.smilkit.render
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
 						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): ADD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						
 						this.addTimingNodeHandlerToActiveList(actionTime);
 					}
+					
 					// Removals
 					for(var r:int=0; r<removedTimingNodes.length; r++)
 					{
@@ -624,8 +695,10 @@ package org.smilkit.render
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
 						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): REMOVE "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						
 						this.removeTimingNodeHandlerFromActiveList(actionTime);
 					}
+					
 					// Modifications
 					for(var m:int=0; m<modifiedTimingNodes.length; m++)
 					{
@@ -633,14 +706,20 @@ package org.smilkit.render
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
 						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): MOD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						
 						this.timingNodeModifiedOnActiveList(actionTime);
 					}
+					
 					this.syncHandlersToViewportState();
 				}
 				
 				// Remove anything no longer found on the timing graph
 				var orphanCount:uint = this.garbageCollectOrphanedHandlers();
-				if(orphanCount > 0) SMILKit.logger.debug("RenderTree update at "+offset+"ms garbage collected "+orphanCount+" dead handlers", this);
+				
+				if (orphanCount > 0)
+				{
+					SMILKit.logger.debug("RenderTree update at " + offset + "ms garbage collected " + orphanCount + " dead handlers", this);
+				}
 				
 				// UPDATE COMPLETE
 				// Perform the sync if we flagged up that one is needed
@@ -657,20 +736,26 @@ package org.smilkit.render
 		{
 			// Get all handlers from the timing graph
 			var tgHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>();
-			for(var i:uint = 0; i < this.timingGraph.elements.length; i++)
+			
+			if (this.document.timeGraph.mediaElements != null)
 			{
-				tgHandlers.push(this.timingGraph.elements[i].mediaElement.handler);
+				for (var i:uint = 0; i < this.document.timeGraph.mediaElements.length; i++)
+				{
+					tgHandlers.push(this.document.timeGraph.mediaElements[i].mediaElement.handler);
+				}
 			}
 
-			var deadTimingNodes:Vector.<TimingNode> = new Vector.<TimingNode>();
-			for(var p:uint = 0; p < this._activeTimingNodes.length; p++)
+			var deadTimingNodes:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
+			
+			for (var p:uint = 0; p < this._activeTimingNodes.length; p++)
 			{
 				if(tgHandlers.indexOf(this._activeTimingNodes[p].mediaElement.handler) < 0)
 				{
 					deadTimingNodes.push(this._activeTimingNodes[p]);
 				}
 			}
-			for(var l:uint = 0; l < deadTimingNodes.length; l++)
+			
+			for (var l:uint = 0; l < deadTimingNodes.length; l++)
 			{
 				SMILKit.logger.debug("RenderTree GC: about to remove "+deadTimingNodes[l].mediaElement.handler+" as it is no longer present on the TimingGraph", this);
 				this.removeTimingNodeHandlerFromActiveList(deadTimingNodes[l]);
@@ -680,7 +765,7 @@ package org.smilkit.render
 			return deadTimingNodes.length;
 		}
 		
-		protected function addTimingNodeHandlerToActiveList(timingNode:TimingNode):void
+		protected function addTimingNodeHandlerToActiveList(timingNode:SMILTimeInstance):void
 		{
 			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
 			var handler:SMILKitHandler = element.handler;
@@ -698,7 +783,7 @@ package org.smilkit.render
 			handler.addedToRenderTree(this);
 			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
 		}
-		protected function removeTimingNodeHandlerFromActiveList(timingNode:TimingNode):void
+		protected function removeTimingNodeHandlerFromActiveList(timingNode:SMILTimeInstance):void
 		{
 			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
 			var handler:SMILKitHandler = element.handler;
@@ -730,7 +815,7 @@ package org.smilkit.render
 			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
 			
 		}
-		protected function timingNodeModifiedOnActiveList(timingNode:TimingNode):void
+		protected function timingNodeModifiedOnActiveList(timingNode:SMILTimeInstance):void
 		{
 			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
 			var handler:SMILKitHandler = element.handler;
@@ -803,7 +888,7 @@ package org.smilkit.render
 		 * @param e
 		 * 
 		 */		
-		protected function onTimeGraphRebuild(e:TimingGraphEvent):void
+		protected function onTimeGraphRebuild(e:SMILMutationEvent):void
 		{
 			this.reset();
 		}
@@ -841,6 +926,9 @@ package org.smilkit.render
 		*/ 
 		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
 		{
+			// refresh the state of the render tree first
+			this.update();
+			
 			switch (this._objectPool.viewport.playbackState)
 			{
 				case Viewport.PLAYBACK_SEEKING:

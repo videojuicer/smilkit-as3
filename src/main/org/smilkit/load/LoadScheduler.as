@@ -1,23 +1,21 @@
 package org.smilkit.load {
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.handler.SMILKitHandler;	
-	
-	import org.smilkit.dom.smil.SMILMediaElement;	
 	import org.smilkit.dom.smil.ElementTimeContainer;
-	import org.smilkit.time.TimingNode;
-	
-	import org.smilkit.view.Viewport;
-	import org.smilkit.view.ViewportObjectPool;
-	import org.smilkit.time.TimingGraph;
-	import org.smilkit.render.RenderTree;
-	import org.smilkit.load.Worker;
-	
-	import org.smilkit.events.WorkerEvent;
-	import org.smilkit.events.WorkUnitEvent;
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.SMILTimeInstance;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.TimingGraphEvent;
+	import org.smilkit.events.WorkUnitEvent;
+	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.load.Worker;
+	import org.smilkit.render.RenderTree;
+	import org.smilkit.view.Viewport;
+	import org.smilkit.view.ViewportObjectPool;
 	
 	/***
 	 * An instance of LoadScheduler listens to both the TimingGraph and RenderTree objects for
@@ -122,6 +120,11 @@ package org.smilkit.load {
 			this.bindWorkUnitEvents();
 		}
 		
+		public function get ownerDocument():SMILDocument
+		{
+			return this._objectPool.document;
+		}
+		
 		public function start():Boolean {
 			if(!this._working) {
 				this._working = true;
@@ -173,13 +176,13 @@ package org.smilkit.load {
 
 		protected function bindOpportunisticTimingGraphEvents():void 
 		{
-			this.timingGraph.addEventListener(TimingGraphEvent.REBUILD, this.onTimingGraphRebuild);
+			this._objectPool.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
 		}
 		
 		/**
 		* Called when the Timing graph is rebuilt in any way. Causes the load scheduler to rebuild the opportunistic workers.
 		*/
-		protected function onTimingGraphRebuild(event:TimingGraphEvent):void 
+		protected function onTimingGraphRebuild(event:SMILMutationEvent):void 
 		{
 			this.rebuildOpportunisticWorkers();
 		}
@@ -223,7 +226,7 @@ package org.smilkit.load {
 		*/
 		protected function rebuildOpportunisticWorkers():void {
 			// Get timing graph contents
-			var timingGraphElements:Vector.<TimingNode> = this.timingGraph.elements;
+			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
 			
 			// Move timing graph contents onto their correct handlers
 			for(var i:uint=0; i<timingGraphElements.length; i++)
@@ -264,7 +267,7 @@ package org.smilkit.load {
 		protected function purgeOrphanedHandlers():void
 		{
 			// Build flat list of handlers
-			var timingGraphElements:Vector.<TimingNode> = this.timingGraph.elements;
+			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
 			var timingGraphHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
 			for(var i:uint=0; i<timingGraphElements.length; i++)
 			{
@@ -314,10 +317,6 @@ package org.smilkit.load {
 		}
 		
 		
-		
-		protected function get timingGraph():TimingGraph {
-			return this._objectPool.timingGraph;
-		}
 		protected function get renderTree():RenderTree {
 			return this._objectPool.renderTree;
 		}
