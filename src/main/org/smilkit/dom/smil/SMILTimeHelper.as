@@ -93,23 +93,20 @@ package org.smilkit.dom.smil
 			
 			var offset:Number = NaN;
 			
-			var aOffset:Number = (a.resolvedOffset * 1000);
-			var bOffset:Number = (b.resolvedOffset * 1000);
-			
 			switch (operator)
 			{
 				case AlgebraicOperator.ARITHMETIC_ADD:
-					offset = (aOffset + bOffset);
+					offset = (a.resolvedOffset + b.resolvedOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MULTIPLY:
 					offset = (a.resolvedOffset * b.resolvedOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MINUS:
-					offset = (aOffset - bOffset);
+					offset = (a.resolvedOffset - b.resolvedOffset);
 					break;
 			}
 			
-			return new Time(null, false, offset + "ms");
+			return new Time(null, false, (offset * 1000) + "ms");
 		}
 	}
 }
