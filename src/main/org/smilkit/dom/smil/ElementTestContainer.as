@@ -1,5 +1,6 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.IElementTest;
 	import org.utilkit.expressions.ExpressionEngine;
@@ -115,7 +116,7 @@ package org.smilkit.dom.smil
 			
 			if (expr != null && expr != "")
 			{
-				   var parser:ExpressionEngine = new ExpressionEngine();
+				   var parser:SMILTimeExpressionParser = new SMILTimeExpressionParser(this);
 				   var result:Number = parser.begin(expr);
 				   
 				   if (result >= 1)

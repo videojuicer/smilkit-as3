@@ -2,8 +2,6 @@ package org.smilkit.events
 {
 	import flash.events.Event;
 	
-	import org.smilkit.time.TimingGraph;
-	
 	public class ViewportEvent extends Event
 	{
 		// When loading a new SMIL document

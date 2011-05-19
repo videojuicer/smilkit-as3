@@ -53,6 +53,16 @@ package org.smilkit.parsers
 			this.parse(null);
 		}
 		
+		public function identifies(timeString:String):Boolean
+		{
+			if (timeString.indexOf(":") != -1)
+			{
+				return true;
+			}
+			
+			return (timeString.search(/^(-?)(\d+)(h|ms|s|min)$/i) != -1);
+		}
+		
 		/**
 		 * Parses the specified SMIL time string into the current <code>SMILTimeParser</code>
 		 * instance.

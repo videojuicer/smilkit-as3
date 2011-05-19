@@ -9,6 +9,7 @@ package org.smilkit.handler
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
@@ -423,16 +424,16 @@ package org.smilkit.handler
 				this._completedResolving = true;
 				
 				// here we update the dom
-				if (this.element != null && (this.element.duration == Time.UNRESOLVED || this.element.duration == 0))
+				if (this.element != null && (this.element.duration == Time.MEDIA || this.element.duration == 0))
 				{
 					if (resolvedDuration == Time.INDEFINITE)
 					{
-						this.element.setAttribute("dur", "indefinite");
+						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, "indefinite");
 					}
+					
 					else
 					{
-						// parse the time as a millisecond time string
-						this.element.setAttribute("dur", this._duration.toString() + "ms");
+						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, this._duration.toString() + "ms");
 					}
 				}
 				
