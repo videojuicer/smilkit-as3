@@ -387,7 +387,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(10, prerollEnd.resolvedOffset);
 			Assert.assertEquals(60, contentEnd.resolvedOffset);
 			
-			parent.startup(true);
+			parent.startup();
 			Assert.assertEquals(60, parentEnd.resolvedOffset);
 		}
 		

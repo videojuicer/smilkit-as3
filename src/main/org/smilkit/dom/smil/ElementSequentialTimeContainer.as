@@ -118,11 +118,11 @@ package org.smilkit.dom.smil
 				}
 				else
 				{
-					duration = child.currentEndInterval.resolvedOffset * 1000;
+					duration = child.currentEndInterval.resolvedOffset;
 				}
 			}
 			
-			return new Time(this, false, duration + "ms");
+			return new Time(this, false, (duration * 1000) + "ms");
 		}
 	}
 }

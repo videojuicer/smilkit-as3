@@ -102,12 +102,12 @@ package org.smilkit.dom.smil
 				{
 					if (child.currentEndInterval.resolvedOffset > duration)
 					{
-						duration = child.currentEndInterval.resolvedOffset * 1000;
+						duration = child.currentEndInterval.resolvedOffset;
 					}
 				}
 			}
 			
-			return new Time(this, false, duration + "ms");
+			return new Time(this, false, (duration * 1000) + "ms");
 		}
 	}
 }
