@@ -23,6 +23,8 @@ package org.smilkit.dom.smil
 		protected var _handler:SMILKitHandler;
 		protected var _region:SMILRegionElement;
 		
+		protected var _handlerState:uint = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
+		
 		public function SMILMediaElement(owner:IDocument, name:String)
 		{
 			super(owner, name);
@@ -307,10 +309,10 @@ package org.smilkit.dom.smil
 				return false;
 			}
 			
-			if (!(this._beginList as TimeList).resolved || !(this._endList as TimeList).resolved)
-			{
-				return false;
-			}
+			//if (!(this._beginList as TimeList).resolved || !(this._endList as TimeList).resolved)
+			//{
+			//	return false;
+			//}
 			
 			return true;
 		}
@@ -361,34 +363,38 @@ package org.smilkit.dom.smil
 			}
 		}
 		
-		public override function resolve():void
-		{
-			if (this._handler == null)
-			{
-				this.updateHandler();
-			}
-			
-			super.resolve();
-		}
-		
 		public override function beginElement():Boolean
-		{
-			return false;
+		{	
+			return super.beginElement();
 		}
 		
 		public override function endElement():Boolean
 		{
-			return false;
+			return super.endElement();
+		}
+		
+		public override function get renderState():uint
+		{
+			var state:uint = super.renderState;
+			return state;
+			if (this._handlerState == ElementTimeContainer.PLAYBACK_STATE_PAUSED)
+			{
+				return ElementTestContainer.RENDER_STATE_HIDDEN;
+			}
+			else
+			{
+				return ElementTestContainer.RENDER_STATE_ACTIVE;
+			}
 		}
 		
 		public override function pauseElement():void
 		{
-			this._handler.pause();
+			super.pauseElement();
 		}
 		
 		public override function resumeElement():void
 		{
-			this._handler.resume();
+			super.resumeElement();
 		}
 		
 		public override function seekElement(seekTo:Number):void
@@ -401,14 +407,29 @@ package org.smilkit.dom.smil
 			if (this._handler != null)
 			{
 				this._handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+				this._handler.removeEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
+				this._handler.removeEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
 			}
 			
 			this._handler = SMILKit.createElementHandlerFor(this);
+			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
 			
 			if (this._handler != null)
 			{
 				this._handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+				this._handler.addEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
+				this._handler.addEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
 			}
+		}
+
+		private function onHandlerPaused(e:HandlerEvent):void
+		{
+			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
+		}
+
+		private function onHandlerResumed(e:HandlerEvent):void
+		{
+			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		}
 		
 		private function onHandlerDurationResolved(e:HandlerEvent):void

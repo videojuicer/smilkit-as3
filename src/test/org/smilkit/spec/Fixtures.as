@@ -311,5 +311,23 @@ package org.smilkit.spec
 				"<video dur=\"5s\" id=\"fail_booleanExpression\" expr=\"4 == 3\" src=\"http://smilkit.org/demo.mp4\" />"+
 			"</par>"+
 			"</body></smil>";
+		
+		public static var BASIC_PAR_TIME_TEST_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<par id=\"holder\">" +
+			"<video id=\"content\" dur=\"10s\" begin=\"0s;10s;20s\" src=\"1.mp4\" />" +
+			"<video id=\"content_2\" dur=\"10s\" src=\"1.mp4\" />" +
+			"</par>                                      " +
+			"</body></smil>";
+		
+		public static var BASIC_SEQ_TIME_TEST_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<seq id=\"holder\">" +
+			"<video id=\"content\" dur=\"10s\" begin=\"0s;10s;20s\" src=\"1.mp4\" />" +
+			"<video id=\"content_2\" dur=\"10s\" src=\"1.mp4\" />" +
+			"</seq>                                      " +
+			"</body></smil>";
 	}
 }

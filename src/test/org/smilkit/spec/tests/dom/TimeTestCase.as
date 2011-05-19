@@ -4,6 +4,7 @@ package org.smilkit.spec.tests.dom
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
+	import org.smilkit.dom.smil.ElementParallelTimeContainer;
 	import org.smilkit.dom.smil.ElementSequentialTimeContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
@@ -27,17 +28,19 @@ package org.smilkit.spec.tests.dom
 		protected var _beginDocument:ISMILDocument;
 		protected var _unresolvedDocument:ISMILDocument;
 		
-		protected var _viewport:Viewport;
-		
 		[Before]
 		public function setUp():void
 		{
 			SMILKit.defaults();
 			
-			this._viewport = new Viewport();
-			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_UNRESOLVED_SMIL_XML;
+			//this._viewport = new Viewport();
+			//this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_UNRESOLVED_SMIL_XML;
 			
 			var parser:BostonDOMParser = new BostonDOMParser();
+
+			this._unresolvedDocument = (parser.parse(Fixtures.BASIC_UNRESOLVED_SMIL_XML) as ISMILDocument);
+			
+			parser = new BostonDOMParser();
 			
 			this._seqDocument = (parser.parse(Fixtures.BASIC_SEQ_SMIL_XML) as ISMILDocument);
 			
@@ -60,14 +63,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			// DA FUCK?
-			Assert.assertEquals(60000, container.end.first.resolvedOffset);
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(60000, video2.end.first.resolvedOffset);
+			Assert.assertEquals(60, container.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(60, video2.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Elements can unresolved when resolved.")]
@@ -81,26 +79,15 @@ package org.smilkit.spec.tests.dom
 			var video2:SMILMediaElement = (document.getElementById("content") as SMILMediaElement);
 			var video3:SMILMediaElement = (document.getElementById("postroll") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			video3.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(10000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(70000, video2.end.first.resolvedOffset);
-			Assert.assertEquals(80000, video3.end.first.resolvedOffset);
-			Assert.assertEquals(80000, container.end.first.resolvedOffset);
+			Assert.assertEquals(10, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(70, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(80, video3.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(80, container.currentEndInterval.resolvedOffset);
 			
 			video1.setAttribute("dur", null);
 
-			video1.resolve();
-			video2.resolve();
-			video3.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(Time.UNRESOLVED, video1.end.first.resolvedOffset);
-			Assert.assertFalse(video1.end.first.resolved);
-			Assert.assertFalse(video1.resolved);
+			Assert.assertEquals(Time.INDEFINITE, video1.currentEndInterval.resolvedOffset);
+			Assert.assertTrue(video1.end.first.resolved);
 		}
 		
 		[Test(description="Child sets the duration in a par. The parent should have the greatest duration selected from the children == 35s")]
@@ -113,13 +100,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(35000, video2.end.first.resolvedOffset);
-			Assert.assertEquals(35000, container.end.first.resolvedOffset);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(35, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(35, container.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Parent sets the duration in a seq. The first child video should be 0=>30s, the second should be cropped and go from 30s=>40s")]
@@ -132,13 +115,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(40000, container.end.first.resolvedOffset);
-			Assert.assertEquals(40000, video2.end.first.resolvedOffset);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Parent sets the duration in a par. The first child video should be 0=>30s, the second should be cropped and go from 0=>40s")]
@@ -151,13 +130,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(40000, video2.end.first.resolvedOffset);
-			Assert.assertEquals(40000, container.end.first.resolvedOffset);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Parent sets the duration on a block and crops the last video")]
@@ -170,27 +145,21 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
+			Assert.assertEquals(00, container.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
 			
-			Assert.assertEquals(00000, container.begin.first.resolvedOffset);
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(40000, video2.end.first.resolvedOffset);
-			Assert.assertEquals(40000, container.end.first.resolvedOffset);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
 			
 			var secondContainer:ElementTimeContainer = (document.getElementsByTagName("par").item(1) as ElementTimeContainer);
 			var video3:SMILMediaElement = (document.getElementById("video_3") as SMILMediaElement);
 			var video4:SMILMediaElement = (document.getElementById("video_4") as SMILMediaElement);
 			
-			video3.resolve();
-			video4.resolve();
-			secondContainer.resolve();
+			Assert.assertEquals(40, secondContainer.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(80, secondContainer.currentEndInterval.resolvedOffset);
 			
-			Assert.assertEquals(40000, secondContainer.begin.first.resolvedOffset);
-			Assert.assertEquals(70000, video3.end.first.resolvedOffset);
-			Assert.assertEquals(80000, video4.end.first.resolvedOffset);
-			Assert.assertEquals(80000, secondContainer.end.first.resolvedOffset);
+			Assert.assertEquals(80, video4.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(70, video3.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Unresolved child sets the duration in a seq. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
@@ -203,14 +172,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.duration);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, container.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Unresolved child sets the duration in a par. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
@@ -223,14 +187,9 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.duration);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, container.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Unresolved child sets the duration in a ref. The second child is unresolved, which should cause the parent to have an unresolved duration.")]
@@ -243,56 +202,43 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
-			video1.resolve();
-			video2.resolve();
-			container.resolve();
-			
-			Assert.assertEquals(30000, video1.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, video2.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.end.first.resolvedOffset);
-			Assert.assertEquals(Time.UNRESOLVED, container.duration);
-		}
-		
-		private function get document():SMILDocument
-		{
-			return (this._viewport.document as SMILDocument);
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, video2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, container.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Tests a document is unresolved and that the elements can resolve over time.")]
 		public function unresolvedAssetsResolvedCorrectly():void
 		{
-			var sequenceLeft:ElementSequentialTimeContainer = (this.document.getElementById("left") as ElementSequentialTimeContainer);
-			var sequenceRight:ElementSequentialTimeContainer = (this.document.getElementById("right") as ElementSequentialTimeContainer);
+			var sequenceLeft:ElementSequentialTimeContainer = (this._unresolvedDocument.getElementById("left") as ElementSequentialTimeContainer);
+			var sequenceRight:ElementSequentialTimeContainer = (this._unresolvedDocument.getElementById("right") as ElementSequentialTimeContainer);
 			
-			var prerollLeft:ISMILMediaElement = (this.document.getElementById("preroll_left") as ISMILMediaElement);
-			var contentLeft:ISMILMediaElement = (this.document.getElementById("content_left") as ISMILMediaElement);
-			var prerollRight:ISMILMediaElement = (this.document.getElementById("preroll_right") as ISMILMediaElement);
-			var contentRight:ISMILMediaElement = (this.document.getElementById("content_right") as ISMILMediaElement);
+			var prerollLeft:SMILMediaElement = (this._unresolvedDocument.getElementById("preroll_left") as SMILMediaElement);
+			var contentLeft:SMILMediaElement = (this._unresolvedDocument.getElementById("content_left") as SMILMediaElement);
+			var prerollRight:SMILMediaElement = (this._unresolvedDocument.getElementById("preroll_right") as SMILMediaElement);
+			var contentRight:SMILMediaElement = (this._unresolvedDocument.getElementById("content_right") as SMILMediaElement);
 			
 			Assert.assertEquals(Time.UNRESOLVED, sequenceLeft.duration);
 			Assert.assertEquals(false, sequenceLeft.durationResolved);
 			Assert.assertEquals(Time.UNRESOLVED, sequenceRight.duration);
 			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
-			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
-			Assert.assertEquals(Time.UNRESOLVED, prerollLeft.end.first.resolvedOffset);
-			Assert.assertEquals(false, prerollLeft.end.first.resolved);
+			Assert.assertEquals(00, prerollLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, prerollLeft.currentEndInterval.resolvedOffset);
 			
-			Assert.assertEquals(Time.UNRESOLVED, contentLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(false, contentLeft.begin.first.resolved);
-			Assert.assertEquals(Time.UNRESOLVED, contentLeft.end.first.resolvedOffset);
-			Assert.assertEquals(false, contentLeft.end.first.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(Time.INDEFINITE, contentLeft.currentEndInterval.resolvedOffset);
+
+			Assert.assertEquals(00, prerollRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, prerollRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentEndInterval.resolved);
 			
-			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.begin.first.resolved);
-			Assert.assertEquals(0, prerollRight.end.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.end.first.resolved);
-			
-			Assert.assertEquals(0, contentRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, contentRight.begin.first.resolved);
-			Assert.assertEquals(Time.UNRESOLVED, contentRight.end.first.resolvedOffset);
-			Assert.assertEquals(false, contentRight.end.first.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentEndInterval.resolved);
 			
 			prerollLeft.dur = "10000ms";
 			prerollRight.dur = "10000ms";
@@ -302,111 +248,96 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(Time.UNRESOLVED, sequenceRight.duration);
 			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
-			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
-			Assert.assertEquals(10000, prerollLeft.end.first.resolvedOffset);
-			Assert.assertEquals(true, prerollLeft.end.first.resolved);
+			Assert.assertEquals(00, prerollLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.currentBeginInterval.resolved);
+			Assert.assertEquals(true, prerollLeft.currentEndInterval.resolved);
+			Assert.assertEquals(10, prerollLeft.currentEndInterval.resolvedOffset);
 			
-			Assert.assertEquals(10000, contentLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(true, contentLeft.begin.first.resolved);
-			Assert.assertEquals(Time.UNRESOLVED, contentLeft.end.first.resolvedOffset);
-			Assert.assertEquals(false, contentLeft.end.first.resolved);
+			Assert.assertEquals(10, contentLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentLeft.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.currentEndInterval.resolved);
 			
-			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.begin.first.resolved);
-			Assert.assertEquals(10000, prerollRight.end.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.end.first.resolved);
+			Assert.assertEquals(00, prerollRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentBeginInterval.resolved);
+			Assert.assertEquals(10, prerollRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentEndInterval.resolved);
 			
-			Assert.assertEquals(10000, contentRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, contentRight.begin.first.resolved);
-			Assert.assertEquals(Time.UNRESOLVED, contentRight.end.first.resolvedOffset);
-			Assert.assertEquals(false, contentRight.end.first.resolved);
+			Assert.assertEquals(10, contentRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentEndInterval.resolved);
 			
 			contentLeft.dur = "10000ms";
 			contentRight.dur = "10000ms";
 			
-			Assert.assertEquals(20000, sequenceLeft.duration);
-			Assert.assertEquals(true, sequenceLeft.durationResolved);
-			Assert.assertEquals(20000, sequenceRight.duration);
-			Assert.assertEquals(true, sequenceRight.durationResolved);
+			Assert.assertEquals(00, prerollLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.currentBeginInterval.resolved);
+			Assert.assertEquals(10, prerollLeft.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollLeft.currentEndInterval.resolved);
 			
-			Assert.assertEquals(0, prerollLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollLeft.begin.first.resolved);
-			Assert.assertEquals(10000, prerollLeft.end.first.resolvedOffset);
-			Assert.assertEquals(true, prerollLeft.end.first.resolved);
+			Assert.assertEquals(10, contentLeft.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.currentBeginInterval.resolved);
+			Assert.assertEquals(20, contentLeft.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentLeft.currentEndInterval.resolved);
 			
-			Assert.assertEquals(10000, contentLeft.begin.first.resolvedOffset);
-			Assert.assertEquals(true, contentLeft.begin.first.resolved);
-			Assert.assertEquals(20000, contentLeft.end.first.resolvedOffset);
-			Assert.assertEquals(true, contentLeft.end.first.resolved);
+			Assert.assertEquals(00, prerollRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentBeginInterval.resolved);
+			Assert.assertEquals(10, prerollRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, prerollRight.currentEndInterval.resolved);
 			
-			Assert.assertEquals(0, prerollRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.begin.first.resolved);
-			Assert.assertEquals(10000, prerollRight.end.first.resolvedOffset);
-			Assert.assertEquals(true, prerollRight.end.first.resolved);
-			
-			Assert.assertEquals(10000, contentRight.begin.first.resolvedOffset);
-			Assert.assertEquals(true, contentRight.begin.first.resolved);
-			Assert.assertEquals(20000, contentRight.end.first.resolvedOffset);
-			Assert.assertEquals(true, contentRight.end.first.resolved);
+			Assert.assertEquals(10, contentRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentBeginInterval.resolved);
+			Assert.assertEquals(20, contentRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentEndInterval.resolved);
 		}
 		
 		[Test(description="Tests resolving a flat-packed sequence of assets, i.e. all the times are defined in the SMIL")]
 		public function resolvesFlatSequence():void
 		{
-			var preroll:ISMILMediaElement = (this._seqDocument.getElementById("preroll") as ISMILMediaElement);
+			var parser:BostonDOMParser = new BostonDOMParser();
+			
+			this._seqDocument = (parser.parse(Fixtures.BASIC_SEQ_SMIL_XML) as ISMILDocument);
+			
+			var preroll:SMILMediaElement = (this._seqDocument.getElementById("preroll") as SMILMediaElement);
 			
 			Assert.assertNotNull(preroll)
 				
-			var prerollTime:Time = (preroll.begin.item(0) as Time);
-			var prerollEnd:Time = (preroll.end.item(0) as Time);
+			var prerollTime:Time = (preroll.currentBeginInterval);
+			var prerollEnd:Time = (preroll.currentEndInterval);
 			
-			Assert.assertNotNull(prerollTime);
-			Assert.assertNotNull(prerollEnd);
-			
-			prerollTime.resolve(true);
-			prerollEnd.resolve(true);
-			
-			var content:ISMILMediaElement = (this._seqDocument.getElementById("content") as ISMILMediaElement);
+			var content:SMILMediaElement = (this._seqDocument.getElementById("content") as SMILMediaElement);
 			
 			Assert.assertNotNull(content)
 			
-			var contentTime:Time = (content.begin.item(0) as Time);
-			var contentEnd:Time = (content.end.item(0) as Time);
+			var contentTime:Time = (content.currentBeginInterval);
+			var contentEnd:Time = (content.currentEndInterval);
 			
 			Assert.assertNotNull(contentTime);
 			Assert.assertNotNull(contentEnd);
 			
-			contentTime.resolve(true);
-			contentEnd.resolve(true);
+			Assert.assertEquals(00, prerollTime.resolvedOffset);
+			Assert.assertEquals(10, prerollEnd.resolvedOffset);
 			
-			Assert.assertEquals(00000, prerollTime.resolvedOffset);
-			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
+			Assert.assertEquals(10, contentTime.resolvedOffset);
+			Assert.assertEquals(70, contentEnd.resolvedOffset);
 			
-			Assert.assertEquals(10000, contentTime.resolvedOffset);
-			Assert.assertEquals(70000, contentEnd.resolvedOffset);
-			
-			var postroll:ISMILMediaElement = (this._seqDocument.getElementById("postroll") as ISMILMediaElement);
+			var postroll:SMILMediaElement = (this._seqDocument.getElementById("postroll") as SMILMediaElement);
 			
 			Assert.assertNotNull(postroll)
 			
-			var postrollTime:Time = (postroll.begin.item(0) as Time);
-			var posrollEnd:Time = (postroll.end.item(0) as Time);
+			var postrollTime:Time = (postroll.currentBeginInterval);
+			var posrollEnd:Time = (postroll.currentEndInterval);
 			
 			Assert.assertNotNull(postrollTime);
 			Assert.assertNotNull(posrollEnd);
+
+			Assert.assertEquals(70, postrollTime.resolvedOffset);
+			Assert.assertEquals(80, posrollEnd.resolvedOffset);
 			
-			postrollTime.resolve(true);
-			posrollEnd.resolve(true);
-			
-			Assert.assertEquals(70000, postrollTime.resolvedOffset);
-			Assert.assertEquals(80000, posrollEnd.resolvedOffset);
-			
-			(content.parentNode as ElementTimeContainer).resolve();
-			
-			Assert.assertEquals(80000, this._seqDocument.duration);
+			//Assert.assertEquals(80, this._seqDocument.duration);
 		}
-		
+
 		[Test(description="Tests that resolving a flat document with a begin= on an asset is calculated correctly")]
 		public function resolvesBeginTimesCorrectly():void
 		{
@@ -414,59 +345,50 @@ package org.smilkit.spec.tests.dom
 		  
 		  Assert.assertNotNull(content);
 		  
-		  var begin:Time = (content.begin.item(0) as Time);
-		  var end:Time = (content.end.item(0) as Time);
+		  (content as ElementTimeContainer).startup();
 		  
-		  begin.resolve();
-		  end.resolve();
-		  
-		  Assert.assertEquals(5000, begin.resolvedOffset);
-		  Assert.assertEquals(15000, end.resolvedOffset);
+		  var begin:Time = (content as ElementTimeContainer).currentBeginInterval;
+		  var end:Time = (content as ElementTimeContainer).currentEndInterval;
+
+		  Assert.assertEquals(5, begin.resolvedOffset);
+		  Assert.assertEquals(15, end.resolvedOffset);
 		}
-		
+
 		[Test(description="Tests resolving a flat-packed set of parallel assets, i.e. all the times are defined in the SMIL")]
 		public function resolvesFlatParallel():void
 		{
-			var parent:IElementParallelTimeContainer = this._parDocument.getElementById("holder") as IElementParallelTimeContainer;
+			var parent:ElementParallelTimeContainer = this._parDocument.getElementById("holder") as ElementParallelTimeContainer;
 			
 			Assert.assertNotNull(parent);
 			
-			var parentBegin:Time = (parent.begin.item(0) as Time);
-			var parentEnd:Time = (parent.end.item(0) as Time);
+			var parentBegin:Time = (parent.currentBeginInterval);
+			var parentEnd:Time = (parent.currentEndInterval);
+
+			var preroll:SMILMediaElement = (this._parDocument.getElementById("preroll") as SMILMediaElement);
 			
-			parentBegin.resolve();
+			Assert.assertNotNull(preroll);
 			
-			var preroll:ISMILMediaElement = (this._parDocument.getElementById("preroll") as ISMILMediaElement);
-			
-			Assert.assertNotNull(preroll)
-			
-			var prerollTime:Time = (preroll.begin.item(0) as Time);
-			var prerollEnd:Time = (preroll.end.item(0) as Time);
+			var prerollTime:Time = (preroll.currentBeginInterval);
+			var prerollEnd:Time = (preroll.currentEndInterval);
 			
 			Assert.assertNotNull(prerollTime);
 			Assert.assertNotNull(prerollEnd);
 			
-			prerollTime.resolve();
-			prerollEnd.resolve();
-			
-			var content:ISMILMediaElement = (this._parDocument.getElementById("content") as ISMILMediaElement);
+			var content:SMILMediaElement = (this._parDocument.getElementById("content") as SMILMediaElement);
 			
 			Assert.assertNotNull(content)
 			
-			var contentTime:Time = (content.begin.item(0) as Time);
-			var contentEnd:Time = (content.end.item(0) as Time);
+			var contentTime:Time = (content.currentBeginInterval);
+			var contentEnd:Time = (content.currentEndInterval);
 			
 			Assert.assertNotNull(contentTime);
 			Assert.assertNotNull(contentEnd);
 			
-			contentTime.resolve();
-			contentEnd.resolve();
+			Assert.assertEquals(10, prerollEnd.resolvedOffset);
+			Assert.assertEquals(60, contentEnd.resolvedOffset);
 			
-			Assert.assertEquals(10000, prerollEnd.resolvedOffset);
-			Assert.assertEquals(60000, contentEnd.resolvedOffset);
-			
-			//parentEnd.resolve();
-			//Assert.assertEquals(60, parentEnd.resolvedOffset);
+			parent.startup(true);
+			Assert.assertEquals(60, parentEnd.resolvedOffset);
 		}
 		
 		[Test(description="Tests a document and parent element having timeChildren")]

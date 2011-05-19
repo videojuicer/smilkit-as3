@@ -51,7 +51,7 @@ package org.smilkit.dom.smil
 		{
 			var duration:Number = super.duration;
 			
-			if (this.hasChildNodes() && (duration == 0 && !this.hasDuration())) // counts special constants like UNRESOLVED
+			if (this.hasChildNodes() && (duration == Time.MEDIA && !this.hasDuration())) // counts special constants like UNRESOLVED
 			{
 				var childDuration:Number = 0;
 				
@@ -60,12 +60,12 @@ package org.smilkit.dom.smil
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
 						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
-						container.resolve();
+						//container.resolve();
 						
-						if (!(container.end as TimeList).resolved)
-						{
-							return Time.UNRESOLVED;
-						}
+						//if (!(container.end as TimeList).resolved)
+						//{
+						//	return Time.UNRESOLVED;
+						//}
 						
 						if (container.end.first.resolvedOffset > childDuration)
 						{
@@ -80,6 +80,8 @@ package org.smilkit.dom.smil
 					
 					return childDuration;
 				}
+				
+				return Time.UNRESOLVED;
 			}
 			return duration;
 		}

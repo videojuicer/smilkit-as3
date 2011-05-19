@@ -1,6 +1,14 @@
 package org.smilkit.dom.smil
 {
+	import com.hurlant.util.asn1.parser.nulll;
+	
+	import mx.effects.easing.Back;
+	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
+	import org.smilkit.dom.smil.expressions.SMILReferenceExpressionParser;
+	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
 	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INode;
@@ -11,16 +19,59 @@ package org.smilkit.dom.smil
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
-		protected var _lastBeginAttributeValue:String = null;
+		public static const PLAYBACK_STATE_PAUSED:uint = 0;
+		public static const PLAYBACK_STATE_PLAYING:uint = 1;
+		public static const PLAYBACK_STATE_SEEKING:uint = 2;
 		
-		protected var _beginList:ITimeList;
-		protected var _endList:ITimeList;
+		protected var _implicitMediaDuration:Time = null;
 		
-		protected var _durationParser:SMILTimeParser;
+		protected var _beginList:TimeList = null;
+		protected var _endList:TimeList = null;
+		
+		protected var _currentBeginInterval:Time = null;
+		protected var _currentEndInterval:Time = null;
+		
+		protected var _previousBeginInterval:Time = null;
+		protected var _previousEndInterval:Time = null;
+		
+		protected var _isPlaying:Boolean = false;
+		
+		protected var _activeDuration:Time = null;
+		
+		protected var _activatedAt:Number = Time.UNRESOLVED;
+		protected var _deactivatedAt:Number = Time.UNRESOLVED;
+		
+		protected var _beginDependencies:Vector.<ElementTimeContainer>;
+		protected var _endDependencies:Vector.<ElementTimeContainer>;
+		
+		protected var _playbackState:uint = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		
 		public function ElementTimeContainer(owner:IDocument, name:String)
 		{
 			super(owner, name);
+			
+			this._beginDependencies = new Vector.<ElementTimeContainer>();
+			this._endDependencies = new Vector.<ElementTimeContainer>();
+		}
+		
+		public function get currentBeginInterval():Time
+		{
+			return this._currentBeginInterval;
+		}
+		
+		public function get currentEndInterval():Time
+		{
+			return this._currentEndInterval;
+		}
+		
+		public function get previousBeginInterval():Time
+		{
+			return this._previousBeginInterval;
+		}
+		
+		public function get previousEndInterval():Time
+		{
+			return this._previousEndInterval;
 		}
 		
 		public function get timeChildren():INodeList
@@ -38,15 +89,28 @@ package org.smilkit.dom.smil
 			return null;
 		}
 		
+		public function get playbackState():uint
+		{
+			return this._playbackState;
+		}
+		
 		public function get begin():ITimeList
 		{
-			var beginAttributeValue:String = this.getAttribute("begin");
-			
-			if (this._beginList == null || this._lastBeginAttributeValue != beginAttributeValue)
+			return this.beginList;
+		}
+		
+		public function get beginList():TimeList
+		{
+			if (this._beginList == null)
 			{
-				this._lastBeginAttributeValue = beginAttributeValue;
+				var tokenString:String = this.getAttribute("begin");
 				
-				this._beginList = ElementTime.parseTimeAttribute(this._lastBeginAttributeValue, this, true);
+				if (tokenString == null || tokenString == "")
+				{
+					tokenString = "0ms";
+				}
+				
+				this._beginList = new TimeList(this, true, tokenString);
 			}
 			
 			return this._beginList;
@@ -54,22 +118,27 @@ package org.smilkit.dom.smil
 		
 		public function set begin(begin:ITimeList):void
 		{
-			this._beginList = begin;
+			
 		}
 		
 		public function get end():ITimeList
 		{
-			if (this._endList == null)
-			{
-				this._endList = ElementTime.parseTimeAttribute(this.getAttribute("end"), this, false);
-			}
-			
-			return this._endList;
+			return this.endList;
 		}
 		
 		public function set end(end:ITimeList):void
 		{
-			this._endList = end;
+			
+		}
+		
+		public function get endList():TimeList
+		{
+			if (this._endList == null)
+			{
+				this._endList = new TimeList(this, false, this.getAttribute("end"));
+			}
+			
+			return this._endList;
 		}
 		
 		public function get dur():String
@@ -77,9 +146,18 @@ package org.smilkit.dom.smil
 			return this.getAttribute("dur");
 		}
 		
+		// need:
+		// implicitDuration -> media duration
+		// simpleDuration -> defined duration
+		// activeDuration -> time to keep the asset playing
+		// renderedDuration -> time to keep the asset on the stage
+		
 		public function get duration():Number
-		{	
-			if (this._durationParser == null)
+		{		
+			// we havent decided on a duration yet so we use the smil default
+			return Time.MEDIA;
+			
+			/*if (this._durationParser == null)
 			{
 				this._durationParser = new SMILTimeParser(this, this.getAttribute("dur"));
 			}
@@ -89,7 +167,7 @@ package org.smilkit.dom.smil
 				this._durationParser.parse(this.getAttribute("dur"));
 			}
 			
-			return this._durationParser.milliseconds;
+			return this._durationParser.milliseconds;*/
 		}
 		
 		/**
@@ -104,12 +182,17 @@ package org.smilkit.dom.smil
 		*/
 		public function get durationResolved():Boolean
 		{
-            return this.hasAttribute("dur");
+            if (this.hasAttribute("dur"))
+			{
+				return (this.duration != Time.UNRESOLVED);
+			}
+			
+			return false;
 		}
 		
 		public function set dur(dur:String):void
 		{
-			this.setAttribute("dur", dur.toString()+"ms");
+			this.setAttribute("dur", dur.toString());
 		}
 		
 		public function get restart():uint
@@ -202,6 +285,12 @@ package org.smilkit.dom.smil
 		
 		public function get parentTimeContainer():IElementTimeContainer
 		{
+			// our parent time container is the body rather than the document
+			if (this.nodeName == "body")
+			{
+				return this;
+			}
+			
 			var parent:IElementTimeContainer = null;
 			var element:INode = this;
 			var i:int = 0;
@@ -229,49 +318,487 @@ package org.smilkit.dom.smil
 		
 		public function beginElement():Boolean
 		{
-			return false;
+			// should be making a begin time at the current offset
+			
+			(this.ownerDocument as SMILDocument).eventStack.triggerEvent(this, SMILEventStack.SMILELEMENT_BEGIN);
+			
+			return true;
 		}
 		
 		public function endElement():Boolean
 		{
-			return false;
+			(this.ownerDocument as SMILDocument).eventStack.triggerEvent(this, SMILEventStack.SMILELEMENT_END);
+				
+			return true;
 		}
 		
 		public function pauseElement():void
 		{
+			var previousState:uint = this._playbackState;
+			
 			// pause children
+			if (this.hasChildNodes())
+			{
+				for (var i:int = 0; i < this.timeDescendants.length; i++)
+				{
+					if (this.timeDescendants.item(i) is ElementTimeContainer)
+					{
+						(this.timeDescendants.item(i) as ElementTimeContainer).pauseElement();
+					}
+				}
+			}
+			
+			this._playbackState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
+			
+			var event:SMILMutationEvent = new SMILMutationEvent();
+			event.initMutationEvent(SMILMutationEvent.DOM_PLAYBACK_STATE_MODIFIED, true, false, (this as INode), previousState.toString(), this._playbackState.toString(), "playback_state", 1);
+		
+			this.ownerDocument.dispatchEvent(event);
 		}
 		
 		public function resumeElement():void
 		{
+			var previousState:uint = this._playbackState;
+			
 			// resume children
+			if (this.hasChildNodes())
+			{
+				for (var i:int = 0; i < this.timeDescendants.length; i++)
+				{
+					if (this.timeDescendants.item(i) is ElementTimeContainer)
+					{
+						(this.timeDescendants.item(i) as ElementTimeContainer).resumeElement();
+					}
+				}
+			}
+			
+			this._playbackState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
+			
+			var event:SMILMutationEvent = new SMILMutationEvent();
+			event.initMutationEvent(SMILMutationEvent.DOM_PLAYBACK_STATE_MODIFIED, true, false, (this as INode), previousState.toString(), this._playbackState.toString(), "playback_state", 1);
+		
+			this.ownerDocument.dispatchEvent(event);
 		}
 		
 		public function seekElement(seekTo:Number):void
 		{
-			// seek children 
+			// seek children
+			
+			// for syncBehaviour support
+			
+			// set a seek flag
+			// timing graph or render tree picks up on the flag and performs the seek
+			// seek flag is removed
+		}
+
+		
+		
+		
+		
+		
+		public function computeImplicitDuration():Time
+		{
+			return this._implicitMediaDuration;
 		}
 		
-		public function resolve():void
+		public function set implicitMediaDuration(time:Time):void
 		{
-			var begin:TimeList = (this.begin as TimeList);
-			var end:TimeList = (this.end as TimeList);
+			this._implicitMediaDuration = time;
 			
-			if (begin != null)
+			this.resetElementState();
+			this.startup(true);
+		}
+		
+		public function resetElementState():void
+		{
+			this._currentBeginInterval = null;
+			this._currentEndInterval = null;
+		}
+		
+		/**
+		 * Intermediate Active Duration Computation
+		 * 
+		 * @see http://www.w3.org/TR/SMIL3/smil-timing.html#q84
+		 */
+		public function computeSimpleDurationTime():Time
+		{
+			var dur:Time = new Time(this, false, this.dur);
+			
+			if (dur.resolvedOffset < 0)
 			{
-				begin.resolve();
+				dur = null;
 			}
 			
-			if (end != null)
+			if (dur == null && this.endList.isDefined)
 			{
-				end.resolve();
+				return new Time(this, false, "indefinite");
+			}
+			
+			var implicitDuration:Time = this.computeImplicitDuration();
+			if (dur == null && implicitDuration != null && implicitDuration.resolved)
+			{
+				return implicitDuration;
+			}
+			
+			if (dur == null)
+			{
+				return new Time(this, false, "unresolved");
+			}
+			
+			if (dur.indefinite)
+			{
+				return new Time(this, false, "indefinite");
+			}
+			
+			if (dur.resolved)
+			{
+				return dur;
+			}
+			
+			return new Time(this, false, "unresolved");
+		}
+		
+		/**
+		 * Intermediate Active Duration Computation
+		 * 
+		 * @see http://www.w3.org/TR/SMIL3/smil-timing.html#q84
+		 */
+		public function computeIntermediateDurationTime(simpleDurationTime:Time):Time
+		{
+			var p0:Time = simpleDurationTime;
+			var p1:Time = new Time(this, false, "indefinite"); // repeat count
+			var p2:Time = new Time(this, false, "indefinite"); // repeat dur
+			
+			if (p0.resolvedOffset == 0)
+			{
+				return new Time(this, false, "0ms");
+			}
+			else if (p1.indefinite && p2.indefinite)
+			{
+				return p0;
+			}
+			else
+			{
+				return SMILTimeHelper.min(SMILTimeHelper.min(p1, new Time(this, false, "indefinite")), SMILTimeHelper.min(p2, new Time(this, false, "indefinite")));
 			}
 		}
 		
-		public function unresolve():void
+		/**
+		 * Active duration algorithm
+		 * 
+		 * @see http://www.w3.org/TR/SMIL3/smil-timing.html#q83
+		 */
+		public function computeActiveDuation(begin:Time, end:Time):Time
 		{
-			(this.begin as TimeList).invalidate();
-			(this.end as TimeList).invalidate();
+			var dur:Time = new Time(this, false, this.dur);
+			
+			var d:Time = this.computeSimpleDurationTime();
+			var pad:Time = new Time(this, false, "indefinite");
+			var iad:Time = this.computeIntermediateDurationTime(d);
+			var ad:Time = null;
+			
+			var min:Time = new Time(this, false, "0ms");
+			var max:Time = new Time(this, false, "indefinite");
+			
+			if (end != null && end.indefinite && d.indefinite)
+			{
+				if (end.resolved)
+				{
+					pad = SMILTimeHelper.subtract(end, begin);
+				}
+				else if (end.indefinite)
+				{
+					pad = new Time(this, false, "indefinite");
+				}
+				else
+				{
+					pad = new Time(this, false, "unresolved");
+				}
+			}
+			else if (end == null || end.indefinite)
+			{
+				pad = iad;
+			}
+			else
+			{
+				pad = SMILTimeHelper.min(iad, SMILTimeHelper.subtract(end, begin));
+			}
+			
+			ad = SMILTimeHelper.min(max, SMILTimeHelper.max(min, pad));
+			
+			this._activeDuration = ad;
+			
+			return ad;
+		}
+		
+		public function gatherFirstInterval():void
+		{
+			var beginAfter:Time = new Time(this, true, Time.NEGATIVE_INDEFINITE.toString() + "ms");
+			
+			var tempBegin:Time = null;
+			var tempEnd:Time = null;
+			
+			// calculate the first current interval
+			while (true)
+			{
+				tempBegin = this.beginList.getTimeGreaterThan(beginAfter);
+				
+				if (tempBegin == null)
+				{
+					this.setCurrentInterval(null, null);
+					
+					return;
+				}
+				
+				if (!this.endList.isDefined)
+				{
+					tempEnd = SMILTimeHelper.add(tempBegin, this.computeActiveDuation(tempBegin, null));
+				}
+				else
+				{
+					tempEnd = this.endList.getTimeGreaterThan(tempBegin);
+					
+					if (tempEnd == null)
+					{
+						tempEnd = new Time(this, false, "unresolved");
+					}
+					
+					tempEnd = this.computeActiveDuation(tempBegin, tempEnd);
+				}
+				
+				if (tempEnd.isGreaterThan(new Time(this, false, "0ms")))
+				{
+					this.setCurrentInterval(tempBegin, tempEnd);
+					
+					return;
+				}
+				else
+				{
+					beginAfter = tempEnd;
+				}
+			}
+		}
+		
+		public function setCurrentInterval(begin:Time, end:Time):void
+		{
+			this._previousBeginInterval = this._currentBeginInterval;
+			this._previousEndInterval = this._currentEndInterval;
+			
+			this._currentBeginInterval = begin;
+			this._currentEndInterval = end;
+
+			// if we havent changed dont notify parents or events
+			if (!(begin != null && this._previousBeginInterval == null)
+			&& !(begin != null && this._previousBeginInterval != null && !begin.isEqualTo(this._previousBeginInterval))
+			&&
+			(!(end != null && this._previousEndInterval == null)
+			&& !(end != null && this._previousEndInterval != null && !end.isEqualTo(this._previousEndInterval))))
+			{
+				return;
+			}
+			
+			// notify the parent we changed
+			(this.parentTimeContainer as ElementTimeContainer).childIntervalChanged(this);
+			
+			// notify dependencies that we changed
+			var event:SMILMutationEvent = new SMILMutationEvent();
+			event.initMutationEvent(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, true, false, this, null, null, null, 1);
+			
+			this.dispatchEvent(event);
+		}
+		
+		protected function childIntervalChanged(child:ElementTimeContainer):void
+		{
+			if (child == this)
+			{
+				return;
+			}
+			
+			// one of our children finished, so that means we should
+			// re-calculate the current intervals again
+			this.resetElementState();
+			this.startup();
+		}
+		
+		public function gatherNextInterval():void
+		{
+			var beginAfter:Time = this._currentBeginInterval;
+			
+			var tempBegin:Time = this.beginList.getTimeGreaterThan(beginAfter);
+			var tempEnd:Time = null;
+			
+			if (tempBegin == null)
+			{
+				this.setCurrentInterval(null, null);
+				
+				return;
+			}
+			
+			if (!this._endList.isDefined)
+			{
+				tempEnd = SMILTimeHelper.add(tempBegin, this.computeActiveDuation(tempBegin, null));
+			}
+			else
+			{
+				tempEnd = this.endList.getTimeGreaterThan(tempBegin);
+				
+				if (tempEnd != null && tempEnd.isEqualTo(this._currentEndInterval))
+				{
+					tempEnd = this.endList.getTimeGreaterThan(tempEnd);
+				}
+				
+				if (tempEnd == null)
+				{
+					// events are open ended ..
+				}
+				
+				tempEnd = this.computeActiveDuation(tempBegin, tempEnd);
+			}
+			
+			this.setCurrentInterval(tempBegin, tempEnd);
+		}
+		
+		public function startChildren():void
+		{
+			// loop time children and call startup()
+			var children:INodeList = this.timeChildren;
+			
+			for (var i:uint = 0; i < children.length; i++)
+			{
+				(children.item(i) as ElementTimeContainer).startup();
+			}
+		}
+		
+		public function offsetForChild(child:ElementTimeContainer):Number
+		{
+			return 0;
+		}
+		
+		public function get isPlaying():Boolean
+		{
+			return this._isPlaying;
+		}
+		
+		public function startup(skipChildren:Boolean = false):void
+		{
+			this._isPlaying = false;
+			
+			this._activatedAt = Time.UNRESOLVED;
+			this._deactivatedAt = Time.UNRESOLVED;
+			
+			(this.ownerDocument as SMILDocument).timeGraph.removeWaiting(this.deactivate);
+			
+			this.startChildren();
+			
+			this.setupFirstInterval();
+			
+			this.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onDOMTreeModified, false);
+		}
+		
+		protected function onDOMTreeModified(e:MutationEvent):void
+		{
+			this.resetElementState();
+			this.startup();
+		}
+		
+		protected function setupFirstInterval():void
+		{
+			this.gatherFirstInterval();
+			
+			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
+			{
+				var waitTime:Number = this.currentBeginInterval.resolvedOffset - (this.ownerDocument as SMILDocument).offset;
+				var waiting:Boolean = (this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+				
+				// setup timer if we need to wait (and were not meant to play)
+				if (!waiting && (this.parentTimeContainer as ElementTimeContainer).isPlaying)
+				{
+					this.activate();
+				}
+			}
+		}
+		
+		/**
+		 * Activates the element for playback, called after the begin has been
+		 * resolved, sets the element into a playing state.
+		 */
+		// TODO: MOVE TO beginElement()
+		public function activate():void
+		{
+			if (!(this.parentTimeContainer as ElementTimeContainer).isPlaying || this.currentBeginInterval.resolved)
+			{
+				return;
+			}
+			
+			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
+			this._isPlaying = true;
+			
+			// trigger a display
+			// this.startChildren();
+			
+			var waitTime:Number = 0;
+			
+			if (this._activeDuration != null && this._activeDuration.resolved && !this._activeDuration.indefinite)
+			{
+				waitTime = this._activeDuration.resolvedOffset + (this.ownerDocument as SMILDocument).offset;
+				
+				(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+			}
+			
+			var simpleDurationTime:Time = this.computeSimpleDurationTime();
+			
+			if (simpleDurationTime.resolved && !simpleDurationTime.indefinite)
+			{
+				if (this._activeDuration == null || this._activeDuration.indefinite || !this._activeDuration.resolved || this._activeDuration.isGreaterThan(simpleDurationTime))
+				{
+					waitTime = simpleDurationTime.resolvedOffset + (this.ownerDocument as SMILDocument).offset;
+					
+					(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+				}
+			}
+			
+			// dispatch beginEvent on DOM
+		}
+		
+		/**
+		 * Deactivates the element from playback, called after the end has been
+		 * resolved, sets the element into a paused state.
+		 */
+		// TODO: MOVE TO pauseElement()
+		public function deactivate():void
+		{
+			if (!this._isPlaying)
+			{
+				return;
+			}
+			
+			// deactivate time
+			this._deactivatedAt = (this._ownerDocument as SMILDocument).offset;
+			
+			// trigger either a remove display or freeze
+			
+			this._isPlaying = false;
+			
+			(this.ownerDocument as SMILDocument).timeGraph.removeWaiting(this.deactivate);
+			
+			// dispatch endEvent on DOM
+			
+			// notify parent that the element has stopped but we might go again
+			
+			// try and build the nextInternal
+			this.gatherNextInterval();
+			
+			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
+			{
+				var waitTime:Number = this.currentBeginInterval.resolvedOffset - (this.ownerDocument as SMILDocument).offset;
+				var waiting:Boolean = (this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+				
+				// setup timer if we need to wait (and were not meant to play)
+				if (!waiting && (this.parentTimeContainer as ElementTimeContainer).isPlaying)
+				{
+					this.activate();
+				}
+			}
 		}
 	}
 }

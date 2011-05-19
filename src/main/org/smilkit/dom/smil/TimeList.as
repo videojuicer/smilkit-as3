@@ -1,23 +1,44 @@
 package org.smilkit.dom.smil
 {
-	import org.utilkit.collection.List;
+	import org.hamcrest.mxml.object.Null;
+	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.expressions.SMILExpressionParser;
+	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.ITime;
 	import org.smilkit.w3c.dom.smil.ITimeList;
+	import org.utilkit.collection.List;
 	
 	public class TimeList implements ITimeList
 	{
-		protected var _times:Vector.<ITime>;
-		protected var _timesResolved:int = 0;
+		protected var _element:ElementTimeContainer = null;
 		
-		public function TimeList()
+		protected var _begin:Boolean = false;
+		protected var _tokenString:String = null;
+		
+		protected var _times:Vector.<Time>;
+
+		public function TimeList(element:ElementTimeContainer, begin:Boolean = false, tokenString:String = null)
 		{
-			this._times = new Vector.<ITime>();
+			this._element = element;
+			
+			this._begin = begin;
+			this._tokenString = tokenString;
+			
+			this._times = new Vector.<Time>();
+			
+			// go go go
+			this.parseAttribute();
 		}
 		
 		public function get length():int
 		{
 			return (this._times != null ? this._times.length : 0);
+		}
+		
+		public function get isDefined():Boolean
+		{
+			return (this.length > 0);
 		}
 		
 		public function get last():ITime
@@ -40,53 +61,96 @@ package org.smilkit.dom.smil
 			return null;
 		}
 		
+		public function get current():ITime
+		{
+			if (this.length > 0)
+			{
+				return this.item(0);
+			}
+			
+			return null;
+		}
+		
 		public function add(time:ITime):void
-		{
-			this.addAt(time, this._times.length);
+		{			
+			this._times.push(time);
+			
+			this._times.sort(this.sortTimeList);
 		}
 		
-		public function addAt(time:ITime, index:int):void
+		public function getTimeGreaterThan(time:Time):Time
 		{
-			this._times[index] = time;
+			var result:Time = null;
+			
+			for (var i:uint = 0; i < this._times.length; i++)
+			{
+				result = this._times[i];
+				
+				if (result.isGreaterThan(time))
+				{
+					return result;
+				}
+			}
+			
+			return null;
 		}
 		
+		protected function sortTimeList(a:Time, b:Time):int
+		{
+			if (b.isGreaterThan(a))
+			{
+				return -1
+			}
+			else if (a.isGreaterThan(b))
+			{
+				return 1;
+			}
+			
+			return 0;
+		}
+
 		public function item(index:int):ITime
 		{
 			return (this._times != null && index < this._times.length ? (this._times[index]) : null);
 		}
 		
-		public function get resolved():Boolean
+		public function parseAttribute():void
 		{
-			return (this._timesResolved == this.length);
-		}
-		
-		public function invalidate():void
-		{
-			for (var i:int = 0; i < this.length; i++)
+			if (this._tokenString != null && this._tokenString != "")
 			{
-				var time:Time = (this.item(i) as Time);
-				time.invalidate();
-			}
-		}
-		
-		public function resolve(force:Boolean=false):Boolean
-		{
-			var oldCount:int = this._timesResolved;
-			this._timesResolved = 0;
-			
-			for (var i:int = 0; i < this.length; i++)
-			{
-				var time:Time = (this.item(i) as Time);
+				// split the expression into many
+				var expressions:Array = this._tokenString.split(";");
 				
-				time.resolve(force);
-				
-				if (time.resolved)
+				for (var i:uint = 0; i < expressions.length; i++)
 				{
-					this._timesResolved++;
+					// our expression
+					var expression:String = expressions[i];
+					
+					var time:Time = new Time(this._element, this._begin, expressions[i]);
+					
+					this.add(time);
 				}
 			}
 			
-			return (oldCount < this._timesResolved);
+			/* NOOO we dont
+			// need to make sure we have an end for each begin
+			if (!this._baseBegin && this._baseElement != null)
+			{
+				var endCount:uint = this._times.length;
+				var beginCount:uint = this._baseElement.begin.length;
+				
+				if (endCount < beginCount)
+				{
+					var missing:uint = (beginCount - endCount);
+					var startIndex:uint = (beginCount - missing);
+					
+					for (var m:uint = 0; m < missing; m++)
+					{
+						
+					}
+				}
+			}
+			*/
 		}
 	}
 }

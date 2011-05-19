@@ -30,7 +30,7 @@ package org.smilkit.dom.smil
 			
 			if (selected != null)
 			{
-				selected.resolve();
+				//selected.resolve();
 				
 				return selected.duration;
 			}
@@ -57,7 +57,20 @@ package org.smilkit.dom.smil
 				}
 			}
 			
+			(selected as ElementTimeContainer).startup(true);
+			
 			return (selected as IElement);
+		}
+		
+		public override function resumeElement():void
+		{
+			// only resume the selected element
+			if (this.selectedElement != null)
+			{
+				this.resumeElement();
+			}
+			
+			this._playbackState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		}
 	}
 }

@@ -102,7 +102,7 @@ package org.smilkit.dom.smil
 					offset = (aOffset + bOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MULTIPLY:
-					offset = (aOffset * bOffset);
+					offset = (a.resolvedOffset * b.resolvedOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MINUS:
 					offset = (aOffset - bOffset);

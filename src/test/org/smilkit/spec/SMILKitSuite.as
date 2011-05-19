@@ -13,21 +13,23 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.ParentNodeTestCase;
 	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase;
+	import org.smilkit.spec.tests.dom.smil.ElementTimeContainerTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILMediaElementTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILSwitchElementTestCase;
+	import org.smilkit.spec.tests.dom.smil.SMILTimeHelperTestCase;
 	import org.smilkit.spec.tests.handler.HTTPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.HandlerTestCase;
 	import org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase;
 	import org.smilkit.spec.tests.handler.SMILReferenceHandlerTestCase;
 	import org.smilkit.spec.tests.load.LoadSchedulerTestCase;
 	import org.smilkit.spec.tests.load.WorkerTestCase;
+	import org.smilkit.spec.tests.parsers.SMILTimeParserTestCase;
 	import org.smilkit.spec.tests.render.DrawingBoardTestClass;
 	import org.smilkit.spec.tests.render.RenderTreeTestCase;
 	import org.smilkit.spec.tests.time.HeartbeatTestCase;
-	import org.smilkit.spec.tests.time.TimingGraphTestCase;
+	import org.smilkit.spec.tests.dom.smil.SMILTimeGraphTestCase;
 	import org.smilkit.spec.tests.view.ViewportTestCase;
-	import org.smilkit.time.TimingGraph;
 	
 	/**
 	 * DOM test suite, contains <code>TestCases</code> for testing SMILKits implemented DOM.
@@ -36,7 +38,7 @@ package org.smilkit.spec
 	[RunWith("org.flexunit.runners.Suite")]
 	public class SMILKitSuite
 	{
-		// SMIL DOM Tests
+		// DOM Tests
 		public var documentTest:DocumentTestCase;
 		public var elementTest:ElementTestCase;
 		public var bostonDOMParserTest:BostonDOMParserTestCase;
@@ -45,9 +47,14 @@ package org.smilkit.spec
 		public var elementTimeDescendantNodeList:ElementTimeDescendantNodeListTestCase;
 		public var smilMediaElementTest:SMILMediaElementTestCase;		
 		public var parentNodeTest:ParentNodeTestCase;
+		
+		// SMIL Tests
+		public var elementTimeContainerTest:ElementTimeContainerTestCase;
 		public var elementTestContainerTest:ElementTestContainerTestCase;
 		public var smilDocumentVariablesTest:SMILDocumentVariablesTestCase;
 		public var smilSwitchElementTest:SMILSwitchElementTestCase;
+		public var smilTimeParserTest:SMILTimeParserTestCase;
+		public var smilTimeHelperTest:SMILTimeHelperTestCase;
 		
 		// Asset Handler Tests
 		public var handlerTest:HandlerTestCase;
@@ -62,7 +69,7 @@ package org.smilkit.spec
 		public var drawingBoardTest:DrawingBoardTestClass;
 		public var heartbeatTest:HeartbeatTestCase;
 		public var renderTreeTest:RenderTreeTestCase;
-		public var timingGraph:TimingGraphTestCase;
+		public var timingGraph:SMILTimeGraphTestCase;
 		public var loadSchedulerTest:LoadSchedulerTestCase;
 		public var workerTest:WorkerTestCase;
 	}

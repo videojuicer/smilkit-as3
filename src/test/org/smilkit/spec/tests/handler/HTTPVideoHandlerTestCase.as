@@ -4,6 +4,7 @@ package org.smilkit.spec.tests.handler
 	
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.parsers.BostonDOMParser;
@@ -53,7 +54,8 @@ package org.smilkit.spec.tests.handler
 			Assert.assertEquals(210930, e.handler.duration);
 			
 			// check the dom is still using the defined smil ending
-			Assert.assertEquals(10000, e.handler.element.duration);
+			Assert.assertEquals(10, (e.handler.element as ElementTimeContainer).currentEndInterval.resolvedOffset);
+			Assert.assertEquals(10, (e.handler.element as ElementTimeContainer).computeSimpleDurationTime().resolvedOffset);
 		}
 		
 		protected function onHandlerResolveTimeout(passThru:Object):void

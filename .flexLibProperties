@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
-    <classEntry path="org.smilkit.dom.smil.SMILDocument"/>
     <classEntry path="org.smilkit.dom.smil.SMILElement"/>
     <classEntry path="org.smilkit.dom.smil.SMILMediaElement"/>
     <classEntry path="org.smilkit.dom.smil.SMILRefElement"/>
@@ -13,8 +12,7 @@
     <classEntry path="org.smilkit.parsers.BostonDOMParser"/>
     <classEntry path="org.smilkit.view.Viewport"/>
     <classEntry path="org.smilkit.spec.tests.dom.BostonDOMParserTestCase"/>
-    <classEntry path="org.smilkit.time.TimingGraph"/>
-    <classEntry path="org.smilkit.time.TimingNode"/>
+    <classEntry path="org.smilkit.dom.smil.SMILTimeInstance"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEventTarget"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEvent"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEventListener"/>
@@ -72,7 +70,6 @@
     <classEntry path="org.smilkit.time.SharedTimer"/>
     <classEntry path="org.smilkit.dom.smil.SMILDocumentVariables"/>
     <classEntry path="org.smilkit.dom.smil.events.SMILMutationEvent"/>
-    <classEntry path="org.smilkit.dom.smil.ElementTest"/>
     <classEntry path="org.smilkit.dom.smil.ElementTestContainer"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase"/>
@@ -80,6 +77,17 @@
     <classEntry path="org.smilkit.dom.smil.ElementExclusiveTimeContainer"/>
     <classEntry path="org.smilkit.parsers.SMILEventParser"/>
     <classEntry path="org.smilkit.parsers.tokenizer.ITokenContext"/>
+    <classEntry path="org.smilkit.dom.smil.expressions.SMILTimeExpressionParser"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.expressions.SMILTimeExpressionParserTestCase"/>
+    <classEntry path="org.smilkit.spec.tests.parsers.SMILTimeParserTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.expressions.SMILReferenceExpressionParser"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.expressions.SMILReferenceExpressionParserTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.SMILEventStack"/>
+    <classEntry path="org.smilkit.dom.smil.SMILTimeGraph"/>
+    <classEntry path="org.smilkit.dom.smil.expressions.SMILExpressionParser"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.ElementTimeContainerTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.SMILTimeHelper"/>
+    <classEntry path="org.smilkit.spec.tests.dom.smil.SMILTimeHelperTestCase"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

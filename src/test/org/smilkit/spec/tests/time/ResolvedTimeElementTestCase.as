@@ -5,20 +5,20 @@ package org.smilkit.spec.tests.time
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.time.TimingNode;
+	import org.smilkit.dom.smil.SMILTimeInstance;
+	import org.smilkit.dom.smil.Time;
 
 	public class ResolvedTimeElementTestCase
 	{		
-		private var resolvedTimeElement:TimingNode;
+		private var resolvedTimeElement:SMILTimeInstance;
 			
 		[Before]
 		public function setUp():void
 		{
-			resolvedTimeElement= new TimingNode(
+			this.resolvedTimeElement = new SMILTimeInstance(
 				new SMILMediaElement(new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd")), "tester"), 
-				0, 
-				10);
-
+				new Time(null, true, "0ms"),
+				new Time(null, false, "10s"));
 		}
 		
 		[After]

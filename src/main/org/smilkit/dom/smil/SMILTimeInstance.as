@@ -120,7 +120,7 @@ package org.smilkit.dom.smil
 // 			
 //			return false;
 
-			var now:Time = new Time(null, false, offset + "s");
+			var now:Time = new Time(null, false, offset + "ms");
 			
 			return ((now.isGreaterThan(this.begin) || now.isEqualTo(this.begin)) && this.end.isGreaterThan(now));
 			

@@ -3,6 +3,7 @@ package org.smilkit.spec.tests.dom.smil
 	import flexunit.framework.Assert;
 	
 	import org.smilkit.dom.smil.ElementTestContainer;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILDocumentVariables;
 	import org.smilkit.dom.smil.SMILSwitchElement;
@@ -37,11 +38,13 @@ package org.smilkit.spec.tests.dom.smil
 		public function documentWithSwitchResolvesCorrectly():void
 		{
 			var element:SMILSwitchElement = (this._document.getElementById("switch_block") as SMILSwitchElement);
+			var selected:ElementTestContainer = (element.selectedElement as ElementTestContainer);
 			
 			Assert.assertNotNull(element);
+			Assert.assertNotNull(selected);
 		
-			Assert.assertEquals(5000, element.duration);
-			Assert.assertEquals(5000, this._document.duration);
+			Assert.assertEquals(5, element.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(5, (element.parentTimeContainer as ElementTimeContainer).currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Tests that a switch block selects the correct element based on the first child to pass the tests")]
@@ -66,13 +69,16 @@ package org.smilkit.spec.tests.dom.smil
 		public function switchIgnoresNonTestContainers():void
 		{
 			var element:SMILSwitchElement = (this._document.getElementById("switch_block") as SMILSwitchElement);
+			var selected:ElementTestContainer = (element.selectedElement as ElementTestContainer);
 			
 			Assert.assertNotNull(element);
+			Assert.assertNotNull(selected);
 			
-			Assert.assertEquals(3.0, (element.selectedElement as ElementTestContainer).getAttribute(SMILDocumentVariables.SYSTEM_VERSION));
+			Assert.assertEquals(3.0, selected.getAttribute(SMILDocumentVariables.SYSTEM_VERSION));
+			Assert.assertEquals(5, selected.currentEndInterval.resolvedOffset);
 			
-			Assert.assertEquals(5000, element.duration);
-			Assert.assertEquals(5000, this._document.duration);
+			Assert.assertEquals(5, element.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(5, (element.parentTimeContainer as ElementTimeContainer).currentEndInterval.resolvedOffset);
 		}
 	}
 }

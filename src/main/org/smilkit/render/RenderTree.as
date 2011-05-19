@@ -683,7 +683,7 @@ package org.smilkit.render
 						actionTime = addedTimingNodes[a];
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
-						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): ADD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): ADD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin.resolvedOffset+"s-"+actionTime.end.resolvedOffset+"s)", this);
 						
 						this.addTimingNodeHandlerToActiveList(actionTime);
 					}
@@ -694,7 +694,7 @@ package org.smilkit.render
 						actionTime = removedTimingNodes[r];
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
-						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): REMOVE "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): REMOVE "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin.resolvedOffset+"s-"+actionTime.end.resolvedOffset+"s)", this);
 						
 						this.removeTimingNodeHandlerFromActiveList(actionTime);
 					}
@@ -705,7 +705,7 @@ package org.smilkit.render
 						actionTime = modifiedTimingNodes[m];
 						actionHandler = (actionTime.element as SMILMediaElement).handler;
 						
-						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): MOD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin+"ms-"+actionTime.end+"ms)", this);
+						SMILKit.logger.debug("RenderTree.updateAt("+offset+"): MOD "+actionHandler.handlerId+":"+actionHandler+"("+actionTime.begin.resolvedOffset+"s-"+actionTime.end.resolvedOffset+"s)", this);
 						
 						this.timingNodeModifiedOnActiveList(actionTime);
 					}

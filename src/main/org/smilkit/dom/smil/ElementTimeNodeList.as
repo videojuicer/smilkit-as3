@@ -26,19 +26,6 @@ package org.smilkit.dom.smil
 			return this._nodes.length;
 		}
 		
-		public function unresolve():void
-		{
-			for (var i:int = 0; i < this.length; i++)
-			{
-				var node:ElementTimeContainer = (this.item(i) as ElementTimeContainer);
-				
-				if (node != null)
-				{
-					node.unresolve();
-				}
-			}
-		}
-		
 		public function item(index:int):INode
 		{
 			var current:INode = null;

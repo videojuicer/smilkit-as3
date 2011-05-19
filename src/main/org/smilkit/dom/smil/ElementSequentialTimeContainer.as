@@ -36,7 +36,7 @@ package org.smilkit.dom.smil
 		{
 			var duration:Number = super.duration;
 			
-			if (this.hasChildNodes() && (duration == 0 && !this.hasDuration()))
+			if (this.hasChildNodes() && ((duration == Time.MEDIA) && !this.hasDuration()))
 			{
 				var childDuration:Number = 0;
 				
@@ -45,17 +45,17 @@ package org.smilkit.dom.smil
 					if (this.timeDescendants.item(i) is ElementTimeContainer)
 					{
 						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
-						container.resolve();
+						//container.resolve();
 						
-						if (!(container.end as TimeList).resolved)
-						{
-							return Time.UNRESOLVED;
-						}
+						//if (!(container.end as TimeList).resolved)
+						//{
+						//	return Time.UNRESOLVED;
+						//}
 						
-						if (container.end.first.resolvedOffset > childDuration)
-						{
-							childDuration = container.end.first.resolvedOffset;
-						}
+						//if (container.end.first.resolvedOffset > childDuration)
+						//{
+						//	childDuration = container.end.first.resolvedOffset;
+						//}
 					}
 				}
 				
@@ -65,8 +65,64 @@ package org.smilkit.dom.smil
 					
 					return childDuration;
 				}
+				
+				return Time.UNRESOLVED;
 			}
+			
 			return duration;
+		}
+		
+		public override function offsetForChild(element:ElementTimeContainer):Number
+		{
+			var duration:Number = 0;
+			
+			var timeChildren:INodeList = this.timeChildren;
+			
+			for (var i:uint = 0; i < timeChildren.length; i++)
+			{
+				var child:ElementTimeContainer = (timeChildren.item(i) as ElementTimeContainer);
+				
+				if (element == child)
+				{
+					return duration;
+				}
+				
+				if (child.currentEndInterval == null || !child.currentEndInterval.resolved)
+				{
+					return Time.UNRESOLVED;
+				}
+				
+				duration = child.currentEndInterval.resolvedOffset;
+			}
+			
+			return duration;
+		}
+		
+		public override function computeImplicitDuration():Time
+		{
+			// no duration defined on a par, so we use the children
+			var duration:Number = 0;
+			var timeChilden:INodeList = this.timeChildren;
+			
+			for (var i:uint = 0; i < timeChildren.length; i++)
+			{
+				var child:ElementTimeContainer = (timeChildren.item(i) as ElementTimeContainer);
+				
+				if (child.currentEndInterval == null || !child.currentEndInterval.resolved)
+				{
+					return new Time(this, false, "unresolved");
+				}
+				else if (child.currentEndInterval.indefinite)
+				{
+					return new Time(this, false, "indefinite");
+				}
+				else
+				{
+					duration = child.currentEndInterval.resolvedOffset * 1000;
+				}
+			}
+			
+			return new Time(this, false, duration + "ms");
 		}
 	}
 }

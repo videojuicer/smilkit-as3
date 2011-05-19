@@ -31,8 +31,9 @@ package org.smilkit.dom.smil
 		}
 		
 		public static function parseTimeAttribute(attributeValue:String, baseElement:INode, baseBegin:Boolean):ITimeList
-		{			
-			var list:TimeList = new TimeList();
+		{	
+			/*
+			var list:TimeList = null; //new TimeList();
 			
 			if (attributeValue == null || attributeValue == "")
 			{
@@ -88,8 +89,8 @@ package org.smilkit.dom.smil
 					list.add(parsedTime);
 				}
 			}
-			
-			return list;
+			*/
+			return null;
 		}
 	}
 }

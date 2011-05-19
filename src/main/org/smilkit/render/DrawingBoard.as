@@ -19,7 +19,7 @@ package org.smilkit.render
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.time.TimingNode;
+	import org.smilkit.dom.smil.SMILTimeInstance;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.logger.Logger;
@@ -28,7 +28,7 @@ package org.smilkit.render
 	{
 		protected var _renderTree:RenderTree;
 		protected var _canvas:Sprite;
-		protected var _elements:Vector.<TimingNode>;
+		protected var _elements:Vector.<SMILTimeInstance>;
 		protected var _regions:Vector.<RegionContainer>;
 		
 		protected var _boundingRect:Rectangle = new Rectangle(0, 0, 0, 0);
@@ -117,7 +117,7 @@ package org.smilkit.render
 		{
 			if (this.renderTree != null)
 			{
-				var elements:Vector.<TimingNode> = this._renderTree.elements;
+				var elements:Vector.<SMILTimeInstance> = this._renderTree.elements;
 				
 				if (elements != null)
 				{
@@ -127,7 +127,7 @@ package org.smilkit.render
 					
 					for (var i:int = 0; i < elements.length; i++)
 					{
-						var time:TimingNode = elements[i];
+						var time:SMILTimeInstance = elements[i];
 						
 						// check if it doesnt exist yet
 						if (this._elements.indexOf(time) == -1)
@@ -242,7 +242,7 @@ package org.smilkit.render
 			
 			SMILKit.logger.debug("Resetting the DrawingBoard and Canvas state", this);
 			
-			this._elements = new Vector.<TimingNode>();
+			this._elements = new Vector.<SMILTimeInstance>();
 			this._canvas = new Sprite();
 			
 			if (this._renderTree != null)
@@ -251,9 +251,9 @@ package org.smilkit.render
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onRenderTreeElementRemoved);
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
 				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
-				
-				this._renderTree.timingGraph.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
-				this._renderTree.timingGraph.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+	
+				this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+				this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			}
 			
 			this._canvas.graphics.clear();
