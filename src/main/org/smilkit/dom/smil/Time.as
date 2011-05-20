@@ -72,18 +72,55 @@ package org.smilkit.dom.smil
 			return !(this._offset == Time.UNRESOLVED);
 		}
 
+		/**
+		 * Resolved offset relative to the parent.
+		 */
 		public function get resolvedOffset():Number
+		{
+			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
+			
+			if (this._element != null)
+			{
+				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
+				
+				if (this.implicitSyncbase != this._element.parentTimeContainer)
+				{
+					// our sync base is not the parent so we need to calculate our time as if we were
+					return parentContainer.offsetForChild(this._element) + syncbaseOffset;
+				}
+			}
+			
+			return syncbaseOffset;
+		}
+		
+		/**
+		 * The ElementTimeContainer used as a reference for the implicit sync base offset.
+		 */
+		public function get implicitSyncbase():ElementTimeContainer
+		{
+			var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
+			
+			if (parentContainer is ElementSequentialTimeContainer)
+			{
+				if (this._element.previousSibling != null)
+				{
+					return (this._element.previousSibling as ElementTimeContainer);
+				}
+			}
+			
+			return parentContainer;
+		}
+		
+		/**
+		 * Relative to the implicitSyncbase of this Time instance.
+		 */
+		public function get implicitSyncbaseOffset():Number
 		{
 			if (this.resolved)
 			{
 				if (this.indefinite || this._offset == Time.INDEFINITE)
 				{
 					return Time.INDEFINITE;
-				}
-				
-				if (this._element != null && this._begin && this._element.parentTimeContainer is ElementSequentialTimeContainer)
-				{
-					return this._offset + (this._element.parentTimeContainer as ElementTimeContainer).offsetForChild(this._element);
 				}
 				
 				return this._offset;
@@ -122,6 +159,11 @@ package org.smilkit.dom.smil
 			return this._marker;
 		}
 		
+		public function get element():ElementTimeContainer
+		{
+			return this._element;
+		}
+		
 		public function isGreaterThan(time:Time):Boolean
 		{
 			if (time == null)
@@ -151,7 +193,7 @@ package org.smilkit.dom.smil
 			
 			if (this.resolved && time.resolved)
 			{
-				if (this.resolvedOffset > time.resolvedOffset)
+				if (this.implicitSyncbaseOffset > time.implicitSyncbaseOffset)
 				{
 					return true;
 				}
@@ -177,7 +219,7 @@ package org.smilkit.dom.smil
 				return false;
 			}
 			
-			if (this.resolvedOffset == time.resolvedOffset)
+			if (this.implicitSyncbaseOffset == time.implicitSyncbaseOffset)
 			{
 				return true;
 			}

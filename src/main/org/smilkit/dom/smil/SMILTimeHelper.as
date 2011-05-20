@@ -93,20 +93,23 @@ package org.smilkit.dom.smil
 			
 			var offset:Number = NaN;
 			
+			// use the implicitSyncbaseOffset to sum two time objects together, as the resolvedOffset
+			// can change dynamically and wont provide an accurate result.
+			
 			switch (operator)
 			{
 				case AlgebraicOperator.ARITHMETIC_ADD:
-					offset = (a.resolvedOffset + b.resolvedOffset);
+					offset = (a.implicitSyncbaseOffset + b.implicitSyncbaseOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MULTIPLY:
-					offset = (a.resolvedOffset * b.resolvedOffset);
+					offset = (a.implicitSyncbaseOffset * b.implicitSyncbaseOffset);
 					break;
 				case AlgebraicOperator.ARITHMETIC_MINUS:
-					offset = (a.resolvedOffset - b.resolvedOffset);
+					offset = (a.implicitSyncbaseOffset - b.implicitSyncbaseOffset);
 					break;
 			}
 			
-			return new Time(null, false, (offset * 1000) + "ms");
+			return new Time(a.element, false, (offset * 1000) + "ms");
 		}
 	}
 }

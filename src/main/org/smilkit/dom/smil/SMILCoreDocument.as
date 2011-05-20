@@ -118,7 +118,7 @@ package org.smilkit.dom.smil
 				
 				if (time.resolved && time.timeType != Time.INDEFINITE && time.timeType != Time.MEDIA)
 				{
-					return (time.resolvedOffset * 1000);
+					return (time.resolvedOffset);
 				}
 				
 				return time.resolvedOffset;

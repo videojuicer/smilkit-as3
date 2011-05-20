@@ -49,8 +49,6 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(0, this._content.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(10, this._content.currentEndInterval.resolvedOffset);
 			
-			this._content2.startup();
-			
 			Assert.assertNotNull(this._content2.currentBeginInterval);
 			Assert.assertNotNull(this._content2.currentEndInterval);
 			
@@ -63,12 +61,6 @@ package org.smilkit.spec.tests.dom.smil
 		{
 			this._seqHolder.startup();
 			
-			Assert.assertNotNull(this._seqHolder.currentBeginInterval);
-			Assert.assertNotNull(this._seqHolder.currentEndInterval);
-			
-			Assert.assertEquals(0, this._seqHolder.currentBeginInterval.resolvedOffset);
-			Assert.assertEquals(20, this._seqHolder.currentEndInterval.resolvedOffset);
-			
 			Assert.assertNotNull(this._seqContent.currentBeginInterval);
 			Assert.assertNotNull(this._seqContent.currentEndInterval);
 			
@@ -80,6 +72,12 @@ package org.smilkit.spec.tests.dom.smil
 			
 			Assert.assertEquals(10, this._seqContent2.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._seqContent2.currentEndInterval.resolvedOffset);
+			
+			Assert.assertNotNull(this._seqHolder.currentBeginInterval);
+			Assert.assertNotNull(this._seqHolder.currentEndInterval);
+			
+			Assert.assertEquals(0, this._seqHolder.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(20, this._seqHolder.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Tests that an element time container can gather the next interval in a seq")]
@@ -97,7 +95,6 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(20, this._seqHolder.currentEndInterval.resolvedOffset);
 			
 			this._seqContent.gatherNextInterval();
-			this._seqContent2.startup();
 
 			Assert.assertEquals(10, this._seqContent.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._seqContent.currentEndInterval.resolvedOffset);
@@ -143,17 +140,14 @@ package org.smilkit.spec.tests.dom.smil
 			
 			this._content.gatherNextInterval();
 			
-			Assert.assertNotNull(this._holder.currentBeginInterval);
-			Assert.assertNotNull(this._holder.currentEndInterval);
-			
-			Assert.assertEquals(0, this._holder.currentBeginInterval.resolvedOffset);
-			Assert.assertEquals(20, this._holder.currentEndInterval.resolvedOffset);
-			
 			Assert.assertEquals(10, this._content.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._content.currentEndInterval.resolvedOffset);
 			
 			Assert.assertEquals(0, this._content2.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(10, this._content2.currentEndInterval.resolvedOffset);
+
+			Assert.assertEquals(0, this._holder.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(20, this._holder.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Tests that an element time container can gather its next interval")]

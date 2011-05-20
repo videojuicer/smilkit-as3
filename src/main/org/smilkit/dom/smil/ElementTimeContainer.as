@@ -587,16 +587,6 @@ package org.smilkit.dom.smil
 			this._currentBeginInterval = begin;
 			this._currentEndInterval = end;
 
-			// if we havent changed dont notify parents or events
-			if (!(begin != null && this._previousBeginInterval == null)
-			&& !(begin != null && this._previousBeginInterval != null && !begin.isEqualTo(this._previousBeginInterval))
-			&&
-			(!(end != null && this._previousEndInterval == null)
-			&& !(end != null && this._previousEndInterval != null && !end.isEqualTo(this._previousEndInterval))))
-			{
-				return;
-			}
-			
 			// notify the parent we changed
 			(this.parentTimeContainer as ElementTimeContainer).childIntervalChanged(this);
 			
@@ -613,19 +603,22 @@ package org.smilkit.dom.smil
 			{
 				return;
 			}
-			
-			// one of our children finished, so that means we should
-			// re-calculate the current intervals again
-			this.resetElementState();
-			this.startup();
+
+			// a child changed so we need to re-calculate another end interval, we keep using our existing begin
+			this.gatherNextInterval(this.currentBeginInterval);
 		}
 		
-		public function gatherNextInterval():void
+		public function gatherNextInterval(usingBegin:Time = null):void
 		{
-			var beginAfter:Time = this._currentBeginInterval;
-			
-			var tempBegin:Time = this.beginList.getTimeGreaterThan(beginAfter);
+			var tempBegin:Time = usingBegin;
 			var tempEnd:Time = null;
+			
+			if (usingBegin == null)
+			{
+				var beginAfter:Time = this._currentBeginInterval;
+				
+				tempBegin = this.beginList.getTimeGreaterThan(beginAfter)
+			}
 			
 			if (tempBegin == null)
 			{
@@ -634,7 +627,7 @@ package org.smilkit.dom.smil
 				return;
 			}
 			
-			if (!this._endList.isDefined)
+			if (!this.endList.isDefined)
 			{
 				tempEnd = SMILTimeHelper.add(tempBegin, this.computeActiveDuation(tempBegin, null));
 			}
@@ -688,7 +681,10 @@ package org.smilkit.dom.smil
 			
 			(this.ownerDocument as SMILDocument).timeGraph.removeWaiting(this.deactivate);
 			
-			this.startChildren();
+			if (!skipChildren)
+			{
+				this.startChildren();
+			}
 			
 			this.setupFirstInterval();
 			
@@ -707,7 +703,7 @@ package org.smilkit.dom.smil
 			
 			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
-				var waitTime:Number = this.currentBeginInterval.resolvedOffset - (this.ownerDocument as SMILDocument).offset;
+				var waitTime:Number = this.currentBeginInterval.implicitSyncbaseOffset - (this.ownerDocument as SMILDocument).offset;
 				var waiting:Boolean = (this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
 				
 				// setup timer if we need to wait (and were not meant to play)

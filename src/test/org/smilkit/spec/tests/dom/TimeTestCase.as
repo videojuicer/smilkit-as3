@@ -87,7 +87,6 @@ package org.smilkit.spec.tests.dom
 			video1.setAttribute("dur", null);
 
 			Assert.assertEquals(Time.INDEFINITE, video1.currentEndInterval.resolvedOffset);
-			Assert.assertTrue(video1.end.first.resolved);
 		}
 		
 		[Test(description="Child sets the duration in a par. The parent should have the greatest duration selected from the children == 35s")]
