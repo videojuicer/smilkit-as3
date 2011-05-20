@@ -114,9 +114,13 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
+			Assert.assertEquals(00, video1.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+	
+			Assert.assertEquals(30, video2.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(60, video2.currentEndInterval.resolvedOffset);
+			
 			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Parent sets the duration in a par. The first child video should be 0=>30s, the second should be cropped and go from 0=>40s")]
@@ -129,8 +133,12 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
+			Assert.assertEquals(0, video1.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
+			
+			Assert.assertEquals(0, video2.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(60, video2.currentEndInterval.resolvedOffset);
+			
 			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
 		}
 		
@@ -144,21 +152,21 @@ package org.smilkit.spec.tests.dom
 			var video1:SMILMediaElement = (document.getElementById("video_1") as SMILMediaElement);
 			var video2:SMILMediaElement = (document.getElementById("video_2") as SMILMediaElement);
 			
+			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(60, video2.currentEndInterval.resolvedOffset);
+			
 			Assert.assertEquals(00, container.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(40, container.currentEndInterval.resolvedOffset);
-			
-			Assert.assertEquals(30, video1.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(40, video2.currentEndInterval.resolvedOffset);
 			
 			var secondContainer:ElementTimeContainer = (document.getElementsByTagName("par").item(1) as ElementTimeContainer);
 			var video3:SMILMediaElement = (document.getElementById("video_3") as SMILMediaElement);
 			var video4:SMILMediaElement = (document.getElementById("video_4") as SMILMediaElement);
 			
+			Assert.assertEquals(60, video4.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(30, video3.currentEndInterval.resolvedOffset);
+			
 			Assert.assertEquals(40, secondContainer.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(80, secondContainer.currentEndInterval.resolvedOffset);
-			
-			Assert.assertEquals(80, video4.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(70, video3.currentEndInterval.resolvedOffset);
 		}
 		
 		[Test(description="Unresolved child sets the duration in a seq. The second child is unresolved, which should cause the parent to have an unresolved duration.")]

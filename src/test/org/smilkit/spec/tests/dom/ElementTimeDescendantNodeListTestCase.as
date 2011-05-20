@@ -35,12 +35,12 @@ package org.smilkit.spec.tests.dom
 		{
 			var list:INodeList = this._document.timeDescendants;
 			
-			Assert.assertEquals(11, list.length);
+			Assert.assertEquals(1, list.length);
 			
 			var body:ElementTimeContainer = (this._document.getElementsByTagName("body").item(0) as ElementTimeContainer);
 		
 			Assert.assertEquals(4, body.childNodes.length);
-			Assert.assertEquals(10, body.timeDescendants.length);
+			Assert.assertEquals(3, body.timeDescendants.length);
 		}
 		
 		[Test(description="Tests that a ElementTimeDescendantNodeList returns the correct children when mixed in with non time container elements")]
@@ -49,7 +49,7 @@ package org.smilkit.spec.tests.dom
 			var content:ElementTimeContainer = (this._document.getElementById("content") as ElementTimeContainer);
 			
 			Assert.assertEquals(3, content.timeChildren.length);
-			Assert.assertEquals(3, content.timeDescendants.length);
+			Assert.assertEquals(1, content.timeDescendants.length);
 			
 			Assert.assertEquals("body", content.timeDescendants.item(0).nodeName);
 		}

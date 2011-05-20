@@ -85,10 +85,11 @@ package org.smilkit.dom.smil
 		{
 			// no duration defined on a par, so we use the children
 			var duration:Number = 0;
+			var timeChilden:INodeList = this.timeDescendants;
 			
-			for (var i:uint = 0; i < this.timeChildren.length; i++)
+			for (var i:uint = 0; i < timeChildren.length; i++)
 			{
-				var child:ElementTimeContainer = (this.timeChildren.item(i) as ElementTimeContainer);
+				var child:ElementTimeContainer = (timeChildren.item(i) as ElementTimeContainer);
 				
 				if (child.currentEndInterval == null || !child.currentEndInterval.resolved)
 				{

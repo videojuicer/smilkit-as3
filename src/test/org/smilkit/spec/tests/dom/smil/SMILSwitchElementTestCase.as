@@ -43,6 +43,8 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertNotNull(element);
 			Assert.assertNotNull(selected);
 		
+			selected.startup();
+			
 			Assert.assertEquals(5, element.currentEndInterval.resolvedOffset);
 			Assert.assertEquals(5, (element.parentTimeContainer as ElementTimeContainer).currentEndInterval.resolvedOffset);
 		}
@@ -74,11 +76,12 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertNotNull(element);
 			Assert.assertNotNull(selected);
 			
+			selected.startup();
+			
 			Assert.assertEquals(3.0, selected.getAttribute(SMILDocumentVariables.SYSTEM_VERSION));
 			Assert.assertEquals(5, selected.currentEndInterval.resolvedOffset);
 			
 			Assert.assertEquals(5, element.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(5, (element.parentTimeContainer as ElementTimeContainer).currentEndInterval.resolvedOffset);
 		}
 	}
 }

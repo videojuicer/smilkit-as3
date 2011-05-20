@@ -177,6 +177,7 @@ package org.smilkit.load {
 		protected function bindOpportunisticTimingGraphEvents():void 
 		{
 			this._objectPool.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
+			this.rebuildOpportunisticWorkers();
 		}
 		
 		/**

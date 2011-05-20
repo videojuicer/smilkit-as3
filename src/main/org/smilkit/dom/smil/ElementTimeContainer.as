@@ -603,6 +603,11 @@ package org.smilkit.dom.smil
 			{
 				return;
 			}
+			
+			if (this.id == "holder")
+			{
+				trace("heyyy");
+			}
 
 			// a child changed so we need to re-calculate another end interval, we keep using our existing begin
 			this.gatherNextInterval(this.currentBeginInterval);

@@ -186,7 +186,7 @@ package org.smilkit.spec
 			"<video id=\"video_1\" dur=\"30s\" src=\"1.mp4\" />" +
 			"<video id=\"video_2\" dur=\"60s\" src=\"2.mp4\" />" +
 			"</par>                                      " +
-			"<par dur=\"40s\">                             " +
+			"<par id=\"cropped_holder\" dur=\"40s\">                             " +
 			"<video id=\"video_3\" dur=\"30s\" src=\"1.mp4\" />" +
 			"<video id=\"video_4\" dur=\"60s\" src=\"2.mp4\" />" +
 			"</par>                                      " +

@@ -169,12 +169,7 @@ package org.smilkit.dom.smil
 			
 			var event:SMILMutationEvent = new SMILMutationEvent();
 			event.initMutationEvent(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, true, false, null, null, null, null, 1);
-			
-			/*if (this._intervalTriggered)
-			{
 
-			}*/
-			
 			this.ownerDocument.dispatchEvent(event);
 		}
 		

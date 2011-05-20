@@ -57,8 +57,6 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			(selected as ElementTimeContainer).startup(true);
-			
 			return (selected as IElement);
 		}
 		
@@ -71,6 +69,22 @@ package org.smilkit.dom.smil
 			}
 			
 			this._playbackState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
+		}
+		
+		public override function computeImplicitDuration():Time
+		{
+			// no duration defined on a par, so we use the children
+			var selected:ElementTimeContainer = (this.selectedElement as ElementTimeContainer);
+			
+			if (selected != null)
+			{
+				if (selected.currentEndInterval != null)
+				{
+					return new Time(this, false, (selected.currentEndInterval.resolvedOffset * 1000)+"ms");
+				}
+			}
+			
+			return new Time(this, false, "unresolved");
 		}
 	}
 }

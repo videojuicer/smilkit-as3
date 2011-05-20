@@ -76,11 +76,11 @@ package org.smilkit.dom.smil
 		{
 			var duration:Number = 0;
 			
-			var timeChildren:INodeList = this.timeChildren;
+			var timeDescendants:INodeList = this.timeDescendants;
 			
-			for (var i:uint = 0; i < timeChildren.length; i++)
+			for (var i:uint = 0; i < timeDescendants.length; i++)
 			{
-				var child:ElementTimeContainer = (timeChildren.item(i) as ElementTimeContainer);
+				var child:ElementTimeContainer = (timeDescendants.item(i) as ElementTimeContainer);
 				
 				if (element == child)
 				{
@@ -100,9 +100,9 @@ package org.smilkit.dom.smil
 		
 		public override function computeImplicitDuration():Time
 		{
-			// no duration defined on a par, so we use the children
+			// no duration defined on a seq, so we use the children
 			var duration:Number = 0;
-			var timeChilden:INodeList = this.timeChildren;
+			var timeChilden:INodeList = this.timeDescendants;
 			
 			for (var i:uint = 0; i < timeChildren.length; i++)
 			{
