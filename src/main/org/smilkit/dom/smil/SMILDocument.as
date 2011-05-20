@@ -9,6 +9,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.utilkit.util.Environment;
+	import org.utilkit.util.Platform;
 	
 	public class SMILDocument extends SMILCoreDocument
 	{
@@ -138,9 +139,9 @@ package org.smilkit.dom.smil
 			this.variables.set(SMILDocumentVariables.SYSTEM_CAPTIONS, "off");
 			this.variables.set(SMILDocumentVariables.SYSTEM_COMPONENT, "");
 			this.variables.set(SMILDocumentVariables.SYSTEM_CONTENT_LOCATION, "");
-			this.variables.set(SMILDocumentVariables.SYSTEM_CPU, Environment.cpuArchitecture);
+			this.variables.set(SMILDocumentVariables.SYSTEM_CPU, Platform.cpuArchitecture);
 			this.variables.set(SMILDocumentVariables.SYSTEM_LANGUAGE, Environment.language);
-			this.variables.set(SMILDocumentVariables.SYSTEM_OPERATING_SYSTEM, Environment.operatingSystem);
+			this.variables.set(SMILDocumentVariables.SYSTEM_OPERATING_SYSTEM, Platform.operatingSystem);
 			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_CAPTION, "overdub");
 			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_SUBTITLE, "overdub");
 			this.variables.set(SMILDocumentVariables.SYSTEM_REQUIRED, "");
