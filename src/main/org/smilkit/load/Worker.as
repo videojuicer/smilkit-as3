@@ -3,11 +3,11 @@ package org.smilkit.load {
 	import flash.events.EventDispatcher;
 	
 	import org.smilkit.SMILKit;
-	import org.utilkit.logger.Logger;
-	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.events.WorkerEvent;
-	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.WorkUnitEvent;
+	import org.smilkit.events.WorkerEvent;
+	import org.smilkit.handler.SMILKitHandler;
+	
 	/**
 	 * An instance of load.Worker deals with queueing and prioritisation of handler load tasks.
 	 * Each worker encapsulates a workQueue, which is a linear list of items to be processed,

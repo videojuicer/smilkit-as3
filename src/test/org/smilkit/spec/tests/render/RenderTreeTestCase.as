@@ -4,11 +4,10 @@ package org.smilkit.spec.tests.render
 	
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
-	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.spec.Fixtures;
-	import org.smilkit.dom.smil.SMILTimeInstance;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.view.Viewport;
 
 	public class RenderTreeTestCase

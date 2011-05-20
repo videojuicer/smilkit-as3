@@ -6,7 +6,6 @@ package org.smilkit.handler.state
 	import flash.net.NetStream;
 	
 	import org.utilkit.parser.FMSURLParser;
-	import org.utilkit.parser.URLParser;
 
 	public class VideoHandlerState extends HandlerState
 	{

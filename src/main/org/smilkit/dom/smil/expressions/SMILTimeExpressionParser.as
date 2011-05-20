@@ -2,7 +2,6 @@ package org.smilkit.dom.smil.expressions
 {
 	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.parsers.SMILTimeParser;
-	import org.smilkit.w3c.dom.INode;
 	import org.utilkit.expressions.ExpressionEngine;
 
 	public class SMILTimeExpressionParser extends ExpressionEngine

@@ -1,11 +1,7 @@
 package org.smilkit.dom.smil
 {
-	import flash.events.Event;
-	
-	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.w3c.dom.IDocument;
-	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementSequentialTimeContainer;
 	import org.smilkit.w3c.dom.smil.ISMILRefElement;
 	

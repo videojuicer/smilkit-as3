@@ -1,8 +1,8 @@
 package org.smilkit.view
 {
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.render.RenderTree;
 	import org.smilkit.load.LoadScheduler;
+	import org.smilkit.render.RenderTree;
 
 	public dynamic class ViewportObjectPool
 	{

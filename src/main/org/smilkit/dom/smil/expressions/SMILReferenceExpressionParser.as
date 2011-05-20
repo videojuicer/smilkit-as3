@@ -2,12 +2,7 @@ package org.smilkit.dom.smil.expressions
 {
 	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
-	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILEventStack;
-	import org.smilkit.dom.smil.Time;
-	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.w3c.dom.IElement;
-	import org.smilkit.w3c.dom.INode;
 
 	public class SMILReferenceExpressionParser extends SMILTimeExpressionParser
 	{

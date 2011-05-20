@@ -1,10 +1,9 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.IElementTest;
-	import org.utilkit.expressions.ExpressionEngine;
-	import org.utilkit.expressions.parsers.BooleanExpressionParser;
 	
 	public class ElementTestContainer extends ElementTimeContainer implements IElementTest
 	{	

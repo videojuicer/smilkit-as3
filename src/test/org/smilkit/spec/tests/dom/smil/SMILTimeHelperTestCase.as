@@ -4,7 +4,7 @@ package org.smilkit.spec.tests.dom.smil
 	
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.dom.smil.SMILTimeHelper;
+	import org.smilkit.dom.smil.time.SMILTimeHelper;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;

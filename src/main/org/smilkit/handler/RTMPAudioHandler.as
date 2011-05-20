@@ -1,7 +1,6 @@
 package org.smilkit.handler
 {
 	import flash.events.NetStatusEvent;
-	import flash.media.ID3Info;
 	import flash.net.Responder;
 	
 	import org.smilkit.SMILKit;

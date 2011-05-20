@@ -1,7 +1,5 @@
 package org.smilkit.events
 {
-	import org.smilkit.w3c.dom.DOMException;
-	
 	public class EventException extends RuntimeException
 	{
 		public static var UNSPECIFIED_EVENT_TYPE_ERR:int = 0;

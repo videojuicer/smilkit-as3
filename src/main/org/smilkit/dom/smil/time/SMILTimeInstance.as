@@ -1,6 +1,9 @@
-package org.smilkit.dom.smil
+package org.smilkit.dom.smil.time
 {
-	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.Time;
 
 	public class SMILTimeInstance
 	{

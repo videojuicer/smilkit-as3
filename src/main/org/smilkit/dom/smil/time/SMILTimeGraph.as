@@ -1,6 +1,10 @@
-package org.smilkit.dom.smil
+package org.smilkit.dom.smil.time
 {
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.time.SharedTimer;
@@ -40,7 +44,6 @@ package org.smilkit.dom.smil
 			
 			this.ownerDocument.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onSMILMutationEvent, false);
 			
-			
 			if (this._ownerDocument.viewportObjectPool != null && this._ownerDocument.viewportObjectPool.viewport != null)
 			{
 				// heartbeat
@@ -52,7 +55,7 @@ package org.smilkit.dom.smil
 		
 		public function waitUntil(offset:Number, callback:Function):Boolean
 		{			
-			if (offset > this._ownerDocument.offset)
+			if (offset >= this._ownerDocument.offset)
 			{
 				if (!this._waitingCallbacks.hasItem(offset))
 				{
@@ -204,11 +207,6 @@ package org.smilkit.dom.smil
 			var begin:Time = (node.currentBeginInterval);
 			var end:Time = (node.currentEndInterval);
 			
-			if (begin == null || end == null && !this._intervalTriggered)
-			{
-				//node.startup(true);
-			}
-			
 			begin = (node.currentBeginInterval);
 			end = (node.currentEndInterval);
 			
@@ -243,8 +241,6 @@ package org.smilkit.dom.smil
 				
 				this.rebuild();
 			}
-			
-			
 		}
 	}
 }

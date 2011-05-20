@@ -7,19 +7,13 @@ package org.smilkit.parsers
 	import flash.events.SecurityErrorEvent;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	import flash.xml.XMLDocument;
 	
-	import org.smilkit.SMILKit;
-	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.dom.Element;
-	import org.smilkit.dom.Node;
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
-	import org.smilkit.w3c.dom.smil.IElementTime;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.utilkit.util.UrlUtil;
 

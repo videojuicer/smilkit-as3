@@ -6,7 +6,6 @@ package org.smilkit.handler
 	import flash.events.IOErrorEvent;
 	import flash.events.NetStatusEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.events.TimerEvent;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
@@ -15,19 +14,15 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayTransitions;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
-	import org.smilkit.render.RegionContainer;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
-	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
-	import org.utilkit.logger.Logger;
 	
 	public class RTMPVideoHandler extends SMILKitHandler
 	{

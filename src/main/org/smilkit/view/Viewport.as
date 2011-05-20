@@ -3,14 +3,11 @@ package org.smilkit.view
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
-	import flash.events.EventDispatcher;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
-	
-	import mx.containers.Canvas;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
@@ -18,15 +15,12 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
-	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.w3c.dom.INodeList;
-	import org.smilkit.w3c.dom.smil.ISMILDocument;
-	import org.utilkit.logger.Logger;
 	import org.utilkit.parser.DataURIParser;
 
 	/**

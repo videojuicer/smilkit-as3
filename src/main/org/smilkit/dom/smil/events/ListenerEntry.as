@@ -1,7 +1,5 @@
-package org.smilkit.collections
+package org.smilkit.dom.smil.events
 {
-	import org.smilkit.w3c.dom.events.IEventListener;
-
 	public class ListenerEntry
 	{
 		private var _type:String;

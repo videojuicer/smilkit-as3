@@ -1,9 +1,9 @@
 package org.smilkit.dom
 {
-	import org.utilkit.collection.List;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
+	import org.utilkit.collection.List;
 	
 	/**
 	 * Describes a collection of <code>Nodes</code> that can be accessed by name. Entity, Notation are placed

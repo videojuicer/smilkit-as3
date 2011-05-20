@@ -20,7 +20,7 @@ package org.smilkit.spec
 			"<video id=\"preroll\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\" dur=\"10s\" />" +
 			"<video id=\"content\" src=\"http://media.smilkit.org/demo.mp4\" dur=\"60s\" region=\"root\" />" +
 			"</par></body></smil>";
-		
+
 		public static var BASIC_SWITCH_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
 			"<body><par id=\"holder\">" +
@@ -329,5 +329,14 @@ package org.smilkit.spec
 			"<video id=\"content_2\" dur=\"10s\" src=\"1.mp4\" />" +
 			"</seq>                                      " +
 			"</body></smil>";
+		
+		public static var BASIC_REPEATS_TEST_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
+			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+			"<body>" +
+			"<video id=\"repeatDur\" repeatDur=\"100s\" dur=\"10s\" src=\"1.mp4\" />" +
+			"<video id=\"repeatCount\" repeatCount=\"10\" dur=\"10s\" src=\"1.mp4\" />" +
+			"<video id=\"repeatBoth\" repeatCount=\"9\" repeatDur=\"110s\" dur=\"10s\" src=\"1.mp4\" />" +
+			"<video id=\"repeatBothReverse\" repeatCount=\"11\" repeatDur=\"90s\" dur=\"10s\" src=\"1.mp4\" />" +
+			"</body></smil>"; 
 	}
 }

@@ -1,7 +1,5 @@
 package org.smilkit
 {
-	import mx.core.ClassFactory;
-	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.handler.HTTPVideoHandler;
@@ -9,14 +7,13 @@ package org.smilkit
 	import org.smilkit.handler.ImageHandler;
 	import org.smilkit.handler.RTMPAudioHandler;
 	import org.smilkit.handler.RTMPVideoHandler;
-	import org.smilkit.handler.SMILReferenceHandler
 	import org.smilkit.handler.SMILKitHandler;
+	import org.smilkit.handler.SMILReferenceHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.utilkit.collection.Hashtable;
-	import org.utilkit.collection.List;
 	import org.utilkit.logger.ApplicationLog;
 	import org.utilkit.logger.Logger;
 	

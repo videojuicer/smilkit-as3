@@ -1,7 +1,5 @@
 package org.smilkit.handler
 {
-	import flash.display.Bitmap;
-	import flash.display.BitmapData;
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.AsyncErrorEvent;
@@ -21,7 +19,6 @@ package org.smilkit.handler
 	import org.smilkit.render.RenderTree;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
-	import org.utilkit.logger.Logger;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{

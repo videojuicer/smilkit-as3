@@ -2,27 +2,18 @@ package org.smilkit.render
 {
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
-	import flash.display.Stage;
 	import flash.errors.IllegalOperationError;
-	import flash.events.Event;
 	import flash.geom.Rectangle;
 	
-	import mx.controls.Button;
-	import mx.controls.Label;
-	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.Element;
-	import org.smilkit.dom.smil.SMILElement;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
-	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.dom.smil.SMILTimeInstance;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
-	import org.utilkit.logger.Logger;
 	
 	public class DrawingBoard extends Sprite
 	{

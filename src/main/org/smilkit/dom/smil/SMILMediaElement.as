@@ -9,14 +9,12 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.smilkit.w3c.dom.smil.ISMILRegionInterface;
-	import org.smilkit.w3c.dom.smil.ITimeList;
 	
 	public class SMILMediaElement extends ElementTestContainer implements ISMILMediaElement, ISMILRegionInterface
 	{

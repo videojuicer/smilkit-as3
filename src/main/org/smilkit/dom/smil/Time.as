@@ -1,20 +1,8 @@
 package org.smilkit.dom.smil
 {
-	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.expressions.SMILExpressionParser;
-	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
-	import org.smilkit.w3c.dom.INodeList;
-	import org.smilkit.w3c.dom.events.IEvent;
-	import org.smilkit.w3c.dom.smil.IElementExclusiveTimeContainer;
-	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
-	import org.smilkit.w3c.dom.smil.IElementSequentialTimeContainer;
-	import org.smilkit.w3c.dom.smil.IElementTime;
-	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
-	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
 	import org.smilkit.w3c.dom.smil.ITime;
-	import org.utilkit.logger.Logger;
 	
 	public class Time implements ITime
 	{

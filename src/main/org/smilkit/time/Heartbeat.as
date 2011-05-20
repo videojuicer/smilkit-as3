@@ -1,13 +1,11 @@
 package org.smilkit.time
 {
-	import flash.errors.IllegalOperationError;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	import flash.utils.Timer;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.utilkit.logger.Logger;
 	
 	/**
 	 * Dispatched when the running offset is changed, this is either due to the <code>Heartbeat</code> ticking

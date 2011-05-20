@@ -4,17 +4,13 @@ package org.smilkit.load {
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.dom.smil.SMILTimeInstance;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.RenderTreeEvent;
-	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.WorkUnitEvent;
-	import org.smilkit.events.WorkerEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.load.Worker;
 	import org.smilkit.render.RenderTree;
-	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	
 	/***

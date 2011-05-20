@@ -3,7 +3,6 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.Element;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
-	import org.smilkit.w3c.dom.smil.ITimeList;
 	
 	public class SMILElement extends Element implements ISMILElement
 	{

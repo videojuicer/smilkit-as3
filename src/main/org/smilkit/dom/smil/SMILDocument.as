@@ -1,9 +1,11 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.events.SMILEventStack;
+	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
+	import org.smilkit.dom.smil.time.SMILTimeGraph;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.utilkit.util.Environment;

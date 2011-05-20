@@ -2,7 +2,6 @@ package org.smilkit.dom
 {
 	import flash.errors.IllegalOperationError;
 	
-	import org.utilkit.collection.Hashtable;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.ICDATASection;
@@ -18,7 +17,7 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.IProcessingInstruction;
 	import org.smilkit.w3c.dom.IText;
 	import org.smilkit.w3c.dom.events.IEvent;
-	import org.smilkit.w3c.dom.events.IEventListener;
+	import org.utilkit.collection.Hashtable;
 	
 	public class CoreDocument extends ParentNode implements IDocument
 	{

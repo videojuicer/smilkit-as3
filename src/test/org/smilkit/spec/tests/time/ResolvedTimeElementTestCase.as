@@ -5,7 +5,7 @@ package org.smilkit.spec.tests.time
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.dom.smil.SMILTimeInstance;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.dom.smil.Time;
 
 	public class ResolvedTimeElementTestCase

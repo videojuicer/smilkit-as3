@@ -4,7 +4,7 @@ package org.smilkit.spec.tests.dom.smil
 	
 	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILDocumentVariables;
+	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 

@@ -22,7 +22,6 @@ package org.smilkit.handler
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.utilkit.logger.Logger;
 
 	public class SMILKitHandler extends EventDispatcher
 	{

@@ -1,17 +1,11 @@
 package org.smilkit.dom.smil
 {
 	import flash.errors.IllegalOperationError;
-	import flash.system.Capabilities;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
-	import org.smilkit.dom.Element;
-	import org.smilkit.dom.smil.events.SMILMutationEvent;
-	import org.smilkit.parsers.SMILEventParser;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
-	import org.smilkit.w3c.dom.IElement;
-	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementExclusiveTimeContainer;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
@@ -23,8 +17,6 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ISMILRegionElement;
 	import org.smilkit.w3c.dom.smil.ISMILSwitchElement;
 	import org.smilkit.w3c.dom.smil.ITimeList;
-	import org.utilkit.logger.Logger;
-	import org.utilkit.util.Environment;
 	
 	public class SMILCoreDocument extends Document implements ISMILDocument
 	{

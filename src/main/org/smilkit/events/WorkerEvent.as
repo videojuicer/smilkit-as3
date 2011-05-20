@@ -1,7 +1,7 @@
 package org.smilkit.events
 {
 	import flash.events.Event;
-	import org.smilkit.handler.SMILKitHandler;
+	
 	import org.smilkit.load.Worker;	
 	
 	public class WorkerEvent extends Event

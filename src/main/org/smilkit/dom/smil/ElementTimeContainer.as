@@ -1,21 +1,15 @@
 package org.smilkit.dom.smil
 {
-	import com.hurlant.util.asn1.parser.nulll;
-	
-	import mx.effects.easing.Back;
-	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
-	import org.smilkit.dom.smil.expressions.SMILReferenceExpressionParser;
-	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
-	import org.smilkit.parsers.SMILTimeParser;
+	import org.smilkit.dom.smil.time.SMILTimeHelper;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
-	import org.utilkit.logger.Logger;
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
@@ -424,7 +418,7 @@ package org.smilkit.dom.smil
 		{
 			var dur:Time = new Time(this, false, this.dur);
 			
-			if (dur.resolvedOffset < 0)
+			if (dur.implicitSyncbaseOffset < 0)
 			{
 				dur = null;
 			}
@@ -468,6 +462,24 @@ package org.smilkit.dom.smil
 			var p0:Time = simpleDurationTime;
 			var p1:Time = new Time(this, false, "indefinite"); // repeat count
 			var p2:Time = new Time(this, false, "indefinite"); // repeat dur
+			
+			if (this.hasAttribute("repeatCount"))
+			{
+				if (p0.resolved)
+				{
+					var repeatCount:Number = new Number(this.getAttribute("repeatCount"));
+					
+					if (!isNaN(repeatCount))
+					{
+						p1 = new Time(this, false, ((p0.implicitSyncbaseOffset * repeatCount) * 1000) + "ms");
+					}
+				}
+			}
+			
+			if (this.hasAttribute("repeatDur"))
+			{
+				p2 = new Time(this, false, this.getAttribute("repeatDur"));
+			}
 			
 			if (p0.resolvedOffset == 0)
 			{
@@ -709,7 +721,7 @@ package org.smilkit.dom.smil
 			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
 				var waitTime:Number = this.currentBeginInterval.implicitSyncbaseOffset - (this.ownerDocument as SMILDocument).offset;
-				var waiting:Boolean = (this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+				var waiting:Boolean = (this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.onIntervalStart);
 				
 				// setup timer if we need to wait (and were not meant to play)
 				if (!waiting && (this.parentTimeContainer as ElementTimeContainer).isPlaying)
@@ -723,13 +735,12 @@ package org.smilkit.dom.smil
 		 * Activates the element for playback, called after the begin has been
 		 * resolved, sets the element into a playing state.
 		 */
-		// TODO: MOVE TO beginElement()
 		public function activate():void
 		{
-			if (!(this.parentTimeContainer as ElementTimeContainer).isPlaying || this.currentBeginInterval.resolved)
+			/*if (!(this.parentTimeContainer as ElementTimeContainer).isPlaying || this.currentBeginInterval.resolved)
 			{
 				return;
-			}
+			}*/
 			
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
@@ -743,7 +754,7 @@ package org.smilkit.dom.smil
 			{
 				waitTime = this._activeDuration.resolvedOffset + (this.ownerDocument as SMILDocument).offset;
 				
-				(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+				(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.onActiveDurationEnd);
 			}
 			
 			var simpleDurationTime:Time = this.computeSimpleDurationTime();
@@ -754,11 +765,36 @@ package org.smilkit.dom.smil
 				{
 					waitTime = simpleDurationTime.resolvedOffset + (this.ownerDocument as SMILDocument).offset;
 					
-					(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.deactivate);
+					(this.ownerDocument as SMILDocument).timeGraph.waitUntil(waitTime, this.onSimpleDurationEnd);
 				}
 			}
 			
 			// dispatch beginEvent on DOM
+		}
+		
+		protected function onIntervalStart():void
+		{
+			this.activate();
+		}
+		
+		protected function onActiveDurationEnd():void
+		{
+			// deactivate and try to restart
+			this.deactivate();
+		}
+		
+		protected function onMediaDurationEnd():void
+		{
+			// ends simple duration if dur=media or dur=indefinite
+		}
+		
+		protected function onSimpleDurationEnd():void
+		{
+			// restarts the element
+			
+			// count repeats
+			// restart children
+			// dispatch repeatEvent
 		}
 		
 		/**

@@ -1,7 +1,5 @@
 package org.smilkit.dom
 {
-	import mx.controls.Text;
-	
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.ICharacterData;
 	import org.smilkit.w3c.dom.IDocument;

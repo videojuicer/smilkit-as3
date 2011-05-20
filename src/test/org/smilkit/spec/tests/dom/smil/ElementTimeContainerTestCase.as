@@ -22,6 +22,8 @@ package org.smilkit.spec.tests.dom.smil
 		protected var _seqContent:SMILMediaElement;
 		protected var _seqContent2:SMILMediaElement;
 		
+		protected var _repeatDocument:SMILDocument;
+		
 		[Before]
 		public function setup():void
 		{
@@ -36,6 +38,40 @@ package org.smilkit.spec.tests.dom.smil
 			this._seqHolder = (this._seqDocument.getElementById("holder") as ElementSequentialTimeContainer);
 			this._seqContent = (this._seqDocument.getElementById("content") as SMILMediaElement);
 			this._seqContent2 = (this._seqDocument.getElementById("content_2") as SMILMediaElement);
+			
+			this._repeatDocument = (parser.parse(Fixtures.BASIC_REPEATS_TEST_SMIL_XML) as SMILDocument);
+		}
+		
+		[Test(description="Tests an element can compute its active time with the repeatDur attribute")]
+		public function testElementsWithRepeatDur():void
+		{
+			var element:SMILMediaElement = (this._seqDocument.getElementById("repeatDur") as SMILMediaElement);
+			element.startup();
+			
+			Assert.assertEquals(100, element.currentEndInterval.implicitSyncbaseOffset);
+		}
+		
+		[Test(description="Tests an element can compute its active time with the repeatCount attribute")]
+		public function testElementsWithRepeatCount():void
+		{
+			var element:SMILMediaElement = (this._seqDocument.getElementById("repeatCount") as SMILMediaElement);
+			element.startup();
+			
+			Assert.assertEquals(100, element.currentEndInterval.implicitSyncbaseOffset);
+		}
+		
+		[Test(description="Tests an element can compute its active time with both repeat attributes and that the right one is used")]
+		public function testElementsWithBothRepeats():void
+		{
+			var element:SMILMediaElement = (this._seqDocument.getElementById("repeatBoth") as SMILMediaElement);
+			element.startup();
+			
+			var elementReverse:SMILMediaElement = (this._seqDocument.getElementById("repeatBothReverse") as SMILMediaElement);
+			elementReverse.startup();
+			
+			Assert.assertEquals(90, element.currentEndInterval.implicitSyncbaseOffset);
+			
+			Assert.assertEquals(90, elementReverse.currentEndInterval.implicitSyncbaseOffset);
 		}
 		
 		[Test(description="Tests that an element time container can gather its first interval")]

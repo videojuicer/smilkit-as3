@@ -8,8 +8,7 @@ package org.smilkit.spec.tests.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementSequentialTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILTimeInstance;
-	import org.smilkit.events.TimingGraphEvent;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;

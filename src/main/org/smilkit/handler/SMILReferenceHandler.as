@@ -1,21 +1,16 @@
 package org.smilkit.handler
 {
 	import flash.display.DisplayObject;
-	import flash.display.LoaderInfo;
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.net.URLRequest;
-	import flash.system.LoaderContext;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
-	import org.smilkit.dom.smil.ElementTimeNodeList;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.events.HandlerEvent;
-	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
@@ -24,7 +19,6 @@ package org.smilkit.handler
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
-	import org.utilkit.logger.Logger;
 
 	
 	/**

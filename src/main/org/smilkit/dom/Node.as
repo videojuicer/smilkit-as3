@@ -1,18 +1,12 @@
 package org.smilkit.dom
 {
-	import flash.events.Event;
-	import flash.events.EventDispatcher;
-	import flash.events.IEventDispatcher;
-	
-	import org.utilkit.util.ObjectUtil;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.events.IEvent;
-	import org.smilkit.w3c.dom.events.IEventListener;
-	import org.smilkit.w3c.dom.events.IEventTarget;
+	import org.utilkit.util.ObjectUtil;
 	
 	/**
 	 * The base implementation class of any DOM tree, should never be accessed or created directly,

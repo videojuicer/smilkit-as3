@@ -1,21 +1,12 @@
 package org.smilkit.dom
 {
-	import flash.events.IEventDispatcher;
-	
-	import mx.events.EventListenerRequest;
-	import mx.utils.ObjectUtil;
-	
 	import org.smilkit.SMILKit;
-	import org.utilkit.collection.Hashtable;
-	import org.utilkit.collection.List;
-	import org.smilkit.collections.ListenerEntry;
 	import org.smilkit.dom.events.DOMEvent;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.events.ListenerEntry;
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.utilkit.util.ObjectUtil;
-	import org.utilkit.logger.Logger;
 	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;
@@ -23,8 +14,9 @@ package org.smilkit.dom
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.events.IEvent;
-	import org.smilkit.w3c.dom.events.IEventListener;
 	import org.smilkit.w3c.dom.events.IEventTarget;
+	import org.utilkit.collection.Hashtable;
+	import org.utilkit.collection.List;
 	
 	/**
 	 * The document class represents an XML document via the W3C DOM Level 2 standard.

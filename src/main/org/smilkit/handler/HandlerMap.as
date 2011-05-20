@@ -1,10 +1,8 @@
 package org.smilkit.handler
 {
-	import flash.net.URLRequest;
-	
-	import org.utilkit.util.ObjectUtil;
-	import org.utilkit.parser.URLParser;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.utilkit.parser.URLParser;
+	import org.utilkit.util.ObjectUtil;
 
 	public class HandlerMap
 	{

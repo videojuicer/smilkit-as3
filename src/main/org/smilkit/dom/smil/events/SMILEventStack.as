@@ -1,5 +1,7 @@
-package org.smilkit.dom.smil
+package org.smilkit.dom.smil.events
 {
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILElement;
 	import org.utilkit.collection.Hashtable;
 
 	public class SMILEventStack

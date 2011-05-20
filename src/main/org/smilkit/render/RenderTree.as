@@ -1,6 +1,5 @@
 package org.smilkit.render
 {
-	import flash.display.Sprite;
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	
@@ -9,21 +8,15 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.dom.smil.SMILTimeInstance;
-	import org.smilkit.dom.smil.Time;
-	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
-	import org.smilkit.events.TimingGraphEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
-	import org.smilkit.w3c.dom.smil.ISMILDocument;
-	import org.utilkit.logger.Logger;
 	
 	/**
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements

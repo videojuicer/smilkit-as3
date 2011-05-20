@@ -1,5 +1,6 @@
-package org.smilkit.dom.smil
+package org.smilkit.dom.smil.time
 {
+	import org.smilkit.dom.smil.Time;
 	import org.utilkit.constants.AlgebraicOperator;
 
 	public class SMILTimeHelper

@@ -1,5 +1,6 @@
-package org.smilkit.dom.smil
+package org.smilkit.dom.smil.expressions
 {
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.utilkit.collection.Hashtable;
 

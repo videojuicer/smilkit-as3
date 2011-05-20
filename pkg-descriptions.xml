@@ -15,14 +15,9 @@
 		</description>
 	</all-classes>
 	<packages>
-		<!--
-			<package name="">
-				<shortDescription></shortDescription>
-				<description></description>
-				<propertiesDescription></propertiesDescription>
-				<functionsDescription></functionsDescription>
-			</package>
-		-->
+		<!-- <package name=""> <shortDescription></shortDescription> <description></description> 
+			<propertiesDescription></propertiesDescription> <functionsDescription></functionsDescription> 
+			</package> -->
 		<package name="org.smilkit">
 			<shortDescription>
 			<![CDATA[
