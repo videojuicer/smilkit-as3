@@ -149,7 +149,7 @@ package org.smilkit.handler
 			
 			this._netStream.checkPolicyFile = true;
 			this._netStream.client = this;
-			this._netStream.bufferTime = 10;
+			this._netStream.bufferTime = 5;
 			this._netStream.soundTransform = this._soundTransformer;
 			
 			this._netStream.play(this.element.src);
