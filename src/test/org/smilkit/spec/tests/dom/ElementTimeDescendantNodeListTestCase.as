@@ -11,7 +11,7 @@ package org.smilkit.spec.tests.dom
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.Viewport;
-	import org.smilkit.w3c.dom.DOMException;
+	import org.smilkit.dom.DOMException;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;

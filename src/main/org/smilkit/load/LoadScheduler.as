@@ -210,6 +210,7 @@ package org.smilkit.load {
 		protected function onHandlerRemovedFromWorker(event:WorkUnitEvent):void
 		{
 			var h:SMILKitHandler = event.handler;
+			
 			if(!this._justInTimeWorker.hasHandler(h) && !this._resolveWorker.hasHandler(h) && !this._preloadWorker.hasHandler(h))
 			{
 				h.removedFromLoadScheduler();
@@ -225,20 +226,24 @@ package org.smilkit.load {
 			// Get timing graph contents
 			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
 			
-			// Move timing graph contents onto their correct handlers
-			for(var i:uint=0; i<timingGraphElements.length; i++)
+			if (timingGraphElements != null)
 			{
-				var h:SMILKitHandler = (timingGraphElements[i].element as SMILMediaElement).handler;
-				// Skip if the handler is on the JIT worker
-				if(this._justInTimeWorker.hasHandler(h)) continue;				
-				// For each element, determine where it's handler should be.
-				var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
-				if(targetWorker != null)
+				// Move timing graph contents onto their correct handlers
+				for(var i:uint=0; i<timingGraphElements.length; i++)
 				{
-					// Move it there.
-					this.moveHandlerToWorker(h, targetWorker);
+					var h:SMILKitHandler = (timingGraphElements[i].element as SMILMediaElement).handler;
+					// Skip if the handler is on the JIT worker
+					if(this._justInTimeWorker.hasHandler(h)) continue;				
+					// For each element, determine where it's handler should be.
+					var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
+					if(targetWorker != null)
+					{
+						// Move it there.
+						this.moveHandlerToWorker(h, targetWorker);
+					}
 				}
 			}
+			
 			// Purge orphaned handlers from the workers
 			this.purgeOrphanedHandlers();
 		}
@@ -250,6 +255,7 @@ package org.smilkit.load {
 		{
 			// Do the add
 			targetWorker.addHandlerToWorkQueue(handler);
+			
 			// Remove from any others
 			for(var i:uint=0; i<this._workers.length; i++)
 			{
@@ -265,13 +271,19 @@ package org.smilkit.load {
 		{
 			// Build flat list of handlers
 			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
-			var timingGraphHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>;
-			for(var i:uint=0; i<timingGraphElements.length; i++)
+			var timingGraphHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>();
+			
+			if (timingGraphElements != null)
 			{
-				timingGraphHandlers.push((timingGraphElements[i].element as SMILMediaElement).handler);
+				for(var i:uint=0; i<timingGraphElements.length; i++)
+				{
+					timingGraphHandlers.push((timingGraphElements[i].element as SMILMediaElement).handler);
+				}
 			}
+			
 			// Scan workers
 			SMILKit.logger.debug("Purging orphaned handlers ("+timingGraphHandlers.length+" exist on the timing graph)", this);
+			
 			for(var j:uint=0; j<this._workers.length; j++)
 			{
 				var worker:Worker = this._workers[j];

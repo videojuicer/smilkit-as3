@@ -12,12 +12,6 @@ package org.smilkit.dom.smil
 			super(owner, name);
 		}
 
-		protected override function onDOMSubtreeModified(e:MutationEvent):void
-		{
-			// DO NOTHING
-			// Ref elements are not interested in subtree modifications.
-		}
-		
 		public override function get durationResolved():Boolean
 		{
 			if (super.durationResolved)

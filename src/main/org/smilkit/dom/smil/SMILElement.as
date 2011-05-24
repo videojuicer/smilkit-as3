@@ -10,5 +10,10 @@ package org.smilkit.dom.smil
 		{
 			super(owner, name);
 		}
+		
+		protected function get ownerSMILDocument():SMILDocument
+		{
+			return (this.ownerDocument as SMILDocument);
+		}
 	}
 }

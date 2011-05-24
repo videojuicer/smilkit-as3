@@ -86,6 +86,8 @@
     <classEntry path="org.smilkit.spec.tests.dom.smil.ElementTimeContainerTestCase"/>
     <classEntry path="org.smilkit.dom.smil.time.SMILTimeHelper"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.SMILTimeHelperTestCase"/>
+    <classEntry path="org.smilkit.dom.smil.time.SMILTimeScheduler"/>
+    <classEntry path="org.smilkit.dom.smil.ElementBodyTimeContainer"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

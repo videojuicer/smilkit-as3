@@ -1,4 +1,4 @@
-package org.smilkit.w3c.dom
+package org.smilkit.dom
 {
 	/**
 	 * DOM operations only raise exceptions in "exceptional" circumstances, i.e., 

@@ -6,6 +6,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.Document;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
+	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementExclusiveTimeContainer;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
@@ -20,8 +21,7 @@ package org.smilkit.dom.smil
 	
 	public class SMILCoreDocument extends Document implements ISMILDocument
 	{
-		protected var _beginList:ITimeList;
-		protected var _endList:ITimeList;
+		protected var _elementBodyContainer:ElementBodyTimeContainer;
 		
 		protected var _viewportObjectPool:ViewportObjectPool;
 		
@@ -58,13 +58,6 @@ package org.smilkit.dom.smil
 		public function get begin():ITimeList
 		{
 			return new TimeList(null, true, "0ms");
-			
-			if (this._beginList == null)
-			{
-				this._beginList = ElementTime.parseTimeAttribute("0", this, true);
-			}
-			
-			return this._beginList;
 		}
 		
 		public function set begin(begin:ITimeList):void
@@ -75,12 +68,6 @@ package org.smilkit.dom.smil
 		public function get end():ITimeList
 		{
 			return new TimeList(null, false);
-			
-			if (this._endList == null)
-			{
-				this._endList = ElementTime.parseTimeAttribute(null, this, false);
-			}
-			return this._endList;
 		}
 		
 		public function set end(end:ITimeList):void
@@ -90,30 +77,24 @@ package org.smilkit.dom.smil
 		
 		public function get dur():String
 		{
-			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
-			
-			if (body != null)
+			if (this._elementBodyContainer != null)
 			{
-				return body.dur;
+				return this._elementBodyContainer.dur;
 			}
 			
-			return "0";
+			return "unresolved";
+		}
+		
+		public function set dur(dur:String):void
+		{
+			throw new IllegalOperationError("Unable to write duration property on SMILDocument.");
 		}
 		
 		public function get duration():Number
 		{
-			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
-			
-			if (body != null)
+			if (this._elementBodyContainer != null)
 			{
-				var time:Time = body.currentEndInterval;
-				
-				if (time.resolved && time.timeType != Time.INDEFINITE && time.timeType != Time.MEDIA)
-				{
-					return (time.resolvedOffset);
-				}
-				
-				return time.resolvedOffset;
+				return this._elementBodyContainer.duration;
 			}
 			
 			return Time.UNRESOLVED;
@@ -121,19 +102,12 @@ package org.smilkit.dom.smil
 		
 		public function get durationResolved():Boolean
 		{
-			var body:ElementTimeContainer = (this.getElementsByTagName("body").item(0) as ElementTimeContainer);
-			
-			if (body != null)
+			if (this._elementBodyContainer != null)
 			{
-				return body.durationResolved;
+				return this._elementBodyContainer.durationResolved;
 			}
 			
-			return false;
-		}
-		
-		public function set dur(dur:String):void
-		{
-			throw new IllegalOperationError("Unable to write duration property on SMILDocument.");
+			return false
 		}
 		
 		public function get restart():uint
@@ -188,17 +162,44 @@ package org.smilkit.dom.smil
 		
 		public function pauseElement():void
 		{
-			// pause children
+			if (this._elementBodyContainer != null)
+			{
+				this._elementBodyContainer.pauseElement();
+			}
+			
+			throw new IllegalOperationError("Unable to perform pauseElement() when no body container is present.");
 		}
 		
 		public function resumeElement():void
 		{
-			// resume children
+			if (this._elementBodyContainer != null)
+			{
+				this._elementBodyContainer.resumeElement();
+			}
+			
+			throw new IllegalOperationError("Unable to perform resumeElement() when no body container is present.");
 		}
 		
 		public function seekElement(seekTo:Number):void
 		{
-			// seek children
+			if (this._elementBodyContainer != null)
+			{
+				this._elementBodyContainer.seekElement(seekTo);
+			}
+			
+			throw new IllegalOperationError("Unable to perform seekElement() when no body container is present.");
+		}
+		
+		public override function appendChild(newChild:INode):INode
+		{
+			var child:INode = super.appendChild(newChild);
+			
+			if (child is ElementBodyTimeContainer)
+			{
+				this._elementBodyContainer = (child as ElementBodyTimeContainer);
+			}
+			
+			return child;
 		}
 		
 		public function createSMILElement(tagName:String):ISMILElement
@@ -211,6 +212,11 @@ package org.smilkit.dom.smil
 			return new SMILMediaElement(this, tagName);
 		}
 		
+		public function createBodyElement(tagName:String = "body"):IElementSequentialTimeContainer
+		{
+			return new ElementBodyTimeContainer(this, tagName);
+		}
+		
 		public function createSequentialElement(tagName:String = "seq"):IElementSequentialTimeContainer
 		{
 			return new ElementSequentialTimeContainer(this, tagName);
@@ -219,6 +225,11 @@ package org.smilkit.dom.smil
 		public function createParallelElement(tagName:String = "par"):IElementParallelTimeContainer
 		{
 			return new ElementParallelTimeContainer(this, tagName);
+		}
+		
+		public function createExclusiveElement(tagName:String = "excl"):IElementExclusiveTimeContainer
+		{
+			return new ElementExclusiveTimeContainer(this, tagName);
 		}
 		
 		public function createSwitchElement(tagName:String = "switch"):ISMILSwitchElement
@@ -235,55 +246,10 @@ package org.smilkit.dom.smil
 		{
 			return new SMILRegionElement(this, tagName);
 		}
-		
-		public function createExclusiveElement(tagName:String = "excl"):IElementExclusiveTimeContainer
-		{
-			return null;
-		}
 
 		protected override function beforeDispatchAggregateEvents():void
 		{
-			this.invalidateCachedTimes();
-		}
-		
-		/**
-		 * Invalidates all the cached resolution times that may exist on the child document
-		 * elements.
-		 */
-		public function invalidateCachedTimes():void
-		{
-			SMILKit.logger.debug("Invalidating cached times on the SMILDocument children", this);
 			
-			this.iterateAndInvalidateCachedTimes(this);
-		}
-		
-		/**
-		 * Iterates through the document tree invalidating the <code>TimeLists</code> on any <code>ElementTimeContainer</code>.
-		 * 
-		 * @param node <code>INodeList</code> to iterate from, every node in the document inherits <code>INodeList</code>.
-		 */
-		protected function iterateAndInvalidateCachedTimes(node:INodeList):void
-		{
-//			for (var i:int = 0; i < node.length; i++)
-//			{
-//				var child:INode = node.item(i);
-//				
-//				if (child is ElementTimeContainer)
-//				{
-//					((child as ElementTimeContainer).begin as TimeList).invalidate();
-//					((child as ElementTimeContainer).end as TimeList).invalidate();
-//				}
-//				
-//				if (child is SMILMediaElement)
-//				{
-//					SMILKit.logger.debug("SMILMediaElement invalidated with begin: "+(child as ElementTimeContainer).begin.first.resolvedOffset+" and end: "+(child as ElementTimeContainer).begin.first.resolvedOffset, this);
-//				}
-//				
-//				if (child.hasChildNodes())
-//				{
-//					this.iterateAndInvalidateCachedTimes(child as INodeList);
-//				}
-//			}
 		}
 	}
 }

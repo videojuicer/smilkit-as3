@@ -1,6 +1,5 @@
 package org.smilkit.dom
 {
-	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.INamedNodeMap;
 	import org.smilkit.w3c.dom.INode;
 	import org.utilkit.collection.List;

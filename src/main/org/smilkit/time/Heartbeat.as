@@ -63,9 +63,7 @@ package org.smilkit.time
 			this._offset = 0;
 		}
 		
-		/**
-		 * The total offset since the Heartbeat was created.
-		 */
+
 		public function get offset():Number
 		{
 			return this._offset;

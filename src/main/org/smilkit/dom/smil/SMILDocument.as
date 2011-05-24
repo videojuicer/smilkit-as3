@@ -5,6 +5,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.time.SMILTimeGraph;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
+	import org.smilkit.dom.smil.time.SMILTimeScheduler;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
@@ -13,6 +14,7 @@ package org.smilkit.dom.smil
 	
 	public class SMILDocument extends SMILCoreDocument
 	{
+		protected var _scheduler:SMILTimeScheduler;
 		protected var _timeGraph:SMILTimeGraph;
 		
 		protected var _variables:SMILDocumentVariables;
@@ -24,12 +26,19 @@ package org.smilkit.dom.smil
 		{
 			super(documentType);
 			
-			//this._activeContainers = new Vector.<ElementTimeContainer>();
-			
+			// keeps track of time
+			this._scheduler = new SMILTimeScheduler(this);
+
 			// handles rebuilding itself
 			this._timeGraph = new SMILTimeGraph(this);
 			
+			// default variables
 			this.setupDocumentVariables();
+		}
+		
+		public function get scheduler():SMILTimeScheduler
+		{
+			return this._scheduler;
 		}
 		
 		public function get timeGraph():SMILTimeGraph

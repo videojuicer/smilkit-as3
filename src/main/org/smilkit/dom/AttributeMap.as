@@ -1,6 +1,5 @@
 package org.smilkit.dom
 {
-	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.INode;
 	
 	public class AttributeMap extends NamedNodeMap

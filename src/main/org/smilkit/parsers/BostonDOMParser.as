@@ -112,7 +112,7 @@ package org.smilkit.parsers
 						child = (doc as ISMILDocument).createSequentialElement() as INode;
 						break;
 					case "body":
-						child = (doc as ISMILDocument).createSequentialElement("body") as INode;
+						child = (doc as SMILDocument).createBodyElement("body") as INode;
 						break;
 					case "video": case "img": case "audio": case "text":
 						child = (doc as ISMILDocument).createMediaElement(node.localName());

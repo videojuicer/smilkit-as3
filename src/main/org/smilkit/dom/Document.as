@@ -7,7 +7,6 @@ package org.smilkit.dom
 	import org.smilkit.events.EventException;
 	import org.smilkit.events.ListenerCount;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.w3c.dom.DOMException;
 	import org.smilkit.w3c.dom.IAttr;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.IElement;
