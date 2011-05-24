@@ -4,6 +4,7 @@ package org.smilkit.dom.smil
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
+	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.INode;
@@ -28,7 +29,12 @@ package org.smilkit.dom.smil
 		public function SMILCoreDocument(documentType:IDocumentType)
 		{
 			super(documentType);
+			
+			this.addEventListener(MutationEvent.DOM_NODE_INSERTED, this.onDOMNodeInserted, false);
+			this.addEventListener(MutationEvent.DOM_NODE_REMOVED, this.onDOMNodeRemoved, false);
 		}
+		
+
 		
 		public function get viewportObjectPool():ViewportObjectPool
 		{
@@ -190,18 +196,6 @@ package org.smilkit.dom.smil
 			throw new IllegalOperationError("Unable to perform seekElement() when no body container is present.");
 		}
 		
-		public override function appendChild(newChild:INode):INode
-		{
-			var child:INode = super.appendChild(newChild);
-			
-			if (child is ElementBodyTimeContainer)
-			{
-				this._elementBodyContainer = (child as ElementBodyTimeContainer);
-			}
-			
-			return child;
-		}
-		
 		public function createSMILElement(tagName:String):ISMILElement
 		{
 			return new SMILElement(this, tagName);
@@ -248,6 +242,17 @@ package org.smilkit.dom.smil
 		}
 
 		protected override function beforeDispatchAggregateEvents():void
+		{
+			
+		}
+		
+		protected function onDOMNodeInserted(e:MutationEvent):void
+		{
+			// should cache this abit better
+			this._elementBodyContainer = (this.getElementsByTagName("body").item(0) as ElementBodyTimeContainer);
+		}
+		
+		protected function onDOMNodeRemoved(e:MutationEvent):void
 		{
 			
 		}

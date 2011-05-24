@@ -59,14 +59,17 @@ package org.smilkit.parsers
 		
 		public function parse(document:String, parent:INode = null):INode
 		{
+			var xml:XML = new XML(document);
+			var root:XML = xml;
+			
 			if (parent == null && this._initialParent == null)
 			{
 				this._initialParent = new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
-			}
 			
-			var xml:XML = new XML(document);
+				//root = (xml.child("smil")[0] as XML);
+			}
 
-			this.parseNode(this._initialParent, xml);
+			this.parseNode(this._initialParent, root);
 			
 			this.dispatchEvent(new BostonDOMParserEvent(BostonDOMParserEvent.PARSER_COMPLETE, this._initialParent));
 			

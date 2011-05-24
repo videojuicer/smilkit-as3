@@ -33,39 +33,21 @@ package org.smilkit.dom.smil
 		
 		public override function get duration():Number
 		{
-			var duration:Number = super.duration;
+			var duration:Number = Time.UNRESOLVED;
 			
-			if (this.hasChildNodes() && ((duration == Time.MEDIA) && !this.hasDuration()))
+			if (this._currentEndInterval != null)
 			{
-				var childDuration:Number = 0;
-				
-				for (var i:int = 0; i < this.timeDescendants.length; i++)
+				if (this._currentEndInterval.resolved)
 				{
-					if (this.timeDescendants.item(i) is ElementTimeContainer)
+					if (this._currentEndInterval.indefinite)
 					{
-						var container:ElementTimeContainer = (this.timeDescendants.item(i) as ElementTimeContainer);
-						//container.resolve();
-						
-						//if (!(container.end as TimeList).resolved)
-						//{
-						//	return Time.UNRESOLVED;
-						//}
-						
-						//if (container.end.first.resolvedOffset > childDuration)
-						//{
-						//	childDuration = container.end.first.resolvedOffset;
-						//}
+						duration = Time.INDEFINITE;	
+					}
+					else
+					{
+						duration = (this._currentEndInterval.resolvedOffset * 1000);
 					}
 				}
-				
-				if (childDuration != 0)
-				{
-					childDuration = (childDuration - this.begin.first.resolvedOffset);
-					
-					return childDuration;
-				}
-				
-				return Time.UNRESOLVED;
 			}
 			
 			return duration;

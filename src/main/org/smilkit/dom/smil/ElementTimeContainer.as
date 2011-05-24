@@ -542,6 +542,8 @@ package org.smilkit.dom.smil
 			var tempBegin:Time = null;
 			var tempEnd:Time = null;
 			
+			var min:Time = new Time(this, false, "0ms");
+			
 			while (true)
 			{
 				tempBegin = this.beginList.getTimeGreaterThan(beginAfter);
@@ -569,7 +571,7 @@ package org.smilkit.dom.smil
 					tempEnd = this.computeActiveDuation(tempBegin, tempEnd);
 				}
 				
-				if (tempEnd.isGreaterThan(new Time(this, false, "0ms")))
+				if (tempEnd.isGreaterThan(min) || (tempBegin.isEqualTo(min) && tempEnd.isEqualTo(min)))
 				{
 					this.setCurrentInterval(tempBegin, tempEnd);
 					
