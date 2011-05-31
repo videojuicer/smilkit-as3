@@ -1,5 +1,6 @@
 package org.smilkit.dom.smil.time
 {
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
@@ -11,6 +12,7 @@ package org.smilkit.dom.smil.time
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.collection.Hashtable;
+	import org.utilkit.util.Platform;
 
 	public class SMILTimeGraph
 	{
@@ -94,6 +96,9 @@ package org.smilkit.dom.smil.time
 		
 		public function rebuild():void
 		{
+			var memoryFreed:uint = Platform.garbageCollection();
+			SMILKit.logger.info("Rebuilding time graph, freed "+memoryFreed+"bytes of memory");
+			
 			this._elements = new Vector.<SMILTimeInstance>();
 				
 			this.rebuildTimeGraph(this.ownerDocument);

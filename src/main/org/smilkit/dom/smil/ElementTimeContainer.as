@@ -10,6 +10,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
+	import org.utilkit.UtilKit;
 	
 	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
 	{
@@ -388,8 +389,7 @@ package org.smilkit.dom.smil
 		{
 			this._implicitMediaDuration = time;
 			
-			this.resetElementState();
-			this.startup(true);
+			this.startup();
 		}
 		
 		/**
@@ -397,8 +397,18 @@ package org.smilkit.dom.smil
 		 */
 		public function resetElementState():void
 		{
+			this._isPlaying = false;
+			
+			this._activatedAt = Time.UNRESOLVED;
+			this._deactivatedAt = Time.UNRESOLVED;
+			
 			this._currentBeginInterval = null;
 			this._currentEndInterval = null;
+			
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onIntervalStart);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd);
 		}
 		
 		/**
@@ -673,13 +683,8 @@ package org.smilkit.dom.smil
 		}
 		
 		public function startup(skipChildren:Boolean = false):void
-		{
-			this._isPlaying = false;
-			
-			this._activatedAt = Time.UNRESOLVED;
-			this._deactivatedAt = Time.UNRESOLVED;
-			
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.deactivate);
+		{			
+			this.resetElementState();
 			
 			if (!skipChildren)
 			{
@@ -715,8 +720,7 @@ package org.smilkit.dom.smil
 			
 			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
-				var waitTime:Number = this.currentBeginInterval.implicitSyncbaseOffset - (this.ownerDocument as SMILDocument).offset;
-				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onIntervalStart);
+				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(this.parentTimeContainer.offsetForChild(this) + this.currentBeginInterval.resolvedOffset, this.onIntervalStart);
 				
 				// setup timer if we need to wait (and were not meant to play)
 				if (!waiting && this.parentTimeContainer.isPlaying)
@@ -732,17 +736,20 @@ package org.smilkit.dom.smil
 		 */
 		public function activate():void
 		{
+			SMILKit.logger.benchmark("---ACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
+			
 			// can only play if our parent is playing and our begin is resolved
-			if (!this.parentTimeContainer.isPlaying || this.currentBeginInterval.resolved)
+			if (!this.parentTimeContainer.isPlaying || this.currentBeginInterval == null || !this.currentBeginInterval.resolved)
 			{
+				SMILKit.logger.benchmark("-----SKIPPED ACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
+
 				return;
 			}
 			
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
 			
-			// trigger a display
-			// this.startChildren();
+			this.display();
 			
 			var waitTime:Number = 0;
 			
@@ -766,6 +773,12 @@ package org.smilkit.dom.smil
 			}
 			
 			// dispatch beginEvent on DOM
+		}
+		
+		public function display():void
+		{
+			// whenever display is called, we look at what the current state
+			// should be, and update our drawingboard + handler with the changes
 		}
 		
 		protected function onIntervalStart():void
@@ -800,8 +813,12 @@ package org.smilkit.dom.smil
 		// TODO: MOVE TO pauseElement()
 		public function deactivate():void
 		{
+			SMILKit.logger.benchmark("---DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
+			
 			if (!this._isPlaying)
 			{
+				
+				SMILKit.logger.benchmark("-----SKIPPED DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
 				return;
 			}
 			

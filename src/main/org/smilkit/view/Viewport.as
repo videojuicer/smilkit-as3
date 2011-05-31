@@ -22,6 +22,7 @@ package org.smilkit.view
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.parser.DataURIParser;
+	import org.utilkit.util.Platform;
 
 	/**
 	 * Dispatched when the <code>Viewport</code> instance has refreshed with a new document.
@@ -165,7 +166,7 @@ package org.smilkit.view
 			this._history = new Vector.<String>();
 			
 			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
-			this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			//this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			
 			this._drawingBoard = new DrawingBoard();
 			this.addChild(this._drawingBoard);
@@ -761,8 +762,11 @@ package org.smilkit.view
 			// parse dom
 			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
 			
+			document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+				
 			// Reset the heartbeat to zero
-			this.heartbeat.reset();
+			//this.heartbeat.reset();
+			//this.document.scheduler.reset();
 			
 			// Create the object pool with internal timing graph, rendertree etc.
 			this._objectPool = new ViewportObjectPool(this, document);
@@ -777,7 +781,11 @@ package org.smilkit.view
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			
+			// tidy up
+			Platform.garbageCollection();
 		}
 
 		/**
@@ -810,9 +818,10 @@ package org.smilkit.view
 			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
 				
-				this.heartbeat.resume();
+				//this.heartbeat.resume();
+				this.document.scheduler.resume();
 				
-				if (this.heartbeat.runningOffset >= this.document.duration && this.document.duration > 0)
+				if (this.document.scheduler.offset >= this.document.duration && this.document.duration > 0)
 				{
 					this.seek(0);
 					this.commitSeek();
@@ -831,31 +840,43 @@ package org.smilkit.view
 		protected function onPlaybackStateChangedToPaused():void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
-			this.heartbeat.pause();
+			//this.heartbeat.pause();
+			
+			if (this.document != null)
+			{
+				this.document.scheduler.pause();
+			}
 		}
 		
 		protected function onPlaybackStateChangedToStopped():void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_STOPPED.", this);
 			
-			this.heartbeat.pause();
+			//this.heartbeat.pause();
 			//this.heartbeat.seek(0);
+			this.document.scheduler.pause();
 		}
 		
 		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_SEEKING with offset: "+offset+".", this);
 			this.loadScheduler.stop();
-			this.heartbeat.pause();
-			this.heartbeat.seek(offset);
+			//this.heartbeat.pause();
+			//this.heartbeat.seek(offset);
 			// can rollback this seek: this.heartbeat.rollback();
+			
+			this.document.scheduler.pause();
+			this.document.scheduler.seek(offset);
 		}
 		
 		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
 		{
 			SMILKit.logger.info("Waiting for more data to load.", this);
 			this._waitingForRenderTree = true;
-			this.heartbeat.pause();
+			//this.heartbeat.pause();
+			
+			this.document.scheduler.pause();
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
@@ -863,7 +884,10 @@ package org.smilkit.view
 		{
 			SMILKit.logger.info("Waiting for sync before playback can resume.", this);
 			this._waitingForRenderTree = true;
-			this.heartbeat.pause();
+			//this.heartbeat.pause();
+			
+			this.document.scheduler.pause();
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
@@ -890,7 +914,7 @@ package org.smilkit.view
 		{
 			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
 			
-			this.heartbeat.beat();
+			//this.heartbeat.beat();
 		}
 		
 		protected function onTimingGraphRebuild(event:SMILMutationEvent):void

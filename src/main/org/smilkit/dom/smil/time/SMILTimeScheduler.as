@@ -3,6 +3,7 @@ package org.smilkit.dom.smil.time
 	import flash.events.EventDispatcher;
 	import flash.events.TimerEvent;
 	
+	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.time.SharedTimer;
@@ -74,6 +75,8 @@ package org.smilkit.dom.smil.time
 				
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RESUMED, this.offset));
 				
+				this._baseLine = new Date();
+				
 				this.triggerTickNow();
 				
 				return true;
@@ -120,7 +123,12 @@ package org.smilkit.dom.smil.time
 		}
 		
 		public function waitUntil(offset:Number, callback:Function):Boolean
-		{			
+		{		
+			if (offset == 0)
+			{
+				SMILKit.logger.benchmark("waitUtil->0 "+callback);
+			}
+			
 			if (offset >= this.ownerSMILDocument.offset)
 			{
 				if (!this._waitingCallbacks.hasItem(offset))
@@ -172,21 +180,27 @@ package org.smilkit.dom.smil.time
 			if (this.running)
 			{
 				this._offset += duration;
-
-				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this._offset));
-			}
-			
-			for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
-			{
-				var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
 				
-				if (Math.abs(this.offset - offset) < SharedTimer.DELAY)
+				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this._offset));
+				
+				for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
 				{
-					var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
+					var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
 					
-					for (var k:uint = 0; k < callbacks.length; k++)
+					// seconds into milliseconds
+					offset = (offset * 1000);
+					
+					// hit any offset that is before our current offset
+					if (offset <= this.offset)
 					{
-						callbacks[k].call();
+						var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
+						
+						for (var k:uint = 0; k < callbacks.length; k++)
+						{
+							callbacks[k].call();
+						}
+						
+						this._waitingCallbacks.removeItem(offset);
 					}
 				}
 			}

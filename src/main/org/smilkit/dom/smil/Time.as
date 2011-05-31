@@ -207,12 +207,12 @@ package org.smilkit.dom.smil
 				return false;
 			}
 			
-			if (this.implicitSyncbaseOffset == time.implicitSyncbaseOffset)
+			if (this.resolvedOffset == time.resolvedOffset)
 			{
 				return true;
 			}
 			
-			return true;
+			return false;
 		}
 		
 		protected function createFromToken():void

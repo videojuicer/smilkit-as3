@@ -129,12 +129,7 @@ package org.smilkit.dom.smil
 		 */
 		public function get offset():Number
 		{
-			if (this.viewportObjectPool != null)
-			{
-				return this.viewportObjectPool.viewport.offset;
-			}
-			
-			return 0;
+			return (this.scheduler.offset / 1000);
 		}
 		
 		public function setupDocumentVariables():void

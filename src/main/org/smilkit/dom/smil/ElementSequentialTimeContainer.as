@@ -83,7 +83,7 @@ package org.smilkit.dom.smil
 		{
 			// no duration defined on a seq, so we use the children
 			var duration:Number = 0;
-			var timeChilden:INodeList = this.timeDescendants;
+			var timeChildren:INodeList = this.timeDescendants;
 			
 			for (var i:uint = 0; i < timeChildren.length; i++)
 			{
@@ -103,7 +103,7 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			return new Time(this, false, (duration * 1000) + "ms");
+			return new Time(this, false, int(duration * 1000) + "ms");
 		}
 	}
 }

@@ -534,7 +534,7 @@ package org.smilkit.render
 				var modifiedTimingNodes:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
 				
 				// make a copy of the elements so we can update the list without causing loop issues
-				var nodes:Vector.<SMILTimeInstance> = this.document.timeGraph.activeElementsAt(offset);
+				var nodes:Vector.<SMILTimeInstance> = this.document.timeGraph.activeElements;
 				
 				for (var i:int = 0; i < nodes.length; i++)
 				{

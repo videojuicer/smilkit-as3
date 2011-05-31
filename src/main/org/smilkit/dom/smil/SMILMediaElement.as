@@ -399,7 +399,6 @@ package org.smilkit.dom.smil
 		{
 			if (this._handler != null)
 			{
-				this._handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 				this._handler.removeEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
 				this._handler.removeEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
 			}
@@ -409,7 +408,6 @@ package org.smilkit.dom.smil
 			
 			if (this._handler != null)
 			{
-				this._handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 				this._handler.addEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
 				this._handler.addEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
 			}
@@ -425,9 +423,23 @@ package org.smilkit.dom.smil
 			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		}
 		
-		private function onHandlerDurationResolved(e:HandlerEvent):void
+		public override function display():void
 		{
-			//(this.ownerDocument as SMILDocument).invalidateCachedTimes();
+			if (this.isPlaying)
+			{
+				this.handler.resume();
+				this.handler.addedToRenderTree(null);
+				
+				(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
+			}
+			else
+			{
+				this.handler.pause();
+				
+				(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);
+				
+				this.handler.addedToRenderTree(null);
+			}
 		}
 	}
 }

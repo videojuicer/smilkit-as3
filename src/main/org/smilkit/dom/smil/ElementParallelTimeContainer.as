@@ -107,7 +107,7 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			return new Time(this, false, (duration * 1000) + "ms");
+			return new Time(this, false, int(duration * 1000) + "ms");
 		}
 	}
 }

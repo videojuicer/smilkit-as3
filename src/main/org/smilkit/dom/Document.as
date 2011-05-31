@@ -845,7 +845,7 @@ package org.smilkit.dom
 					this.dispatchNodeEvent(node, me);
 				}
 				
-				this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
+				//this.dispatchAggregateEvent(node, this._savedEnclosingAttr);
 			}
 		}
 		
