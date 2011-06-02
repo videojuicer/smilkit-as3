@@ -109,7 +109,7 @@ package org.smilkit.load {
 			this._workers.push(this._justInTimeWorker, this._resolveWorker, this._preloadWorker);
 			
 			this._opportunisticWorkers = new Vector.<Worker>;
-			this._opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);			
+			this._opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);
 			
 			this.bindJustInTimeRenderTreeEvents();
 			this.bindOpportunisticTimingGraphEvents();

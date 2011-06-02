@@ -7,6 +7,7 @@ package org.smilkit.handler
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.net.URLRequest;
 	import flash.system.LoaderContext;
 	
@@ -66,6 +67,7 @@ package org.smilkit.handler
 			
 			this._loader.addEventListener(Event.COMPLETE, this.onLoaderComplete);
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderError);
+			this._loader.addEventListener(ProgressEvent.PROGRESS, this.onLoaderProgress);
 			
 			this._loader.load(new URLRequest(this.element.src), new LoaderContext(true));
 			
@@ -101,6 +103,15 @@ package org.smilkit.handler
 				}
 				
 				super.cancel();
+			}
+		}
+		
+		protected function onLoaderProgress(e:ProgressEvent):void
+		{
+			if(this._mediaElement != null)
+			{
+				this._mediaElement.intrinsicBytesLoaded = e.bytesLoaded;
+				this._mediaElement.intrinsicBytesTotal = e.bytesTotal;
 			}
 		}
 		

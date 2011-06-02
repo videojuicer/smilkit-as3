@@ -10,10 +10,12 @@ package org.smilkit.handler
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.dom.smil.ElementLoadableContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.dom.smil.FileSize;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
@@ -29,6 +31,7 @@ package org.smilkit.handler
 		
 		protected var _handlerId:int;
 		protected var _element:IElement;
+		protected var _mediaElement:SMILMediaElement;
 		protected var _startedLoading:Boolean = false;
 		protected var _completedLoading:Boolean = false;
 		protected var _completedResolving:Boolean = false;
@@ -40,8 +43,10 @@ package org.smilkit.handler
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
+			this._mediaElement = (element as SMILMediaElement);
 			SMILKitHandler.__idCounter++;
 			this._handlerId = SMILKitHandler.__idCounter;
+			this.resolveInitialLoadableProperties();
 		}
 		
 		public function get handlerId():int
@@ -87,6 +92,11 @@ package org.smilkit.handler
 		public function get temporal():Boolean
 		{
 			return false;
+		}
+		
+		public function get fileSizeWillResolve():Boolean
+		{
+			return true;
 		}
 		
 		public function get displayObject():DisplayObject
@@ -175,6 +185,40 @@ package org.smilkit.handler
 		public function load():void
 		{
 			
+		}
+		
+		protected function resolveInitialLoadableProperties():void
+		{
+			if(this._mediaElement != null)
+			{
+				if(this.fileSizeWillResolve)
+				{
+					var sizeParam:String = this._mediaElement.getParam("filesize");
+					if(sizeParam)
+					{
+						var sizeVal:int = parseInt(sizeParam);
+						if(isNaN(sizeVal))
+						{
+							SMILKit.logger.debug("Ignoring hinted size "+sizeParam+" as it appears to be invalid", this);
+							this._mediaElement.intrinsicBytesLoaded = FileSize.UNRESOLVED;
+						}
+						else
+						{
+							SMILKit.logger.debug("Caught hinted intrinsic size "+sizeVal+", passing to element as intrinsic value", this);
+							this._mediaElement.intrinsicBytesTotal = sizeVal;
+						}
+					}
+					else
+					{
+						this._mediaElement.intrinsicBytesLoaded = FileSize.UNRESOLVED;
+					}
+				}
+				else
+				{
+					this._mediaElement.intrinsicBytesTotal = FileSize.UNRESOLVED;
+					this._mediaElement.intrinsicBytesLoaded = FileSize.UNRESOLVED;
+				}
+			}
 		}
 		
 		/**
@@ -312,6 +356,10 @@ package org.smilkit.handler
 		{
 			SMILKit.logger.debug("Handler "+this.handlerId+" cancelling load operation.", this)
 			
+			if(this._mediaElement != null)
+			{
+				this._mediaElement.intrinsicBytesLoaded = 0;
+			}
 			this._completedLoading = false;
 			this._startedLoading = false;
 			

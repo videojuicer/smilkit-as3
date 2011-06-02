@@ -89,5 +89,33 @@ package org.smilkit.spec.tests.dom.smil
 			
 			//Assert.assertNull(element.handler);
 		}
+		
+		[Test(description="Ensures that params may be read from an element containing param tags")]
+		public function paramReaderHashCorrect():void
+		{
+			var parser:BostonDOMParser = new BostonDOMParser();
+			var doc:ISMILDocument = (parser.parse(Fixtures.PARAMS_SMIL_XML) as ISMILDocument);
+			
+			// Group params only
+			var e:SMILMediaElement = doc.getElementById("group_params") as SMILMediaElement;
+			Assert.assertNotNull(e);
+			Assert.assertEquals("foo-group1", e.params.foo);
+			Assert.assertEquals("bar-group1", e.params.bar);
+			Assert.assertNull(e.params.baz);
+			
+			// Mixed params
+			e = doc.getElementById("mixed_params") as SMILMediaElement;
+			Assert.assertNotNull(e);
+			Assert.assertEquals("foo-group2", e.params.foo);
+			Assert.assertEquals("bar-local", e.params.bar);
+			Assert.assertEquals("baz-local", e.params.baz);
+			
+			// Local only
+			e = doc.getElementById("local_params") as SMILMediaElement;
+			Assert.assertNotNull(e);
+			Assert.assertEquals("foo-local", e.params.foo);
+			Assert.assertNull(e.params.bar);
+			Assert.assertNull(e.params.baz);
+		}
 	}
 }

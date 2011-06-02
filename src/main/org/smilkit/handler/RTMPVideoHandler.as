@@ -49,6 +49,11 @@ package org.smilkit.handler
 			this._soundTransformer = new SoundTransform(0.2, 0);
 		}
 		
+		public override function get fileSizeWillResolve():Boolean
+		{
+			return false;
+		}
+		
 		public override function get width():uint
 		{
 			if (this._metadata == null)
