@@ -116,6 +116,7 @@ package org.smilkit.time
 			{
 				SMILKit.logger.debug("Heartbeat resumed.", this);
 				this._running = true;
+				this._baseline = new Date();
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RESUMED, this.runningOffset));
 				return true;
 			}

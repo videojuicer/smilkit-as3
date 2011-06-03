@@ -15,6 +15,10 @@ package org.smilkit.render
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
+	
+	import org.smilkit.time.Heartbeat;
+	import org.smilkit.time.SharedTimer;
+
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	
@@ -90,6 +94,11 @@ package org.smilkit.render
 		public function get viewport():Viewport
 		{
 			return this._objectPool.viewport;
+		}
+		
+		public function get heartbeat():Heartbeat
+		{
+			return this.viewport.heartbeat;
 		}
 		
 		public function get elements():Vector.<SMILTimeInstance>
@@ -641,7 +650,8 @@ package org.smilkit.render
 								// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
 								// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
 								// viewport is currently playing.
-								if(!syncAfterUpdate && handler.seekable)
+								// Also only schedule a sync operation if the asset is added at a non-zero timestamp
+								if(!syncAfterUpdate && handler.seekable && time.begin != offset)
 								{
 									syncAfterUpdate = true;
 								}
@@ -766,6 +776,7 @@ package org.smilkit.render
 			// we add our listeners for the dependancy management
 			handler.addEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 			handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+			handler.addEventListener(HandlerEvent.LOAD_COMPLETED, this.onHandlerLoadReady);
 			handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 			handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);

@@ -225,10 +225,8 @@ package org.smilkit.spec.tests.dom
 			var prerollRight:SMILMediaElement = (this._unresolvedDocument.getElementById("preroll_right") as SMILMediaElement);
 			var contentRight:SMILMediaElement = (this._unresolvedDocument.getElementById("content_right") as SMILMediaElement);
 			
-			Assert.assertEquals(Time.UNRESOLVED, sequenceLeft.duration);
-			Assert.assertEquals(false, sequenceLeft.durationResolved);
-			Assert.assertEquals(Time.UNRESOLVED, sequenceRight.duration);
-			Assert.assertEquals(false, sequenceRight.durationResolved);
+			Assert.assertEquals(Time.INDEFINITE, sequenceLeft.duration);
+			Assert.assertEquals(Time.INDEFINITE, sequenceRight.duration);
 			
 			Assert.assertEquals(00, prerollLeft.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(true, prerollLeft.currentBeginInterval.resolved);
@@ -250,9 +248,9 @@ package org.smilkit.spec.tests.dom
 			prerollLeft.dur = "10000ms";
 			prerollRight.dur = "10000ms";
 			
-			Assert.assertEquals(Time.UNRESOLVED, sequenceLeft.duration);
+			Assert.assertEquals(Time.INDEFINITE, sequenceLeft.duration);
 			Assert.assertEquals(false, sequenceLeft.durationResolved);
-			Assert.assertEquals(Time.UNRESOLVED, sequenceRight.duration);
+			Assert.assertEquals(Time.INDEFINITE, sequenceRight.duration);
 			Assert.assertEquals(false, sequenceRight.durationResolved);
 			
 			Assert.assertEquals(00, prerollLeft.currentBeginInterval.resolvedOffset);

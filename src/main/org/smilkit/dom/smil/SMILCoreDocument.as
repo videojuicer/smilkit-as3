@@ -34,8 +34,6 @@ package org.smilkit.dom.smil
 			this.addEventListener(MutationEvent.DOM_NODE_REMOVED, this.onDOMNodeRemoved, false);
 		}
 		
-
-		
 		public function get viewportObjectPool():ViewportObjectPool
 		{
 			return this._viewportObjectPool;

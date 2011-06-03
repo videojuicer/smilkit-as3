@@ -7,6 +7,7 @@ package org.smilkit.spec.tests.time
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.time.Heartbeat;
+	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.Viewport;
 
 	public class HeartbeatTestCase
@@ -93,7 +94,11 @@ package org.smilkit.spec.tests.time
 		protected function handleHasOffSet(event:ViewportEvent, passThroughData:Object):void
 		{
 			var heartBeat:Heartbeat = this._viewport.heartbeat;
-			Assert.assertEquals(0, heartBeat.offset);
+			
+			//Assert.assertEquals(0, heartBeat.offset);
+			
+			// will never actually be 0, because the first tick starts from where we last were
+			Assert.assertTrue((heartBeat.offset >= 0 && heartBeat.offset <= 2000));
 		}
 		
 		protected function handleHasOffSetTimeOut(passThroughData:Object):void

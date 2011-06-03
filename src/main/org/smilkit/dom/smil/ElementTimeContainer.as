@@ -305,6 +305,7 @@ package org.smilkit.dom.smil
 			return parent;
 		}
 		
+		// TODO: remove code, beginElement -> create begin interval at current offset
 		public function beginElement():Boolean
 		{
 			// should be making a begin time at the current offset
@@ -314,6 +315,7 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
+		// TODO: remove code, pauseElement -> create end interval at current offset
 		public function endElement():Boolean
 		{
 			(this.ownerDocument as SMILDocument).eventStack.triggerEvent(this, SMILEventStack.SMILELEMENT_END);
@@ -321,6 +323,8 @@ package org.smilkit.dom.smil
 			return true;
 		}
 		
+		
+		// TODO: remove code, pauseElement -> deactivate()
 		public function pauseElement():void
 		{
 			var previousState:uint = this._playbackState;
@@ -345,6 +349,7 @@ package org.smilkit.dom.smil
 			this.ownerDocument.dispatchEvent(event);
 		}
 		
+		// TODO: remove code, resumeElement -> activate()
 		public function resumeElement():void
 		{
 			var previousState:uint = this._playbackState;
@@ -369,6 +374,7 @@ package org.smilkit.dom.smil
 			this.ownerDocument.dispatchEvent(event);
 		}
 		
+		// TODO: seek handler
 		public function seekElement(seekTo:Number):void
 		{
 			// seek children
@@ -795,6 +801,7 @@ package org.smilkit.dom.smil
 		protected function onMediaDurationEnd():void
 		{
 			// ends simple duration if dur=media or dur=indefinite
+			this.onSimpleDurationEnd();
 		}
 		
 		protected function onSimpleDurationEnd():void
@@ -810,7 +817,6 @@ package org.smilkit.dom.smil
 		 * Deactivates the element from playback, called after the end has been
 		 * resolved, sets the element into a paused state.
 		 */
-		// TODO: MOVE TO pauseElement()
 		public function deactivate():void
 		{
 			SMILKit.logger.benchmark("---DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
@@ -824,9 +830,10 @@ package org.smilkit.dom.smil
 			
 			this._deactivatedAt = (this._ownerDocument as SMILDocument).offset;
 			
-			// trigger either a remove display or freeze
-			
 			this._isPlaying = false;
+			
+			// trigger either a remove display or freeze
+			this.display();
 			
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.deactivate);
 			

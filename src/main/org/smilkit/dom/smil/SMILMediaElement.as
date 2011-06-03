@@ -425,18 +425,28 @@ package org.smilkit.dom.smil
 		
 		public override function display():void
 		{
+			if (this.region != null)
+			{
+				if (this.isPlaying)
+				{
+					(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
+				}
+				else
+				{
+					(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
+				}
+			}
+			
 			if (this.isPlaying)
 			{
-				this.handler.resume();
 				this.handler.addedToRenderTree(null);
 				
-				(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
+				this.handler.resume();
+				
 			}
 			else
 			{
 				this.handler.pause();
-				
-				(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);
 				
 				this.handler.addedToRenderTree(null);
 			}
