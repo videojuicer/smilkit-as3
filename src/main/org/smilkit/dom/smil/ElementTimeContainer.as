@@ -12,7 +12,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	import org.utilkit.UtilKit;
 	
-	public class ElementTimeContainer extends SMILElement implements IElementTimeContainer
+	public class ElementTimeContainer extends ElementLoadableContainer implements IElementTimeContainer
 	{
 		public static const PLAYBACK_STATE_PAUSED:uint = 0;
 		public static const PLAYBACK_STATE_PLAYING:uint = 1;

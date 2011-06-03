@@ -15,6 +15,11 @@ package org.smilkit.handler
 			super(element);
 		}
 		
+		public override function get fileSizeWillResolve():Boolean
+		{
+			return false;
+		}
+		
 		public override function get width():uint
 		{
 			return super.width;

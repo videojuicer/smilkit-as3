@@ -46,5 +46,9 @@ package org.smilkit.w3c.dom.smil
 		
 		function get type():String;
 		function set type(type:String):void;
+		
+		function get params():Object;
+		function getParam(name:String):String;
+		function setParam(name:String, value:String):void;
 	}
 }

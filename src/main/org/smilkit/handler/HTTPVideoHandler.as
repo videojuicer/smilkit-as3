@@ -417,6 +417,13 @@ package org.smilkit.handler
 			var percentageLoaded:Number = (this._netStream.bytesLoaded / this._netStream.bytesTotal) * 100;
 			var durationLoaded:Number = ((percentageLoaded / 100) * this.duration);
 			
+			// Update the parent element
+			if(this._mediaElement != null)
+			{
+				this._mediaElement.intrinsicBytesLoaded = this._netStream.bytesLoaded;
+				this._mediaElement.intrinsicBytesTotal = this._netStream.bytesTotal;
+			}
+			
 			// if were not already ready, check if we are
 			if (!this._loadReady)
 			{

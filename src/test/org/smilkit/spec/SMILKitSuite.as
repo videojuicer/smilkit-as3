@@ -14,6 +14,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.dom.TimeTestCase;
 	import org.smilkit.spec.tests.dom.smil.ElementTestContainerTestCase;
 	import org.smilkit.spec.tests.dom.smil.ElementTimeContainerTestCase;
+	import org.smilkit.spec.tests.dom.smil.ElementLoadableContainerTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILDocumentVariablesTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILMediaElementTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILSwitchElementTestCase;
@@ -45,12 +46,13 @@ package org.smilkit.spec
 		public var eventTest:EventTestCase;
 		public var timeTest:TimeTestCase;
 		public var elementTimeDescendantNodeList:ElementTimeDescendantNodeListTestCase;
-		public var smilMediaElementTest:SMILMediaElementTestCase;		
+		public var smilMediaElementTest:SMILMediaElementTestCase;
 		public var parentNodeTest:ParentNodeTestCase;
 		
 		// SMIL Tests
 		public var elementTimeContainerTest:ElementTimeContainerTestCase;
 		public var elementTestContainerTest:ElementTestContainerTestCase;
+		public var elementLoadableContainerTest:ElementLoadableContainerTestCase;
 		public var smilDocumentVariablesTest:SMILDocumentVariablesTestCase;
 		public var smilSwitchElementTest:SMILSwitchElementTestCase;
 		public var smilTimeParserTest:SMILTimeParserTestCase;

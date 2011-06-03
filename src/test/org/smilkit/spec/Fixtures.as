@@ -46,7 +46,9 @@ package org.smilkit.spec
 		public static var MP4_VIDEO_SMIL_XML:String =  "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
 			"<body><seq id=\"holder\">" +
-			"<video id=\"video_http\" src=\"http://assets.videojuicer.net/smilkit/bcf93ccc-7e18-11df-a68c-1231390c28d1.mp4\" dur=\"10s\" />" +
+			"<video id=\"video_http\" src=\"http://assets.videojuicer.net/smilkit/bcf93ccc-7e18-11df-a68c-1231390c28d1.mp4\" dur=\"10s\">"+
+			"<param name=\"filesize\" value=\"1000\"/>"+
+			"</video>" +
 			"<video id=\"video_rtmp\" src=\"rtmp://media.smilkit.org/demo.mp4\" dur=\"60s\" region=\"root\" />" +
 			"</seq></body></smil>";
 		
@@ -338,5 +340,18 @@ package org.smilkit.spec
 			"<video id=\"repeatBoth\" repeatCount=\"9\" repeatDur=\"110s\" dur=\"10s\" src=\"1.mp4\" />" +
 			"<video id=\"repeatBothReverse\" repeatCount=\"11\" repeatDur=\"90s\" dur=\"10s\" src=\"1.mp4\" />" +
 			"</body></smil>"; 
+			
+		public static var PARAMS_SMIL_XML:String = 	"<?xml version=\"1.0\"?><smil>" +
+				"<head>"+
+				"<paramGroup xml:id=\"group1\"><param name=\"foo\" value=\"foo-group1\" /><param name=\"bar\" value=\"bar-group1\" /></paramGroup>"+
+				"<paramGroup xml:id=\"group2\"><param name=\"foo\" value=\"foo-group2\" /><param name=\"bar\" value=\"bar-group2\" /></paramGroup>"+
+				"<layout><region xml:id=\"root\" width=\"100%\" height=\"100%\" /></layout></head>" +
+				"<body>" +
+				"<seq id=\"holder\">" +
+				"<video id=\"group_params\" src=\"1.mp4\" paramGroup=\"group1\" />" +
+				"<video id=\"mixed_params\" src=\"1.mp4\" paramGroup=\"group2\"><param name=\"bar\" value=\"bar-local\" /><param name=\"baz\" value=\"baz-local\" /></video>" +
+				"<video id=\"local_params\" dur=\"10s\" src=\"1.mp4\"><param name=\"foo\" value=\"foo-local\" /></video>" +
+				"</seq>                                      " +
+				"</body></smil>";
 	}
 }

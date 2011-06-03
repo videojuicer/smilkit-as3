@@ -12,6 +12,7 @@ package org.smilkit.spec.tests.handler
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.smilkit.dom.smil.SMILMediaElement;
 
 	public class HandlerTestCase
 	{		
@@ -96,6 +97,14 @@ package org.smilkit.spec.tests.handler
 			
 			Assert.assertEquals(httpHandler.innerDisplayObject.width, snapshot.width);
 			Assert.assertEquals(httpHandler.innerDisplayObject.height, snapshot.height);
+		}
+		
+		[Test(description="Tests that a handler sets the intrinsic byte size if the param is found")]
+		public function intrinsicFileSizeResolvedFromParams():void
+		{
+			var httpElement:SMILMediaElement = this._document.getElementById("video_http") as SMILMediaElement;
+			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			Assert.assertEquals(1000, httpElement.bytesTotal);
 		}
 	}
 }

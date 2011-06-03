@@ -10,6 +10,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IDocument;
+	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
@@ -313,6 +314,57 @@ package org.smilkit.dom.smil
 			//}
 			
 			return true;
+		}
+		
+		/**
+		 * Finds all the param tags that are direct children of this element and
+		 * composes them into a dictionary of objects. 
+		 */
+		public function get params():Object
+		{
+			var dict:Object = {};
+			// Get defaults
+			var paramGroup:String = this.getAttribute("paramGroup");
+			if(paramGroup != null) {
+				var paramGroupElement:IElement = this.ownerSMILDocument.getElementById(paramGroup);
+				if(paramGroupElement != null && paramGroupElement.tagName.toLowerCase() == "paramgroup")
+				{
+					// Group element exists - merge into dict
+					dict = this.paramNodeListToObject(paramGroupElement.getElementsByTagName("param"), dict);
+				}
+			}
+			// Get params on this element
+			dict = this.paramNodeListToObject(this.getElementsByTagName("param"), dict, this);
+			return dict;
+		}
+		
+		protected function paramNodeListToObject(list:INodeList, mergeInto:Object = null, onlyParent:Element=null):Object
+		{
+			var dict:Object = (mergeInto != null)? mergeInto : {};
+			for(var i:uint=0; i<list.length; i++)
+			{
+				var n:IElement = list.item(i) as IElement;
+				if(onlyParent == null || onlyParent == n.parentNode)
+				{
+					var name:String = n.getAttribute("name");
+					var value:String = n.getAttribute("value");
+					if(name != null)
+					{
+						dict[name] = value;
+					}
+				}
+			}
+			return dict;
+		}
+		
+		public function getParam(name:String):String
+		{
+			return this.params[name];
+		}
+		
+		public function setParam(name:String, value:String):void
+		{
+			// TODO
 		}
 		
 		public override function ancestorChanged(newAncestor:ParentNode=null):void
