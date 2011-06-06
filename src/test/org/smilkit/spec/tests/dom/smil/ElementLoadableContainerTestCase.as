@@ -46,9 +46,10 @@ package org.smilkit.spec.tests.dom.smil
 		[Test(description="Bubbles file size changes to the parent load container")]
 		public function loadPropertyChangesBubbled():void
 		{
-			Assert.assertEquals(0, this._body.bytesLoaded);
-			Assert.assertEquals(0, this._body.bytesTotal);
-			
+			this._linkWrappedVideo.intrinsicBytesLoaded = 0;
+			this._linkWrappedVideo.intrinsicBytesTotal = 0;
+			this._deepWrappedVideo.intrinsicBytesLoaded = 0;
+			this._deepWrappedVideo.intrinsicBytesTotal = 0;
 			this._unwrappedVideo.intrinsicBytesLoaded = 5000;
 			this._unwrappedVideo.intrinsicBytesTotal = 10000;
 			
@@ -56,6 +57,8 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(10000, this._unwrappedVideo.bytesTotal);
 			Assert.assertEquals(5000, this._body.bytesLoaded);
 			Assert.assertEquals(10000, this._body.bytesTotal);
+			Assert.assertEquals(5000, this._document.loadables.bytesLoaded);
+			Assert.assertEquals(10000, this._document.loadables.bytesTotal);
 			
 			// Set unresolved on the deep-wrapped video
 			this._deepWrappedVideo.intrinsicBytesLoaded = FileSize.UNRESOLVED;
@@ -80,13 +83,18 @@ package org.smilkit.spec.tests.dom.smil
 			// Now try an intrinsic set on the body
 			this._body.intrinsicBytesLoaded = FileSize.UNRESOLVED;
 			Assert.assertEquals(FileSize.UNRESOLVED, this._body.bytesLoaded);
+			Assert.assertEquals(FileSize.UNRESOLVED, this._document.loadables.bytesLoaded);
 			this._body.intrinsicBytesTotal = FileSize.UNRESOLVED;
 			Assert.assertEquals(FileSize.UNRESOLVED, this._body.bytesTotal);
+			Assert.assertEquals(FileSize.UNRESOLVED, this._document.loadables.bytesTotal);
 			
 			this._body.intrinsicBytesLoaded = 30;
 			Assert.assertEquals(10030, this._body.bytesLoaded);
+			Assert.assertEquals(10030, this._document.loadables.bytesLoaded);
+			
 			this._body.intrinsicBytesTotal = 40;
 			Assert.assertEquals(20040, this._body.bytesTotal);
+			Assert.assertEquals(20040, this._document.loadables.bytesTotal);
 		}
 	}
 }
