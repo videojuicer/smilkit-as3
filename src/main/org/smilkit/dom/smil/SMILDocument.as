@@ -1,6 +1,7 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.display.SMILDocumentDisplayStack;
 	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.time.SMILTimeGraph;
@@ -17,6 +18,8 @@ package org.smilkit.dom.smil
 		protected var _scheduler:SMILTimeScheduler;
 		protected var _timeGraph:SMILTimeGraph;
 		
+		protected var _displayStack:SMILDocumentDisplayStack;
+		
 		protected var _variables:SMILDocumentVariables;
 		protected var _eventStack:SMILEventStack;
 		
@@ -29,10 +32,16 @@ package org.smilkit.dom.smil
 			// keeps track of time
 			this._scheduler = new SMILTimeScheduler(this);
 
-			// handles rebuilding itself
+			// handles active elements, rebuilds itself
 			this._timeGraph = new SMILTimeGraph(this);
 			
-			// default variables
+			// handles painting
+			this._displayStack = new SMILDocumentDisplayStack();
+			
+			// magic variables for smil
+			this._variables = new SMILDocumentVariables(this);
+			
+			// push the default variables into the document
 			this.setupDocumentVariables();
 		}
 		
@@ -44,6 +53,11 @@ package org.smilkit.dom.smil
 		public function get timeGraph():SMILTimeGraph
 		{
 			return this._timeGraph;
+		}
+		
+		public function get displayStack():SMILDocumentDisplayStack
+		{
+			return this._displayStack;
 		}
 		
 		public function get eventStack():SMILEventStack
@@ -134,8 +148,6 @@ package org.smilkit.dom.smil
 		
 		public function setupDocumentVariables():void
 		{
-			this._variables = new SMILDocumentVariables(this);
-			
 			// SMIL 3.0 default system variables
 			this.variables.set(SMILDocumentVariables.SYSTEM_AUDIO_DESC, "off");
 			this.variables.set(SMILDocumentVariables.SYSTEM_BASE_PROFILE, "");

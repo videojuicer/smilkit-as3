@@ -10,7 +10,7 @@ package org.smilkit.load {
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.view.ViewportObjectPool;
 	
 	/***
@@ -326,7 +326,7 @@ package org.smilkit.load {
 		}
 		
 		
-		protected function get renderTree():RenderTree {
+		protected function get renderTree():HandlerController {
 			return this._objectPool.renderTree;
 		}
 	}

@@ -5,7 +5,7 @@ package org.smilkit.spec.tests.render
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.view.Viewport;
@@ -38,7 +38,7 @@ package org.smilkit.spec.tests.render
 		}		
 			protected function handleHasElements(e:ViewportEvent, passThru:Object):void
 			{
-				var renderTree:RenderTree = this._viewport.renderTree;
+				var renderTree:HandlerController = this._viewport.renderTree;
 				var renderElements:Vector.<SMILTimeInstance> = renderTree.elements;
 				var elementsNum:int = renderElements.length;
 				
@@ -64,7 +64,7 @@ package org.smilkit.spec.tests.render
 		
 		protected function handleHasLastChangeOffSet(event:ViewportEvent, passThroughData:Object):void
 		{
-			var renderTree:RenderTree = this._viewport.renderTree;
+			var renderTree:HandlerController = this._viewport.renderTree;
 			
 			Assert.assertEquals(0, renderTree.lastChangeOffset);
 		}
@@ -85,7 +85,7 @@ package org.smilkit.spec.tests.render
 		
 		protected function handleHasNextChangeOffSet(event:ViewportEvent, passThroughData:Object):void
 		{
-			var renderTree:RenderTree = this._viewport.renderTree;
+			var renderTree:HandlerController = this._viewport.renderTree;
 			
 			Assert.assertEquals(-1,renderTree.nextChangeOffset);
 		}

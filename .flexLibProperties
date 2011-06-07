@@ -42,7 +42,7 @@
     <classEntry path="org.smilkit.events.HandlerEvent"/>
     <classEntry path="org.smilkit.events.EventHandler"/>
     <classEntry path="org.smilkit.events.ViewportEvent"/>
-    <classEntry path="org.smilkit.render.RenderTree"/>
+    <classEntry path="org.smilkit.render.HandlerController"/>
     <classEntry path="org.smilkit.time.Heartbeat"/>
     <classEntry path="org.smilkit.events.RenderTreeEvent"/>
     <classEntry path="org.smilkit.render.DrawingBoard"/>
@@ -88,6 +88,8 @@
     <classEntry path="org.smilkit.spec.tests.dom.smil.SMILTimeHelperTestCase"/>
     <classEntry path="org.smilkit.dom.smil.time.SMILTimeScheduler"/>
     <classEntry path="org.smilkit.dom.smil.ElementBodyTimeContainer"/>
+    <classEntry path="org.smilkit.dom.smil.display.SMILDocumentDisplayStack"/>
+    <classEntry path="org.smilkit.dom.smil.display.DisplayStackEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

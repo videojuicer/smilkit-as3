@@ -18,7 +18,7 @@ package org.smilkit.view
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.parser.DataURIParser;
@@ -179,7 +179,7 @@ package org.smilkit.view
 		 */
 		public function get offset():Number
 		{
-			return this._heartbeat.runningOffset;
+			return this.document.offset;
 		}
 		
 		/**
@@ -226,7 +226,7 @@ package org.smilkit.view
 		 * 
 		 * @see org.smilkit.render.RenderTree
 		 */
-		public function get renderTree():RenderTree
+		public function get renderTree():HandlerController
 		{
 			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.renderTree;

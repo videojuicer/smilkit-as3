@@ -4,7 +4,7 @@ package org.smilkit.spec
 	
 	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.render.DrawingBoard;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.spec.tests.dom.BostonDOMParserTestCase;
 	import org.smilkit.spec.tests.dom.DocumentTestCase;
 	import org.smilkit.spec.tests.dom.ElementTestCase;

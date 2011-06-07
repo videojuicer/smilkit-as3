@@ -19,7 +19,7 @@ package org.smilkit.handler
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.RegionContainer;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -442,7 +442,7 @@ package org.smilkit.handler
 		/**
 		* Callback method for when this handler is added to the <code>RenderTree</code>'s active list.
 		*/
-		public function addedToRenderTree(r:RenderTree):void
+		public function addedToRenderTree(r:HandlerController):void
 		{
 			// override me IF YOU DARE
 		}
@@ -450,7 +450,7 @@ package org.smilkit.handler
 		/**
 		* Callback method for when this handler is added to the <code>RenderTree</code>'s active list.
 		*/
-		public function removedFromRenderTree(r:RenderTree):void
+		public function removedFromRenderTree(r:HandlerController):void
 		{
 			// override me IF YOU'RE MAN ENOUGH
 		}

@@ -14,7 +14,7 @@ package org.smilkit.handler
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -271,12 +271,12 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 		}
 		
-		public override function addedToRenderTree(r:RenderTree):void
+		public override function addedToRenderTree(r:HandlerController):void
 		{
 			this._activeOnRenderTree = true;
 		}
 		
-		public override function removedFromRenderTree(r:RenderTree):void
+		public override function removedFromRenderTree(r:HandlerController):void
 		{
 			this._activeOnRenderTree = false;
 			this.invalidate();

@@ -2,8 +2,9 @@ package org.smilkit.view
 {
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.load.LoadScheduler;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 
+	// TODO: remove completely
 	public dynamic class ViewportObjectPool
 	{
 		protected var _viewport:Viewport;
@@ -16,7 +17,7 @@ package org.smilkit.view
 		/**
 		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
 		 */	
-		protected var _renderTree:RenderTree;
+		protected var _renderTree:HandlerController;
 		
 		/* 
 		 * An instance of LoadScheduler responsible for determining current load priorities and performing opportunistic
@@ -42,7 +43,7 @@ package org.smilkit.view
 			return this._document;
 		}
 		
-		public function get renderTree():RenderTree
+		public function get renderTree():HandlerController
 		{
 			return this._renderTree;
 		}
@@ -58,7 +59,7 @@ package org.smilkit.view
 			this._document.viewportObjectPool = this;
 
 			// make the first render tree!
-			this._renderTree = new RenderTree(this);
+			this._renderTree = new HandlerController(this);
 			
 			// schedule those loads
 			this._loadScheduler = new LoadScheduler(this);

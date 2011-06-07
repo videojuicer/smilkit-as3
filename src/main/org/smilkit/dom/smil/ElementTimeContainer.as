@@ -783,8 +783,50 @@ package org.smilkit.dom.smil
 		
 		public function display():void
 		{
+			SMILKit.logger.benchmark(">> DISPLAYING TIME CONTAINER RIGHT NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
+			
 			// whenever display is called, we look at what the current state
 			// should be, and update our drawingboard + handler with the changes
+			
+			// states to account for:
+				// - show
+				// - disable
+				// - hidden
+			if (this.isPlaying)
+			{
+				this.ownerSMILDocument.displayStack.append(this);
+			}
+			else
+			{
+				this.ownerSMILDocument.displayStack.remove(this);
+			}
+		
+			/*
+			if (this.region != null)
+			{
+				if (this.isPlaying)
+				{
+					(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
+				}
+				else
+				{
+					(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
+				}
+			}
+			
+			if (this.isPlaying)
+			{
+				this.handler.addedToRenderTree(null);
+				
+				this.handler.resume();
+				
+			}
+			else
+			{
+				this.handler.pause();
+				
+				this.handler.addedToRenderTree(null);
+			}*/
 		}
 		
 		protected function onIntervalStart():void
@@ -818,9 +860,7 @@ package org.smilkit.dom.smil
 		 * resolved, sets the element into a paused state.
 		 */
 		public function deactivate():void
-		{
-			SMILKit.logger.benchmark("---DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
-			
+		{			
 			if (!this._isPlaying)
 			{
 				
@@ -835,7 +875,8 @@ package org.smilkit.dom.smil
 			// trigger either a remove display or freeze
 			this.display();
 			
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.deactivate);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd);
 			
 			// dispatch endEvent on DOM
 			

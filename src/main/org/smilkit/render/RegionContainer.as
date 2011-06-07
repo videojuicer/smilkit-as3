@@ -22,7 +22,7 @@ package org.smilkit.render
 		protected var _region:SMILRegionElement;
 		protected var _matrix:Rectangle;
 		protected var _children:Vector.<SMILKitHandler>;
-		protected var _renderTree:RenderTree;
+		protected var _renderTree:HandlerController;
 
 		// Link context for managing click actions
 		protected var _linkContextElement:Element;
@@ -67,12 +67,12 @@ package org.smilkit.render
 			this.useHandCursor = (e != null);
 		}
 		
-		public function get renderTree():RenderTree
+		public function get renderTree():HandlerController
 		{
 			return this._renderTree;
 		}
 		
-		public function set renderTree(r:RenderTree):void
+		public function set renderTree(r:HandlerController):void
 		{
 			this._renderTree = r;
 		}

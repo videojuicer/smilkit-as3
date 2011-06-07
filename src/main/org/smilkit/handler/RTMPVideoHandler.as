@@ -19,7 +19,7 @@ package org.smilkit.handler
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
@@ -290,7 +290,7 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function addedToRenderTree(r:RenderTree):void
+		public override function addedToRenderTree(r:HandlerController):void
 		{
 			if (this._video == null)
 			{
@@ -326,7 +326,7 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function removedFromRenderTree(r:RenderTree):void
+		public override function removedFromRenderTree(r:HandlerController):void
 		{
 			this.clearVideoDisplay();
 			

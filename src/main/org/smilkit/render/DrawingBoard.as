@@ -6,8 +6,11 @@ package org.smilkit.render
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
+	import org.smilkit.dom.smil.display.DisplayStackEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
@@ -17,9 +20,9 @@ package org.smilkit.render
 	
 	public class DrawingBoard extends Sprite
 	{
-		protected var _renderTree:RenderTree;
+		protected var _renderTree:HandlerController;
 		protected var _canvas:Sprite;
-		protected var _elements:Vector.<SMILTimeInstance>;
+		protected var _elements:Vector.<ElementTimeContainer>;
 		protected var _regions:Vector.<RegionContainer>;
 		
 		protected var _boundingRect:Rectangle = new Rectangle(0, 0, 0, 0);
@@ -33,7 +36,7 @@ package org.smilkit.render
 		/**
 		 * The <code>RenderTree</code> instance used by this <code>DrawingBoard</code>.
 		 */
-		public function get renderTree():RenderTree
+		public function get renderTree():HandlerController
 		{
 			return this._renderTree;
 		}
@@ -42,10 +45,15 @@ package org.smilkit.render
 		 * Sets the <code>RenderTree</code> instance used by this <code>DrawingBoard</code>,
 		 * resets the current state of the DrawingBoard when this is set.
 		 */
-		public function set renderTree(value:RenderTree):void
+		public function set renderTree(value:HandlerController):void
 		{
 			this._renderTree = value;
 			this.reset();
+		}
+		
+		public function get ownerDocument():SMILDocument
+		{
+			return this.renderTree.document;
 		}
 		
 		/**
@@ -108,9 +116,9 @@ package org.smilkit.render
 		{
 			if (this.renderTree != null)
 			{
-				var elements:Vector.<SMILTimeInstance> = this._renderTree.elements;
+				var elements:Vector.<ElementTimeContainer> = this.ownerDocument.displayStack.elements;
 				
-				if (elements != null)
+				if (elements != null && elements.length > 0)
 				{
 					SMILKit.logger.debug("Attempting to draw "+elements.length+" handlers to the Canvas", this);
 					
@@ -118,43 +126,49 @@ package org.smilkit.render
 					
 					for (var i:int = 0; i < elements.length; i++)
 					{
-						var time:SMILTimeInstance = elements[i];
+						var element:ElementTimeContainer = elements[i];
+						var mediaElement:SMILMediaElement = (element as SMILMediaElement);
 						
 						// check if it doesnt exist yet
-						if (this._elements.indexOf(time) == -1)
+						if (mediaElement != null)
 						{
-							var region:SMILRegionElement = ((time.element as SMILMediaElement).region as SMILRegionElement);
-							
-							if (region != null)
+							if (this._elements.indexOf(element) == -1)
 							{
-								var mediaElement:SMILMediaElement = time.mediaElement;
-								var handler:SMILKitHandler = mediaElement.handler;
 								
-								SMILKit.logger.debug("Adding Handler to region '"+region.id+"' on the DrawingBoard", handler);
-								drawnCount++;
+								var region:SMILRegionElement = (mediaElement.region as SMILRegionElement);
 								
-								// place the element on to the region it belongs too
-								region.regionContainer.addAssetChild(handler);
-								region.regionContainer.renderTree = this._renderTree;
-								
-								if(handler.spatial)
+								if (region != null)
 								{
-									region.regionContainer.linkContextElement = mediaElement.linkContextElement;
-								}
-								// Examine the link context with element.linkParent
-								// Set link href and target on regioncontainer
-									// set pointerCursor if link context found
-									// set null if no link context
+									var handler:SMILKitHandler = mediaElement.handler;
 									
+									SMILKit.logger.benchmark("Adding Handler to region '"+region.id+"' on the DrawingBoard", handler);
+									
+									drawnCount++;
+									
+									// place the element on to the region it belongs too
+									region.regionContainer.addAssetChild(handler);
+									region.regionContainer.renderTree = this._renderTree;
+									
+									if(handler.spatial)
+									{
+										region.regionContainer.linkContextElement = mediaElement.linkContextElement;
+									}
+									
+									// Examine the link context with element.linkParent
+									// Set link href and target on regioncontainer
+										// set pointerCursor if link context found
+										// set null if no link context
+										
+								}
+								
+								this._elements.push(element);
 							}
-							
-							this._elements.push(time);
 						}
 					}
 					
 					if (drawnCount > 0)
 					{
-						SMILKit.logger.debug("Drawn "+drawnCount+" handlers to the Canvas", this);
+						SMILKit.logger.benchmark("Drawn "+drawnCount+" handlers to the Canvas", this);
 					}
 				}
 			}
@@ -233,18 +247,19 @@ package org.smilkit.render
 			
 			SMILKit.logger.debug("Resetting the DrawingBoard and Canvas state", this);
 			
-			this._elements = new Vector.<SMILTimeInstance>();
+			this._elements = new Vector.<ElementTimeContainer>();
 			this._canvas = new Sprite();
 			
 			if (this._renderTree != null)
 			{
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onRenderTreeElementAdded);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onRenderTreeElementRemoved);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
-				this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
+				this.ownerDocument.displayStack.addEventListener(DisplayStackEvent.ELEMENT_ADDED, this.onDisplayStackElementAdded);
+				this.ownerDocument.displayStack.addEventListener(DisplayStackEvent.ELEMENT_REMOVED, this.onDisplayStackElementRemoved);
+				//this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
+				//this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
 	
-				this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
-				this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+				//this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+				//this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+				//this.ownerDocument.displayStack.addEventListener(RenderTree
 			}
 			
 			this._canvas.graphics.clear();
@@ -310,12 +325,12 @@ package org.smilkit.render
 			throw new IllegalOperationError("Invalid method call, you cannot remove a child from SMILKits drawing board.");
 		}
 		
-		protected function onRenderTreeElementAdded(e:RenderTreeEvent):void
+		protected function onDisplayStackElementAdded(e:DisplayStackEvent):void
 		{
 			this.draw();
 		}
 		
-		protected function onRenderTreeElementRemoved(e:RenderTreeEvent):void
+		protected function onDisplayStackElementRemoved(e:DisplayStackEvent):void
 		{
 			this.reset();
 			this.draw();

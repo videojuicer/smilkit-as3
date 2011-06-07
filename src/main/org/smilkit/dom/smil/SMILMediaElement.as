@@ -477,31 +477,35 @@ package org.smilkit.dom.smil
 		
 		public override function display():void
 		{
+			super.display();
+			
+			/*
 			if (this.region != null)
 			{
-				if (this.isPlaying)
-				{
-					(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
-				}
-				else
-				{
-					(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
-				}
+			if (this.isPlaying)
+			{
+			(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
+			}
+			else
+			{
+			(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
+			}
 			}
 			
 			if (this.isPlaying)
 			{
-				this.handler.addedToRenderTree(null);
-				
-				this.handler.resume();
-				
+			this.handler.addedToRenderTree(null);
+			
+			this.handler.resume();
+			
 			}
 			else
 			{
-				this.handler.pause();
-				
-				this.handler.addedToRenderTree(null);
+			this.handler.pause();
+			
+			this.handler.addedToRenderTree(null);
 			}
+			*/
 		}
 	}
 }

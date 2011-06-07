@@ -8,7 +8,7 @@ package org.smilkit.spec.tests.render
 	import org.flexunit.async.Async;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.DrawingBoard;
-	import org.smilkit.render.RenderTree;
+	import org.smilkit.render.HandlerController;
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.view.Viewport;
 
@@ -39,7 +39,7 @@ package org.smilkit.spec.tests.render
 		protected function handleHasRenderTree(event:ViewportEvent, passThroughData:Object):void
 		{
 			var drawingBoard:DrawingBoard = this._viewport.drawingBoard;
-			var renderTree:RenderTree = drawingBoard.renderTree;
+			var renderTree:HandlerController = drawingBoard.renderTree;
 			
 			Assert.assertStrictlyEquals(this._viewport.renderTree, renderTree);
 		}

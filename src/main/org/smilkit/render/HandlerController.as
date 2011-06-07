@@ -15,10 +15,8 @@ package org.smilkit.render
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	
 	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.SharedTimer;
-
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	
@@ -26,7 +24,7 @@ package org.smilkit.render
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements
 	 * 
 	 */	
-	public class RenderTree extends EventDispatcher
+	public class HandlerController extends EventDispatcher
 	{
 		/**
 		 * Stored reference to the <code>ViewportObjectPool</code> instance including links to the parent <code>Viewport</code>.
@@ -62,26 +60,40 @@ package org.smilkit.render
 		 * @param timeGraph - that has been created by the parent Viewport
 		 * 
 		 */		
-		public function RenderTree(objectPool:ViewportObjectPool)
+		public function HandlerController(objectPool:ViewportObjectPool)
 		{
 			this._objectPool = objectPool;
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
-			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
+			//this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
 			// listener for every heart beat (so we recheck the timing graph)
-			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
-			this._objectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			//this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			//this._objectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			
 			// listener for heartbeat stop/go events
-			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
-			this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+			//this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+			//this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			
+			//
+			// listeners
+			//
+			
+			// running offset event
+			this.document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			
+			// tick tick tick
+			SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			
+			// pause / resume events
+			this.document.scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+			this.document.scheduler.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 			
 			// listener to detect playback state changes on the viewport
-			this._objectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			this.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			
 			// listener for changing volume levels
-			this._objectPool.viewport.addEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
+			this.viewport.addEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
 			
 			this._activeTimingNodes = new Vector.<SMILTimeInstance>();
 			this._activeMediaElements = new Vector.<SMILMediaElement>();
@@ -158,7 +170,7 @@ package org.smilkit.render
 		 */
 		public function update():void
 		{
-			this.updateAt(this._objectPool.viewport.offset);
+			this.updateAt(this.document.offset);
 		}
 		
 		/**
@@ -180,7 +192,7 @@ package org.smilkit.render
 		 */
 		public function syncHandlersToViewportState():void
 		{
-			if (this._objectPool.viewport.heartbeat.running)
+			if (this.document.scheduler.running)
 			{
 				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is running - resuming "+this.elements.length+" assets.", this);
 				// Sync everything to a running state by resuming playback.
@@ -527,8 +539,6 @@ package org.smilkit.render
 		 */		
 		public function updateAt(offset:Number):void
 		{
-			trace("updateAt -> "+offset);
-			
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)

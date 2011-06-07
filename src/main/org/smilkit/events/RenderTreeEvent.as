@@ -2,6 +2,7 @@ package org.smilkit.events
 {
 	import flash.events.Event;
 	
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.handler.SMILKitHandler;
 
 	public class RenderTreeEvent extends Event
@@ -18,11 +19,11 @@ package org.smilkit.events
 		
 		protected var _handler:SMILKitHandler;
 		
-		public function RenderTreeEvent(type:String, handler:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function RenderTreeEvent(type:String, element:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
 			
-			this._handler = handler;
+			this._handler = element;
 		}
 		
 		public function get handler():SMILKitHandler
