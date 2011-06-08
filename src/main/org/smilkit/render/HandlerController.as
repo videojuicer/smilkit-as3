@@ -807,6 +807,7 @@ package org.smilkit.render
 			{
 				handler.removeEventListener(HandlerEvent.LOAD_WAITING, this.onHandlerLoadWaiting);
 				handler.removeEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
+				handler.removeEventListener(HandlerEvent.LOAD_COMPLETED, this.onHandlerLoadReady);
 				handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 				handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 				handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);

@@ -39,6 +39,8 @@ package org.smilkit.dom.smil
 		
 		protected var _element:ElementTimeContainer = null;
 		protected var _timeString:String = null;
+		
+		protected var _parentOffset:int = 0;
 			
 		public function Time(element:ElementTimeContainer, begin:Boolean = false, timeString:String = null)
 		{
@@ -67,18 +69,18 @@ package org.smilkit.dom.smil
 		{
 			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
 			
-			if (this._element != null)
+			if (this._element != null && this._parentOffset == Time.UNRESOLVED)
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				
 				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
 					// our sync base is not the parent so we need to calculate our time as if we were
-					return parentContainer.offsetForChild(this._element) + syncbaseOffset;
+					this._parentOffset = parentContainer.offsetForChild(this._element);
 				}
 			}
 			
-			return syncbaseOffset;
+			return this._parentOffset + syncbaseOffset;
 		}
 		
 		/**
