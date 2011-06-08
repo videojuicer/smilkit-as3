@@ -71,7 +71,7 @@ package org.smilkit.dom.smil
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				
-				if (this.implicitSyncbase != this._element.parentTimeContainer)
+				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
 					// our sync base is not the parent so we need to calculate our time as if we were
 					return parentContainer.offsetForChild(this._element) + syncbaseOffset;

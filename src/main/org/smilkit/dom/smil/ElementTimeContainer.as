@@ -634,6 +634,11 @@ package org.smilkit.dom.smil
 			{
 				var beginAfter:Time = this._currentBeginInterval;
 				
+				if (beginAfter == null && this.nodeName == "body")
+				{
+					trace("beginAfter == null");
+				}
+				
 				tempBegin = this.beginList.getTimeGreaterThan(beginAfter)
 			}
 			

@@ -24,6 +24,16 @@ package org.smilkit.dom.smil
 			return this;
 		}
 		
+		public override function gatherFirstInterval():void
+		{
+			super.gatherFirstInterval();
+		}
+		
+		public override function gatherNextInterval(usingBegin:Time = null):void
+		{
+			super.gatherNextInterval(usingBegin);
+		}
+		
 		protected override function childIntervalChanged(child:ElementTimeContainer):void
 		{
 			// since were our own parent time container, we dont trigger a change when
