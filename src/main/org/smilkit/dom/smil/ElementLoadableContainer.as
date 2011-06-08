@@ -3,7 +3,9 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.Node;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.IDocument;
-	import org.smilkit.dom.smil.SMILElement
+	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILElement;
+	import org.smilkit.dom.smil.SMILDocumentLoadables;
 	import org.smilkit.dom.smil.FileSize;
 	
 	public class ElementLoadableContainer extends SMILElement
@@ -87,7 +89,15 @@ package org.smilkit.dom.smil
 			var p:ElementLoadableContainer = this.parentLoadableContainer;
 			if(p!=null)
 			{
+				// Update ancestor element
 				p.resolveChildLoadableSizes();
+			}
+			else {
+				// Update document
+				if(this._ownerDocument != null)
+				{
+					(this._ownerDocument as SMILDocument).loadables.resolveChildLoadableSizes();
+				}
 			}
 		}
 		

@@ -2,6 +2,7 @@ package org.smilkit.dom.smil
 {
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.display.SMILDocumentDisplayStack;
+	import org.smilkit.dom.smil.SMILDocumentLoadables;
 	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.time.SMILTimeGraph;
@@ -17,6 +18,7 @@ package org.smilkit.dom.smil
 	{
 		protected var _scheduler:SMILTimeScheduler;
 		protected var _timeGraph:SMILTimeGraph;
+		protected var _loadables:SMILDocumentLoadables;
 		
 		protected var _displayStack:SMILDocumentDisplayStack;
 		
@@ -41,7 +43,10 @@ package org.smilkit.dom.smil
 			// magic variables for smil
 			this._variables = new SMILDocumentVariables(this);
 			
-			// push the default variables into the document
+			// catches loadable property changes from ElementLoadableContainers
+			this._loadables = new SMILDocumentLoadables(this);
+			
+			// default variables
 			this.setupDocumentVariables();
 		}
 		
@@ -58,6 +63,11 @@ package org.smilkit.dom.smil
 		public function get displayStack():SMILDocumentDisplayStack
 		{
 			return this._displayStack;
+		}
+		
+		public function get loadables():SMILDocumentLoadables
+		{
+			return this._loadables;
 		}
 		
 		public function get eventStack():SMILEventStack

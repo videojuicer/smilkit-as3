@@ -5,6 +5,7 @@ package org.smilkit.view
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -161,6 +162,12 @@ package org.smilkit.view
 		*/
 		protected var _waitingForRenderTree:Boolean = false;
 		
+		/**
+		 * Flags stored when the document's loader progress is updated
+		 */
+		protected var _bytesLoaded:int = 0;
+		protected var _bytesTotal:int = 0;
+		
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
@@ -250,6 +257,16 @@ package org.smilkit.view
 		public function get drawingBoard():DrawingBoard
 		{
 			return this._drawingBoard;
+		}
+		
+		public function get bytesLoaded():int
+		{
+			return this._bytesLoaded;
+		}
+		
+		public function get bytesTotal():int
+		{
+			return this._bytesTotal;
 		}
 
 		public function get history():Vector.<String>
@@ -746,6 +763,7 @@ package org.smilkit.view
 				var objectPool:Object = { pool: this._objectPool };
 				
 				// Trash old event listeners just in case
+				this.document.loadables.removeEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
@@ -773,6 +791,7 @@ package org.smilkit.view
 			
 			// Bind events to the newly-created object pool contents
 			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
+			this.document.loadables.addEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
 		
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
 			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
@@ -787,7 +806,14 @@ package org.smilkit.view
 			// tidy up
 			Platform.garbageCollection();
 		}
-
+		
+		protected function onDocumentProgress(e:ProgressEvent):void
+		{
+			this._bytesLoaded = e.bytesLoaded;
+			this._bytesTotal = e.bytesTotal;
+			this.dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, this._bytesLoaded, this._bytesTotal));
+		}
+		
 		/**
 		* Called when the heartbeat's offset changes for any reason, be it a seek, a reset to zero, or a natural progression
 		* during playback. Emits a public-facing viewport event.
