@@ -3,6 +3,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.ElementLoadableContainer;
+	import org.smilkit.dom.smil.FileSize;
 	
 	import flash.events.Event;
 	import flash.events.EventDispatcher;
@@ -35,6 +36,7 @@ package org.smilkit.dom.smil
 			if(this._childrenBytesLoaded != l)
 			{
 				this._childrenBytesLoaded = l;
+				SMILKit.logger.debug("Document loadables at "+((this.bytesLoaded == FileSize.UNRESOLVED)? "UNRESOLVED" : this.bytesLoaded)+"/"+((this.bytesTotal == FileSize.UNRESOLVED)? "UNRESOLVED" : this.bytesTotal), this);
 				this.dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, this.bytesLoaded, this.bytesTotal));
 			}
 		}
@@ -44,6 +46,7 @@ package org.smilkit.dom.smil
 			if(this._childrenBytesTotal != t)
 			{
 				this._childrenBytesTotal = t;
+				SMILKit.logger.debug("Document loadables at "+((this.bytesLoaded == FileSize.UNRESOLVED)? "UNRESOLVED" : this.bytesLoaded)+"/"+((this.bytesTotal == FileSize.UNRESOLVED)? "UNRESOLVED" : this.bytesTotal), this);
 				this.dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, this.bytesLoaded, this.bytesTotal));
 			}
 		}
