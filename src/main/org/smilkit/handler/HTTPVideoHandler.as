@@ -13,10 +13,12 @@ package org.smilkit.handler
 	import flash.net.NetStream;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
 	
@@ -162,8 +164,8 @@ package org.smilkit.handler
 			
 			if (this.viewportObjectPool != null)
 			{
-				this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick); // remove then add to guarantee single binding only
-				this.viewportObjectPool.viewport.heartbeat.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+				SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick); // remove then add to guarantee single binding only
+				SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
 			
 			this._canvas.addChild(this._video);
@@ -287,7 +289,7 @@ package org.smilkit.handler
 		{
 			if (this.viewportObjectPool != null)
 			{
-				this.viewportObjectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+				SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
 			}
 			
 			this._resumed = false;

@@ -11,6 +11,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	import org.smilkit.w3c.dom.smil.ITimeList;
 	import org.utilkit.UtilKit;
+	import org.utilkit.collection.Hashtable;
 	
 	public class ElementTimeContainer extends ElementLoadableContainer implements IElementTimeContainer
 	{
@@ -797,6 +798,7 @@ package org.smilkit.dom.smil
 				// - show
 				// - disable
 				// - hidden
+
 			if (this.isPlaying)
 			{
 				this.ownerSMILDocument.displayStack.append(this);

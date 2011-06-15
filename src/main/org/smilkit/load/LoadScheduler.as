@@ -232,14 +232,19 @@ package org.smilkit.load {
 				for(var i:uint=0; i<timingGraphElements.length; i++)
 				{
 					var h:SMILKitHandler = (timingGraphElements[i].element as SMILMediaElement).handler;
-					// Skip if the handler is on the JIT worker
-					if(this._justInTimeWorker.hasHandler(h)) continue;				
-					// For each element, determine where it's handler should be.
-					var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
-					if(targetWorker != null)
+					
+					// skip if the handler is null, i.e. the media element hasnt started loading yet
+					if (h != null)
 					{
-						// Move it there.
-						this.moveHandlerToWorker(h, targetWorker);
+						// Skip if the handler is on the JIT worker
+						if(this._justInTimeWorker.hasHandler(h)) continue;				
+						// For each element, determine where it's handler should be.
+						var targetWorker:Worker = this.opportunisticWorkerForHandler(h);
+						if(targetWorker != null)
+						{
+							// Move it there.
+							this.moveHandlerToWorker(h, targetWorker);
+						}
 					}
 				}
 			}

@@ -15,7 +15,6 @@ package org.smilkit.render
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
@@ -108,11 +107,6 @@ package org.smilkit.render
 			return this._objectPool.viewport;
 		}
 		
-		public function get heartbeat():Heartbeat
-		{
-			return this.viewport.heartbeat;
-		}
-		
 		public function get elements():Vector.<SMILTimeInstance>
 		{
 			return this._activeTimingNodes;
@@ -156,10 +150,11 @@ package org.smilkit.render
 			
 			this.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
-			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
-			this._objectPool.viewport.heartbeat.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
-			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
-			this._objectPool.viewport.heartbeat.removeEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
+			SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			
+			this.document.scheduler.removeEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			this.document.scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
+			this.document.scheduler.removeEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
 		
 			this._objectPool.viewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
 			this._objectPool.viewport.removeEventListener(ViewportEvent.AUDIO_VOLUME_CHANGED, this.onViewportAudioVolumeChanged);
@@ -565,46 +560,49 @@ package org.smilkit.render
 					{
 						var handler:SMILKitHandler = element.handler;
 						
-						var previousIndex:int = this._activeMediaElements.indexOf(element);
-						var alreadyExists:Boolean = (previousIndex != -1);
-						
-						element.updateRenderState();
-						
-						// hidden things skip the render tree and dont playback
-						if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
+						if (handler != null)
 						{
-							if (alreadyExists)
+							var previousIndex:int = this._activeMediaElements.indexOf(element);
+							var alreadyExists:Boolean = (previousIndex != -1);
+							
+							element.updateRenderState();
+							
+							// hidden things skip the render tree and dont playback
+							if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
 							{
-								actionableChanges = true;
-								modifiedTimingNodes.push(time);
-								
-								this._lastChangeOffset = offset;
+								if (alreadyExists)
+								{
+									actionableChanges = true;
+									modifiedTimingNodes.push(time);
+									
+									this._lastChangeOffset = offset;
+								}
+								else
+								{
+									actionableChanges = true;
+									addedTimingNodes.push(time);
+									
+									this._lastChangeOffset = offset;
+									
+									// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
+									// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
+									// viewport is currently playing.
+									if(!syncAfterUpdate && handler.seekable)
+									{
+										syncAfterUpdate = true;
+									}
+								}
 							}
 							else
 							{
-								actionableChanges = true;
-								addedTimingNodes.push(time);
-								
-								this._lastChangeOffset = offset;
-								
-								// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
-								// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
-								// viewport is currently playing.
-								if(!syncAfterUpdate && handler.seekable)
+								// remove if we used to exist and were now hidden
+								if (alreadyExists)
 								{
-									syncAfterUpdate = true;
+									actionableChanges = true;
+									removedTimingNodes.push(time);
+									
+									this._lastChangeOffset = offset;
 								}
-							}
-						}
-						else
-						{
-							// remove if we used to exist and were now hidden
-							if (alreadyExists)
-							{
-								actionableChanges = true;
-								removedTimingNodes.push(time);
-								
-								this._lastChangeOffset = offset;
 							}
 						}
 					}

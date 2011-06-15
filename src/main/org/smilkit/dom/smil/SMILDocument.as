@@ -85,7 +85,7 @@ package org.smilkit.dom.smil
 			super.viewportObjectPool = viewportObjectPool;
 			
 			// setup listeners
-			this.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
+			//this.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatOffsetChanged);
 		}
 		
 		protected function onHeartbeatOffsetChanged(e:HeartbeatEvent):void

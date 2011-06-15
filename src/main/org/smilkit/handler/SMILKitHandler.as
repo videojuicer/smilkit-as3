@@ -9,17 +9,17 @@ package org.smilkit.handler
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.ElementLoadableContainer;
+	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.dom.smil.FileSize;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.Time;
-	import org.smilkit.dom.smil.FileSize;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
-	import org.smilkit.render.RegionContainer;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.render.RegionContainer;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -176,7 +176,14 @@ package org.smilkit.handler
 			
 			if (this.displayObject != null)
 			{
-				bitmapData.draw(this.displayObject, matrix);
+				try
+				{
+					bitmapData.draw(this.displayObject, matrix);
+				}
+				catch (e:SecurityError)
+				{
+					SMILKit.logger.error("Unable to read byte data on Handler, crossdomain.xml missing from content source?");
+				}
 			}
 			
 			return bitmapData;

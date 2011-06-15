@@ -6,6 +6,18 @@ package org.smilkit.dom.smil
 	
 	public class Time implements ITime
 	{
+		public static var SMIL_TIME_INDEFINITE:int = 0;
+		public static var SMIL_TIME_OFFSET:int = 1;
+		public static var SMIL_TIME_SYNC_BASED:int = 2;
+		public static var SMIL_TIME_EVENT_BASED:int = 3;
+		public static var SMIL_TIME_WALLCLOCK:int = 4;
+		public static var SMIL_TIME_MEDIA_MARKER:int = 5;
+		
+		public static var INDEFINITE:int = 900000;
+		public static var NEGATIVE_INDEFINITE:int = -900000;
+		public static var UNRESOLVED:int = -101;
+		public static var MEDIA:int = -102;
+		
 		protected var _resolved:Boolean = false;
 		protected var _begin:Boolean = false;
 		
@@ -25,23 +37,9 @@ package org.smilkit.dom.smil
 		*/
 		protected var _resolveWithoutDuration:Boolean = true;
 		
-		public static var SMIL_TIME_INDEFINITE:int = 0;
-		public static var SMIL_TIME_OFFSET:int = 1;
-		public static var SMIL_TIME_SYNC_BASED:int = 2;
-		public static var SMIL_TIME_EVENT_BASED:int = 3;
-		public static var SMIL_TIME_WALLCLOCK:int = 4;
-		public static var SMIL_TIME_MEDIA_MARKER:int = 5;
-		
-		public static var INDEFINITE:int = 900000;
-		public static var NEGATIVE_INDEFINITE:int = -900000;
-		public static var UNRESOLVED:int = -101;
-		public static var MEDIA:int = -102;
-		
 		protected var _element:ElementTimeContainer = null;
 		protected var _timeString:String = null;
 		
-		protected var _parentOffset:int = 0;
-			
 		public function Time(element:ElementTimeContainer, begin:Boolean = false, timeString:String = null)
 		{
 			this._element = element;
@@ -68,19 +66,36 @@ package org.smilkit.dom.smil
 		public function get resolvedOffset():Number
 		{
 			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
+			var parentOffset:Number = Time.UNRESOLVED;
 			
-			if (this._element != null && this._parentOffset == Time.UNRESOLVED)
+			if (this._element != null)
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				
 				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
 					// our sync base is not the parent so we need to calculate our time as if we were
-					this._parentOffset = parentContainer.offsetForChild(this._element);
+					parentOffset = parentContainer.offsetForChild(this._element);
 				}
 			}
 			
-			return this._parentOffset + syncbaseOffset;
+			if (this.element != null)
+			{
+				trace("id -> "+this.element.id);
+			}
+			
+			if (parentOffset == Time.INDEFINITE)
+			{
+				return Time.INDEFINITE;
+			}
+			else if (parentOffset != Time.UNRESOLVED && parentOffset != Time.MEDIA)
+			{
+				trace(this.element+"parentOffset: "+parentOffset+" syncbaseOffset: "+syncbaseOffset);
+				
+				return parentOffset + syncbaseOffset;
+			}
+			
+			return syncbaseOffset;
 		}
 		
 		/**
@@ -154,6 +169,9 @@ package org.smilkit.dom.smil
 			return this._element;
 		}
 		
+		/**
+		 * Determines whether or not the specified Time instance is greater than the current instance.
+		 */
 		public function isGreaterThan(time:Time):Boolean
 		{
 			if (time == null)
@@ -192,6 +210,10 @@ package org.smilkit.dom.smil
 			return false;
 		}
 		
+		
+		/**
+		 * Determines whether the specified Time is equal to the current Time instance.
+		 */
 		public function isEqualTo(time:Time):Boolean
 		{
 			if (time == null)

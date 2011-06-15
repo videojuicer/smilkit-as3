@@ -14,6 +14,7 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayTransitions;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
@@ -369,7 +370,7 @@ package org.smilkit.handler
 					
 					if (this.viewportObjectPool != null)
 					{
-						this.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunning);
+						(this.element.ownerDocument as SMILDocument).scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunning);
 					}
 					
 					if (this._attachVideoDisplayDelayed)

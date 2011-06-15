@@ -9,7 +9,6 @@ package org.smilkit.spec.tests.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
-	import org.smilkit.time.Heartbeat;
 	import org.smilkit.view.Viewport;
 
 	public class DrawingBoardTestClass

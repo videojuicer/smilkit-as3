@@ -477,7 +477,11 @@ package org.smilkit.dom.smil
 		
 		public override function display():void
 		{
-			super.display();
+			// if we dont have a handler, what could we display!
+			if (this.handler != null)
+			{
+				super.display();
+			}
 			
 			/*
 			if (this.region != null)
