@@ -8,6 +8,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.smil.time.SMILTimeGraph;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.dom.smil.time.SMILTimeScheduler;
+	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
@@ -19,6 +20,7 @@ package org.smilkit.dom.smil
 		protected var _scheduler:SMILTimeScheduler;
 		protected var _timeGraph:SMILTimeGraph;
 		protected var _loadables:SMILDocumentLoadables;
+		protected var _loadScheduler:LoadScheduler;
 		
 		protected var _displayStack:SMILDocumentDisplayStack;
 		
@@ -46,8 +48,16 @@ package org.smilkit.dom.smil
 			// catches loadable property changes from ElementLoadableContainers
 			this._loadables = new SMILDocumentLoadables(this);
 			
+			// create the load scheduler instance for this document
+			this._loadScheduler = new LoadScheduler(this);
+			
 			// default variables
 			this.setupDocumentVariables();
+		}
+		
+		public function get loadScheduler():LoadScheduler
+		{
+			return this._loadScheduler;
 		}
 		
 		public function get scheduler():SMILTimeScheduler

@@ -7,7 +7,6 @@ package org.smilkit.load {
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HandlerEvent;
-	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.render.HandlerController;
@@ -47,9 +46,9 @@ package org.smilkit.load {
 	*/
 	public class LoadScheduler {
 		/***
-		 * An instance of ViewportObjectPool is required in order to reference the RenderTree and TimingGraph instances. 
+		 * The owning SMILDocument which will generate the events needed to drive the loader.
 		 */
-		protected var _objectPool:ViewportObjectPool;
+		protected var _ownerSMILDocument:SMILDocument;
 		
 		/***
 		 * Used in conditional checks to prevent the scheduler from starting work more than once.
@@ -89,8 +88,8 @@ package org.smilkit.load {
 		*/
 		protected var _opportunisticWorkers:Vector.<Worker>;
 
-		public function LoadScheduler(objectPool:ViewportObjectPool, resolveConcurrency:uint=1, preloadConcurrency:uint=1) {
-			this._objectPool = objectPool;
+		public function LoadScheduler(document:SMILDocument, resolveConcurrency:uint=1, preloadConcurrency:uint=1) {
+			this._ownerSMILDocument = document;
 			this._resolveWorkerConcurrencyLimit = resolveConcurrency;
 			this._preloadWorkerConcurrencyLimit = preloadConcurrency;
 			
@@ -111,14 +110,13 @@ package org.smilkit.load {
 			this._opportunisticWorkers = new Vector.<Worker>;
 			this._opportunisticWorkers.push(this._resolveWorker, this._preloadWorker);
 			
-			this.bindJustInTimeRenderTreeEvents();
-			this.bindOpportunisticTimingGraphEvents();
+			this.bindOpportunisticLoadEvents();
 			this.bindWorkUnitEvents();
 		}
 		
-		public function get ownerDocument():SMILDocument
+		public function get ownerSMILDocument():SMILDocument
 		{
-			return this._objectPool.document;
+			return this._ownerSMILDocument;
 		}
 		
 		public function start():Boolean {
@@ -139,40 +137,37 @@ package org.smilkit.load {
 		}
 		
 		/**
-		* Binds to the object pool's render tree in order to receive just in time handler notifications.
-		*/
-		protected function bindJustInTimeRenderTreeEvents():void
-		{
-			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_ADDED, this.onHandlerAddedToRenderTree);
-			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_REMOVED, this.onHandlerRemovedFromRenderTree);
-		}
-		
-		/**
-		* Called when a handler is added to the RenderTree. Takes the following actions:
+		* Called when any time container is activated by the document scheduler. Takes the following actions:
 		* 1. Adds the handler to the JIT worker's queue
 		* 2. Removes the handler from the Resolve and Preload workers
 		*/
-		protected function onHandlerAddedToRenderTree(event:RenderTreeEvent):void {
-			if(event.handler)
+		public function timeContainerActivated(element:ElementTimeContainer):void {
+			var mediaElement:SMILMediaElement = element as SMILMediaElement;
+			if(mediaElement == null) return;
+			if(mediaElement.handler != null)
 			{
-				this.moveHandlerToWorker(event.handler, this._justInTimeWorker);
+				this.moveHandlerToWorker(mediaElement.handler, this._justInTimeWorker);
 			}
 		}
 		
 		/**
-		* Called when a handler is removed from the RenderTree. Takes the following actions:
+		* Called when a time container is inactivated by the document scheduler. Takes the following actions:
 		* 1. Remove the handler from the JIT worker
 		* 2. Rebuild the opportunistic workers
 		*/
-		protected function onHandlerRemovedFromRenderTree(event:RenderTreeEvent):void 
+		public function timeContainerDeactivated(element:ElementTimeContainer):void 
 		{
-			this._justInTimeWorker.removeHandler(event.handler);
-			this.rebuildOpportunisticWorkers();
+			var mediaElement:SMILMediaElement = element as SMILMediaElement;
+			if(mediaElement == null) return;
+			if(mediaElement.handler != null) {
+				this._justInTimeWorker.removeHandler(mediaElement.handler);
+				this.rebuildOpportunisticWorkers();
+			}
 		}
 
-		protected function bindOpportunisticTimingGraphEvents():void 
+		protected function bindOpportunisticLoadEvents():void 
 		{
-			this._objectPool.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
+			this.ownerSMILDocument.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
 			this.rebuildOpportunisticWorkers();
 		}
 		
@@ -224,7 +219,7 @@ package org.smilkit.load {
 		*/
 		protected function rebuildOpportunisticWorkers():void {
 			// Get timing graph contents
-			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
+			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerSMILDocument.timeGraph.mediaElements;
 			
 			if (timingGraphElements != null)
 			{
@@ -270,7 +265,7 @@ package org.smilkit.load {
 		protected function purgeOrphanedHandlers():void
 		{
 			// Build flat list of handlers
-			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerDocument.timeGraph.mediaElements;
+			var timingGraphElements:Vector.<SMILTimeInstance> = this.ownerSMILDocument.timeGraph.mediaElements;
 			var timingGraphHandlers:Vector.<SMILKitHandler> = new Vector.<SMILKitHandler>();
 			
 			if (timingGraphElements != null)
@@ -325,10 +320,6 @@ package org.smilkit.load {
 			}
 		}
 		
-		
-		protected function get renderTree():HandlerController {
-			return this._objectPool.renderTree;
-		}
 	}
 	
 }

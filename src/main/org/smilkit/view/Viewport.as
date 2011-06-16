@@ -224,8 +224,8 @@ package org.smilkit.view
 		*/
 		public function get loadScheduler():LoadScheduler
 		{
-			if(!this.viewportObjectPool) return null;
-			return this.viewportObjectPool.loadScheduler;
+			if(!this.document) return null;
+			return this.document.loadScheduler;
 		}
 		
 		/**
