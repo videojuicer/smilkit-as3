@@ -303,7 +303,7 @@ package org.smilkit.view
 		{
 			if (location == this.location)
 			{
-				throw new IllegalOperationError("Attempting to navigate to the same location.");
+				this.refresh(); return;
 			}
 			
 			var i:int = this._history.indexOf(location);
