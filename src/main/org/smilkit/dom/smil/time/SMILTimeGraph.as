@@ -25,7 +25,10 @@ package org.smilkit.dom.smil.time
 		public function SMILTimeGraph(ownerDocument:SMILDocument)
 		{
 			this._ownerDocument = ownerDocument;
-
+			
+			// default blank vector
+			this._elements = new Vector.<SMILTimeInstance>();
+			
 			// dom mutations (only used until the body is ready)
 			this.ownerDocument.addEventListener(MutationEvent.DOM_ATTR_MODIFIED, this.onMutationEvent, false);
 			this.ownerDocument.addEventListener(MutationEvent.DOM_NODE_INSERTED, this.onMutationEvent, false);

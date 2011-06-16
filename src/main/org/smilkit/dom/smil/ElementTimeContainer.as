@@ -761,6 +761,9 @@ package org.smilkit.dom.smil
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
 			
+			// Notify the load scheduler
+			this.ownerSMILDocument.loadScheduler.timeContainerActivated(this);
+			
 			this.display();
 			
 			var waitTime:Number = 0;
@@ -878,6 +881,9 @@ package org.smilkit.dom.smil
 			this._deactivatedAt = (this._ownerDocument as SMILDocument).offset;
 			
 			this._isPlaying = false;
+			
+			// Notify the load scheduler
+			this.ownerSMILDocument.loadScheduler.timeContainerDeactivated(this);
 			
 			// trigger either a remove display or freeze
 			this.display();

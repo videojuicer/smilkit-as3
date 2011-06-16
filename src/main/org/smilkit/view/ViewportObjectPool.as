@@ -1,7 +1,6 @@
 package org.smilkit.view
 {
 	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.HandlerController;
 
 	// TODO: remove completely
@@ -18,12 +17,6 @@ package org.smilkit.view
 		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
 		 */	
 		protected var _renderTree:HandlerController;
-		
-		/* 
-		 * An instance of LoadScheduler responsible for determining current load priorities and performing opportunistic
-		 * loading where possible.
-		*/
-		protected var _loadScheduler:LoadScheduler;
 		
 		public function ViewportObjectPool(viewport:Viewport, document:SMILDocument)
 		{
@@ -48,11 +41,6 @@ package org.smilkit.view
 			return this._renderTree;
 		}
 		
-		public function get loadScheduler():LoadScheduler
-		{
-			return this._loadScheduler;
-		}
-		
 		public function reset():void
 		{
 			// link the object pool to the document
@@ -60,9 +48,6 @@ package org.smilkit.view
 
 			// make the first render tree!
 			this._renderTree = new HandlerController(this);
-			
-			// schedule those loads
-			this._loadScheduler = new LoadScheduler(this);
 			
 			// create render tree to drawingboard
 			// drawingboard is always around, and renderTree is constantly destroyed
