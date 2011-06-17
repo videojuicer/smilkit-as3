@@ -79,11 +79,6 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			if (this.element != null)
-			{
-				trace("id -> "+this.element.id);
-			}
-			
 			if (parentOffset == Time.INDEFINITE)
 			{
 				return Time.INDEFINITE;

@@ -303,16 +303,11 @@ package org.smilkit.dom.smil
 		 */
 		public function get resolved():Boolean
 		{
-			if (this._beginList == null || this._endList == null)
+			if (this.currentBeginInterval == null && this.currentEndInterval == null)
 			{
 				return false;
 			}
-			
-			//if (!(this._beginList as TimeList).resolved || !(this._endList as TimeList).resolved)
-			//{
-			//	return false;
-			//}
-			
+
 			return true;
 		}
 		
@@ -475,41 +470,13 @@ package org.smilkit.dom.smil
 			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		}
 		
-		public override function display():void
+		protected override function display():void
 		{
-			// if we dont have a handler, what could we display!
+			// if we dont have a handler, what can we display ... nothing!
 			if (this.handler != null)
 			{
 				super.display();
 			}
-			
-			/*
-			if (this.region != null)
-			{
-			if (this.isPlaying)
-			{
-			(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
-			}
-			else
-			{
-			(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
-			}
-			}
-			
-			if (this.isPlaying)
-			{
-			this.handler.addedToRenderTree(null);
-			
-			this.handler.resume();
-			
-			}
-			else
-			{
-			this.handler.pause();
-			
-			this.handler.addedToRenderTree(null);
-			}
-			*/
 		}
 	}
 }

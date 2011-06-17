@@ -534,6 +534,11 @@ package org.smilkit.render
 		 */		
 		public function updateAt(offset:Number):void
 		{
+			if (this.elements != null && this.elements.length > 0)
+			{
+				//return;
+			}
+			
 			// we only need to do a loop if the offset is less than our last change
 			// or bigger than our next change
 			if (offset < this._lastChangeOffset || offset >= this._nextChangeOffset)

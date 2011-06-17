@@ -29,9 +29,9 @@ package org.smilkit.dom.smil
 			super.gatherFirstInterval();
 		}
 		
-		public override function gatherNextInterval(usingBegin:Time = null):void
+		public override function gatherNextInterval(usingBegin:Time = null):Boolean
 		{
-			super.gatherNextInterval(usingBegin);
+			return super.gatherNextInterval(usingBegin);
 		}
 		
 		protected override function childIntervalChanged(child:ElementTimeContainer):void

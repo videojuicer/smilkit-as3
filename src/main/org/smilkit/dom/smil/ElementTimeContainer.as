@@ -601,8 +601,8 @@ package org.smilkit.dom.smil
 			}
 		}
 		
-		public function setCurrentInterval(begin:Time, end:Time):void
-		{
+		public function setCurrentInterval(begin:Time, end:Time):Boolean
+		{	
 			this._previousBeginInterval = this._currentBeginInterval;
 			this._previousEndInterval = this._currentEndInterval;
 			
@@ -617,16 +617,19 @@ package org.smilkit.dom.smil
 			event.initMutationEvent(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, true, false, this, null, null, null, 1);
 			
 			this.dispatchEvent(event);
+			
+			return true;
 		}
 		
 		protected function childIntervalChanged(child:ElementTimeContainer):void
 		{
 			// a child changed so we need to re-calculate another end interval
 			// we keep using our existing begin
+			
 			this.gatherNextInterval(this.currentBeginInterval);
 		}
 		
-		public function gatherNextInterval(usingBegin:Time = null):void
+		public function gatherNextInterval(usingBegin:Time = null):Boolean
 		{
 			var tempBegin:Time = usingBegin;
 			var tempEnd:Time = null;
@@ -635,19 +638,14 @@ package org.smilkit.dom.smil
 			{
 				var beginAfter:Time = this._currentBeginInterval;
 				
-				if (beginAfter == null && this.nodeName == "body")
-				{
-					trace("beginAfter == null");
-				}
-				
 				tempBegin = this.beginList.getTimeGreaterThan(beginAfter)
 			}
 			
 			if (tempBegin == null)
 			{
-				this.setCurrentInterval(null, null);
+				//this.setCurrentInterval(null, null);
 				
-				return;
+				return false;
 			}
 			
 			if (!this.endList.isDefined)
@@ -671,7 +669,7 @@ package org.smilkit.dom.smil
 				tempEnd = this.computeActiveDuation(tempBegin, tempEnd);
 			}
 			
-			this.setCurrentInterval(tempBegin, tempEnd);
+			return this.setCurrentInterval(tempBegin, tempEnd);
 		}
 		
 		/**
@@ -748,15 +746,13 @@ package org.smilkit.dom.smil
 		 */
 		public function activate():void
 		{
-			SMILKit.logger.benchmark("---ACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
-			
 			// can only play if our parent is playing and our begin is resolved
 			if (!this.parentTimeContainer.isPlaying || this.currentBeginInterval == null || !this.currentBeginInterval.resolved)
 			{
-				SMILKit.logger.benchmark("-----SKIPPED ACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
-
 				return;
 			}
+			
+			SMILKit.logger.benchmark("---ACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
 			
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
@@ -790,7 +786,7 @@ package org.smilkit.dom.smil
 			// dispatch beginEvent on DOM
 		}
 		
-		public function display():void
+		protected function display():void
 		{
 			SMILKit.logger.benchmark(">> DISPLAYING TIME CONTAINER RIGHT NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
 			
@@ -810,33 +806,6 @@ package org.smilkit.dom.smil
 			{
 				this.ownerSMILDocument.displayStack.remove(this);
 			}
-		
-			/*
-			if (this.region != null)
-			{
-				if (this.isPlaying)
-				{
-					(this.region as SMILRegionElement).regionContainer.addAssetChild(this.handler);
-				}
-				else
-				{
-					(this.region as SMILRegionElement).regionContainer.removeAssetChild(this.handler);					
-				}
-			}
-			
-			if (this.isPlaying)
-			{
-				this.handler.addedToRenderTree(null);
-				
-				this.handler.resume();
-				
-			}
-			else
-			{
-				this.handler.pause();
-				
-				this.handler.addedToRenderTree(null);
-			}*/
 		}
 		
 		protected function onIntervalStart():void
@@ -873,10 +842,10 @@ package org.smilkit.dom.smil
 		{			
 			if (!this._isPlaying)
 			{
-				
-				SMILKit.logger.benchmark("-----SKIPPED DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
 				return;
 			}
+			
+			SMILKit.logger.benchmark("-----DEACTIVATING TIME CONTAINER NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
 			
 			this._deactivatedAt = (this._ownerDocument as SMILDocument).offset;
 			
