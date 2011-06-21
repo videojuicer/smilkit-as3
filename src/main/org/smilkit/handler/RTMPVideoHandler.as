@@ -229,7 +229,7 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Pausing playback.", this);
 				
-				this._resumed = true;
+				this._resumed = false;
 
 				this._netStream.pause();
 			}
@@ -425,8 +425,15 @@ package org.smilkit.handler
 					}
 					break;
 				case "NetStream.Buffer.Empty":
-					this._waiting = true;
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					if(this._resumed)
+					{
+						this._waiting = true;
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					}
+					else
+					{
+						SMILKit.logger.debug("Ignored NetStream.Buffer.Empty event as this handler is not currently playing", this);
+					}
 					break;
 				case "NetStream.Failed":
 				case "NetStream.Play.Failed":
@@ -439,6 +446,7 @@ package org.smilkit.handler
 				case "NetStream.Unpublish.Success":
 				case "NetStream.Play.Stop":
 					// playback has finished, important for live events (so we can continue)
+					this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					break;
 				case "NetStream.Pause.Notify":
