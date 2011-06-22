@@ -212,6 +212,9 @@ package org.smilkit.render
 					rootRegion.setAttribute("height", "100%");
 					rootRegion.setAttribute("width", "100%");
 					
+					// to help with debugging
+					rootRegion.setAttribute("backgroundColor", "#EEEEEE");
+					
 					// and assign all of our children to it
 					this._usingRootRegion = rootRegion;
 					
