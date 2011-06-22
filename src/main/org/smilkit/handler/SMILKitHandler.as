@@ -40,6 +40,10 @@ package org.smilkit.handler
 		protected var _currentOffset:int;
 		protected var _duration:int = Time.UNRESOLVED;
 		
+		protected var _region:SMILRegionElement = null;
+		
+		protected var _hasSetImplicitMediaDuration:Boolean = false;
+		
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
@@ -187,6 +191,11 @@ package org.smilkit.handler
 			}
 			
 			return bitmapData;
+		}
+		
+		public function get region():SMILRegionElement
+		{
+			return this._region;
 		}
 		
 		public function load():void
@@ -367,6 +376,19 @@ package org.smilkit.handler
 			{
 				this._mediaElement.intrinsicBytesLoaded = 0;
 			}
+			
+			// cancelling the implicit media duration on the element, would cause
+			// the element to be reset and new intervals which might not reflect
+			// the state it currently should be in
+			/*
+			if (this._hasSetImplicitMediaDuration)
+			{
+				this._mediaElement.implicitMediaDuration = null;
+				
+				this._hasSetImplicitMediaDuration = false;
+			}
+			*/
+			
 			this._completedLoading = false;
 			this._startedLoading = false;
 			
@@ -447,6 +469,22 @@ package org.smilkit.handler
 		}
 		
 		/**
+		 * Callback method for when this handler is added to a <code>SMILRegionElement</code> during drawing.
+		 */
+		public function addedToDrawingRegion(region:SMILRegionElement):void
+		{
+			this._region = region;
+		}
+		
+		/**
+		 * Callback method for when this handler is removed from a <code>SMILRegionElement</code> during drawing.
+		 */
+		public function removedFromDrawingRegion(region:SMILRegionElement):void
+		{
+			this._region = null;
+		}
+		
+		/**
 		* Callback method for when this handler is added to the <code>RenderTree</code>'s active list.
 		*/
 		public function addedToRenderTree(r:HandlerController):void
@@ -483,11 +521,15 @@ package org.smilkit.handler
 					if (resolvedDuration == Time.INDEFINITE)
 					{
 						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, "indefinite");
+						
+						this._hasSetImplicitMediaDuration = true;
 					}
 					
 					else
 					{
 						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, this._duration.toString() + "ms");
+						
+						this._hasSetImplicitMediaDuration = true;
 					}
 				}
 				
@@ -507,11 +549,10 @@ package org.smilkit.handler
 		public function resize():void
 		{
 			var mediaElement:SMILMediaElement = (this.element as SMILMediaElement);
-			var region:SMILRegionElement = (mediaElement.region as SMILRegionElement);
-			
-			if (region != null)
+
+			if (this.region != null)
 			{
-				var container:RegionContainer = region.regionContainer;
+				var container:RegionContainer = this.region.regionContainer;
 				
 				if (container != null)
 				{

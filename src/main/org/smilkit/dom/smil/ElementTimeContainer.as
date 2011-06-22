@@ -396,6 +396,7 @@ package org.smilkit.dom.smil
 		{
 			this._implicitMediaDuration = time;
 			
+			this.resetElementState();
 			this.startup();
 		}
 		

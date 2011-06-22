@@ -8,7 +8,7 @@ package org.smilkit.dom.smil
 	{
 		protected var _regionContainer:RegionContainer;
 		
-		public function SMILRegionElement(owner:IDocument, name:String)
+		public function SMILRegionElement(owner:IDocument, name:String = "region")
 		{
 			super(owner, name);
 			

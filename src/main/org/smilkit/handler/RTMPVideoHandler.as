@@ -230,7 +230,7 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Pausing playback.", this);
 				
-				this._resumed = true;
+				this._resumed = false;
 
 				this._netStream.pause();
 			}

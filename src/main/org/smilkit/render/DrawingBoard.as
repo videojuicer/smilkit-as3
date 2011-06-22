@@ -28,6 +28,8 @@ package org.smilkit.render
 		protected var _boundingRect:Rectangle = new Rectangle(0, 0, 0, 0);
 		protected var _boundingDisplayParent:Sprite = null;
 		
+		protected var _usingRootRegion:SMILRegionElement = null;
+		
 		public function DrawingBoard()
 		{
 			this.reset();
@@ -134,8 +136,12 @@ package org.smilkit.render
 						{
 							if (this._elements.indexOf(element) == -1)
 							{
-								
 								var region:SMILRegionElement = (mediaElement.region as SMILRegionElement);
+								
+								if (this._usingRootRegion != null && region == null)
+								{
+									region = this._usingRootRegion;
+								}
 								
 								if (region != null)
 								{
@@ -183,12 +189,38 @@ package org.smilkit.render
 			{
 				this._regions = new Vector.<RegionContainer>();
 				
-				var regions:INodeList = this.renderTree.document.getElementsByTagName("region");
+				var regionsElements:INodeList = this.renderTree.document.getElementsByTagName("region");
+				var regions:Vector.<SMILRegionElement> = new Vector.<SMILRegionElement>();
 				
-				for (var i:int = 0; i < regions.length; i++)
+				if (regionsElements.length > 0)
 				{
-					var node:INode = regions.item(i) as INode;
-					var region:SMILRegionElement = (node as SMILRegionElement);
+					for (var i:int = 0; i < regionsElements.length; i++)
+					{
+						var node:INode = regionsElements.item(i) as INode;
+						var regionEl:SMILRegionElement = (node as SMILRegionElement);
+						
+						regions.push(regionEl);
+					}
+				}
+				else
+				{
+					// we have no regions, so lets make a default called 'fake-root'
+					var rootRegion:SMILRegionElement = new SMILRegionElement(this.ownerDocument);
+					
+					rootRegion.setAttribute("id", "fake-root");
+					
+					rootRegion.setAttribute("height", "100%");
+					rootRegion.setAttribute("width", "100%");
+					
+					// and assign all of our children to it
+					this._usingRootRegion = rootRegion;
+					
+					regions.push(this._usingRootRegion);
+				}
+				
+				for (var j:int = 0; j < regions.length; j++)
+				{
+					var region:SMILRegionElement = regions[j];
 					
 					region.regionContainer.drawingBoard = this;
 					
@@ -205,9 +237,9 @@ package org.smilkit.render
 				}
 				
 				// add the regions now
-				for (var j:int = 0; j < this._regions.length; j++)
+				for (var k:int = 0; k < this._regions.length; k++)
 				{
-					this._canvas.addChild(this._regions[j]);
+					this._canvas.addChild(this._regions[k]);
 				}
 				
 				SMILKit.logger.debug("Re-drawn "+this._regions.length+" regions to the DrawingBoard's Canvas", this);

@@ -281,6 +281,9 @@ package org.smilkit.render
 			
 			this._children.push(handler);
 			
+			// let the handler know we are drawing to a region
+			handler.addedToDrawingRegion(this.region);
+			
 			handler.resize();
 		}
 		
@@ -299,7 +302,11 @@ package org.smilkit.render
 			}
 			
 			super.removeChild(handler.displayObject);
+			
 			this._children = children;
+			
+			// let the handler know we being removed from the region
+			handler.removedFromDrawingRegion(this.region);
 		}
 		
 		public function clear():void
