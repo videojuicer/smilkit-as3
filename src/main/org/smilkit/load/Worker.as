@@ -156,7 +156,11 @@ package org.smilkit.load {
 				this._workQueue.splice(this._workQueue.indexOf(handler), 1);
 				res = true;
 			}
-			if(res) this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_REMOVED, handler));
+			if(res) {
+				handler.removeEventListener(this._completionEventType, this.onWorkUnitCompleted);
+				handler.removeEventListener(this._failureEventType, this.onWorkUnitFailed);
+				this.dispatchEvent(new WorkUnitEvent(WorkUnitEvent.WORK_UNIT_REMOVED, handler));
+			}
 			this.advance();
 			return res;
 		}
