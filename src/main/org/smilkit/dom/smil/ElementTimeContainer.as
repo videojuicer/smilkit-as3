@@ -758,11 +758,11 @@ package org.smilkit.dom.smil
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
 			
-			// Notify the load scheduler
-			this.ownerSMILDocument.loadScheduler.timeContainerActivated(this);
-			
 			this.display();
 			
+			// Notify the load scheduler
+			this.ownerSMILDocument.loadScheduler.timeContainerActivated(this);
+
 			var waitTime:Number = 0;
 			
 			if (this._activeDuration != null && this._activeDuration.resolved && !this._activeDuration.indefinite)
@@ -852,11 +852,11 @@ package org.smilkit.dom.smil
 			
 			this._isPlaying = false;
 			
-			// Notify the load scheduler
-			this.ownerSMILDocument.loadScheduler.timeContainerDeactivated(this);
-			
 			// trigger either a remove display or freeze
 			this.display();
+			
+			// Notify the load scheduler
+			this.ownerSMILDocument.loadScheduler.timeContainerDeactivated(this);
 			
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd);
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd);

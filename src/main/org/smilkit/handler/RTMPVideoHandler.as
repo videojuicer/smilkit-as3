@@ -416,7 +416,7 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
-					this.resize();
+					//this.resize();
 					
 					if (this._waiting)
 					{

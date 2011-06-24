@@ -50,8 +50,8 @@ package org.smilkit.util
 		{
 			// this is where we do the logic for the fitting to a canvas and the like ...
 			// think of it like a zombie stretching your brains to fit the region
-			var ratio:Number = (handler.width / handler.height);
-			var aspectRatio:Number = (region.width / region.height);
+			var ratio:Number = MathHelper.calculateAspectRatio(handler.width, handler.height);
+			var aspectRatio:Number = MathHelper.calculateAspectRatio(region.width, region.height);
 			var matrix:Rectangle = new Rectangle();
 			
 			if (aspectRatio < ratio)
@@ -70,6 +70,11 @@ package org.smilkit.util
 			}
 			
 			return matrix;
+		}
+		
+		public static function calculateAspectRatio(width:Number, height:Number):Number
+		{
+			return (width / height);
 		}
 	}
 }

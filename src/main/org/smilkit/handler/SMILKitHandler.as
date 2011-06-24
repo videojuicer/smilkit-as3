@@ -548,8 +548,6 @@ package org.smilkit.handler
 		 */ 
 		public function resize():void
 		{
-			var mediaElement:SMILMediaElement = (this.element as SMILMediaElement);
-
 			if (this.region != null)
 			{
 				var container:RegionContainer = this.region.regionContainer;

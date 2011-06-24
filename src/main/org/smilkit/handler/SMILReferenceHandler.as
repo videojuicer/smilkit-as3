@@ -7,6 +7,7 @@ package org.smilkit.handler
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
 	import flash.events.SecurityErrorEvent;
+	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
@@ -17,6 +18,7 @@ package org.smilkit.handler
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -67,6 +69,7 @@ package org.smilkit.handler
 		protected var _viewport:Viewport = null;
 		
 		protected var _resuming:Boolean = false;
+		protected var _canvas:Sprite = null;
 		
 		public function SMILReferenceHandler(element:IElement)
 		{
@@ -85,6 +88,20 @@ package org.smilkit.handler
 			this._viewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onViewportLoaderSecurityError);
 			
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onViewportRefreshComplete);	
+		
+			this._canvas = new Sprite();
+			
+			/*
+			this._canvas.width = 100;
+			this._canvas.height = 100;
+			
+			this._canvas.graphics.beginFill(0xEEEEEE, 0.8);
+			this._canvas.graphics.drawRect(0, 0, 100, 100);
+			this._canvas.graphics.endFill();
+			*/
+			
+			
+			this._canvas.addChild(this._viewport);
 		}
 		
 		public override function get resolvable():Boolean
@@ -99,7 +116,8 @@ package org.smilkit.handler
 		
 		public override function get displayObject():DisplayObject
 		{
-			return this._viewport;
+			return this._canvas;
+			//return this._viewport;
 		}
 		
 		public function get contentValid():Boolean
@@ -129,11 +147,21 @@ package org.smilkit.handler
 		
 		public override function get width():uint
 		{
+			if (this._region != null)
+			{
+				return this._region.regionContainer.width;
+			}
+			
 			return 100;
 		}
 		
 		public override function get height():uint
 		{
+			if (this._region != null)
+			{
+				return this._region.regionContainer.height;
+			}
+			
 			return 100;
 		}
 		
@@ -177,6 +205,21 @@ package org.smilkit.handler
 		public override function setVolume(volume:uint):void
 		{
 			this._viewport.setVolume(volume);
+		}
+		
+		public override function resize():void
+		{
+			super.resize();
+			
+			if (this.region != null)
+			{
+				// width = aspectRatio * height
+				var aspectRatio:Number = MathHelper.calculateAspectRatio(this.region.regionContainer.width, this.region.regionContainer.height);
+			
+				// how big is the height in comparison to the width?
+			
+				this._viewport.boundingRect = new Rectangle(0, 0, (aspectRatio * 100), 100);
+			}
 		}
 		
 		protected function onViewportRefreshComplete(e:ViewportEvent):void
