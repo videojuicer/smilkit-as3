@@ -69,6 +69,18 @@ package org.smilkit.handler
 		protected var _viewport:Viewport = null;
 		
 		protected var _resuming:Boolean = false;
+		
+		protected var _contentValid:Boolean = false;
+		
+		/**
+		* Tracks whether the element is currently active on the RenderTree.
+		*/
+		protected var _activeOnRenderTree:Boolean = false;
+		
+		/**
+		* Tracks whether the document content should be invalidated on the next viewport resume.
+		*/
+		protected var _invalidateOnNextResume:Boolean = false;
 
 		public function SMILReferenceHandler(element:IElement)
 		{
@@ -199,6 +211,50 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		* Marks the content of this SMIL reference element as invalid. If the handler is currently
+		* active on the render tree, the invalidation will trigger a reload. Give (true) as the
+		* argument for this method if you wish to force a reload of the document contents.
+		*/
+		public function invalidate(hardInvalidation:Boolean = false):void
+		{
+			var hadStartedLoading:Boolean = this._startedLoading;
+			var hadCompletedLoading:Boolean = this._completedLoading;
+			
+			this._contentValid = false;
+			this._startedLoading = false;
+			this._completedLoading = false;
+			
+			if ((this._activeOnRenderTree || hardInvalidation) && ((!hadStartedLoading) || (hadStartedLoading && hadCompletedLoading)))
+			{
+				var msg:String = "Performing hard invalidation with reload as ref handler is ";
+				
+				if(this._activeOnRenderTree) msg += "[active on the RenderTree]";
+				if(hardInvalidation) msg += "[explicitly hard-invalidating]";
+				if(!hadStartedLoading) msg += "[not already loaded]";
+				if(hadStartedLoading && hadCompletedLoading) msg += "[already completed loading]";
+				
+				SMILKit.logger.debug(msg, this);
+				
+				this.load();
+			}
+			else
+			{
+				SMILKit.logger.debug("Performing soft invalidation on SMILReferenceHandler load flags (active: "+this._activeOnRenderTree+" hadStarted: "+hadStartedLoading+", hadCompleted: "+hadCompletedLoading+")", this);
+			}
+		}
+		
+		public override function addedToRenderTree(r:HandlerController):void
+		{
+			this._activeOnRenderTree = true;
+		}
+		
+		public override function removedFromRenderTree(r:HandlerController):void
+		{
+			this._activeOnRenderTree = false;
+			this.invalidate();
+		}
+		
 		protected function onViewportRefreshComplete(e:ViewportEvent):void
 		{
 			if (this._resuming)
@@ -225,6 +281,23 @@ package org.smilkit.handler
 		
 		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
 		{
+			if (this._viewport.playbackState == Viewport.PLAYBACK_PAUSED)
+			{
+				SMILKit.logger.debug("Caught viewport pause. This reference handler will invalidate on the next resume.", this);
+				
+				this._invalidateOnNextResume = true;
+			}
+			else if(this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			{
+				// TODO - this is wrong. the element must be on the rendertree for this to be valid.
+				if(this._invalidateOnNextResume)
+				{
+					this.invalidate();
+				}
+				
+				this._invalidateOnNextResume = false;
+			}
+			
 			if (this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
