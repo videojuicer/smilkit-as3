@@ -572,12 +572,20 @@ package org.smilkit.render
 							
 							element.updateRenderState();
 							
+							// we have made some modifications, so lets look
+							// over our current list and see how long we could wait before doing another update
+							if (time.end.resolvedOffset > this._nextChangeOffset)
+							{
+								this._nextChangeOffset = time.end.resolvedOffset;
+							}
+							
 							// hidden things skip the render tree and dont playback
 							if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
 							{
 								if (alreadyExists)
 								{
-									actionableChanges = true;
+									// why change anything, we already exist?
+									//actionableChanges = true;
 									modifiedTimingNodes.push(time);
 									
 									this._lastChangeOffset = offset;
