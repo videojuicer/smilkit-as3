@@ -33,7 +33,7 @@ package org.smilkit.dom.smil.time
 		
 		public function get isRealTime():Boolean
 		{
-			return false;
+			return true;
 		}
 		
 		public function get running():Boolean
