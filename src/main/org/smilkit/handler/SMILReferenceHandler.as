@@ -12,6 +12,7 @@ package org.smilkit.handler
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
@@ -87,19 +88,21 @@ package org.smilkit.handler
 		{
 			super(element);
 			
+			//(this.element.ownerDocument as SMILDocument).viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onExternalViewportPlaybackStateChanged);
+			
 			this._viewport = new Viewport();
 			
-			this._viewport.addEventListener(ViewportEvent.READY, this.onViewportReady);
-			this._viewport.addEventListener(ViewportEvent.WAITING, this.onViewportWaiting);
+			this._viewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
+			this._viewport.addEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
 			
-			this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportPlaybackStateChanged);
+			this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
 			
-			this._viewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onViewportDocumentMutated);
+			this._viewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
 			
-			this._viewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onViewportLoaderIOError);
-			this._viewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onViewportLoaderSecurityError);
+			this._viewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
+			this._viewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
 			
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onViewportRefreshComplete);	
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);	
 		}
 		
 		public override function get resolvable():Boolean
@@ -114,7 +117,7 @@ package org.smilkit.handler
 		
 		public override function get displayObject():DisplayObject
 		{
-			return this._viewport;
+			return this.viewport;
 		}
 		
 		public function get contentValid():Boolean
@@ -141,7 +144,7 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
-				return (this._viewport.offset * 1000);
+				return (this.viewport.offset * 1000);
 			}
 			
 			return 0;
@@ -149,7 +152,12 @@ package org.smilkit.handler
 		
 		public override function get completedResolving():Boolean
 		{
-			var duration:Number = this.viewport.document.duration;
+			var duration:Number = Time.MEDIA;
+			
+			if (this.isViewportSMILReady)
+			{
+				duration = this.viewport.document.duration;
+			}
 			
 			return (duration != Time.UNRESOLVED && duration != Time.MEDIA);
 		}
@@ -200,6 +208,13 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
+				if (this._invalidateOnNextResume)
+				{
+					this.invalidate();
+				}
+				
+				this._invalidateOnNextResume = false;
+				
 				this._viewport.resume();
 			}
 			else
@@ -213,6 +228,8 @@ package org.smilkit.handler
 			if (this.isViewportSMILReady)
 			{
 				this._viewport.pause();
+				
+				this._invalidateOnNextResume = true;
 			}
 		}
 		
@@ -283,13 +300,21 @@ package org.smilkit.handler
 			this.invalidate();
 		}
 		
-		protected function onViewportRefreshComplete(e:ViewportEvent):void
+		protected function onInternalViewportRefreshComplete(e:ViewportEvent):void
 		{
+			this._contentValid = true;
+			
 			if (this._resuming)
 			{
-				this._viewport.resume();
+				if (this._invalidateOnNextResume)
+				{
+					this.invalidate();
+				}
 				
+				this._invalidateOnNextResume = false;
 				this._resuming = false;
+				
+				this._viewport.resume();
 			}
 			else
 			{
@@ -297,35 +322,18 @@ package org.smilkit.handler
 			}
 		}
 		
-		protected function onViewportReady(e:ViewportEvent):void
+		protected function onInternalViewportReady(e:ViewportEvent):void
 		{			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 		
-		protected function onViewportWaiting(e:ViewportEvent):void
+		protected function onInternalViewportWaiting(e:ViewportEvent):void
 		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
-		protected function onViewportPlaybackStateChanged(e:ViewportEvent):void
-		{
-			if (this._viewport.playbackState == Viewport.PLAYBACK_PAUSED)
-			{
-				SMILKit.logger.debug("Caught viewport pause. This reference handler will invalidate on the next resume.", this);
-				
-				this._invalidateOnNextResume = true;
-			}
-			else if (this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
-			{
-				// TODO - this is wrong. the element must be on the rendertree for this to be valid.
-				if(this._invalidateOnNextResume)
-				{
-					//this.invalidate();
-				}
-				
-				this._invalidateOnNextResume = false;
-			}
-			
+		protected function onInternalViewportPlaybackStateChanged(e:ViewportEvent):void
+		{			
 			if (this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
@@ -336,19 +344,39 @@ package org.smilkit.handler
 			}
 		}
 		
-		protected function onViewportDocumentMutated(e:ViewportEvent):void
+		protected function onInternalViewportDocumentMutated(e:ViewportEvent):void
 		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 		
-		protected function onViewportLoaderIOError(e:ViewportEvent):void
+		protected function onInternalViewportLoaderIOError(e:ViewportEvent):void
 		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
-		protected function onViewportLoaderSecurityError(e:ViewportEvent):void
+		protected function onInternalViewportLoaderSecurityError(e:ViewportEvent):void
 		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
+		}
+		
+		protected function onExternalViewportPlaybackStateChanged(e:ViewportEvent):void
+		{
+			if (this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED)
+			{
+				SMILKit.logger.debug("Caught viewport pause. This reference handler will invalidate on the next resume.", this);
+				
+				this._invalidateOnNextResume = true;
+			}
+			else if (viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			{
+				// TODO - this is wrong. the element must be on the rendertree for this to be valid.
+				if(this._invalidateOnNextResume)
+				{
+					this.invalidate();
+				}
+				
+				this._invalidateOnNextResume = false;
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap

@@ -130,7 +130,9 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(0, this._seqHolder.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._seqHolder.currentEndInterval.resolvedOffset);
 			
-			this._seqContent.gatherNextInterval();
+			var nextResult:Boolean = this._seqContent.gatherNextInterval();
+			
+			Assert.assertTrue(nextResult);
 
 			Assert.assertEquals(10, this._seqContent.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._seqContent.currentEndInterval.resolvedOffset);
@@ -194,7 +196,9 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(0, this._content.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(10, this._content.currentEndInterval.resolvedOffset);
 			
-			this._content.gatherNextInterval();
+			var nextResult:Boolean = this._content.gatherNextInterval();
+			
+			Assert.assertTrue(nextResult);
 			
 			Assert.assertNotNull(this._content.currentBeginInterval);
 			Assert.assertNotNull(this._content.currentEndInterval);
@@ -202,7 +206,9 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(10, this._content.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._content.currentEndInterval.resolvedOffset);
 		
-			this._content.gatherNextInterval();
+			nextResult = this._content.gatherNextInterval();
+			
+			Assert.assertTrue(nextResult);
 			
 			Assert.assertNotNull(this._content.currentBeginInterval);
 			Assert.assertNotNull(this._content.currentEndInterval);
@@ -210,10 +216,12 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(20, this._content.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(30, this._content.currentEndInterval.resolvedOffset);
 			
-			this._content.gatherNextInterval();
+			nextResult = this._content.gatherNextInterval();
 			
-			Assert.assertNull(this._content.currentBeginInterval);
-			Assert.assertNull(this._content.currentEndInterval);
+			Assert.assertFalse(nextResult);
+			
+			Assert.assertNotNull(this._content.currentBeginInterval);
+			Assert.assertNotNull(this._content.currentEndInterval);
 		}
 		
 		[Test(description="Tests the calculation of the simple duration")]

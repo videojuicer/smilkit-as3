@@ -87,7 +87,7 @@ package org.smilkit.spec.tests.render
 		{
 			var renderTree:HandlerController = this._viewport.renderTree;
 			
-			Assert.assertEquals(-1,renderTree.nextChangeOffset);
+			Assert.assertFalse(-1 == renderTree.nextChangeOffset);
 		}
 		
 		protected function handleHasNextChangeOffSetTimeOut(passThroughData:Object):void
