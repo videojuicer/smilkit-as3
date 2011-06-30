@@ -287,7 +287,7 @@ package org.smilkit.render
 				{
 					// Calculate the target offset for this handler
 					// TODO include clip-begin into the equation
-					var offset:uint = (this._objectPool.viewport.offset - node.currentBegin);
+					var offset:uint = Math.max(0, this._objectPool.viewport.offset - node.begin.resolvedOffset) * 1000;
 					
 					// Push the handler onto the sync wait list
 					this._offsetSyncHandlerList.push(handler);

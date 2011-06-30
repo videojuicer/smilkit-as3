@@ -29,6 +29,8 @@ package org.smilkit.dom.smil
 		protected var _marker:String;
 		protected var _type:int = Time.SMIL_TIME_SYNC_BASED;
 		
+		protected var _parentOffset:Number = Time.UNRESOLVED;
+		
 		/** NON-DOM:
 		* Determines whether this time should be considered resolved if the baseElement contains no duration attribute. This flag is used to 
 		* prevent the timing model from marking temporal media elements such as video, audio etc. as having a resolved duration of zero if the 
@@ -66,28 +68,27 @@ package org.smilkit.dom.smil
 		public function get resolvedOffset():Number
 		{
 			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
-			var parentOffset:Number = Time.UNRESOLVED;
-			
-			if (this._element != null)
+
+			if (this._element != null && this._parentOffset == Time.UNRESOLVED)
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				
 				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
 					// our sync base is not the parent so we need to calculate our time as if we were
-					parentOffset = parentContainer.offsetForChild(this._element);
+					this._parentOffset = parentContainer.offsetForChild(this._element);
 				}
 			}
 			
-			if (parentOffset == Time.INDEFINITE)
+			if (this._parentOffset == Time.INDEFINITE)
 			{
 				return Time.INDEFINITE;
 			}
-			else if (parentOffset != Time.UNRESOLVED && parentOffset != Time.MEDIA)
+			else if (this._parentOffset != Time.UNRESOLVED && this._parentOffset != Time.MEDIA)
 			{
-				trace(this.element+"parentOffset: "+parentOffset+" syncbaseOffset: "+syncbaseOffset);
+				//trace(this.element+"parentOffset: "+this._parentOffset+" syncbaseOffset: "+syncbaseOffset);
 				
-				return parentOffset + syncbaseOffset;
+				return this._parentOffset + syncbaseOffset;
 			}
 			
 			return syncbaseOffset;
@@ -196,7 +197,8 @@ package org.smilkit.dom.smil
 			
 			if (this.resolved && time.resolved)
 			{
-				if (this.implicitSyncbaseOffset > time.implicitSyncbaseOffset)
+				//if (this.implicitSyncbaseOffset > time.implicitSyncbaseOffset)
+				if (this.resolvedOffset > time.resolvedOffset)
 				{
 					return true;
 				}

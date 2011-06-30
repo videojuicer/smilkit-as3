@@ -592,7 +592,7 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
-				SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString());
+				SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString()+" Source: "+this.element.src);
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);

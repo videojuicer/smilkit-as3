@@ -42,13 +42,16 @@ package org.smilkit.dom.smil
 			{
 				return;
 			}
-			
+
 			super.childIntervalChanged(child);
 		}
 		
 		protected function onDOMSubtreeModified(e:MutationEvent):void
 		{
 			this.resetElementState();
+			
+			this.ownerSMILDocument.scheduler.reset();
+			
 			this.startup();
 		}
 	}

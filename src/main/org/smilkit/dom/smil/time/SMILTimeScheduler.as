@@ -4,6 +4,7 @@ package org.smilkit.dom.smil.time
 	import flash.events.TimerEvent;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.time.SharedTimer;
@@ -28,6 +29,11 @@ package org.smilkit.dom.smil.time
 			this.reset();
 			
 			SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onTimerTick);
+		}
+		
+		public function get isRealTime():Boolean
+		{
+			return false;
 		}
 		
 		public function get running():Boolean
@@ -69,8 +75,15 @@ package org.smilkit.dom.smil.time
 		 */ 
 		public function resume():Boolean
 		{
+			if (!this.isRealTime)
+			{
+				SMILKit.logger.warn("FATAL: Heartbeat is not set to run with real time, freezes to the virtual machine will suspend the clock.");
+			}
+			
 			if (!this.running)
 			{
+				SMILKit.logger.debug("Scheduler resumed with a current offset of "+this.offset+"s");
+				
 				this._running = true;
 				
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RESUMED, this.offset));
@@ -94,6 +107,8 @@ package org.smilkit.dom.smil.time
 		{
 			if (this.running)
 			{
+				SMILKit.logger.debug("Scheduler paused with a current offset of "+this.offset+"s");
+				
 				this._running = false;
 				
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.PAUSED, this.offset));
@@ -114,6 +129,11 @@ package org.smilkit.dom.smil.time
 		
 		public function reset():void
 		{
+			if (this._waitingCallbacks != null)
+			{
+				SMILKit.logger.debug("Scheduler reset, all "+this._waitingCallbacks.length+" waiting callbacks have been purged.");
+			}
+			
 			this._baseLine = new Date();
 			
 			this._uptime = 0;
@@ -122,22 +142,30 @@ package org.smilkit.dom.smil.time
 			this._waitingCallbacks = new Hashtable();
 		}
 		
-		public function waitUntil(offset:Number, callback:Function):Boolean
-		{		
-			if (offset == 0)
-			{
-				SMILKit.logger.benchmark("waitUtil->0 "+callback);
-			}
-			
+		public function waitUntil(offset:Number, callback:Function, element:ElementTimeContainer = null, friendlyName:String = null):Boolean
+		{
 			if (offset >= this.ownerSMILDocument.offset)
 			{
+				var callbacks:Vector.<Function> = null;
+				
 				if (!this._waitingCallbacks.hasItem(offset))
 				{
-					this._waitingCallbacks.setItem(offset, new Vector.<Function>());
+					callbacks = new Vector.<Function>();
+					
+					this._waitingCallbacks.setItem(offset, callbacks);
+				}
+				else
+				{
+					callbacks = (this._waitingCallbacks.getItem(offset) as Vector.<Function>);
 				}
 				
-				(this._waitingCallbacks.getItem(offset) as Vector.<Function>).push(callback);
-				
+				if (callbacks.indexOf(callback) == -1)
+				{
+					SMILKit.logger.debug("Scheduler added callback named "+friendlyName+" at "+offset+"s, from "+element);
+					
+					callbacks.push(callback);
+				}
+					
 				return true;
 			}
 			
@@ -145,7 +173,7 @@ package org.smilkit.dom.smil.time
 			return false;
 		}
 		
-		public function removeWaitUntil(callback:Function):void
+		public function removeWaitUntil(callback:Function, element:ElementTimeContainer = null, friendlyName:String = null):void
 		{
 			for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
 			{
@@ -165,6 +193,8 @@ package org.smilkit.dom.smil.time
 					}
 					
 					this._waitingCallbacks.setItemAt(newCallbacks, i);
+					
+					//SMILKit.logger.debug("Scheduler removed callback named "+friendlyName+" at "+offset+"s, from "+element);
 				}
 			}
 		}
@@ -174,6 +204,11 @@ package org.smilkit.dom.smil.time
 			var delta:Date = new Date();
 			var duration:Number = (delta.getTime() - this._baseLine.getTime());
 			
+			if (!this.isRealTime)
+			{
+				duration = SharedTimer.DELAY;
+			}
+			
 			this._uptime += duration;
 			this._baseLine = delta;
 			
@@ -182,6 +217,8 @@ package org.smilkit.dom.smil.time
 				this._offset += duration;
 				
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this._offset));
+				
+				var callbacksTriggered:uint = 0;
 				
 				for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
 				{
@@ -198,10 +235,17 @@ package org.smilkit.dom.smil.time
 						for (var k:uint = 0; k < callbacks.length; k++)
 						{
 							callbacks[k].call();
+							
+							callbacksTriggered++;
 						}
 						
 						this._waitingCallbacks.removeItem(offset);
 					}
+				}
+				
+				if (callbacksTriggered > 0)
+				{
+					SMILKit.logger.info(callbacksTriggered+" callbacks triggered at "+ this.offset);
 				}
 			}
 		}

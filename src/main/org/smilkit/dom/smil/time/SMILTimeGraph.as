@@ -169,7 +169,7 @@ package org.smilkit.dom.smil.time
 				this.ownerDocument.removeEventListener(MutationEvent.DOM_NODE_INSERTED, this.onMutationEvent, false);
 				this.ownerDocument.removeEventListener(MutationEvent.DOM_NODE_REMOVED, this.onMutationEvent, false);
 				
-				container.startup();
+				//container.startup();
 				
 				this.rebuild();
 			}

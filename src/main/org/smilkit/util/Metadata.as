@@ -197,7 +197,7 @@ package org.smilkit.util
 		 */
 		public function toString():String
 		{
-			return "Video: "+this.videoCodec+", "+this.framerate+"fps, "+this.width+" x "+this.height+". Audio: "+this.audioCodec+", "+this.audioChannels+" channels, "+this.audioSampleRate+" Hz.";
+			return "Video: "+this.videoCodec+", "+this.duration+"s, "+this.framerate+"fps, "+this.width+"x"+this.height+". Audio: "+this.audioCodec+", "+this.audioChannels+" channels, "+this.audioSampleRate+" Hz.";
 		}
 	}
 }

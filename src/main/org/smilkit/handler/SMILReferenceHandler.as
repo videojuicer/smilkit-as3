@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILRefElement;
+	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
@@ -103,7 +104,7 @@ package org.smilkit.handler
 		
 		public override function get resolvable():Boolean
 		{
-			return false;
+			return true;
 		}
 		
 		public override function get preloadable():Boolean
@@ -118,7 +119,7 @@ package org.smilkit.handler
 		
 		public function get contentValid():Boolean
 		{
-			return (this.isViewportSMILReady);
+			return this._contentValid;
 		}
 		
 		public override function get spatial():Boolean
@@ -131,14 +132,31 @@ package org.smilkit.handler
 			return true;
 		}
 		
+		public override function get seekable():Boolean
+		{
+			return true;
+		}
+		
 		public override function get currentOffset():int
 		{
 			if (this.isViewportSMILReady)
 			{
-				return this._viewport.offset;
+				return (this._viewport.offset * 1000);
 			}
 			
 			return 0;
+		}
+		
+		public override function get completedResolving():Boolean
+		{
+			var duration:Number = this.viewport.document.duration;
+			
+			return (duration != Time.UNRESOLVED && duration != Time.MEDIA);
+		}
+		
+		public override function get completedLoading():Boolean
+		{
+			return false;
 		}
 		
 		public override function get width():uint
@@ -198,6 +216,15 @@ package org.smilkit.handler
 			}
 		}
 		
+		public override function seek(seekTo:Number):void
+		{
+			if (this.isViewportSMILReady)
+			{
+				this._viewport.seek(seekTo);
+				this._viewport.commitSeek();
+			}
+		}
+		
 		public override function setVolume(volume:uint):void
 		{
 			this._viewport.setVolume(volume);
@@ -252,6 +279,7 @@ package org.smilkit.handler
 		public override function removedFromRenderTree(r:HandlerController):void
 		{
 			this._activeOnRenderTree = false;
+			
 			this.invalidate();
 		}
 		
@@ -287,12 +315,12 @@ package org.smilkit.handler
 				
 				this._invalidateOnNextResume = true;
 			}
-			else if(this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			else if (this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
 				// TODO - this is wrong. the element must be on the rendertree for this to be valid.
 				if(this._invalidateOnNextResume)
 				{
-					this.invalidate();
+					//this.invalidate();
 				}
 				
 				this._invalidateOnNextResume = false;

@@ -448,6 +448,7 @@ package org.smilkit.dom.smil
 			{
 				this._handler.removeEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
 				this._handler.removeEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
+				this._handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopped);
 			}
 			
 			this._handler = SMILKit.createElementHandlerFor(this);
@@ -457,6 +458,7 @@ package org.smilkit.dom.smil
 			{
 				this._handler.addEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
 				this._handler.addEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
+				this._handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopped);
 			}
 		}
 
@@ -470,11 +472,18 @@ package org.smilkit.dom.smil
 			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		}
 		
+		private function onHandlerStopped(e:HandlerEvent):void
+		{
+			this.onMediaDurationEnd();
+		}
+		
 		protected override function display():void
 		{
 			// if we dont have a handler, what can we display ... nothing!
 			if (this.handler != null)
 			{
+				//SMILKit.logger.info("DISPLAYING -> "+this.src);
+				
 				super.display();
 			}
 		}

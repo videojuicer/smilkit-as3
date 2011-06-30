@@ -26,19 +26,21 @@ package org.smilkit.time
 	 */	
 	public class Heartbeat extends EventDispatcher
 	{
+		public static var BPS_5:Number = 200;
+		public static var BPS_2:Number = 500;
+		public static var BPS_1:Number = 1000;
+		
 		protected var _timer:Timer;
+		
 		protected var _baseline:Date = new Date();
 		protected var _offset:Number = 0;
 		protected var _slowBeats:int = 0;
+
 		protected var _running:Boolean = false;
 		protected var _previousOffset:Number = 0;
 		protected var _runningOffset:Number = 0;
 		
-		protected static var __timerInstance:Timer;
-		
-		public static var BPS_5:Number = 200;
-		public static var BPS_2:Number = 500;
-		public static var BPS_1:Number = 1000;
+		protected var _isRealTime:Boolean = false;
 		
 		/**
 		 * The maximum number of slow beats to reach before lowering the beats per second. A slow beat
@@ -63,6 +65,15 @@ package org.smilkit.time
 			this._offset = 0;
 		}
 		
+		public function get isRealTime():Boolean
+		{
+			return this._isRealTime;
+		}
+		
+		public function set isRealTime(state:Boolean):void
+		{
+			this._isRealTime = state;
+		}
 
 		public function get offset():Number
 		{
@@ -190,6 +201,11 @@ package org.smilkit.time
 			var delta:Date = new Date();
 			var beatDuration:Number = (delta.getTime() - this._baseline.getTime());
 		
+			if (!this.isRealTime)
+			{
+				beatDuration = SharedTimer.instance.delay;
+			}
+			
 			this._offset += beatDuration;
 			this._baseline = delta;
 			

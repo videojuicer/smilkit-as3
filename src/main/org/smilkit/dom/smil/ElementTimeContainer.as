@@ -413,10 +413,10 @@ package org.smilkit.dom.smil
 			this._currentBeginInterval = null;
 			this._currentEndInterval = null;
 			
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onIntervalStart);
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd);
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd);
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onIntervalStart, this, "onIntervalStart");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd, this, "onMediaDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
 		}
 		
 		/**
@@ -731,7 +731,7 @@ package org.smilkit.dom.smil
 			
 			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
-				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(this.parentTimeContainer.offsetForChild(this) + this.currentBeginInterval.resolvedOffset, this.onIntervalStart);
+				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(this.currentBeginInterval.resolvedOffset, this.onIntervalStart, this, "onIntervalStart");
 				
 				// setup timer if we need to wait (and were not meant to play)
 				if (!waiting && this.parentTimeContainer.isPlaying)
@@ -762,14 +762,19 @@ package org.smilkit.dom.smil
 			
 			// Notify the load scheduler
 			this.ownerSMILDocument.loadScheduler.timeContainerActivated(this);
+			
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onIntervalStart, this, "onIntervalStart");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd, this, "onMediaDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 
 			var waitTime:Number = 0;
 			
 			if (this._activeDuration != null && this._activeDuration.resolved && !this._activeDuration.indefinite)
 			{
-				waitTime = this._activeDuration.resolvedOffset + this.ownerSMILDocument.offset;
+				waitTime = this._activeDuration.offset + this.ownerSMILDocument.offset;
 				
-				this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onActiveDurationEnd);
+				this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onActiveDurationEnd, this, "onActiveDurationEnd");
 			}
 			
 			var simpleDurationTime:Time = this.computeSimpleDurationTime();
@@ -778,9 +783,9 @@ package org.smilkit.dom.smil
 			{
 				if (this._activeDuration == null || this._activeDuration.indefinite || !this._activeDuration.resolved || this._activeDuration.isGreaterThan(simpleDurationTime))
 				{
-					waitTime = simpleDurationTime.resolvedOffset + this.ownerSMILDocument.offset;
+					waitTime = simpleDurationTime.offset + this.ownerSMILDocument.offset;
 					
-					this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onSimpleDurationEnd);
+					this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 				}
 			}
 			
@@ -789,7 +794,7 @@ package org.smilkit.dom.smil
 		
 		protected function display():void
 		{
-			SMILKit.logger.benchmark(">> DISPLAYING TIME CONTAINER RIGHT NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this);
+			SMILKit.logger.benchmark(">> DISPLAYING TIME CONTAINER RIGHT NOW: "+this.ownerSMILDocument.offset+" TYPE: "+this+" SRC: "+this.getAttribute("src"));
 			
 			// whenever display is called, we look at what the current state
 			// should be, and update our drawingboard + handler with the changes
@@ -823,7 +828,10 @@ package org.smilkit.dom.smil
 		protected function onMediaDurationEnd():void
 		{
 			// ends simple duration if dur=media or dur=indefinite
-			this.onSimpleDurationEnd();
+			if (this.isPlaying)
+			{
+				this.onSimpleDurationEnd();
+			}
 		}
 		
 		protected function onSimpleDurationEnd():void
@@ -833,6 +841,7 @@ package org.smilkit.dom.smil
 			// count repeats
 			// restart children
 			// dispatch repeatEvent
+			this.deactivate();
 		}
 		
 		/**
@@ -858,20 +867,22 @@ package org.smilkit.dom.smil
 			// Notify the load scheduler
 			this.ownerSMILDocument.loadScheduler.timeContainerDeactivated(this);
 			
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd);
-			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd);
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onIntervalStart, this, "onIntervalStart");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd, this, "onMediaDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
+			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 			
 			// dispatch endEvent on DOM
 			
 			// notify parent that the element has stopped but we might go again
 			
 			// try and build the nextInternal
-			this.gatherNextInterval();
-			
-			if (this.currentBeginInterval != null && this.currentBeginInterval.resolved)
+			if (this.gatherNextInterval() && this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
-				var waitTime:Number = this.currentBeginInterval.resolvedOffset - (this.ownerDocument as SMILDocument).offset;
-				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.deactivate);
+				// TODO: fix this so that it activates correctly
+				
+				var waitTime:Number = this.currentBeginInterval.offset + (this.ownerDocument as SMILDocument).offset;
+				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onIntervalStart, this, "onIntervalStart (yet again)");
 				
 				// setup timer if we need to wait (and were not meant to play)
 				if (!waiting && (this.parentTimeContainer as ElementTimeContainer).isPlaying)
