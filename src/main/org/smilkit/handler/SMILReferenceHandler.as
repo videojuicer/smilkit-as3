@@ -84,6 +84,8 @@ package org.smilkit.handler
 		*/
 		protected var _invalidateOnNextResume:Boolean = false;
 
+		protected var _canvas:Sprite = null;
+		
 		public function SMILReferenceHandler(element:IElement)
 		{
 			super(element);
@@ -102,7 +104,9 @@ package org.smilkit.handler
 			this._viewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
 			this._viewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
 			
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);	
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+			
+			this._canvas = new Sprite();
 		}
 		
 		public override function get resolvable():Boolean
@@ -117,7 +121,8 @@ package org.smilkit.handler
 		
 		public override function get displayObject():DisplayObject
 		{
-			return this.viewport;
+			return this._canvas;
+			//return this._viewport.drawingBoard;
 		}
 		
 		public function get contentValid():Boolean
@@ -251,6 +256,19 @@ package org.smilkit.handler
 		{
 			if (this.region != null)
 			{
+				for (var i:int = 0; i < this._canvas.numChildren; i++)
+				{
+					this._canvas.removeChildAt(i);
+				}
+				
+				this._canvas.graphics.clear();
+				
+				this._canvas.graphics.beginFill(0xEEEEEE, 0.0);
+				this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
+				this._canvas.graphics.endFill();
+				
+				this._canvas.addChild(this._viewport.drawingBoard);
+				
 				this._viewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 			}
 		}
