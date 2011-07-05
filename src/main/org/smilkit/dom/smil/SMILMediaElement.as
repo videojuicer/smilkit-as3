@@ -449,6 +449,10 @@ package org.smilkit.dom.smil
 				this._handler.removeEventListener(HandlerEvent.PAUSE_NOTIFY, this.onHandlerPaused);
 				this._handler.removeEventListener(HandlerEvent.RESUME_NOTIFY, this.onHandlerResumed);
 				this._handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopped);
+				
+				this._handler.destroy();
+				
+				this._handler = null;
 			}
 			
 			this._handler = SMILKit.createElementHandlerFor(this);

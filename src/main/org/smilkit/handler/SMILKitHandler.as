@@ -396,6 +396,15 @@ package org.smilkit.handler
 		}
 		
 		/**
+		 * Destroys the current handler and all of its children, if any exist.
+		 */
+		public function destroy():void
+		{
+			this._element = null;
+			this._region = null;
+		}
+		
+		/**
 		 * Callback method for when the <code>LoadScheduler</code> moves this handler instance
 		 * to the just in time work list. The just in time queue starts loading as soon as its
 		 * placed on the queue.

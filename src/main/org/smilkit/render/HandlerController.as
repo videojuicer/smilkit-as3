@@ -448,7 +448,8 @@ package org.smilkit.render
 		
 		protected function onHandlerSelfModified(e:HandlerEvent):void
 		{
-			this.syncHandlersToViewportOffset();
+			this.reset();
+			//this.syncHandlersToViewportOffset();
 		}
 		
 		/**
