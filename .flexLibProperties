@@ -90,6 +90,7 @@
     <classEntry path="org.smilkit.dom.smil.ElementBodyTimeContainer"/>
     <classEntry path="org.smilkit.dom.smil.display.SMILDocumentDisplayStack"/>
     <classEntry path="org.smilkit.dom.smil.display.DisplayStackEvent"/>
+    <classEntry path="org.smilkit.view.NestedViewport"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

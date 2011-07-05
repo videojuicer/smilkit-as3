@@ -98,7 +98,7 @@ package org.smilkit.spec.tests.handler
 					
 					Assert.assertEquals(0, videoChildren.length);
 					
-					videoChildren = (refElement.handler as SMILReferenceHandler).viewport.document.getElementsByTagName("video");
+					videoChildren = (refElement.handler as SMILReferenceHandler).nestedViewport.document.getElementsByTagName("video");
 					
 					Assert.assertEquals(1, videoChildren.length);
 				}

@@ -844,8 +844,8 @@ package org.smilkit.view
 			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
 				
-				//this.heartbeat.resume();
-				this.document.scheduler.resume();
+				this.document.scheduler.userResume();
+				//this.document.scheduler.resume();
 				
 				if (this.document.scheduler.offset >= this.document.duration && this.document.duration > 0)
 				{
@@ -854,8 +854,6 @@ package org.smilkit.view
 					
 					//this.heartbeat.seek(0);
 				}
-				
-				
 			}
 			else
 			{
@@ -866,11 +864,11 @@ package org.smilkit.view
 		protected function onPlaybackStateChangedToPaused():void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
-			//this.heartbeat.pause();
 			
 			if (this.document != null)
 			{
-				this.document.scheduler.pause();
+				this.document.scheduler.userPause();
+				//this.document.scheduler.pause();
 			}
 		}
 		

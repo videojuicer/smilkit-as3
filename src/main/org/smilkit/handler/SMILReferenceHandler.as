@@ -6,6 +6,7 @@ package org.smilkit.handler
 	import flash.display.Sprite;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
+	import flash.events.ProgressEvent;
 	import flash.events.SecurityErrorEvent;
 	import flash.geom.Rectangle;
 	
@@ -16,11 +17,13 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.util.MathHelper;
+	import org.smilkit.view.NestedViewport;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -68,7 +71,7 @@ package org.smilkit.handler
 	
 	public class SMILReferenceHandler extends SMILKitHandler
 	{
-		protected var _viewport:Viewport = null;
+		protected var _nestedViewport:NestedViewport = null;
 		
 		protected var _resuming:Boolean = false;
 		
@@ -84,6 +87,8 @@ package org.smilkit.handler
 		*/
 		protected var _invalidateOnNextResume:Boolean = false;
 
+		protected var _invalidateOffset:Number = 0;
+		
 		protected var _canvas:Sprite = null;
 		
 		public function SMILReferenceHandler(element:IElement)
@@ -92,19 +97,23 @@ package org.smilkit.handler
 			
 			//(this.element.ownerDocument as SMILDocument).viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onExternalViewportPlaybackStateChanged);
 			
-			this._viewport = new Viewport();
+			this._nestedViewport = new NestedViewport();
 			
-			this._viewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
-			this._viewport.addEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
+			this._nestedViewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
+			this._nestedViewport.addEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
 			
-			this._viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
+			this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
 			
-			this._viewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
+			this._nestedViewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
 			
-			this._viewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
-			this._viewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
+			this._nestedViewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
+			this._nestedViewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
 			
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+			this._nestedViewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+			
+			this._nestedViewport.addEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+			
+			(this.element.ownerDocument as SMILDocument).scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
 			
 			this._canvas = new Sprite();
 		}
@@ -116,13 +125,12 @@ package org.smilkit.handler
 		
 		public override function get preloadable():Boolean
 		{
-			return false;
+			return true;
 		}
 		
 		public override function get displayObject():DisplayObject
 		{
 			return this._canvas;
-			//return this._viewport.drawingBoard;
 		}
 		
 		public function get contentValid():Boolean
@@ -149,7 +157,7 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
-				return (this.viewport.offset * 1000);
+				return (this.nestedViewport.offset * 1000);
 			}
 			
 			return 0;
@@ -161,7 +169,7 @@ package org.smilkit.handler
 			
 			if (this.isViewportSMILReady)
 			{
-				duration = this.viewport.document.duration;
+				duration = this.nestedViewport.document.duration;
 			}
 			
 			return (duration != Time.UNRESOLVED && duration != Time.MEDIA);
@@ -192,19 +200,24 @@ package org.smilkit.handler
 			return 100;
 		}
 		
-		public function get viewport():Viewport
+		public function get nestedViewport():NestedViewport
 		{
-			return this._viewport;
+			return this._nestedViewport;
 		}
 		
 		public function get isViewportSMILReady():Boolean
 		{
-			return (this.viewport.document != null);
+			return (this.nestedViewport.document != null);
 		}
 		
 		public override function load():void
 		{
-			this._viewport.location = this.element.src;
+			this._nestedViewport.location = this.element.src;
+			
+			var el:SMILMediaElement = (this.element as SMILMediaElement);
+			
+			el.childrenBytesLoaded = 0;
+			el.childrenBytesTotal = 0;
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
@@ -215,12 +228,15 @@ package org.smilkit.handler
 			{
 				if (this._invalidateOnNextResume)
 				{
+					this._invalidateOnNextResume = false;
+					this._resuming = true;
+					
 					this.invalidate();
 				}
-				
-				this._invalidateOnNextResume = false;
-				
-				this._viewport.resume();
+				else
+				{
+					this._nestedViewport.resume();
+				}
 			}
 			else
 			{
@@ -232,9 +248,7 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
-				this._viewport.pause();
-				
-				this._invalidateOnNextResume = true;
+				this._nestedViewport.pause();
 			}
 		}
 		
@@ -242,14 +256,14 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
-				this._viewport.seek(seekTo);
-				this._viewport.commitSeek();
+				this._nestedViewport.seek(seekTo);
+				this._nestedViewport.commitSeek();
 			}
 		}
 		
 		public override function setVolume(volume:uint):void
 		{
-			this._viewport.setVolume(volume);
+			this._nestedViewport.setVolume(volume);
 		}
 		
 		public override function resize():void
@@ -263,13 +277,17 @@ package org.smilkit.handler
 				
 				this._canvas.graphics.clear();
 				
-				this._canvas.graphics.beginFill(0xEEEEEE, 0.0);
+				this._canvas.graphics.beginFill(0xEEEEEE, 1.0);
 				this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 				this._canvas.graphics.endFill();
 				
-				this._canvas.addChild(this._viewport.drawingBoard);
+				this._canvas.addChild(this._nestedViewport.drawingBoard);
 				
-				this._viewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
+				this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
+				this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
+				this._nestedViewport.drawingBoard.graphics.endFill();
+				
+				this._nestedViewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 			}
 		}
 		
@@ -286,6 +304,8 @@ package org.smilkit.handler
 			this._contentValid = false;
 			this._startedLoading = false;
 			this._completedLoading = false;
+			
+			this._invalidateOffset = this.nestedViewport.offset;
 			
 			if ((this._activeOnRenderTree || hardInvalidation) && ((!hadStartedLoading) || (hadStartedLoading && hadCompletedLoading)))
 			{
@@ -323,25 +343,36 @@ package org.smilkit.handler
 			this._contentValid = true;
 			
 			if (this._resuming)
-			{
-				if (this._invalidateOnNextResume)
-				{
-					this.invalidate();
-				}
-				
+			{				
 				this._invalidateOnNextResume = false;
-				this._resuming = false;
 				
-				this._viewport.resume();
+				if (this._invalidateOffset > 0)
+				{
+					if (this._invalidateOffset > 0)
+					{
+						this._invalidateOffset = 0;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.SELF_MODIFIED, this));
+					}
+				}
+				else
+				{
+					this._resuming = false;
+					
+					this._nestedViewport.resume();
+				}
 			}
 			else
 			{
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				if (this.nestedViewport.ready)
+				{
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				}
 			}
 		}
 		
 		protected function onInternalViewportReady(e:ViewportEvent):void
-		{			
+		{
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 		
@@ -352,13 +383,24 @@ package org.smilkit.handler
 		
 		protected function onInternalViewportPlaybackStateChanged(e:ViewportEvent):void
 		{			
-			if (this._viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 			}
-			else if (this._viewport.playbackState == Viewport.PLAYBACK_PAUSED)
+			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PAUSED)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
+			}
+			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_SEEKING)
+			{				
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+				
+				if (this._resuming)
+				{
+					this._resuming = false;
+					
+					this.resume();
+				}
 			}
 		}
 		
@@ -377,24 +419,20 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_UNAUTHORISED, this));
 		}
 		
-		protected function onExternalViewportPlaybackStateChanged(e:ViewportEvent):void
+		protected function onSchedulerPaused(e:HeartbeatEvent):void
 		{
-			if (this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED)
+			if ((this.element.ownerDocument as SMILDocument).scheduler.userPaused)
 			{
-				SMILKit.logger.debug("Caught viewport pause. This reference handler will invalidate on the next resume.", this);
-				
 				this._invalidateOnNextResume = true;
 			}
-			else if (viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
-			{
-				// TODO - this is wrong. the element must be on the rendertree for this to be valid.
-				if(this._invalidateOnNextResume)
-				{
-					this.invalidate();
-				}
-				
-				this._invalidateOnNextResume = false;
-			}
+		}
+		
+		protected function onNestedViewportLoadablesProgress(e:ProgressEvent):void
+		{
+			var el:SMILMediaElement = (this.element as SMILMediaElement);
+			
+			el.childrenBytesLoaded = e.bytesLoaded;
+			el.childrenBytesTotal = e.bytesTotal;
 		}
 		
 		public static function toHandlerMap():HandlerMap

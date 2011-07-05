@@ -15,10 +15,13 @@ package org.smilkit.dom.smil.time
 		protected var _ownerSMILDocument:SMILDocument;
 		
 		protected var _running:Boolean = false;
+		protected var _userPaused:Boolean = false;
 		
 		protected var _baseLine:Date = null;
-		protected var _uptime:Number = 0;
 		protected var _offset:Number = 0;
+		
+		protected var _uptime:Number = 0;
+		protected var _runningUptime:Number = 0;
 		
 		protected var _waitingCallbacks:Hashtable;
 		
@@ -41,12 +44,22 @@ package org.smilkit.dom.smil.time
 			return this._running;
 		}
 		
+		public function get userPaused():Boolean
+		{
+			return this._userPaused;
+		}
+		
 		/**
 		 * Total number of milliseconds past since the SMILTimeScheduler was created.
 		 */
 		public function get uptime():Number
 		{
 			return this._uptime;
+		}
+		
+		public function get runningUptime():Number
+		{
+			return this._runningUptime;
 		}
 		
 		/**
@@ -79,6 +92,8 @@ package org.smilkit.dom.smil.time
 			{
 				SMILKit.logger.warn("FATAL: Heartbeat is not set to run with real time, freezes to the virtual machine will suspend the clock.");
 			}
+			
+			this._userPaused = false;
 			
 			if (!this.running)
 			{
@@ -136,10 +151,24 @@ package org.smilkit.dom.smil.time
 			
 			this._baseLine = new Date();
 			
+			this._userPaused = false;
+			
 			this._uptime = 0;
 			this._offset = 0;
 			
 			this._waitingCallbacks = new Hashtable();
+		}
+		
+		public function userResume():void
+		{
+			this.resume();
+		}
+		
+		public function userPause():void
+		{
+			this._userPaused = true;
+			
+			this.pause();
 		}
 		
 		public function waitUntil(offset:Number, callback:Function, element:ElementTimeContainer = null, friendlyName:String = null):Boolean
@@ -215,7 +244,8 @@ package org.smilkit.dom.smil.time
 			if (this.running)
 			{
 				this._offset += duration;
-				
+				this._runningUptime += duration;
+
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this._offset));
 				
 				var callbacksTriggered:uint = 0;

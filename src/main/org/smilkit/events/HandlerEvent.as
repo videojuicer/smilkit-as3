@@ -24,6 +24,8 @@ package org.smilkit.events
 		
 		public static var DURATION_RESOLVED:String = "handlerDurationResolved";
 		
+		public static var SELF_MODIFIED:String = "handlerSelfModified";
+		
 		protected var _handler:SMILKitHandler;
 		
 		public function HandlerEvent(type:String, handler:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)

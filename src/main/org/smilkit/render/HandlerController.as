@@ -446,6 +446,11 @@ package org.smilkit.render
 			this.execSyncHandlerForViewportOffset(waitHandler);
 		}
 		
+		protected function onHandlerSelfModified(e:HandlerEvent):void
+		{
+			this.syncHandlersToViewportOffset();
+		}
+		
 		/**
 		* Called when any of the RenderTree's handlers completes an asynchronous seek event.
 		*/
@@ -802,6 +807,7 @@ package org.smilkit.render
 			handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 			handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+			handler.addEventListener(HandlerEvent.SELF_MODIFIED, this.onHandlerSelfModified);
 			
 			this._activeTimingNodes.push(timingNode);
 			this._activeMediaElements.push(element);
@@ -824,6 +830,7 @@ package org.smilkit.render
 				handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 				handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 				handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
+				handler.removeEventListener(HandlerEvent.SELF_MODIFIED, this.onHandlerSelfModified);
 			}
 			
 			// remove from the list
