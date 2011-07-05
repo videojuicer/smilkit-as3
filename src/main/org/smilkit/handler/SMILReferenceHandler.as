@@ -343,7 +343,7 @@ package org.smilkit.handler
 				
 				SMILKit.logger.debug(msg, this);
 				
-				this.load();
+				//this.load();
 			}
 			else
 			{
