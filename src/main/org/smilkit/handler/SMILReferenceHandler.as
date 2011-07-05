@@ -16,6 +16,7 @@ package org.smilkit.handler
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
@@ -90,7 +91,7 @@ package org.smilkit.handler
 		protected var _invalidateOffset:Number = 0;
 		
 		protected var _canvas:Sprite = null;
-		
+
 		public function SMILReferenceHandler(element:IElement)
 		{
 			super(element);
@@ -114,6 +115,7 @@ package org.smilkit.handler
 			this._nestedViewport.addEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
 			
 			(this.element.ownerDocument as SMILDocument).scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
+			
 			
 			this._canvas = new Sprite();
 		}
@@ -212,12 +214,17 @@ package org.smilkit.handler
 		
 		public override function load():void
 		{
-			this._nestedViewport.location = this.element.src;
-			
-			var el:SMILMediaElement = (this.element as SMILMediaElement);
-			
-			el.childrenBytesLoaded = 0;
-			el.childrenBytesTotal = 0;
+			if (!this._startedLoading)
+			{
+				this._nestedViewport.location = this.element.src;
+				
+				var el:SMILMediaElement = (this.element as SMILMediaElement);
+				
+				el.intrinsicBytesLoaded = 0;
+				el.intrinsicBytesTotal = 0;
+				
+				this._startedLoading = true;	
+			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
@@ -341,10 +348,19 @@ package org.smilkit.handler
 		protected function onInternalViewportRefreshComplete(e:ViewportEvent):void
 		{
 			this._contentValid = true;
+		
+			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
+			
+			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
 			
 			if (this._resuming)
 			{				
 				this._invalidateOnNextResume = false;
+				
+				if (this.nestedViewport.document.durationResolved)
+				{
+					this.resolved(this.nestedViewport.document.duration);
+				}
 				
 				if (this._invalidateOffset > 0)
 				{
@@ -433,6 +449,11 @@ package org.smilkit.handler
 			
 			el.childrenBytesLoaded = e.bytesLoaded;
 			el.childrenBytesTotal = e.bytesTotal;
+		}
+		
+		protected function onDOMTimeGraphModified(e:SMILMutationEvent):void
+		{
+			this.resolved(this.nestedViewport.document.duration);
 		}
 		
 		public static function toHandlerMap():HandlerMap
