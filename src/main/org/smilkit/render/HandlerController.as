@@ -443,13 +443,15 @@ package org.smilkit.render
 		protected function onHandlerDurationResolved(event:HandlerEvent):void
 		{
 			var waitHandler:SMILKitHandler = event.handler;
+			
 			this.execSyncHandlerForViewportOffset(waitHandler);
 		}
 		
 		protected function onHandlerSelfModified(e:HandlerEvent):void
 		{
 			this.reset();
-			//this.syncHandlersToViewportOffset();
+			//this.update();
+			this.syncHandlersToViewportOffset();
 		}
 		
 		/**
@@ -866,7 +868,12 @@ package org.smilkit.render
 		{
 			SMILKit.logger.debug("Handler dispatched LOAD_WAITING, about to enter load wait cycle.", this);
 			// add to waiting list
-			this._waitingForDataHandlerList.push(e.handler);
+			
+			if (this._waitingForDataHandlerList.indexOf(e.handler) == -1)
+			{
+				this._waitingForDataHandlerList.push(e.handler);
+			}
+			
 			this.checkLoadState();
 		}
 		

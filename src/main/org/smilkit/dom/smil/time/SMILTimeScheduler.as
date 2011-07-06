@@ -140,6 +140,7 @@ package org.smilkit.dom.smil.time
 			this._offset = offset;
 			
 			this.triggerTickNow();
+			this.triggerRunningTickNow();
 		}
 		
 		public function reset():void
@@ -248,35 +249,40 @@ package org.smilkit.dom.smil.time
 
 				this.dispatchEvent(new HeartbeatEvent(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this._offset));
 				
-				var callbacksTriggered:uint = 0;
+				this.triggerRunningTickNow();
+			}
+		}
+		
+		protected function triggerRunningTickNow():void
+		{
+			var callbacksTriggered:uint = 0;
+			
+			for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
+			{
+				var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
 				
-				for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
+				// seconds into milliseconds
+				offset = (offset * 1000);
+				
+				// hit any offset that is before our current offset
+				if (offset <= this.offset)
 				{
-					var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
+					var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
 					
-					// seconds into milliseconds
-					offset = (offset * 1000);
-					
-					// hit any offset that is before our current offset
-					if (offset <= this.offset)
+					for (var k:uint = 0; k < callbacks.length; k++)
 					{
-						var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
+						callbacks[k].call();
 						
-						for (var k:uint = 0; k < callbacks.length; k++)
-						{
-							callbacks[k].call();
-							
-							callbacksTriggered++;
-						}
-						
-						this._waitingCallbacks.removeItem(offset);
+						callbacksTriggered++;
 					}
+					
+					this._waitingCallbacks.removeItem(offset);
 				}
-				
-				if (callbacksTriggered > 0)
-				{
-					SMILKit.logger.info(callbacksTriggered+" callbacks triggered at "+ this.offset);
-				}
+			}
+			
+			if (callbacksTriggered > 0)
+			{
+				SMILKit.logger.info(callbacksTriggered+" callbacks triggered at "+ this.offset);
 			}
 		}
 		

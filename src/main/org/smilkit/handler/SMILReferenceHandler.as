@@ -29,6 +29,7 @@ package org.smilkit.handler
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.utilkit.util.UrlUtil;
 
 	
 	/**
@@ -98,16 +99,7 @@ package org.smilkit.handler
 			
 			//(this.element.ownerDocument as SMILDocument).viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onExternalViewportPlaybackStateChanged);
 			
-			this._nestedViewport = new NestedViewport();
-			
-			this._nestedViewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
-			this._nestedViewport.addEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
-			this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
-			this._nestedViewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
-			this._nestedViewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
-			this._nestedViewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
-			this._nestedViewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
-			this._nestedViewport.addEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+			this.createNestedViewport();
 			
 			(this.element.ownerDocument as SMILDocument).scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
 			
@@ -121,7 +113,7 @@ package org.smilkit.handler
 		
 		public override function get preloadable():Boolean
 		{
-			return true;
+			return false;
 		}
 		
 		public override function get displayObject():DisplayObject
@@ -206,11 +198,42 @@ package org.smilkit.handler
 			return (this.nestedViewport.document != null);
 		}
 		
+		protected function createNestedViewport():void
+		{
+			this._nestedViewport = new NestedViewport();
+			
+			this._nestedViewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
+			this._nestedViewport.addEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
+			this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
+			this._nestedViewport.addEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
+			this._nestedViewport.addEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
+			this._nestedViewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
+			this._nestedViewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+			this._nestedViewport.addEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+		}
+		
+		protected function destroyNestedViewport():void
+		{
+			this._nestedViewport.removeEventListener(ViewportEvent.READY, this.onInternalViewportReady);
+			this._nestedViewport.removeEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
+			this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
+			this._nestedViewport.removeEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
+			this._nestedViewport.removeEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
+			this._nestedViewport.removeEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
+			this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+			this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+			
+			this._nestedViewport = null;
+		}
+		
 		public override function load():void
 		{
 			if (!this._startedLoading)
 			{
-				this._nestedViewport.location = this.element.src;
+				this.destroyNestedViewport();
+				this.createNestedViewport();
+				
+				this._nestedViewport.location = UrlUtil.addCacheBlocking(this.element.src);
 				
 				var el:SMILMediaElement = (this.element as SMILMediaElement);
 				
@@ -227,19 +250,10 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
-				if (!this._contentValid)
+				if (this.revalidate())
 				{
-					this._resuming = true;
-					
-					this.load();
+					// do nothing
 				}
-				//if (this._invalidateOnNextResume)
-				//{
-				//	this._invalidateOnNextResume = false;
-					
-					
-				//	this.invalidate(true);
-				//}
 				else
 				{
 					this._nestedViewport.resume();
@@ -263,8 +277,14 @@ package org.smilkit.handler
 		{
 			if (this.isViewportSMILReady)
 			{
+				this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);
+				
+				//this._resuming = true;
+
 				this._nestedViewport.seek(seekTo);
 				this._nestedViewport.commitSeek();
+				
+				//this._nestedViewport.resume();
 			}
 		}
 		
@@ -302,15 +322,15 @@ package org.smilkit.handler
 				
 				this._canvas.graphics.clear();
 				
-				this._canvas.graphics.beginFill(0xEEEEEE, 1.0);
+				this._canvas.graphics.beginFill(0xEEEEEE, 0.0);
 				this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 				this._canvas.graphics.endFill();
 				
 				this._canvas.addChild(this._nestedViewport.drawingBoard);
 				
-				this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
-				this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
-				this._nestedViewport.drawingBoard.graphics.endFill();
+				//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
+				//this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
+				//this._nestedViewport.drawingBoard.graphics.endFill();
 				
 				this._nestedViewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 			}
@@ -321,7 +341,7 @@ package org.smilkit.handler
 		* active on the render tree, the invalidation will trigger a reload. Give (true) as the
 		* argument for this method if you wish to force a reload of the document contents.
 		*/
-		public function invalidate(hardInvalidation:Boolean = false):void
+		public function invalidate():void
 		{
 			var hadStartedLoading:Boolean = this._startedLoading;
 			var hadCompletedLoading:Boolean = this._completedLoading;
@@ -332,23 +352,30 @@ package org.smilkit.handler
 			
 			this._invalidateOffset = this.nestedViewport.offset;
 			
-			if ((this._activeOnRenderTree || hardInvalidation) && ((!hadStartedLoading) || (hadStartedLoading && hadCompletedLoading)))
+			var msg:String = "Performing invalidation with reload as ref handler is ";
+			
+			if(this._activeOnRenderTree) msg += "[active on the RenderTree]";
+			if(!hadStartedLoading) msg += "[not already loaded]";
+			if(hadStartedLoading && hadCompletedLoading) msg += "[already completed loading]";
+			
+			SMILKit.logger.debug(msg, this);
+		}
+		
+		public function revalidate():Boolean
+		{
+			if (!this._startedLoading || (this._startedLoading && this._completedLoading))
 			{
-				var msg:String = "Performing hard invalidation with reload as ref handler is ";
-				
-				if(this._activeOnRenderTree) msg += "[active on the RenderTree]";
-				if(hardInvalidation) msg += "[explicitly hard-invalidating]";
-				if(!hadStartedLoading) msg += "[not already loaded]";
-				if(hadStartedLoading && hadCompletedLoading) msg += "[already completed loading]";
-				
-				SMILKit.logger.debug(msg, this);
-				
-				//this.load();
+				if (!this._contentValid)
+				{
+					this._resuming = true;
+					
+					this.load();
+					
+					return true;
+				}
 			}
-			else
-			{
-				SMILKit.logger.debug("Performing soft invalidation on SMILReferenceHandler load flags (active: "+this._activeOnRenderTree+" hadStarted: "+hadStartedLoading+", hadCompleted: "+hadCompletedLoading+")", this);
-			}
+			
+			return false;
 		}
 		
 		public override function addedToRenderTree(r:HandlerController):void
@@ -362,6 +389,20 @@ package org.smilkit.handler
 			this._contentValid = false;
 			
 			this.invalidate();
+		}
+		
+		protected function onNestedViewportOffsetChanged(e:ViewportEvent):void
+		{
+			this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+			
+			if (this._resuming)
+			{
+				this._resuming = false;
+				
+				this.resume();
+			}
 		}
 		
 		protected function onInternalViewportRefreshComplete(e:ViewportEvent):void
@@ -384,26 +425,19 @@ package org.smilkit.handler
 				
 				if (this._invalidateOffset > 0)
 				{
-					if (this._invalidateOffset > 0)
-					{
-						this._invalidateOffset = 0;
-						
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.SELF_MODIFIED, this));
-					}
-				}
-				else
-				{
-					this._resuming = false;
+					this._invalidateOffset = 0;
 					
-					this._nestedViewport.resume();
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.SELF_MODIFIED, this));
 				}
+				
+				this._resuming = false;
+					
+				this._nestedViewport.resume();
 			}
 			else
 			{
-				if (this.nestedViewport.ready)
-				{
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
-				}
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
 			}
 		}
 		
@@ -426,17 +460,6 @@ package org.smilkit.handler
 			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PAUSED)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
-			}
-			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_SEEKING)
-			{				
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
-				
-				if (this._resuming)
-				{
-					this._resuming = false;
-					
-					this.resume();
-				}
 			}
 		}
 		

@@ -15,7 +15,7 @@ package org.smilkit.dom.smil
 
 		public override function get isPlaying():Boolean
 		{
-			return this.ownerSMILDocument.scheduler.running;
+			return true; // this.ownerSMILDocument.scheduler.running;
 		}
 		
 		public override function get parentTimeContainer():ElementTimeContainer
