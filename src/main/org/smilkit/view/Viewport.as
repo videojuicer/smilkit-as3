@@ -784,11 +784,10 @@ package org.smilkit.view
 			// Create the object pool with internal timing graph, rendertree etc.
 			this._objectPool = new ViewportObjectPool(this, document);
 			
-			document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
+			this.document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 				
 			// Reset the heartbeat to zero
-			//this.heartbeat.reset();
-			document.scheduler.reset();
+			//this.document.scheduler.reset();
 			
 			// Bind events to the newly-created object pool contents
 			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
