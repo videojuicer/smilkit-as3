@@ -155,9 +155,17 @@ package org.smilkit.dom.smil.time
 			this._userPaused = false;
 			
 			this._uptime = 0;
+			this._runningUptime = 0;
+			
 			this._offset = 0;
 			
 			this._waitingCallbacks = new Hashtable();
+			
+			this._running = true;
+			
+			this.triggerTickNow();
+			
+			this._running = false;
 		}
 		
 		public function userResume():void
@@ -257,26 +265,29 @@ package org.smilkit.dom.smil.time
 		{
 			var callbacksTriggered:uint = 0;
 			
-			for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
-			{
-				var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
-				
-				// seconds into milliseconds
-				offset = (offset * 1000);
-				
-				// hit any offset that is before our current offset
-				if (offset <= this.offset)
+			if (this._waitingCallbacks != null)
+			{	
+				for (var i:uint = 0; i < this._waitingCallbacks.length; i++)
 				{
-					var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
+					var offset:Number = (this._waitingCallbacks.getKeyAt(i) as Number);
 					
-					for (var k:uint = 0; k < callbacks.length; k++)
+					// seconds into milliseconds
+					offset = (offset * 1000);
+					
+					// hit any offset that is before our current offset
+					if (offset <= this.offset)
 					{
-						callbacks[k].call();
+						var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
 						
-						callbacksTriggered++;
+						for (var k:uint = 0; k < callbacks.length; k++)
+						{
+							callbacks[k].call();
+							
+							callbacksTriggered++;
+						}
+						
+						this._waitingCallbacks.removeItem(offset);
 					}
-					
-					this._waitingCallbacks.removeItem(offset);
 				}
 			}
 			
