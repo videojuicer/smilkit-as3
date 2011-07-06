@@ -303,6 +303,7 @@ package org.smilkit.view
 		{
 			if (location == this.location)
 			{
+				SMILKit.logger.debug("Location re-set to existing value ("+location+" -> "+this.location+"), about to refresh", this);
 				this.refresh(); return;
 			}
 			
@@ -950,6 +951,7 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURIComplete(e:Event):void
 		{
+			SMILKit.logger.debug("Finished loading remote document, about to refresh viewport objects.", this);
 			this.refreshObjectPoolWithLoadedData(e.target.data);
 		}
 		
