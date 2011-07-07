@@ -496,7 +496,14 @@ package org.smilkit.handler
 		
 		protected function onDOMTimeGraphModified(e:SMILMutationEvent):void
 		{
-			this.resolved(this.nestedViewport.document.duration);
+			if (this.nestedViewport.document != null)
+			{
+				this.resolved(this.nestedViewport.document.duration);
+			}
+			else
+			{
+				this.resolved(Time.INDEFINITE);
+			}
 		}
 		
 		public static function toHandlerMap():HandlerMap

@@ -86,7 +86,7 @@ package org.smilkit.dom.smil
 		public override function offsetForChild(element:ElementTimeContainer):Number
 		{
 			var duration:Number = 0;
-			var timeDescendants:INodeList = this.timeDescendants;
+			var timeDescendants:INodeList = this.timeChildren;
 			
 			for (var i:uint = 0; i < timeDescendants.length; i++)
 			{

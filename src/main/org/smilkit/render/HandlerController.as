@@ -343,7 +343,9 @@ package org.smilkit.render
 							destinationOffset = offset ;
 							SMILKit.logger.debug("Syncing a handler using random access (since nearest syncpoint was "+nearestSyncPoint+"ms). Seeking handler to "+offset+"ms.", this);
 						};
-
+						
+						handler.resume();
+						
 						handler.seek(destinationOffset); // The SEEK_NOTIFY operation dispatched by this call will continue the sync for this handler.
 					}
 					else

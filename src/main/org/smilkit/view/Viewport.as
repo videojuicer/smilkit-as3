@@ -186,6 +186,11 @@ package org.smilkit.view
 		 */
 		public function get offset():Number
 		{
+			if (this.document == null)
+			{
+				return 0;
+			}
+			
 			return this.document.offset;
 		}
 		
