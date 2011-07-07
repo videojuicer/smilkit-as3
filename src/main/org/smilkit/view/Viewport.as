@@ -786,8 +786,7 @@ package org.smilkit.view
 			
 			this.document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 				
-			// Reset the heartbeat to zero
-			//this.document.scheduler.reset();
+
 			
 			// Bind events to the newly-created object pool contents
 			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
@@ -802,6 +801,9 @@ package org.smilkit.view
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			
+			// send a playback offset changed event
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			
 			// tidy up
 			Platform.garbageCollection();

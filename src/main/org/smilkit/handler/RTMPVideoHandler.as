@@ -47,6 +47,7 @@ package org.smilkit.handler
 			super(element);
 			
 			this._canvas = new Sprite();
+			
 			this._soundTransformer = new SoundTransform(0.2, 0);
 		}
 		
@@ -418,7 +419,7 @@ package org.smilkit.handler
 				case "NetStream.Buffer.Full":
 					//this.resize();
 					
-					if (this._waiting)
+					if (this._waiting && this._metadata != null)
 					{
 						this._waiting = false;
 						

@@ -4,6 +4,7 @@ package org.smilkit.dom.smil.time
 	import flash.events.TimerEvent;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementBodyTimeContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HeartbeatEvent;
@@ -138,6 +139,14 @@ package org.smilkit.dom.smil.time
 		{
 			this._baseLine = new Date();
 			this._offset = offset;
+			
+			var bodyContainer:ElementBodyTimeContainer = (this.ownerSMILDocument.getElementsByTagName("body").item(0) as ElementBodyTimeContainer);
+			
+			if (bodyContainer != null)
+			{
+				//bodyContainer.resetElementState();
+				bodyContainer.startup();
+			}
 			
 			this.triggerTickNow();
 			this.triggerRunningTickNow();
