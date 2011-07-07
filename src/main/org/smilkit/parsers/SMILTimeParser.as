@@ -60,7 +60,7 @@ package org.smilkit.parsers
 				return true;
 			}
 			
-			return (timeString.search(/^(-?)(\d+)(h|ms|s|min)$/i) != -1);
+			return (timeString.search(/^(-?)(\d+(\.\d+)?)(h|ms|s|min)$/i) != -1);
 		}
 		
 		/**
@@ -69,7 +69,7 @@ package org.smilkit.parsers
 		 * 
 		 * @param timeString The SMIL time string to parse into milliseconds.
 		 */
-		public function parse(timeString:String):void
+		public function parse(timeString:String):SMILTimeParser
 		{
 			this._timeString = timeString;
 			
@@ -110,31 +110,33 @@ package org.smilkit.parsers
 				// hours
 				if (this._timeString.indexOf("h") != -1)
 				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("h"))) * 60 * 60 * 1000; 
+					this._milliseconds = parseFloat(this._timeString.substring(0, this._timeString.indexOf("h"))) * 60 * 60 * 1000; 
 				}
 				// minutes
 				else if (this._timeString.indexOf("min") != -1)
 				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("min"))) * 60 * 1000; 
+					this._milliseconds = parseFloat(this._timeString.substring(0, this._timeString.indexOf("min"))) * 60 * 1000; 
 				}
 				// milliseconds value
 				else if (this._timeString.indexOf("ms") != -1)
 				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("ms")));
+					this._milliseconds = parseFloat(this._timeString.substring(0, this._timeString.indexOf("ms")));
 				}				
 				// seconds
 				else if (this._timeString.indexOf("s") != -1)
 				{
-					this._milliseconds = parseInt(this._timeString.substring(0, this._timeString.indexOf("s"))) * 1000; 
+					this._milliseconds = parseFloat(this._timeString.substring(0, this._timeString.indexOf("s"))) * 1000; 
 				}
 				// assume the time is declared in seconds
 				else
 				{
-					this._milliseconds = parseInt(this._timeString) * 1000;
+					this._milliseconds = parseFloat(this._timeString) * 1000;
 				}
 				
 				this._type = Time.SMIL_TIME_OFFSET;
 			}
+			
+			return this;
 		}
 	}
 }

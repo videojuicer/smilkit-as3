@@ -163,7 +163,7 @@
 	<target name="fetch-crypto"
 		description="Fetches the AS3 Crypto from subversion and exports into libs/">
 		<exec executable="svn" spawn="false" dir="${basedir}">
-			<arg line="export --force" />
+			<arg line="export" /> <!-- \-\-force -->
 			<arg line="http://as3crypto.googlecode.com/svn/trunk/as3crypto/" />
 			<arg line="${as3crypto.loc}" />
 		</exec>
@@ -247,7 +247,6 @@
 					name="version" expression="0.81" /> </xslt> -->
 			</sequential>
 			<sequential>
-				<sleep seconds="30" />
 				<flexunit swf="${bin.loc}/SpecRunner.swf" toDir="${report.unit.loc}"
 					haltonfailure="false" verbose="true" localTrusted="true"
 					headless="${FLEX_HEADLESS}" timeout="40000" />
@@ -261,8 +260,8 @@
 		<flexunit swf="${bin.loc}/smilkit-as3-specs.swf" toDir="${report.unit.loc}"
 			haltonfailure="false" verbose="true" localTrusted="true" headless="${FLASH_HEADLESS}"
 			timeout="40000" />
-		<sleep seconds="10" />
-		<!--><exec executable="vncserver" spawn="false"> <arg line="-kill :99" 
+
+		<!-->		<sleep seconds="10" /><exec executable="vncserver" spawn="false"> <arg line="-kill :99" 
 			/> </exec> -->
 	</target>
 
