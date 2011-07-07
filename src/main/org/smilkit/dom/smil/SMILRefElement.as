@@ -71,8 +71,9 @@ package org.smilkit.dom.smil
 					return childDuration;
 				}
 				
-				return Time.UNRESOLVED;
+				return Time.MEDIA;
 			}
+			
 			return duration;
 		}
 	}

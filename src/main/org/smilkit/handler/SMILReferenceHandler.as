@@ -410,9 +410,11 @@ package org.smilkit.handler
 			this._contentValid = true;
 			this._completedLoading = true;
 		
-			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
+			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMTimeGraphModified, false);
 			
-			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
+			//this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
+			
+			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMTimeGraphModified, false);
 			
 			if (this._resuming)
 			{				
