@@ -24,6 +24,8 @@ package org.smilkit.dom.smil.time
 		protected var _uptime:Number = 0;
 		protected var _runningUptime:Number = 0;
 		
+		protected var _lastDuration:Number = 0;
+		
 		protected var _waitingCallbacks:Hashtable;
 		
 		public function SMILTimeScheduler(ownerDocument:SMILDocument)
@@ -38,6 +40,11 @@ package org.smilkit.dom.smil.time
 		public function get isRealTime():Boolean
 		{
 			return true;
+		}
+		
+		public function get lastDuration():Number
+		{
+			return this._lastDuration;
 		}
 		
 		public function get running():Boolean
@@ -258,6 +265,8 @@ package org.smilkit.dom.smil.time
 			
 			this._uptime += duration;
 			this._baseLine = delta;
+			
+			this._lastDuration = duration;
 			
 			if (this.running)
 			{

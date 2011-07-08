@@ -4,8 +4,8 @@ package org.smilkit.view
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
-	import flash.events.SecurityErrorEvent;
 	import flash.events.ProgressEvent;
+	import flash.events.SecurityErrorEvent;
 	import flash.geom.Rectangle;
 	import flash.net.URLLoader;
 	import flash.net.URLRequest;
@@ -766,8 +766,10 @@ package org.smilkit.view
 			// destroy the object pool n all its precious children
 			if (this._objectPool != null)
 			{
-				var objectPool:Object = { pool: this._objectPool };
+				this.pause();
 				
+				var objectPool:Object = { pool: this._objectPool };
+
 				// Trash old event listeners just in case
 				this.document.loadables.removeEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
 				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
@@ -781,6 +783,8 @@ package org.smilkit.view
 				
 				// we delete the object pool to avoid a memory leak when re-creating it,
 				delete objectPool.pool;
+				
+				Platform.garbageCollection();
 			}
 			
 			// parse dom

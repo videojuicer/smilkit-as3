@@ -4,7 +4,7 @@ package org.smilkit.time
 	
 	public final class SharedTimer extends Timer
 	{
-		public static var DELAY:int = 200;
+		public static var DELAY:int = 100;
 		
 		protected static var __instance:SharedTimer;
 		
