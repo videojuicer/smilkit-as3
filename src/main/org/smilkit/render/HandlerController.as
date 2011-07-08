@@ -148,6 +148,20 @@ package org.smilkit.render
 		{
 			SMILKit.logger.debug("Detaching from object pool", this);
 			
+			for (var i:uint = 0; i < this._activeMediaElements.length; i++)
+			{
+				if (this._activeMediaElements[i].handler != null)
+				{
+					this._activeMediaElements[i].handler.pause();
+					this._activeMediaElements[i].handler.destroy();
+				}
+			}
+			
+			this._activeTimingNodes = new Vector.<SMILTimeInstance>();
+			this._activeMediaElements = new Vector.<SMILMediaElement>();
+			
+			this._waitingForDataHandlerList = new Vector.<SMILKitHandler>();
+			
 			this.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
 			SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);

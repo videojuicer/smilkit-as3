@@ -766,7 +766,7 @@ package org.smilkit.view
 			// destroy the object pool n all its precious children
 			if (this._objectPool != null)
 			{
-				this.pause();
+				//this.pause();
 				
 				var objectPool:Object = { pool: this._objectPool };
 
@@ -862,8 +862,6 @@ package org.smilkit.view
 				{
 					this.seek(0);
 					this.commitSeek();
-					
-					//this.heartbeat.seek(0);
 				}
 			}
 			else
@@ -950,6 +948,7 @@ package org.smilkit.view
 			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
 			
 			//this.heartbeat.beat();
+			this.document.scheduler.triggerTickNow();
 		}
 		
 		protected function onTimingGraphRebuild(event:SMILMutationEvent):void

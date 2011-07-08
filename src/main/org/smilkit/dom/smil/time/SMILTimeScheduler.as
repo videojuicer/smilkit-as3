@@ -253,7 +253,7 @@ package org.smilkit.dom.smil.time
 			}
 		}
 		
-		protected function triggerTickNow():void
+		public function triggerTickNow():void
 		{
 			var delta:Date = new Date();
 			var duration:Number = (delta.getTime() - this._baseLine.getTime());
