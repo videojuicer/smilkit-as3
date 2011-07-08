@@ -13,7 +13,9 @@ package org.smilkit.view
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Element;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
+	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
@@ -759,6 +761,25 @@ package org.smilkit.view
 				return false;
 			}
 		}
+		
+		protected function destroyHandlers():void
+		{
+			if (this.document != null)
+			{
+				var mediaElements:Vector.<SMILTimeInstance> = this.document.timeGraph.mediaElements;
+				
+				for (var i:uint = 0; i < mediaElements.length; i++)
+				{
+					var mediaElement:SMILMediaElement = (mediaElements[i].element as SMILMediaElement);
+					
+					if (mediaElement != null && mediaElement.handler != null)
+					{
+						mediaElement.handler.pause();
+						mediaElement.handler.destroy();
+					}
+				}
+			}
+		}
 				
 		
 		private function refreshObjectPoolWithLoadedData(data:String):void
@@ -778,6 +799,8 @@ package org.smilkit.view
 				this.renderTree.removeEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 				// Detach instances from this viewport
 				this.renderTree.detach();
+				
+				this.destroyHandlers();
 				
 				this._objectPool = null;
 				
