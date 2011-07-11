@@ -502,6 +502,8 @@ package org.smilkit.view
 				this._loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
 				this._loader.removeEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
 				
+				this._loader.close();
+				
 				this._loader = null;
 			}
 			
@@ -801,6 +803,8 @@ package org.smilkit.view
 				this._loader.removeEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
 				this._loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
 				this._loader.removeEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+				
+				this._loader.close();
 				
 				this._loader = null;
 			}
