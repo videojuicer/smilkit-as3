@@ -1,7 +1,5 @@
 package org.smilkit.view
 {
-	import com.hurlant.util.asn1.parser.nulll;
-	
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
