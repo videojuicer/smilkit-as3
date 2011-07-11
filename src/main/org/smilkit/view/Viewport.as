@@ -1,5 +1,7 @@
 package org.smilkit.view
 {
+	import com.hurlant.util.asn1.parser.nulll;
+	
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
 	import flash.events.Event;
@@ -169,6 +171,8 @@ package org.smilkit.view
 		 */
 		protected var _bytesLoaded:int = 0;
 		protected var _bytesTotal:int = 0;
+		
+		protected var _loader:URLLoader = null;
 		
 		public function Viewport()
 		{
@@ -493,13 +497,23 @@ package org.smilkit.view
 		protected function refreshWithRemoteURI():void
 		{
 			var request:URLRequest = new URLRequest(this.location);
-			var loader:URLLoader = new URLLoader();
 			
-			loader.addEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
-			loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
-			loader.addEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+			if (this._loader != null)
+			{
+				this._loader.removeEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
+				this._loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
+				this._loader.removeEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+				
+				this._loader = null;
+			}
 			
-			loader.load(request);
+			this._loader = new URLLoader();
+			
+			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
+			this._loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
+			this._loader.addEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+			
+			this._loader.load(request);
 		}
 		
 		/**
@@ -784,6 +798,15 @@ package org.smilkit.view
 		
 		private function refreshObjectPoolWithLoadedData(data:String):void
 		{
+			if (this._loader != null)
+			{
+				this._loader.removeEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
+				this._loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
+				this._loader.removeEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+				
+				this._loader = null;
+			}
+			
 			// destroy the object pool n all its precious children
 			if (this._objectPool != null)
 			{
