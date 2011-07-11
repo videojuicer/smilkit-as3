@@ -128,7 +128,14 @@ package org.smilkit.handler
 		
 		public override function get handlerState():HandlerState
 		{
-			return new VideoHandlerState(this.element.src, 0, this._netConnection, this._netStream, this._video, this._canvas);	
+			var source:String = null;
+			
+			if (this.element != null)
+			{
+				source = this.element.src;
+			}
+			
+			return new VideoHandlerState(source, 0, this._netConnection, this._netStream, this._video, this._canvas);	
 		}
 		
 		public function get videoHandlerState():VideoHandlerState
@@ -539,7 +546,14 @@ package org.smilkit.handler
 			{
 				this.resolved(this._metadata.duration);
 			}
-		}	
+		}
+		
+		public function close():void
+		{
+			// playback has finished, important for live events (so we can continue)
+			this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+		}
 		
 		protected function onHeartbeatRunning(e:HeartbeatEvent):void
 		{

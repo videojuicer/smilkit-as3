@@ -790,6 +790,8 @@ package org.smilkit.view
 				//this.pause();
 				
 				var objectPool:Object = { pool: this._objectPool };
+				
+				this.destroyHandlers();
 
 				// Trash old event listeners just in case
 				this.document.loadables.removeEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
@@ -799,8 +801,6 @@ package org.smilkit.view
 				this.renderTree.removeEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 				// Detach instances from this viewport
 				this.renderTree.detach();
-				
-				this.destroyHandlers();
 				
 				this._objectPool = null;
 				
@@ -818,8 +818,6 @@ package org.smilkit.view
 			
 			this.document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 				
-
-			
 			// Bind events to the newly-created object pool contents
 			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
 			this.document.loadables.addEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);

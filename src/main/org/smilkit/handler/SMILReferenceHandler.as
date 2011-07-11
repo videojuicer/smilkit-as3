@@ -195,7 +195,7 @@ package org.smilkit.handler
 		
 		public function get isViewportSMILReady():Boolean
 		{
-			return (this.nestedViewport.document != null);
+			return (this.nestedViewport != null && this.nestedViewport.document != null);
 		}
 		
 		protected function createNestedViewport():void
@@ -295,16 +295,19 @@ package org.smilkit.handler
 		
 		public override function destroy():void
 		{
-			this._nestedViewport.removeEventListener(ViewportEvent.READY, this.onInternalViewportReady);
-			this._nestedViewport.removeEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
-			this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
-			this._nestedViewport.removeEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
-			this._nestedViewport.removeEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
-			this._nestedViewport.removeEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
-			this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
-			this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
-			
-			(this.element.ownerDocument as SMILDocument).scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
+			if (this._nestedViewport != null)
+			{
+				this._nestedViewport.removeEventListener(ViewportEvent.READY, this.onInternalViewportReady);
+				this._nestedViewport.removeEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
+				this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
+				this._nestedViewport.removeEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
+				this._nestedViewport.removeEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
+				this._nestedViewport.removeEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
+				this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
+				this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+				
+				(this.element.ownerDocument as SMILDocument).scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
+			}
 			
 			this._nestedViewport = null;
 			
