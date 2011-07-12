@@ -517,6 +517,13 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
+				
+				if(!this._resumed)
+				{
+					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
+					this.seek(0);
+					this.pause();
+				}
 			}
 			else
 			{

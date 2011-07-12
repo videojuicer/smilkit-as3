@@ -233,11 +233,6 @@ package org.smilkit.dom
 				}
 			}
 			
-			//(oldChild as ParentNode)._ownerDocument = null;
-			(oldChild as ChildNode).nextSibling = null;
-			(oldChild as ChildNode).previousSibling = null;
-			//(oldChild as ChildNode).parentNode = null;
-			
 			// invalidate cache
 			this._childNodeCount = -1;
 			
@@ -250,6 +245,11 @@ package org.smilkit.dom
 					(this._ownerDocument as Document).removeIdentifier(oldElement.id);
 				}
 			}
+			
+			(oldChild as ParentNode)._ownerDocument = null;
+			(oldChild as ChildNode).nextSibling = null;
+			(oldChild as ChildNode).previousSibling = null;
+			(oldChild as ChildNode).parentNode = null;
 			
 			this.changed();
 			
