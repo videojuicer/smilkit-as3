@@ -221,6 +221,39 @@ package org.smilkit.render
 					regions.push(this._usingRootRegion);
 				}
 				
+				// here we sort by z-index!
+				regions.sort(function(regionA:SMILRegionElement, regionB:SMILRegionElement):int
+				{
+					var regionAIndex:String = regionA.zIndex;
+					var regionBIndex:String = regionB.zIndex;
+					
+					var aIndex:Number = 0;
+					var bIndex:Number = 0;
+					
+					if (regionAIndex != null && regionAIndex != "")
+					{
+						aIndex = parseInt(regionAIndex);
+					}
+					
+					if (regionBIndex != null && regionBIndex != "")
+					{
+						bIndex = parseInt(regionBIndex);
+					}
+					
+					if (aIndex < bIndex)
+					{
+						return -1;
+					}
+					else if (aIndex > bIndex)
+					{
+						return 1;
+					}
+					else
+					{
+						return 0;
+					}	
+				});
+				
 				for (var j:int = 0; j < regions.length; j++)
 				{
 					var region:SMILRegionElement = regions[j];
