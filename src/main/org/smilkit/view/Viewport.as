@@ -504,6 +504,8 @@ package org.smilkit.view
 				
 				this._loader.close();
 				
+				this._history.splice(this._currentIndex, 1);
+				
 				this._loader = null;
 			}
 			

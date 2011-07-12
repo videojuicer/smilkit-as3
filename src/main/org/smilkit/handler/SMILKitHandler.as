@@ -400,6 +400,8 @@ package org.smilkit.handler
 		 */
 		public function destroy():void
 		{
+			this.cancel();
+			
 			this._element = null;
 			this._region = null;
 		}

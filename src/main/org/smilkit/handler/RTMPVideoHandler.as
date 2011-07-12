@@ -523,7 +523,7 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
-			if (this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED) //if(!this._resumed)
+			if (this.viewportObjectPool != null && this.viewportObjectPool.viewport != null && this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED) //if(!this._resumed)
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				
@@ -548,6 +548,9 @@ package org.smilkit.handler
 			}
 		}
 		
+		/**
+		 * Callback routine, not really close!!!!!!!
+		 */
 		public function close():void
 		{
 			// playback has finished, important for live events (so we can continue)
