@@ -507,6 +507,7 @@ package org.smilkit.view
 				if (this._history != null && this._history.length > 0 && this._history.length >= this._currentIndex)
 				{
 					this._history.splice(this._currentIndex, 1);
+					this._currentIndex = this._history.length;
 				}
 				
 				this._loader = null;
