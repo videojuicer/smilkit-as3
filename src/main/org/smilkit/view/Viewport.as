@@ -309,36 +309,28 @@ package org.smilkit.view
 		 * @see org.smilkit.view.Viewport.refresh
 		 */
 		public function set location(location:String):void
-		{
-			if (this._loader != null)
-			{
-				// a loader exists, and were trying to load something new, so lets kill the old one
-				this._loader.removeEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
-				this._loader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
-				this._loader.removeEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
-				
-				this._loader.close();
-				
-				this._loader = null;
-				
-				if (this._history != null && this._history.length > 0 && this._history.length >= this._currentIndex)
-				{
-					this._history.splice(this._currentIndex, 1);
-					this._currentIndex = this._history.length;
-				}
-			}
-			
+		{			
 			if (location == this.location)
 			{
 				SMILKit.logger.debug("Location re-set to existing value ("+location+" -> "+this.location+"), about to refresh", this);
 				this.refresh(); return;
 			}
 			
+			if (this._loader != null)
+			{
+				// a loader exists, and were trying to load something new, so lets kill the old one
+				if (this._history.length > 0 && this._history.length >= this._currentIndex)
+				{
+					this._history.splice(this._currentIndex, 1);
+					this._currentIndex = this._history.length;
+				}
+			}
+			
 			var i:int = this._history.indexOf(location);
 			
 			if (this._history.length > 0 && (this._currentIndex < (this._history.length - 1)))
 			{
-				this._history = this._history.slice(0, this._currentIndex + 1);
+				this._history = this._history.slice(08, this._currentIndex + 1);
 			}
 			
 			this._history.push(location);

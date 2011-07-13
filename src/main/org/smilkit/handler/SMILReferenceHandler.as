@@ -290,7 +290,10 @@ package org.smilkit.handler
 		
 		public override function setVolume(volume:uint):void
 		{
-			this._nestedViewport.setVolume(volume);
+			if (this._nestedViewport != null)
+			{
+				this._nestedViewport.setVolume(volume);
+			}
 		}
 		
 		public override function destroy():void
@@ -325,17 +328,20 @@ package org.smilkit.handler
 				
 				this._canvas.graphics.clear();
 				
-				this._canvas.graphics.beginFill(0xEEEEEE, 0.0);
-				this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
-				this._canvas.graphics.endFill();
+				if (this._nestedViewport != null)
+				{
+					this._canvas.graphics.beginFill(0xEEEEEE, 0.0);
+					this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
+					this._canvas.graphics.endFill();
 				
-				this._canvas.addChild(this._nestedViewport.drawingBoard);
+					this._canvas.addChild(this._nestedViewport.drawingBoard);
+					
+					//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
+					//this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
+					//this._nestedViewport.drawingBoard.graphics.endFill();
 				
-				//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
-				//this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
-				//this._nestedViewport.drawingBoard.graphics.endFill();
-				
-				this._nestedViewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
+					this._nestedViewport.boundingRect = new Rectangle(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
+				}
 			}
 		}
 		
