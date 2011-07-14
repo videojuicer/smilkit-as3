@@ -489,12 +489,12 @@ package org.smilkit.view
 			
 			if(this.location.indexOf("data:") == 0)
 			{
-				SMILKit.logger.info("About to refresh with Data URI.", this);
+				SMILKit.logger.benchmark("About to refresh with Data URI.", this);
 				this.refreshWithDataURI();
 			}
 			else
 			{
-				SMILKit.logger.info("About to refresh with remote URL: "+this.location, this);
+				SMILKit.logger.benchmark("About to refresh with remote URL: "+this.location, this);
 				this.refreshWithRemoteURI();
 			}
 		}
@@ -845,8 +845,12 @@ package org.smilkit.view
 				Platform.garbageCollection();
 			}
 			
+			SMILKit.logger.benchmark("Parsing XML Document into SMILKit's DOM ...");
+			
 			// parse dom
 			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
+			
+			SMILKit.logger.benchmark("Finished parsing XML Document into DOM");
 			
 			// Create the object pool with internal timing graph, rendertree etc.
 			this._objectPool = new ViewportObjectPool(this, document);
@@ -922,7 +926,7 @@ package org.smilkit.view
 			}
 			else
 			{
-				SMILKit.logger.info("Playback state changed to PLAYBACK_PLAYING, but RenderTree is not ready. Waiting for RenderTree to become ready before resuming playback.", this);
+				SMILKit.logger.benchmark("Playback state changed to PLAYBACK_PLAYING, but RenderTree is not ready. Waiting for RenderTree to become ready before resuming playback.", this);
 			}	
 		}
 		
@@ -1016,7 +1020,7 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURIComplete(e:Event):void
 		{
-			SMILKit.logger.debug("Finished loading remote document, about to refresh viewport objects.", this);
+			SMILKit.logger.benchmark("Finished loading remote document, about to refresh viewport objects.", this);
 			this.refreshObjectPoolWithLoadedData(e.target.data);
 		}
 		

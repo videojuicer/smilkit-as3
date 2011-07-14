@@ -120,7 +120,7 @@ package org.smilkit.dom
 		 */
 		public function applyMutation(node:INode, mutation:Function):Boolean
 		{
-			if (node.ownerDocument != this)
+			if (node.ownerDocument != this && !(node is Document))
 			{
 				throw new DOMException(DOMException.WRONG_DOCUMENT_ERR, DOMMessageFormatter.formatMessage(DOMMessageFormatter.DOM_DOMAIN, "WRONG_DOCUMENT_ERR"));
 			}
@@ -252,7 +252,7 @@ package org.smilkit.dom
 		 */
 		internal override function dispatchNodeEvent(node:INode, event:IEvent):Boolean
 		{
-			if (event == null)
+			if (event == null || !this.mutationEvents)
 			{
 				return false;
 			}

@@ -168,25 +168,33 @@ package org.smilkit.dom.smil
 		
 		public function setupDocumentVariables():void
 		{
-			// SMIL 3.0 default system variables
-			this.variables.set(SMILDocumentVariables.SYSTEM_AUDIO_DESC, "off");
-			this.variables.set(SMILDocumentVariables.SYSTEM_BASE_PROFILE, "");
-			this.variables.set(SMILDocumentVariables.SYSTEM_BITRATE, 0);
-			this.variables.set(SMILDocumentVariables.SYSTEM_CAPTIONS, "off");
-			this.variables.set(SMILDocumentVariables.SYSTEM_COMPONENT, "");
-			this.variables.set(SMILDocumentVariables.SYSTEM_CONTENT_LOCATION, "");
-			this.variables.set(SMILDocumentVariables.SYSTEM_CPU, Platform.cpuArchitecture);
-			this.variables.set(SMILDocumentVariables.SYSTEM_LANGUAGE, Environment.language);
-			this.variables.set(SMILDocumentVariables.SYSTEM_OPERATING_SYSTEM, Platform.operatingSystem);
-			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_CAPTION, "overdub");
-			this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_SUBTITLE, "overdub");
-			this.variables.set(SMILDocumentVariables.SYSTEM_REQUIRED, "");
-			this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_DEPTH, 0);
-			this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_SIZE, Environment.screenSize);
-			this.variables.set(SMILDocumentVariables.SYSTEM_VERSION, 3.0);
+			//var mutation:Boolean = this._mutationEvents;
 			
-			// magic SMILKit variables
-			this.variables.set("smilkitVersion", SMILKit.version);
+			//this._mutationEvents = false;
+			this.applyMutation(this, function():void {
+				// SMIL 3.0 default system variables
+				this.variables.set(SMILDocumentVariables.SYSTEM_AUDIO_DESC, "off");
+				this.variables.set(SMILDocumentVariables.SYSTEM_BASE_PROFILE, "");
+				this.variables.set(SMILDocumentVariables.SYSTEM_BITRATE, 0);
+				this.variables.set(SMILDocumentVariables.SYSTEM_CAPTIONS, "off");
+				this.variables.set(SMILDocumentVariables.SYSTEM_COMPONENT, "");
+				this.variables.set(SMILDocumentVariables.SYSTEM_CONTENT_LOCATION, "");
+				this.variables.set(SMILDocumentVariables.SYSTEM_CPU, Platform.cpuArchitecture);
+				this.variables.set(SMILDocumentVariables.SYSTEM_LANGUAGE, Environment.language);
+				this.variables.set(SMILDocumentVariables.SYSTEM_OPERATING_SYSTEM, Platform.operatingSystem);
+				this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_CAPTION, "overdub");
+				this.variables.set(SMILDocumentVariables.SYSTEM_OVERDUB_OR_SUBTITLE, "overdub");
+				this.variables.set(SMILDocumentVariables.SYSTEM_REQUIRED, "");
+				this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_DEPTH, 0);
+				this.variables.set(SMILDocumentVariables.SYSTEM_SCREEN_SIZE, Environment.screenSize);
+				this.variables.set(SMILDocumentVariables.SYSTEM_VERSION, 3.0);
+				
+				
+				// magic SMILKit variables
+				this.variables.set("smilkitVersion", SMILKit.version);
+			});
+			
+			//this._mutationEvents = mutation;
 		}
 		
 		
