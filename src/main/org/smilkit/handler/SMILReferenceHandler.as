@@ -1,7 +1,5 @@
 package org.smilkit.handler
 {
-	import com.hurlant.util.asn1.parser.nulll;
-	
 	import flash.display.DisplayObject;
 	import flash.display.Sprite;
 	import flash.events.Event;

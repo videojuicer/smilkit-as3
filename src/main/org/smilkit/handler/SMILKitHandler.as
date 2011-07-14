@@ -163,11 +163,14 @@ package org.smilkit.handler
 		
 		public function get viewportObjectPool():ViewportObjectPool
 		{
-			var document:SMILDocument = (this.element.ownerDocument as SMILDocument)
-			
-			if (document != null)
+			if (this.element != null)
 			{
-				return document.viewportObjectPool;
+				var document:SMILDocument = (this.element.ownerDocument as SMILDocument)
+				
+				if (document != null)
+				{
+					return document.viewportObjectPool;
+				}
 			}
 				
 			return null;
