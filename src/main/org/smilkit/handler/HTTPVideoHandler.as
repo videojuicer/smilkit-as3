@@ -13,6 +13,7 @@ package org.smilkit.handler
 	import flash.net.NetStream;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
@@ -51,6 +52,11 @@ package org.smilkit.handler
 			super(element);
 			
 			this._canvas = new Sprite();
+			
+			//this._canvas.graphics.clear();
+			//this._canvas.graphics.beginFill(0xEEEEEE, 0.8);
+			//this._canvas.graphics.drawRect(0, 0, 200, 200);
+			//this._canvas.graphics.endFill();
 		}
 
 		public override function get width():uint
@@ -453,7 +459,7 @@ package org.smilkit.handler
 				}
 			}
 			
-			if (percentageLoaded >= 100 && !this._completedLoading)
+			if (percentageLoaded >= 100 && !this._completedLoading && durationLoaded > 0)
 			{
 				this._completedLoading = true;
 				
@@ -486,6 +492,8 @@ package org.smilkit.handler
 		
 		protected function attachVideoDisplay():void
 		{
+			//SMILKit.logger.error("ATTACHING VIDEO DISPLAY UNIT RIGHT NOW -->");
+			
 			this._video.attachNetStream(this._netStream as NetStream);
 			this._attachVideoDisplayDelayed = false;
 			
