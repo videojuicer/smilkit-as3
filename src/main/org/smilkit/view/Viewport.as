@@ -914,15 +914,14 @@ package org.smilkit.view
 			if(!this._waitingForRenderTree)
 			{				
 				SMILKit.logger.info("Completed changing playback state to PLAYBACK_PLAYING.", this);
-				
-				this.document.scheduler.userResume();
-				//this.document.scheduler.resume();
-				
+
 				if (this.document.scheduler.offset >= this.document.duration && this.document.duration > 0)
 				{
 					this.seek(0);
 					this.commitSeek();
 				}
+				
+				this.document.scheduler.userResume();
 			}
 			else
 			{

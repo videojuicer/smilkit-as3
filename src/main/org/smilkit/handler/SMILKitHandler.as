@@ -608,7 +608,7 @@ package org.smilkit.handler
 					parent.addChild(this._shield);
 				}
 				
-				if (parent.getChildIndex(child) != -1)
+				if (parent.contains(child) && parent.getChildIndex(child) != -1)
 				{
 					parent.setChildIndex(child, 0);
 					parent.setChildIndex(this._shield, 1);
