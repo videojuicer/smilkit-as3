@@ -597,21 +597,21 @@ package org.smilkit.handler
 		{
 			if (this._startedLoading && child != null)
 			{
+				var parent:Sprite = (this.displayObject as Sprite);
+				
 				if (this._shield == null)
 				{
 					this._shield = new Sprite();
 					this._shield.x = 0;
 					this._shield.y = 0;
 					
-					var parent:Sprite = (this.displayObject as Sprite);
-					
 					parent.addChild(this._shield);
-					
-					if (parent.getChildIndex(child) != -1)
-					{
-						parent.setChildIndex(child, 1);
-						parent.setChildIndex(this._shield, 0);
-					}
+				}
+				
+				if (parent.getChildIndex(child) != -1)
+				{
+					parent.setChildIndex(child, 0);
+					parent.setChildIndex(this._shield, 1);
 				}
 				
 				this._shield.graphics.clear();
