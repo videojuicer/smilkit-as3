@@ -1007,7 +1007,7 @@ package org.smilkit.view
 			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
 			
 			//this.heartbeat.beat();
-			this.document.scheduler.triggerTickNow();
+			//this.document.scheduler.triggerTickNow();
 		}
 		
 		protected function onTimingGraphRebuild(event:SMILMutationEvent):void

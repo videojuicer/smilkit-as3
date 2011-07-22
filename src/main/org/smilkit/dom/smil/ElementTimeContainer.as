@@ -193,7 +193,22 @@ package org.smilkit.dom.smil
 		
 		public function get restart():uint
 		{
-			return (this.getAttribute("restart") as uint);
+			var value:String = this.getAttribute("restart");
+			var result:uint = ElementTime.RESTART_ALWAYS;
+			
+			if (value != null)
+			{
+				if (value == "never")
+				{
+					result = ElementTime.RESTART_NEVER;
+				}
+				else if (value == "whenNotActive")
+				{
+					result = ElementTime.RESTART_WHEN_NOT_ACTIVE;
+				}
+			}
+
+			return result;
 		}
 		
 		public function set restart(restart:uint):void
@@ -635,6 +650,11 @@ package org.smilkit.dom.smil
 			var tempBegin:Time = usingBegin;
 			var tempEnd:Time = null;
 			
+			if (this.restart == ElementTime.RESTART_NEVER)
+			{
+				//return false;
+			}
+			
 			if (usingBegin == null)
 			{
 				var beginAfter:Time = this._currentBeginInterval;
@@ -827,8 +847,19 @@ package org.smilkit.dom.smil
 		
 		protected function onMediaDurationEnd():void
 		{
-			// ends simple duration if dur=media or dur=indefinite
-			if (this.isPlaying)
+			/*
+				onMediaDurationEnd
+					- if duration == media or duration == indefinite
+						- setCurrentInterval currentBegin offset
+					- onSimpleDuration
+				onSimpleDurationEnd
+					- onActiveDurationEnd
+				onActiveDurationEnd
+					- deactivate
+			*/
+			
+			// ends current interval if dur=media or dur=indefinite, or implicitDuration < simpleDuration
+			if (this.isPlaying && (this.dur == "media" || this.dur == "indefinite"))
 			{
 				this.onSimpleDurationEnd();
 			}
