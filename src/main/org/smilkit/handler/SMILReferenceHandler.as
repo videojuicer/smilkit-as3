@@ -208,6 +208,8 @@ package org.smilkit.handler
 			this._nestedViewport.addEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
 			this._nestedViewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
 			this._nestedViewport.addEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+			
+			this.resize();
 		}
 		
 		protected function destroyNestedViewport():void
@@ -298,14 +300,7 @@ package org.smilkit.handler
 		{
 			if (this._nestedViewport != null)
 			{
-				this._nestedViewport.removeEventListener(ViewportEvent.READY, this.onInternalViewportReady);
-				this._nestedViewport.removeEventListener(ViewportEvent.WAITING, this.onInternalViewportWaiting);
-				this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onInternalViewportPlaybackStateChanged);
-				this._nestedViewport.removeEventListener(ViewportEvent.DOCUMENT_MUTATED, this.onInternalViewportDocumentMutated);
-				this._nestedViewport.removeEventListener(ViewportEvent.LOADER_IOERROR, this.onInternalViewportLoaderIOError);
-				this._nestedViewport.removeEventListener(ViewportEvent.LOADER_SECURITY_ERROR, this.onInternalViewportLoaderSecurityError);
-				this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
-				this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
+				this.destroyNestedViewport();
 				
 				(this.element.ownerDocument as SMILDocument).scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onSchedulerPaused);
 			}
@@ -332,7 +327,7 @@ package org.smilkit.handler
 					this._canvas.graphics.drawRect(0, 0, this.region.regionContainer.width, this.region.regionContainer.height);
 					this._canvas.graphics.endFill();
 				
-					this._canvas.addChild(this._nestedViewport.drawingBoard);
+					this._canvas.addChild(this._nestedViewport);
 					
 					//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
 					//this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
@@ -417,11 +412,8 @@ package org.smilkit.handler
 			this._contentValid = true;
 			this._completedLoading = true;
 		
-			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMTimeGraphModified, false);
-			
-			//this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onDOMTimeGraphModified, false);
-			
-			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMTimeGraphModified, false);
+			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMCurrentIntervalsModified, false);
+			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMCurrentIntervalsModified, false);
 			
 			if (this._resuming)
 			{				
@@ -503,7 +495,7 @@ package org.smilkit.handler
 			el.childrenBytesTotal = e.bytesTotal;
 		}
 		
-		protected function onDOMTimeGraphModified(e:SMILMutationEvent):void
+		protected function onDOMCurrentIntervalsModified(e:SMILMutationEvent):void
 		{
 			if (this.nestedViewport.document != null)
 			{

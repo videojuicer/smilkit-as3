@@ -36,7 +36,8 @@ package org.smilkit.render
 			this._region = region;
 			this._children = new Vector.<SMILKitHandler>();
 			
-			this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+			//this.addEventListener(Event.ADDED_TO_STAGE, this.onAddedToStage);
+			
 			this.addEventListener(MouseEvent.CLICK, this.onClick)
 		}
 		
@@ -272,7 +273,10 @@ package org.smilkit.render
 		
 		protected function onAddedToStage(e:Event):void
 		{
-			this.invalidateSizeAndLayout();
+			if (e.currentTarget == this)
+			{
+				this.invalidateSizeAndLayout();
+			}
 		}
 		
 		public function addAssetChild(handler:SMILKitHandler):void
