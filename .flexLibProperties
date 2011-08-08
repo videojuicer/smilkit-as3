@@ -43,7 +43,6 @@
     <classEntry path="org.smilkit.events.EventHandler"/>
     <classEntry path="org.smilkit.events.ViewportEvent"/>
     <classEntry path="org.smilkit.render.HandlerController"/>
-    <classEntry path="org.smilkit.time.Heartbeat"/>
     <classEntry path="org.smilkit.events.RenderTreeEvent"/>
     <classEntry path="org.smilkit.render.DrawingBoard"/>
     <classEntry path="org.smilkit.dom.CharacterData"/>

@@ -28,13 +28,16 @@ package org.smilkit.dom.smil.time
 		
 		protected var _waitingCallbacks:Hashtable;
 		
+		protected var _everyCallbacks:Hashtable = new Hashtable();
+		protected var _everyRunningCallbacks:Hashtable = new Hashtable();
+		
 		public function SMILTimeScheduler(ownerDocument:SMILDocument)
 		{
 			this._ownerSMILDocument = ownerDocument;
 			
 			this.reset();
 			
-			SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onTimerTick);
+			SharedTimer.subscribe(this.onTimerTick);
 		}
 		
 		public function get isRealTime():Boolean
@@ -253,6 +256,53 @@ package org.smilkit.dom.smil.time
 			}
 		}
 		
+		public function every(seconds:Number, callback:Function, whenRunning:Boolean = false):void
+		{
+			var callbacks:Vector.<Function> = null;
+			
+			if (whenRunning)
+			{
+				if (!this._everyRunningCallbacks.hasItem(seconds))
+				{
+					callbacks = new Vector.<Function>();
+					
+					this._everyRunningCallbacks.setItem(seconds, callbacks);
+				}
+				else
+				{
+					callbacks = (this._everyRunningCallbacks.getItem(seconds) as Vector.<Function>);
+				}
+			}
+			else
+			{
+				if (!this._everyCallbacks.hasItem(seconds))
+				{
+					callbacks = new Vector.<Function>();
+					
+					this._everyCallbacks.setItem(seconds, callbacks);
+				}
+				else
+				{
+					callbacks = (this._everyCallbacks.getItem(seconds) as Vector.<Function>);
+				}
+			}
+			
+			if (callbacks.indexOf(callback) == -1)
+			{
+				SMILKit.logger.debug("Scheduler added every callback for every "+seconds+"s, running "+whenRunning);
+				
+				callbacks.push(callback);
+			}
+		}
+		
+		public function removeEvery(seconds:Number, callback:Function, whenRunning:Boolean = false):void
+		{
+			if (whenRunning)
+			{
+				
+			}
+		}
+		
 		public function triggerTickNow():void
 		{
 			var delta:Date = new Date();
@@ -267,6 +317,29 @@ package org.smilkit.dom.smil.time
 			this._baseLine = delta;
 			
 			this._lastDuration = duration;
+			
+			if (this._everyCallbacks != null)
+			{
+				var everyCallbacksTriggered:uint = 0;
+				
+				for (var j:uint = 0; j < this._everyCallbacks.length; j++)
+				{
+					var seconds:Number = (this._everyCallbacks.getKeyAt(j) as Number);
+					var ms:Number = (seconds * 1000);
+					
+					if ((this.uptime % ms) < SharedTimer.DELAY)
+					{
+						var everyCallbacks:Vector.<Function> = (this._everyCallbacks.getItemAt(j) as Vector.<Function>);
+						
+						for (var o:uint = 0; o < everyCallbacks.length; o++)
+						{
+							everyCallbacks[o].call();
+							
+							everyCallbacksTriggered++;
+						}
+					}
+				}
+			}
 			
 			if (this.running)
 			{
@@ -315,7 +388,7 @@ package org.smilkit.dom.smil.time
 			}
 		}
 		
-		protected function onTimerTick(e:TimerEvent):void
+		protected function onTimerTick(duration:Number, offset:Number):void
 		{	
 			this.triggerTickNow();
 			

@@ -170,8 +170,8 @@ package org.smilkit.handler
 			
 			if (this.viewportObjectPool != null)
 			{
-				SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick); // remove then add to guarantee single binding only
-				SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+				SharedTimer.unsubscribe(this.onHeartbeatTick); // remove then add to guarantee single binding only
+				SharedTimer.subscribe(this.onHeartbeatTick);
 			}
 			
 			this._canvas.addChild(this._video);
@@ -295,16 +295,16 @@ package org.smilkit.handler
 		{
 			if (this.viewportObjectPool != null)
 			{
-				SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+				SharedTimer.unsubscribe(this.onHeartbeatTick);
 			}
 			
 			this._resumed = false;
 			
-			if(this._netStream != null)
+			if (this._netStream != null)
 			{
 				this._netStream.close();
 			}
-			if(this._netConnection != null)
+			if (this._netConnection != null)
 			{
 				this._netConnection.close();
 			}
@@ -369,7 +369,7 @@ package org.smilkit.handler
 		* Executed each time the heartbeat timer ticks, regardless of it's paused/resumed state.
 		* Checks the load status of this handler and emits LOAD_READY or LOAD_WAIT events on any state change.
 		*/
-		protected function onHeartbeatTick(e:TimerEvent):void
+		protected function onHeartbeatTick(duration:Number, offset:Number):void
 		{
 			if (this._netStream == null)
 			{

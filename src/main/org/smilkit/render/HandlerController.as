@@ -82,7 +82,7 @@ package org.smilkit.render
 			this.document.scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			
 			// tick tick tick
-			SharedTimer.instance.addEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			SharedTimer.subscribe(this.onHeartbeatTick);
 			
 			// pause / resume events
 			this.document.scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
@@ -164,7 +164,7 @@ package org.smilkit.render
 			
 			this.document.removeEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
-			SharedTimer.instance.removeEventListener(TimerEvent.TIMER, this.onHeartbeatTick);
+			SharedTimer.unsubscribe(this.onHeartbeatTick);
 			
 			this.document.scheduler.removeEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
 			this.document.scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
@@ -969,7 +969,7 @@ package org.smilkit.render
 			this.update();
 		}
 		
-		protected function onHeartbeatTick(e:TimerEvent):void
+		protected function onHeartbeatTick(duration:Number, offset:Number):void
 		{
 			this.checkSyncOperation();
 		}

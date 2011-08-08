@@ -336,7 +336,13 @@ package org.smilkit.render
 			this._canvas.graphics.drawRect(0, 0, this.boundingRect.width, this.boundingRect.height);
 			this._canvas.graphics.endFill();
 			
+			//this._canvas.graphics.beginFill(0xA62A2A, 0.4);
+			//this._canvas.graphics.drawRect(10, 10, this.boundingRect.width - 20, this.boundingRect.height - 20);
+			//this._canvas.graphics.endFill();
+			
 			super.addChild(this._canvas);
+			
+			this._usingRootRegion = null;
 			
 			this.drawRegions();
 		}

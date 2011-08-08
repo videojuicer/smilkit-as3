@@ -22,7 +22,6 @@ package org.smilkit.view
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
-	import org.smilkit.time.Heartbeat;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.util.Platform;
@@ -120,11 +119,6 @@ package org.smilkit.view
 		protected var _objectPool:ViewportObjectPool;
 		
 		/**
-		 * An instance of Heartbeat, the class which is responsible for controlling the rate at which the player updates and redraws 
-		 */		
-		protected var _heartbeat:Heartbeat;
-		
-		/**
 		 * Contains the main canvas Sprite to which all RenderTree elements are drawn and displayed
 		 */	
 		protected var _drawingBoard:DrawingBoard;
@@ -175,10 +169,7 @@ package org.smilkit.view
 		public function Viewport()
 		{
 			this._history = new Vector.<String>();
-			
-			this._heartbeat = new Heartbeat(Heartbeat.BPS_5);
-			//this._heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
-			
+
 			this._drawingBoard = new DrawingBoard();
 			this.addChild(this._drawingBoard);
 			
@@ -246,16 +237,6 @@ package org.smilkit.view
 		{
 			if(!this.viewportObjectPool) return null;
 			return this.viewportObjectPool.renderTree;
-		}
-		
-		/**
-		 * Returns the current <code>Heartbeat</code> object for the active document.
-		 * 
-		 * @see org.smilkit.time.Heartbeat
-		 */
-		public function get heartbeat():Heartbeat
-		{
-			return this._heartbeat;
 		}
 		
 		/**

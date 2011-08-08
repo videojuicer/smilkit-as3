@@ -6,12 +6,13 @@ package org.smilkit.spec.tests.time
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.time.Heartbeat;
+	//import org.smilkit.time.Heartbeat;
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.Viewport;
 
 	public class HeartbeatTestCase
 	{		
+		/*
 		protected var _viewport:Viewport;
 		protected var _resumeEventDispatched:Boolean;
 		protected var _pauseEventDispatched:Boolean;
@@ -105,5 +106,6 @@ package org.smilkit.spec.tests.time
 		{
 			Assert.fail( "Timeout reached before viewport refreshed: HeartbeatTestCase:handleHasOffset");
 		}
+		*/
 	}
 }
