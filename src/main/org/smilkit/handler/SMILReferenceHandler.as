@@ -329,7 +329,7 @@ package org.smilkit.handler
 				
 					this._canvas.addChild(this._nestedViewport);
 					
-					//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 0.8);
+					//this._nestedViewport.drawingBoard.graphics.beginFill(0x333333, 1.0);
 					//this._nestedViewport.drawingBoard.graphics.drawRect(10, 10, this.region.regionContainer.width - 20, this.region.regionContainer.height - 20);
 					//this._nestedViewport.drawingBoard.graphics.endFill();
 				
@@ -444,6 +444,8 @@ package org.smilkit.handler
 		
 		protected function onInternalViewportReady(e:ViewportEvent):void
 		{
+			this.resize();
+			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 		
