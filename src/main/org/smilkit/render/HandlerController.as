@@ -64,7 +64,7 @@ package org.smilkit.render
 			this._objectPool = objectPool;
 			
 			// listener to re-draw for every timing graph rebuild (does a fresh draw of the canvas - incase big things have changed)
-			//this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
+			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimeGraphRebuild, false);
 
 			// listener for every heart beat (so we recheck the timing graph)
 			//this._objectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunningOffsetChanged);
@@ -950,6 +950,13 @@ package org.smilkit.render
 		protected function onTimeGraphRebuild(e:SMILMutationEvent):void
 		{
 			this.reset();
+			
+			this.syncHandlersToViewportState();
+			
+			if (this.viewport.offset > 0)
+			{
+				this.syncHandlersToViewportOffset();
+			}
 		}
 		
 		protected function onHeartbeatResumed(e:HeartbeatEvent):void

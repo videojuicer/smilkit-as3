@@ -247,6 +247,7 @@ package org.smilkit.handler
 			{
 				// Stash the seek until we're able to do it.
 				SMILKit.logger.debug("Seek to "+seekTo+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+				
 				this._queuedSeek = true;
 				this._queuedSeekTarget = seekTo;
 			}
@@ -260,10 +261,13 @@ package org.smilkit.handler
 			// Cancel queued seek
 			this._queuedSeek = false;
 			
+			this._netStream.resume();
+			
 			// Execute seek
-			// this._netStream.resume();
 			var seconds:Number = (seekTo / 1000);
+			
 			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			
 			this._netStream.seek(seconds);
 		}
 		
@@ -304,6 +308,7 @@ package org.smilkit.handler
 			{
 				this._netStream.close();
 			}
+			
 			if (this._netConnection != null)
 			{
 				this._netConnection.close();

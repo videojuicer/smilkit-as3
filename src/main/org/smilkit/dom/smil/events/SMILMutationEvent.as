@@ -20,5 +20,7 @@ package org.smilkit.dom.smil.events
 		public static var DOM_TIMEGRAPH_MODIFIED:String = "DOMTimeGraphModified";
 		
 		public static var DOM_CURRENT_INTERVAL_MODIFIED:String = "DOMCurrentIntervalModified";
+		
+		public static var DOM_NODE_RENDER_STATE_MODIFIED:String = "DOMNodeRenderStateModified";
 	}
 }

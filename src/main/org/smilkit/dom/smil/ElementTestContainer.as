@@ -1,5 +1,7 @@
 package org.smilkit.dom.smil
 {
+	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.expressions.SMILTimeExpressionParser;
 	import org.smilkit.w3c.dom.IDocument;
@@ -20,6 +22,12 @@ package org.smilkit.dom.smil
 		public function ElementTestContainer(owner:IDocument, name:String)
 		{
 			super(owner, name);
+			
+			this.ownerSMILDocument.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMSubtreeModified, false);
+			
+			this.ownerSMILDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_MODIFIED, this.onDOMVariablesModified, false);
+			this.ownerSMILDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_INSERTED, this.onDOMVariablesModified, false);
+			this.ownerSMILDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_REMOVED, this.onDOMVariablesModified, false);
 		}
 		
 		protected function get variables():SMILDocumentVariables
@@ -134,18 +142,41 @@ package org.smilkit.dom.smil
 			return this._renderState;
 		}
 		
+		public function set renderState(value:uint):void
+		{
+			var previous:uint = this.renderState;
+			
+			if (value != previous)
+			{
+				this._renderState = value;
+				
+				var e:SMILMutationEvent = new SMILMutationEvent();
+				e.initMutationEvent(SMILMutationEvent.DOM_NODE_RENDER_STATE_MODIFIED, false, false, this, previous.toString(), value.toString(), "renderState", 1);
+				
+				this.dispatchEvent(e);
+			}
+		}
+		
 		public function updateRenderState():void
 		{
-			if (!this.test())
+			if (this.test())
 			{
-				this._renderState = ElementTestContainer.RENDER_STATE_HIDDEN;
+				this.renderState = ElementTestContainer.RENDER_STATE_ACTIVE;
 			}
 			else
 			{
-				// do some stuff to determine if its disabled or not
-				
-				this._renderState = ElementTestContainer.RENDER_STATE_ACTIVE;
+				this.renderState = ElementTestContainer.RENDER_STATE_DISABLED;
 			}
+		}
+		
+		protected function onDOMSubtreeModified(e:MutationEvent):void
+		{
+			this.updateRenderState();
+		}
+		
+		protected function onDOMVariablesModified(e:SMILMutationEvent):void
+		{
+			this.updateRenderState();
 		}
 		
 		public function test():Boolean
@@ -207,9 +238,13 @@ package org.smilkit.dom.smil
 					documentValue = "";
 				}
 				
-				if (documentValue is Number)
+				var documentNumber:Number = new Number(documentValue);
+				
+				if (!isNaN(documentNumber))
 				{
-					if (attributeValue <= documentValue)
+					var attributeNumber:Number = new Number(attributeValue);
+					
+					if (attributeNumber <= documentNumber)
 					{
 						return ElementTestContainer.TEST_PASSED;
 					}

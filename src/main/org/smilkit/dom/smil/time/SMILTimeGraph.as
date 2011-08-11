@@ -35,9 +35,9 @@ package org.smilkit.dom.smil.time
 			this.ownerDocument.addEventListener(MutationEvent.DOM_NODE_REMOVED, this.onMutationEvent, false);
 			
 			// smil mutations (should be removed, modifications should trigger new intervals if needed
-			this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_INSERTED, this.onSMILMutationEvent, false);
-			this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_MODIFIED, this.onSMILMutationEvent, false);
-			this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_REMOVED, this.onSMILMutationEvent, false);
+			//this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_INSERTED, this.onSMILMutationEvent, false);
+			//this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_MODIFIED, this.onSMILMutationEvent, false);
+			//this.ownerDocument.addEventListener(SMILMutationEvent.DOM_VARIABLES_REMOVED, this.onSMILMutationEvent, false);
 			
 			// interval mutations
 			this.ownerDocument.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onSMILMutationEvent, false);

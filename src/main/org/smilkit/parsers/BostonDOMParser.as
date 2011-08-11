@@ -108,6 +108,9 @@ package org.smilkit.parsers
 					case "switch":
 						child = (parent.ownerDocument as ISMILDocument).createSwitchElement();
 						break;
+					case "excl":
+						child = (parent.ownerDocument as ISMILDocument).createExclusiveElement() as INode;
+						break;
 					case "par":
 						child = (parent.ownerDocument as ISMILDocument).createParallelElement() as INode;
 						break;

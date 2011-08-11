@@ -42,12 +42,19 @@ package org.smilkit.dom.smil
 		
 		protected var _playbackState:uint = ElementTimeContainer.PLAYBACK_STATE_PLAYING;
 		
+		protected var _waitingParentActivation:Boolean = false;
+		
 		public function ElementTimeContainer(owner:IDocument, name:String)
 		{
 			super(owner, name);
 			
 			this._beginDependencies = new Vector.<ElementTimeContainer>();
 			this._endDependencies = new Vector.<ElementTimeContainer>();
+		}
+		
+		public function get waitingParentActivation():Boolean
+		{
+			return this._waitingParentActivation;
 		}
 		
 		public function get currentBeginInterval():Time
@@ -421,6 +428,7 @@ package org.smilkit.dom.smil
 		public function resetElementState():void
 		{
 			this._isPlaying = false;
+			this._waitingParentActivation = false;
 			
 			this._activatedAt = Time.UNRESOLVED;
 			this._deactivatedAt = Time.UNRESOLVED;
@@ -432,6 +440,13 @@ package org.smilkit.dom.smil
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd, this, "onMediaDurationEnd");
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
+		
+			var children:INodeList = this.timeDescendants;
+			
+			for (var i:uint = 0; i < children.length; i++)
+			{
+				(children.item(i) as ElementTimeContainer).resetElementState();
+			}
 		}
 		
 		/**
@@ -729,7 +744,7 @@ package org.smilkit.dom.smil
 		
 		public function startChildren():void
 		{
-			var children:INodeList = this.timeChildren;
+			var children:INodeList = this.timeDescendants;
 			
 			for (var i:uint = 0; i < children.length; i++)
 			{
@@ -753,8 +768,7 @@ package org.smilkit.dom.smil
 			{
 				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(this.currentBeginInterval.resolvedOffset, this.onIntervalStart, this, "onIntervalStart");
 				
-				// setup timer if we need to wait (and were not meant to play)
-				if (!waiting && this.parentTimeContainer.isPlaying)
+				if (!waiting)
 				{
 					this.activate();
 				}
@@ -767,9 +781,16 @@ package org.smilkit.dom.smil
 		 */
 		public function activate():void
 		{
-			// can only play if our parent is playing and our begin is resolved
-			if (!this.parentTimeContainer.isPlaying || this.currentBeginInterval == null || !this.currentBeginInterval.resolved)
+			// can only play if our parent is playing and our begin is resolved			
+			if (this.currentBeginInterval == null || !this.currentBeginInterval.resolved)
 			{
+				return;
+			}
+			
+			if (!this.parentTimeContainer.isPlaying)
+			{
+				this._waitingParentActivation = true;
+				
 				return;
 			}
 			
@@ -777,6 +798,7 @@ package org.smilkit.dom.smil
 			
 			this._activatedAt = (this._ownerDocument as SMILDocument).offset;
 			this._isPlaying = true;
+			this._waitingParentActivation = false;
 			
 			this.display();
 			
@@ -810,6 +832,19 @@ package org.smilkit.dom.smil
 			}
 			
 			// dispatch beginEvent on DOM
+			
+			// activate any waiting children
+			var children:INodeList = this.timeDescendants;
+			
+			for (var i:uint = 0; i < children.length; i++)
+			{
+				var child:ElementTimeContainer = (children.item(i) as ElementTimeContainer);
+				
+				if (child.waitingParentActivation)
+				{
+					child.activate();
+				}
+			}
 		}
 		
 		protected function display():void
@@ -906,6 +941,16 @@ package org.smilkit.dom.smil
 			// dispatch endEvent on DOM
 			
 			// notify parent that the element has stopped but we might go again
+			
+			// force children to deactivate now with our parent
+			var children:INodeList = this.timeDescendants;
+			
+			for (var i:uint = 0; i < children.length; i++)
+			{
+				var child:ElementTimeContainer = (children.item(i) as ElementTimeContainer);
+				
+				child.deactivate();
+			}
 			
 			// try and build the nextInternal
 			if (this.gatherNextInterval() && this.currentBeginInterval != null && this.currentBeginInterval.resolved)

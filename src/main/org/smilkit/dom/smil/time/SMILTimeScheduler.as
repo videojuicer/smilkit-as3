@@ -331,7 +331,7 @@ package org.smilkit.dom.smil.time
 					{
 						var everyCallbacks:Vector.<Function> = (this._everyCallbacks.getItemAt(j) as Vector.<Function>);
 						
-						for (var o:uint = 0; o < everyCallbacks.length; o++)
+						for (var o:int = (everyCallbacks.length - 1); o >= 0; o--)
 						{
 							everyCallbacks[o].call();
 							
@@ -370,7 +370,7 @@ package org.smilkit.dom.smil.time
 					{
 						var callbacks:Vector.<Function> = (this._waitingCallbacks.getItemAt(i) as Vector.<Function>);
 						
-						for (var k:uint = 0; k < callbacks.length; k++)
+						for (var k:int = (callbacks.length - 1); k >= 0; k--)
 						{
 							callbacks[k].call();
 							

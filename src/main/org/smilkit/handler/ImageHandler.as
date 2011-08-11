@@ -131,9 +131,11 @@ package org.smilkit.handler
 			
 			this._canvas.addChild(this._bitmap);
 			
-			this.drawClickShield(this._bitmap);
+			//this.drawClickShield(this._bitmap);
 			
 			SMILKit.logger.debug("Finished loading image ("+this.element.src+")", this);
+			
+			this.resize();
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_COMPLETED, this));
