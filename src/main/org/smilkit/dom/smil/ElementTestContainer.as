@@ -165,7 +165,7 @@ package org.smilkit.dom.smil
 			}
 			else
 			{
-				this.renderState = ElementTestContainer.RENDER_STATE_DISABLED;
+				this.renderState = ElementTestContainer.RENDER_STATE_HIDDEN;
 			}
 		}
 		
