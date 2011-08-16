@@ -28,7 +28,7 @@ package org.smilkit.spec
 	import org.smilkit.spec.tests.parsers.SMILTimeParserTestCase;
 	import org.smilkit.spec.tests.render.DrawingBoardTestClass;
 	import org.smilkit.spec.tests.render.RenderTreeTestCase;
-	import org.smilkit.spec.tests.time.HeartbeatTestCase;
+	import org.smilkit.spec.tests.dom.SMILTimeSchedulerTestCase;
 	import org.smilkit.spec.tests.dom.smil.SMILTimeGraphTestCase;
 	import org.smilkit.spec.tests.view.ViewportTestCase;
 	
@@ -69,7 +69,7 @@ package org.smilkit.spec
 		// View Tests
 		public var viewportTest:ViewportTestCase;
 		public var drawingBoardTest:DrawingBoardTestClass;
-		public var heartbeatTest:HeartbeatTestCase;
+		public var smilTimeSchedulerTest:SMILTimeSchedulerTestCase;
 		public var renderTreeTest:RenderTreeTestCase;
 		public var timingGraph:SMILTimeGraphTestCase;
 		public var loadSchedulerTest:LoadSchedulerTestCase;

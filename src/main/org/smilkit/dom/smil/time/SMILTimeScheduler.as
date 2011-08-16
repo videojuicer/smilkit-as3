@@ -150,14 +150,17 @@ package org.smilkit.dom.smil.time
 			this._baseLine = new Date();
 			this._offset = offset;
 			
-			var bodyContainer:ElementBodyTimeContainer = (this.ownerSMILDocument.getElementsByTagName("body").item(0) as ElementBodyTimeContainer);
-			
-			if (bodyContainer != null)
+			if (this.ownerSMILDocument != null)
 			{
-				//bodyContainer.resetElementState();
-				//bodyContainer.startup();
+				var bodyContainer:ElementBodyTimeContainer = (this.ownerSMILDocument.getElementsByTagName("body").item(0) as ElementBodyTimeContainer);
 				
-				bodyContainer.seekElement(offset / 1000);
+				if (bodyContainer != null)
+				{
+					//bodyContainer.resetElementState();
+					//bodyContainer.startup();
+					
+					bodyContainer.seekElement(offset / 1000);
+				}
 			}
 			
 			this.triggerTickNow();
@@ -203,7 +206,7 @@ package org.smilkit.dom.smil.time
 		
 		public function waitUntil(offset:Number, callback:Function, element:ElementTimeContainer = null, friendlyName:String = null):Boolean
 		{
-			if (offset >= this.ownerSMILDocument.offset)
+			if (offset >= this.offset)
 			{
 				var callbacks:Vector.<Function> = null;
 				
