@@ -142,10 +142,7 @@ package org.smilkit.dom.smil.time
 		{
 			var begin:Time = (node.currentBeginInterval);
 			var end:Time = (node.currentEndInterval);
-			
-			begin = (node.currentBeginInterval);
-			end = (node.currentEndInterval);
-			
+
 			if (begin != null)
 			{
 				this._elements.push(new SMILTimeInstance(node, begin, end));

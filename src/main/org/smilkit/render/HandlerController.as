@@ -18,6 +18,7 @@ package org.smilkit.render
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
+	import org.utilkit.util.NumberHelper;
 	
 	/**
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements
@@ -410,7 +411,7 @@ package org.smilkit.render
 					var waitHandler:SMILKitHandler = this._offsetSyncHandlerList[i];
 					var waitOffset:uint = this._offsetSyncOffsetList[i];
 					
-					if (waitHandler.currentOffset >= waitOffset)
+					if (waitHandler.currentOffset >= waitOffset && NumberHelper.withinTolerance(waitHandler.currentOffset, waitOffset, 5000.0))
 					{
 						SMILKit.logger.debug("A handler is synced to "+waitHandler.currentOffset+" (target was "+waitOffset+"). Will remove from sync wait list.", this);
 						// Sync is complete on this handler.
@@ -438,6 +439,9 @@ package org.smilkit.render
 					if (!this._waitingForData)
 					{
 						SMILKit.logger.debug("Sync operation completed. RenderTree now READY.", this);
+						
+						this.syncHandlersToViewportState();
+						
 						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
 					}
 					else

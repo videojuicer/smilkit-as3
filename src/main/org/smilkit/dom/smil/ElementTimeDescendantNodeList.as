@@ -50,7 +50,7 @@ package org.smilkit.dom.smil
 				
 				if (current != this._rootNode && current != null && current is IElementTimeContainer && (this._walkParent == null || this._walkParent == current.parentNode))
 				{
-					this._walkParent = current.parentNode;
+					this._walkParent = (current as ElementTimeContainer).parentTimeContainer;
 					
 					return current;
 				}

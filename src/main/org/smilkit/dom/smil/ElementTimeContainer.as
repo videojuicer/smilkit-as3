@@ -400,6 +400,45 @@ package org.smilkit.dom.smil
 		// TODO: seek handler
 		public function seekElement(seekTo:Number):void
 		{
+			var now:Time = new Time(null, false, (seekTo * 1000)+"ms");
+			var seekChildren:Boolean = true;
+			
+			if (this.isPlaying)
+			{
+				if (this.currentEndInterval.isGreaterThan(now))
+				{
+					// our end time is greater than where were seeking to
+				}
+				else
+				{
+					seekChildren = false;
+					
+					this.deactivate();
+				}
+			}
+			else
+			{
+				// were not playing, should we be?
+				if (!this.currentBeginInterval.isGreaterThan(now) && !this.currentEndInterval.isGreaterThan(now))
+				{
+					// the seek time is in the middle of our intervals so we should activate
+					//this.gatherNextInterval(this.currentBeginInterval);
+				}
+				
+				this.startup();
+			}
+			
+			if (seekChildren)
+			{
+				var children:INodeList = this.timeDescendants;
+				
+				for (var i:uint = 0; i < children.length; i++)
+				{
+					(children.item(i) as ElementTimeContainer).seekElement(seekTo);
+				}
+			}
+
+			
 			// seek children
 			
 			// for syncBehaviour support
@@ -410,6 +449,11 @@ package org.smilkit.dom.smil
 		}
 				
 		public function computeImplicitDuration():Time
+		{
+			return this._implicitMediaDuration;
+		}
+		
+		public function get implicitMediaDuration():Time
 		{
 			return this._implicitMediaDuration;
 		}
@@ -441,6 +485,8 @@ package org.smilkit.dom.smil
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
 		
+			this.display();
+			
 			var children:INodeList = this.timeDescendants;
 			
 			for (var i:uint = 0; i < children.length; i++)
@@ -640,14 +686,15 @@ package org.smilkit.dom.smil
 			this._currentBeginInterval = begin;
 			this._currentEndInterval = end;
 
-			// notify the parent we changed
-			(this.parentTimeContainer as ElementTimeContainer).childIntervalChanged(this);
-			
 			// notify dependencies that we changed
 			var event:SMILMutationEvent = new SMILMutationEvent();
 			event.initMutationEvent(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, true, false, this, null, null, null, 1);
 			
 			this.dispatchEvent(event);
+			
+			// notify the parent we changed
+			(this.parentTimeContainer as ElementTimeContainer).childIntervalChanged(this);
+			
 			
 			return true;
 		}

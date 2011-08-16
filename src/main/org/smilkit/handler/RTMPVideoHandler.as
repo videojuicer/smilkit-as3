@@ -37,6 +37,7 @@ package org.smilkit.handler
 		
 		protected var _resumed:Boolean = false;
 		protected var _waiting:Boolean = false;
+		protected var _waitingForMetaRefresh:Boolean = false;
 		
 		protected var _playOptions:NetStreamPlayOptions;
 		
@@ -225,6 +226,7 @@ package org.smilkit.handler
 				SMILKit.logger.debug("Resuming playback.", this);
 
 				this._resumed = true;
+				this._waitingForMetaRefresh = true;
 				
 				this._netStream.resume();
 			}
@@ -239,6 +241,7 @@ package org.smilkit.handler
 				SMILKit.logger.debug("Pausing playback.", this);
 				
 				this._resumed = false;
+				this._waitingForMetaRefresh = false;
 
 				this._netStream.pause();
 			}
@@ -426,7 +429,7 @@ package org.smilkit.handler
 				case "NetStream.Buffer.Full":
 					//this.resize();
 					
-					if (this._waiting && this._metadata != null)
+					if (this._waiting && this._metadata != null && !this._waitingForMetaRefresh)
 					{
 						this._waiting = false;
 						
@@ -462,7 +465,10 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 					break;
 				case "NetStream.Unpause.Notify":
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+					if (!this._waitingForMetaRefresh)
+					{
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+					}
 					break;
 				case "NetStream.Seek.Failed":
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_FAILED, this));
@@ -552,6 +558,13 @@ package org.smilkit.handler
 			else
 			{
 				this.resolved(this._metadata.duration);
+			}
+			
+			if (this._waitingForMetaRefresh)
+			{
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+				
+				this._waitingForMetaRefresh = false;
 			}
 		}
 		

@@ -155,7 +155,9 @@ package org.smilkit.dom.smil.time
 			if (bodyContainer != null)
 			{
 				//bodyContainer.resetElementState();
-				bodyContainer.startup();
+				//bodyContainer.startup();
+				
+				bodyContainer.seekElement(offset / 1000);
 			}
 			
 			this.triggerTickNow();

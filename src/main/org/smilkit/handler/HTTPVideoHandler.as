@@ -22,6 +22,7 @@ package org.smilkit.handler
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.util.NumberHelper;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
 	{
@@ -44,6 +45,9 @@ package org.smilkit.handler
 		*/
 		protected var _queuedSeek:Boolean = false;
 		protected var _queuedSeekTarget:uint;
+		
+		protected var _seeking:Boolean = false;
+		protected var _seekingTarget:uint;
 		
 		protected var _attachVideoDisplayDelayed:Boolean = false;
 		
@@ -120,7 +124,7 @@ package org.smilkit.handler
 		}
 		
 		public override function get currentOffset():int
-		{
+		{			
 			if (this._netStream == null)
 			{
 				return super.currentOffset;
@@ -261,14 +265,20 @@ package org.smilkit.handler
 			// Cancel queued seek
 			this._queuedSeek = false;
 			
-			this._netStream.resume();
-			
-			// Execute seek
-			var seconds:Number = (seekTo / 1000);
-			
-			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
-			
-			this._netStream.seek(seconds);
+			//if (!this._seeking || this._seekingTarget != seekTo)
+			//{
+				this._netStream.resume();
+				
+				// Execute seek
+				var seconds:Number = (seekTo / 1000);
+				
+				SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+				
+				this._seeking = true;
+				this._seekingTarget = seekTo;
+				
+				this._netStream.seek(seconds);
+			//}
 		}
 		
 		/*
@@ -497,7 +507,7 @@ package org.smilkit.handler
 		
 		protected function attachVideoDisplay():void
 		{
-			//SMILKit.logger.error("ATTACHING VIDEO DISPLAY UNIT RIGHT NOW -->");
+			SMILKit.logger.error("ATTACHING VIDEO DISPLAY UNIT RIGHT NOW -->");
 			
 			this._video.attachNetStream(this._netStream as NetStream);
 			this._attachVideoDisplayDelayed = false;
@@ -560,13 +570,43 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
-					if (!this._resumed)
+					if (!this.seekComplete())
 					{
-						this._netStream.pause();
-					}
+						// need to wait for _netStream.time to update
+						SMILKit.logger.debug("Seek complete but NetStream.time still not caught up, waiting before dispatching SEEK_NOTIFY ...");
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+						SharedTimer.every(1, this.onCheckSeekTarget);
+					}
 					break;
+			}
+		}
+		
+		protected function seekComplete():Boolean
+		{
+			if (NumberHelper.withinTolerance((this._seekingTarget / 1000), this._netStream.time, 2.0))
+			{
+				this._seeking = false;
+				
+				if (!this._resumed)
+				{
+					this._netStream.pause();
+				}
+				
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+				
+				return true;
+			}
+				
+			return false;
+		}
+		
+		protected function onCheckSeekTarget():void
+		{
+			SMILKit.logger.debug("Checking seek target ("+Math.floor(this._seekingTarget / 1000)+"s) against NetStream.time ("+this._netStream.time+"s)");
+			
+			if (this.seekComplete())
+			{
+				SharedTimer.removeEvery(1, this.onCheckSeekTarget);
 			}
 		}
 		
@@ -609,6 +649,7 @@ package org.smilkit.handler
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
+					
 					this.seek(0);
 					this.pause();
 				}

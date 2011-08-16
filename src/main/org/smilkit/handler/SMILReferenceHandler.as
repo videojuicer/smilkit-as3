@@ -10,6 +10,7 @@ package org.smilkit.handler
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRefElement;
@@ -501,7 +502,12 @@ package org.smilkit.handler
 		{
 			if (this.nestedViewport.document != null)
 			{
-				this.resolved(this.nestedViewport.document.duration);
+				var mediaDuration:Time = (this.element as ElementTimeContainer).implicitMediaDuration;
+				
+				if (mediaDuration == null || mediaDuration.resolvedOffset != this.nestedViewport.document.duration)
+				{
+					this.resolved(this.nestedViewport.document.duration);
+				}
 			}
 			else
 			{
