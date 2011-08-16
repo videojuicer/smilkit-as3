@@ -48,9 +48,16 @@ package org.smilkit.dom.smil
 					current = next;
 				}
 				
-				if (current != this._rootNode && current != null && current is IElementTimeContainer && (this._walkParent == null || this._walkParent == current.parentNode))
+				var timeContainer:ElementTimeContainer = (current as ElementTimeContainer);
+				
+				if (current != this._rootNode && current != null && timeContainer != null && (this._walkParent == null || this._walkParent == timeContainer.parentTimeContainer))
 				{
-					this._walkParent = (current as ElementTimeContainer).parentTimeContainer;
+					this._walkParent = timeContainer.parentTimeContainer;
+					
+					if (this._walkParent == null || this._walkParent == current)
+					{
+						this._walkParent = current.parentNode;
+					}
 					
 					return current;
 				}
