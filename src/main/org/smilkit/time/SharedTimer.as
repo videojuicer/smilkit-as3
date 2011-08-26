@@ -192,7 +192,7 @@ class SharedTimerInstance extends Timer
 			
 			if (triggered > 0)
 			{
-				SMILKit.logger.debug("SharedTimer triggered " + triggered + " callbacks with 'every' subscriptions.");
+				//SMILKit.logger.debug("SharedTimer triggered " + triggered + " callbacks with 'every' subscriptions.");
 			}
 		}
 	}

@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project name="smilkit" basedir=".">
+    <description>Provides build tasks for SMILKit-as3, cannot be used standalone.</description>
+    
+    <property name="smilkit.target" value="smilkit-as3.swc" />
+    <property name="smilkit.libs" value="${basedir}/libs" />
+    <property name="smilkit.src.main" value="${basedir}/src/main" />
+    <property name="smilkit.src.test" value="${basedir}/src/test" />
+    
+    <property name="as3crypto.path" value="${tmp.path}/smilkit-as3crypto-trunk-src" />
+    
+    <property file="build.properties" />
+    
+    <taskdef resource="flexTasks.tasks" classpath="${flex.path}/ant/lib/flexTasks.jar" />
+
+    <target name="smilkit.setup">
+        
+    </target>
+    
+	<target name="smilkit.dependencies">
+		<ant antfile="${smilkit.libs}/utilkit-as3/tasks.xml" target="utilkit.compile" inheritAll="true" useNativeBasedir="true" />
+	</target>
+
+    <target name="smilkit.compile">		
+        <echo>Compiling into ${target.path}/${smilkit.target} ...</echo>
+        
+        <compc output="${target.path}/${smilkit.target}"  
+            as3="true" benchmark="${build.verbose}" debug="${build.debug}" incremental="false" fork="false"
+            keep-generated-actionscript="${build.debug}" link-report="${report.path}/link-report.xml"
+            locale="en_US" optimize="${build.optimise}" target-player="10.0.0" warnings="true">
+            
+            <define name="BUILD::DEBUG" value="${build.debug}" />
+            <define name="BUILD::SSL" value="${build.ssl}" />
+            
+            <source-path path-element="${smilkit.src.main}" />
+            <include-sources dir="${smilkit.src.main}" includes="*" />
+            
+            <library-path dir="${target.path}" append="true">
+				<include name="utilkit-as3.swc" />
+			</library-path>
+            
+            <compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+            <compiler.headless-server>true</compiler.headless-server>
+        </compc>
+        
+        <echo>Finished compiling: ${smilkit.target}</echo>
+    </target>
+    
+    <target name="smilkit.optimise">
+        
+    </target>
+    
+    <target name="smilkit.compile.test">
+        <echo>Compiling tests into SWF ...</echo>
+        
+        <mxmlc output="${target.path}/smilkit-as3-specs.swf" file="${smilkit.src.test}/SpecRunner.mxml"
+            as3="true" benchmark="${build.verbose}" debug="${build.debug}" incremental="false" fork="false"
+            keep-generated-actionscript="true"
+            locale="en_US" optimize="${build.optimise}" target-player="10.0.0" warnings="true">
+            
+            <define name="BUILD::DEBUG" value="${build.debug}" />
+            <define name="BUILD::SSL" value="${build.ssl}" />
+            
+            <source-path path-element="${smilkit.src.main}" />
+            <source-path path-element="${smilkit.src.test}" />
+
+            <library-path dir="${target.path}" append="true">
+				<include name="utilkit-as3.swc" />
+			</library-path>
+            
+            <library-path dir="${smilkit.libs}" append="true">
+				<include name="flexunit-4.1.0_RC2-4-as3_4.1.0.16076.swc" />
+				<include name="flexunit-cilistener-4.1.0_RC2-4-4.1.0.16076.swc" />
+			</library-path>
+            
+            <compiler.verbose-stacktraces>true</compiler.verbose-stacktraces>
+            <compiler.headless-server>true</compiler.headless-server>
+        </mxmlc>
+        
+        <echo>Finished compiling tests into SWF</echo>
+    </target>
+</project>

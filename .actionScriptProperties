@@ -18,9 +18,6 @@
           <libraryPathEntry kind="3" linkType="1" path="${PROJECT_FRAMEWORKS}/libs/core.swc" useDefaultLinkType="false"/>
         </excludedEntries>
       </libraryPathEntry>
-      <libraryPathEntry kind="1" linkType="1" path="/Users/staticnature/Sites/smilkit-as3/libs"/>
-      <libraryPathEntry kind="1" linkType="1" path="/SDKs/FlexUnit.sdk/Common"/>
-      <libraryPathEntry kind="1" linkType="1" path="/SDKs/FlexUnit.sdk/FlexProject"/>
     </libraryPath>
     <sourceAttachmentPath/>
   </compiler>
