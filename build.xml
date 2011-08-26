@@ -19,28 +19,37 @@
     <property name="flex.path" location="${env.FLEX_HOME}" />
     <property name="flex.headless" value="${env.FLEX_HEADLESS}" />
     
-    <property name="report.path" value="${basedir}/target/report" />
+		<property name="root.path" value="${basedir}" />
+
+    <property name="report.path" value="${root.path}/target/report" />
     <property name="report.unit.path" value="${report.path}/unit" />
-	<property name="root.path" value="${basedir}" />
     <property name="target.path" value="${root.path}/target/bin" />
-    <property name="tmp.path" value="/tmp/${ant.project.name}" />
+    <property name="tmp.path" value="${root.path}/target/tmp" />
 
     <property name="FLEX_HOME" location="${flex.path}" />
     
     <import file="tasks.xml" />
     
     <target name="configuration" description="Setups up configuration for the build.">
-        <echo>Build Configuration:</echo>
-        <echo>- Debug Enabled: ${build.debug}</echo>
-        <echo>- Optimise Enabled: ${build.optimise}</echo>
-        <echo>- SSL Enabled: ${build.ssl}</echo>
-        <echo>- Verbose Enabled: ${build.verbose}</echo>
-        <echo></echo>
-        <echo>Path Configuration:</echo>
-        <echo>- Flash SDK: ${flex.path}</echo>
-        <echo>- Target Directory: ${target.path}</echo>
-        <echo>- Report Directory: ${report.path}</echo>
-        <echo>- Temporary Directory: ${tmp.path}</echo>
+			<echo>Compiler Configuration:</echo>
+			<echo>- Debug Enabled: ${build.debug}</echo>
+			<echo>- Optimise Enabled: ${build.optimise}</echo>
+			<echo>- Release Enabled: ${build.release}</echo>
+			<echo>- Verbose Enabled: ${build.verbose}</echo>
+			<echo></echo>
+			<echo>Flag Configuration:</echo>
+			<echo>- Debug Enabled: ${build.debug}</echo>
+			<echo>- SSL Enabled: ${build.ssl}</echo>
+			<echo></echo>
+			<echo>Path Configuration:</echo>
+			<echo>- Flash SDK: ${flex.path}</echo>
+			<echo>- Target Directory: ${target.path}</echo>
+			<echo>- Report Directory: ${report.path}</echo>
+			<echo>- Temporary Directory: ${tmp.path}</echo>
+			
+			<mkdir dir="${target.path}" />
+			<mkdir dir="${report.path}" />
+			<mkdir dir="${tmp.path}" />
     </target>
     
     <target name="setup" description="Sets up project dependencies.">
@@ -51,7 +60,7 @@
     <target name="compile" description="Compile's the application into a SWC.">
         <antcall target="configuration" />
         
-		<antcall target="smilkit.dependencies" />
+				<antcall target="smilkit.dependencies" />
         <antcall target="smilkit.compile" />
     </target>
     
