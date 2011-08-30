@@ -6,8 +6,8 @@ package org.smilkit.spec.tests.view
 	import flexunit.framework.AsyncTestHelper;
 	
 	import org.flexunit.async.Async;
-	import org.smilkit.spec.Fixtures;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.Viewport;
 
 	public class ViewportTestCase
@@ -220,16 +220,25 @@ package org.smilkit.spec.tests.view
 			Assert.assertEquals("http://smilkit.org/three.smil", this._viewport.location);
 		}
 		
-		[Test(description="Tests that history is remembered correctly when using back and forward")]
+		[Test(async,description="Tests that history is remembered correctly when using back and forward")]
 		public function historyIsManagedCorrectly():void
 		{
+			this._viewport.autoRefresh = true;
+			
+			var listener:Function = Async.asyncHandler(this, this.onViewportRefreshComplete, 5000, { }, this.onViewportRefreshTimeout);
+			
+			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, listener);
+			
+			// ignores #1 because we load #2 to quickly
 			this._viewport.location = "http://smilkit.org/1.smil";
-			this._viewport.location = "http://smilkit.org/2.smil";
-			this._viewport.location = "http://smilkit.org/3.smil";
 			
-			this._viewport.back();
-			
-			Assert.assertEquals("http://smilkit.org/2.smil", this._viewport.location);
+			this._viewport.location = "http://block4.net/excl.smil";			
+		}
+		
+		protected function onViewportRefreshComplete(e:ViewportEvent, passThru:Object = null):void
+		{
+			// should be #2
+			Assert.assertEquals("http://block4.net/excl.smil", this._viewport.location);
 			
 			this._viewport.location = "http://smilkit.org/4.smil";
 			
@@ -237,7 +246,12 @@ package org.smilkit.spec.tests.view
 			
 			this._viewport.back();
 			
-			Assert.assertEquals("http://smilkit.org/2.smil", this._viewport.location);
+			Assert.assertEquals("http://block4.net/excl.smil", this._viewport.location);
+		}
+		
+		protected function onViewportRefreshTimeout(passThru:Object):void
+		{
+			Assert.fail("Failed whilst waiting for the Viewport to refresh");
 		}
 		
 		[Test(async,description="Can fetch metadata from the document")]

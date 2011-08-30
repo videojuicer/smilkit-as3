@@ -131,13 +131,13 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(20, this._seqHolder.currentEndInterval.resolvedOffset);
 			
 			var nextResult:Boolean = this._seqContent.gatherNextInterval();
-			
+
 			Assert.assertTrue(nextResult);
 
 			Assert.assertEquals(10, this._seqContent.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(20, this._seqContent.currentEndInterval.resolvedOffset);
 
-			Assert.assertEquals(20, this._seqContent2.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(10, this._seqContent2.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(30, this._seqContent2.currentEndInterval.resolvedOffset);
 			
 			Assert.assertEquals(0, this._seqHolder.currentBeginInterval.resolvedOffset);

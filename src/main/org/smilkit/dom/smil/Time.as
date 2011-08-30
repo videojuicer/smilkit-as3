@@ -75,6 +75,11 @@ package org.smilkit.dom.smil
 				
 				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
+					if (!this.baseBegin)
+					{
+						trace("he");
+					}
+					
 					// our sync base is not the parent so we need to calculate our time as if we were
 					this._parentOffset = parentContainer.offsetForChild(this._element);
 				}
