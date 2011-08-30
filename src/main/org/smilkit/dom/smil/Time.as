@@ -69,7 +69,7 @@ package org.smilkit.dom.smil
 		{
 			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
 
-			if (this._element != null && this._parentOffset == Time.UNRESOLVED)
+			if (this._element != null && (this._parentOffset == Time.UNRESOLVED || this._parentOffset == Time.INDEFINITE))
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				

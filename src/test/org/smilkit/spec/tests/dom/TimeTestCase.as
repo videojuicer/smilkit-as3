@@ -165,6 +165,8 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(60, video4.currentEndInterval.resolvedOffset);
 			Assert.assertEquals(30, video3.currentEndInterval.resolvedOffset);
 			
+			secondContainer.startup();
+			
 			Assert.assertEquals(40, secondContainer.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(80, secondContainer.currentEndInterval.resolvedOffset);
 		}
@@ -240,10 +242,8 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(Time.INDEFINITE, prerollRight.currentEndInterval.resolvedOffset);
 			Assert.assertEquals(true, prerollRight.currentEndInterval.resolved);
 			
-			Assert.assertEquals(Time.INDEFINITE, contentRight.currentBeginInterval.resolvedOffset);
-			Assert.assertEquals(true, contentRight.currentBeginInterval.resolved);
-			Assert.assertEquals(Time.INDEFINITE, contentRight.currentEndInterval.resolvedOffset);
-			Assert.assertEquals(true, contentRight.currentEndInterval.resolved);
+			Assert.assertNull(Time.INDEFINITE, contentRight.currentBeginInterval);
+			Assert.assertNull(contentRight.currentEndInterval);
 			
 			prerollLeft.dur = "10000ms";
 			prerollRight.dur = "10000ms";
@@ -257,7 +257,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(true, prerollLeft.currentBeginInterval.resolved);
 			Assert.assertEquals(true, prerollLeft.currentEndInterval.resolved);
 			Assert.assertEquals(10, prerollLeft.currentEndInterval.resolvedOffset);
-			
+
 			Assert.assertEquals(10, contentLeft.currentBeginInterval.resolvedOffset);
 			Assert.assertEquals(true, contentLeft.currentBeginInterval.resolved);
 			Assert.assertEquals(Time.INDEFINITE, contentLeft.currentEndInterval.resolvedOffset);

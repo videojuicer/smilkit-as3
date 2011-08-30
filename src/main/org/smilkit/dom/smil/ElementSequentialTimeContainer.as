@@ -86,7 +86,7 @@ package org.smilkit.dom.smil
 		public override function offsetForChild(element:ElementTimeContainer):Number
 		{
 			var duration:Number = 0;
-			var timeDescendants:INodeList = this.timeChildren;
+			var timeDescendants:INodeList = this.timeDescendants;
 			
 			for (var i:uint = 0; i < timeDescendants.length; i++)
 			{
@@ -110,6 +110,26 @@ package org.smilkit.dom.smil
 		
 		protected override function childIntervalChanged(child:ElementTimeContainer):void
 		{
+			var timeDescendants:INodeList = this.timeDescendants;
+			var gathered:Boolean = false;
+			
+			for (var i:int = 0; i < timeDescendants.length; i++)
+			{
+				var element:ElementTimeContainer = (timeDescendants.item(i) as ElementTimeContainer);
+				
+				if (gathered)
+				{
+					element.startup();
+				}
+				else
+				{
+					if (element == child)
+					{
+						gathered = true;
+					}
+				}
+			}
+			
 			this.updateChildCachedTimes();
 			
 			// we only change ourself if the last child changed, otherwise we might as well wait

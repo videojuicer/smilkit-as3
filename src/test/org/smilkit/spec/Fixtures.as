@@ -54,15 +54,16 @@ package org.smilkit.spec
 		
 		public static var BASIC_UNRESOLVED_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +
 			"<head><layout><region xml:id=\"left\" width=\"50%\" height=\"100%\" /><region xml:id=\"right\" right=\"0\" width=\"50%\" height=\"100%\" /></layout></head>" +
-			"<body><par>"+
-			"<seq id=\"left\">" +
-			"<video id=\"preroll_left\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"left\" />" +
-			"<video id=\"content_left\" src=\"http://media.smilkit.org/demo.mp4\" region=\"left\" />" +
-			"</seq>"+
-			"<seq id=\"right\">" +
-			"<img id=\"preroll_right\" src=\"http://sixty.im/DecodedBase64.jpg\" region=\"right\" />" +
-			"<video id=\"content_right\" src=\"http://media.smilkit.org/demo.mp4\" region=\"right\" />" +
-			"</seq>"+
+			"<body>"+
+			"<par>"+
+				"<seq id=\"left\">" +
+					"<video id=\"preroll_left\" src=\"http://cloud.sixones.com/family-guy-trailer.mp4\"  region=\"left\" />" +
+					"<video id=\"content_left\" src=\"http://media.smilkit.org/demo.mp4\" region=\"left\" />" +
+				"</seq>"+
+				"<seq id=\"right\">" +
+					"<img id=\"preroll_right\" src=\"http://sixty.im/DecodedBase64.jpg\" region=\"right\" />" +
+					"<video id=\"content_right\" src=\"http://media.smilkit.org/demo.mp4\" region=\"right\" />" +
+				"</seq>"+
 			"</par></body></smil>";
 		
 		public static var MULTIPLE_CHILDREN_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +

@@ -25,6 +25,13 @@ package org.smilkit.dom.smil
 			return 0;
 		}
 		
+		protected override function childIntervalChanged(child:ElementTimeContainer):void
+		{
+			// a child changed but were running in parallel so we dont need to do anything
+			
+			super.childIntervalChanged(child);
+		}
+		
 		public override function get durationResolved():Boolean
 		{
 		    if(super.durationResolved)
