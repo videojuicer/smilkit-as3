@@ -15,9 +15,9 @@ Needs to have `FLEX_HOME` defined in your environment variables, should point to
 
 
 
-#### Full build, test and produce reports + docs
+#### Full compile
 
-	ant build
+	ant compile
 	
 
 #### Test
