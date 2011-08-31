@@ -14,7 +14,6 @@ Requires Adobe [Flex SDK][] 4+ and ANT.
 Needs to have `FLEX_HOME` defined in your environment variables, should point to your Flex SDK. `FLEX_HOME` should always be defined as an absolute path. Defining `FLEX_HOME` relative to the current working directory or relative to your home directory will result in errors. Define `FLEX_HEADLESS` as `true` when building on Linux headless servers (via [xVNC][]).
 
 
-
 #### Full compile
 
 	ant compile
