@@ -13,17 +13,14 @@ Requires Adobe [Flex SDK][] 4+ and ANT.
 
 Needs to have `FLEX_HOME` defined in your environment variables, should point to your Flex SDK. `FLEX_HOME` should always be defined as an absolute path. Defining `FLEX_HOME` relative to the current working directory or relative to your home directory will result in errors. Define `FLEX_HEADLESS` as `true` when building on Linux headless servers (via [xVNC][]).
 
-
 #### Full compile
 
 	ant compile
 	
-
 #### Test
 
 	ant test
 	
-
 You should have the [Flash 10 debug player](http://www.adobe.com/support/flashplayer/downloads.html#fp10) and the [Flash 10 Standalone player](http://download.macromedia.com/pub/flashplayer/updaters/10/flashplayer_10_sa_debug.app.zip) installed before attempting to run the tests.
 
 #### Generate ASDocs
