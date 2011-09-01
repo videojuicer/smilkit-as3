@@ -13,10 +13,10 @@ package org.smilkit.dom.smil
 		public static var SMIL_TIME_WALLCLOCK:int = 4;
 		public static var SMIL_TIME_MEDIA_MARKER:int = 5;
 		
-		public static var INDEFINITE:int = 900000;
-		public static var NEGATIVE_INDEFINITE:int = -900000;
 		public static var UNRESOLVED:int = -101;
 		public static var MEDIA:int = -102;
+		public static var INDEFINITE:int = -103;
+		public static var NEGATIVE_INDEFINITE:int = -104;
 		
 		protected var _resolved:Boolean = false;
 		protected var _begin:Boolean = false;

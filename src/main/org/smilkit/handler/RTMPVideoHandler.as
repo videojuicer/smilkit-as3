@@ -389,6 +389,8 @@ package org.smilkit.handler
 						this.attachVideoDisplay();
 					}
 					
+					this._netStream.bufferTime = 3;
+					
 					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
 					
 					
