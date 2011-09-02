@@ -504,7 +504,7 @@ package org.smilkit.dom.smil
 		{
 			var dur:Time = new Time(this, false, this.dur);
 			
-			if (dur.implicitSyncbaseOffset < 0)
+			if (dur.implicitSyncbaseOffset < 0 && !dur.indefinite)
 			{
 				dur = null;
 			}
@@ -520,7 +520,7 @@ package org.smilkit.dom.smil
 				return implicitDuration;
 			}
 			
-			if (dur == null)
+			if (dur == null || dur.negativeIndefinite)
 			{
 				return new Time(this, false, "unresolved");
 			}
@@ -631,7 +631,7 @@ package org.smilkit.dom.smil
 		
 		public function gatherFirstInterval():void
 		{
-			var beginAfter:Time = new Time(this, true, Time.NEGATIVE_INDEFINITE.toString() + "ms");
+			var beginAfter:Time = new Time(this, true, "nindefinite");
 			
 			var tempBegin:Time = null;
 			var tempEnd:Time = null;
@@ -776,9 +776,7 @@ package org.smilkit.dom.smil
 		}
 		
 		public function startup(skipChildren:Boolean = false):void
-		{			
-			this.resetElementState();
-			
+		{
 			if (!skipChildren)
 			{
 				this.startChildren();
@@ -801,10 +799,18 @@ package org.smilkit.dom.smil
 		
 		protected function onDOMTreeModified(e:MutationEvent):void
 		{
+			// we kill the tree state completely and rewrite everything from ElementBodyTimeContainer downwards
+			
 			// this might not always happen
 			this.resetElementState();
 			
 			this.startup();
+			
+			// the dom tree has changed, lets reset the entire tree from the body
+			//this.ownerSMILDocument.bodyContainer.resetElementState();
+			
+			// and startup!
+			//this.ownerSMILDocument.bodyContainer.startup();
 		}
 		
 		protected function setupFirstInterval():void

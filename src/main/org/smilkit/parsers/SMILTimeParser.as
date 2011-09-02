@@ -53,14 +53,24 @@ package org.smilkit.parsers
 			this.parse(null);
 		}
 		
-		public function identifies(timeString:String):Boolean
+		public static function identifies(timeString:Object):Boolean
 		{
+			if (!(timeString is String) && !(timeString is Number))
+			{
+				return false;
+			}
+				
 			if (timeString.indexOf(":") != -1)
 			{
 				return true;
 			}
 			
 			return (timeString.search(/^(-?)(\d+(\.\d+)?)(h|ms|s|min)$/i) != -1);
+		}
+		
+		public function identifies(timeString:Object):Boolean
+		{
+			return SMILTimeParser.identifies(timeString);
 		}
 		
 		/**

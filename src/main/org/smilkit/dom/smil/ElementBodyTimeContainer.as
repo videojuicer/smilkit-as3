@@ -6,11 +6,15 @@ package org.smilkit.dom.smil
 	
 	public class ElementBodyTimeContainer extends ElementSequentialTimeContainer
 	{
+		protected var _coldBoot:Boolean = false;
+		
 		public function ElementBodyTimeContainer(owner:IDocument, name:String)
 		{
 			super(owner, name);
 			
 			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMBodySubtreeModified, false);
+			
+			this._coldBoot = true;
 		}
 
 		public override function get isPlaying():Boolean
@@ -48,9 +52,9 @@ package org.smilkit.dom.smil
 		
 		protected function onDOMBodySubtreeModified(e:MutationEvent):void
 		{
-			this.resetElementState();
-			
 			this.ownerSMILDocument.scheduler.reset();
+			
+			this.resetElementState();
 			
 			this.startup();
 		}

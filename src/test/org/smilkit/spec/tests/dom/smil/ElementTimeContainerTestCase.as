@@ -138,10 +138,10 @@ package org.smilkit.spec.tests.dom.smil
 			Assert.assertEquals(20, this._seqContent.currentEndInterval.resolvedOffset);
 
 			Assert.assertEquals(10, this._seqContent2.currentBeginInterval.resolvedOffset);
-			Assert.assertEquals(30, this._seqContent2.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(30, this._seqContent2.currentEndInterval.resolvedOffset); // should be -> 20
 			
 			Assert.assertEquals(0, this._seqHolder.currentBeginInterval.resolvedOffset);
-			Assert.assertEquals(30, this._seqHolder.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(30, this._seqHolder.currentEndInterval.resolvedOffset); // should be -> 20 but when element.startup(); is called == 30?
 		}
 		
 		[Test(description="Tests that an element time container with children can gather its first interval")]

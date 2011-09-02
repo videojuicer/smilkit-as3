@@ -54,6 +54,11 @@ package org.smilkit.dom.smil
 			return new ElementTimeDescendantNodeList(this);
 		}
 		
+		public function get bodyContainer():ElementBodyTimeContainer
+		{
+			return this._elementBodyContainer;
+		}
+		
 		public function activeChildrenAt(instant:Number):INodeList
 		{
 			return null;

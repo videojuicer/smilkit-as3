@@ -84,7 +84,7 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(80, video3.currentEndInterval.resolvedOffset);
 			Assert.assertEquals(80, container.currentEndInterval.resolvedOffset);
 			
-			video1.setAttribute("dur", null);
+			video1.setAttribute("dur", "unresolved");
 
 			Assert.assertEquals(Time.INDEFINITE, video1.currentEndInterval.resolvedOffset);
 		}
@@ -241,9 +241,11 @@ package org.smilkit.spec.tests.dom
 			Assert.assertEquals(true, prerollRight.currentBeginInterval.resolved);
 			Assert.assertEquals(Time.INDEFINITE, prerollRight.currentEndInterval.resolvedOffset);
 			Assert.assertEquals(true, prerollRight.currentEndInterval.resolved);
-			
-			Assert.assertNull(Time.INDEFINITE, contentRight.currentBeginInterval);
-			Assert.assertNull(contentRight.currentEndInterval);
+
+			Assert.assertEquals(Time.INDEFINITE, contentRight.currentBeginInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentBeginInterval.resolved);
+			Assert.assertEquals(Time.INDEFINITE, contentRight.currentEndInterval.resolvedOffset);
+			Assert.assertEquals(true, contentRight.currentEndInterval.resolved);
 			
 			prerollLeft.dur = "10000ms";
 			prerollRight.dur = "10000ms";

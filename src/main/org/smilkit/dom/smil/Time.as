@@ -57,6 +57,11 @@ package org.smilkit.dom.smil
 			return (this._offset == Time.INDEFINITE);
 		}
 		
+		public function get negativeIndefinite():Boolean
+		{
+			return (this._offset == Time.NEGATIVE_INDEFINITE);
+		}
+		
 		public function get resolved():Boolean
 		{
 			return !(this._offset == Time.UNRESOLVED);
@@ -75,11 +80,6 @@ package org.smilkit.dom.smil
 				
 				if (this.implicitSyncbase != parentContainer && this.element != parentContainer)
 				{
-					if (!this.baseBegin)
-					{
-						trace("he");
-					}
-					
 					// our sync base is not the parent so we need to calculate our time as if we were
 					this._parentOffset = parentContainer.offsetForChild(this._element);
 				}
@@ -180,6 +180,16 @@ package org.smilkit.dom.smil
 				return true;
 			}
 			
+			if (this.negativeIndefinite)
+			{
+				return false;
+			}
+			
+			if (time.negativeIndefinite)
+			{
+				return true;
+			}
+			
 			if (!this.resolved)
 			{
 				return true;
@@ -190,15 +200,17 @@ package org.smilkit.dom.smil
 				return true;
 			}
 			
-			if (this.indefinite)
-			{
-				return true;
-			}
-			
 			if (this.indefinite && time.indefinite)
 			{
 				return false;
 			}
+			
+			if (this.indefinite || this.resolvedOffset == Time.INDEFINITE)
+			{
+				return true;
+			}
+			
+
 			
 			if (this.resolved && time.resolved)
 			{
@@ -224,6 +236,11 @@ package org.smilkit.dom.smil
 			}
 			
 			if (this.indefinite && time.indefinite)
+			{
+				return true;
+			}
+			
+			if (this.negativeIndefinite && this.negativeIndefinite)
 			{
 				return true;
 			}
@@ -257,6 +274,11 @@ package org.smilkit.dom.smil
 			{
 				this._offset = Time.INDEFINITE;
 				this._resolved = true;
+			}
+			else if (this._timeString == "nindefinite")
+			{
+				this._offset = Time.NEGATIVE_INDEFINITE;
+				this._resolved = false;
 			}
 			else if (this._timeString == "media")
 			{

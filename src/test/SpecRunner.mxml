@@ -16,7 +16,45 @@
 				//this._core.addListener(new UIListener(this.uiListener));
 				this._core.addListener(new CIListener());
 				//this._core.addListener(new FlexCoverListener());
-				this._core.run(org.smilkit.spec.SMILKitSuite);
+				
+				
+				// take flashvars for 
+				// Request.methods 
+				// testsToRun.push(Request.methods(org.smilkit.spec.tests.dom.TimeTestCase,["elementsCanUnresolveWhenResolved"]));
+				// testRunner.runWithFlexUnit4Runner(currentRunTestSuite(), "smilkit-as3");
+
+				
+				
+				
+				if (this.parameters.hasOwnProperty("class"))
+				{
+					var paramClass:String = this.parameters["class"];
+					var paramMethods:String = this.parameters["methods"];
+					
+					if (paramClass != null && paramClass != "")
+					{
+						var klass:Class = (getDefinitionByName(paramClass) as Class);
+						
+						if (paramMethods != null && paramMethods != "")
+						{
+							var methods:Array = paramMethods.split(";");
+							
+							this._core.runRequest(Request.methods(klass, methods));
+						}
+						else
+						{
+							this._core.runRequest(Request.aClass(klass));
+						}
+					}
+					else
+					{
+						this._core.run(org.smilkit.spec.SMILKitSuite);
+					}
+				}
+				else
+				{
+					this._core.run(org.smilkit.spec.SMILKitSuite);
+				}
 			}
 	]]>
 	</mx:Script>

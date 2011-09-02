@@ -2,6 +2,7 @@ package org.smilkit.dom.smil.expressions
 {
 	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
+	import org.smilkit.parsers.SMILTimeParser;
 	import org.smilkit.w3c.dom.IElement;
 
 	public class SMILReferenceExpressionParser extends SMILTimeExpressionParser
@@ -67,7 +68,7 @@ package org.smilkit.dom.smil.expressions
 		
 		public override function calculateValue(value:Object):Object
 		{
-			if (value is String && this.relatedContainer != null)
+			if (value is String && this.relatedContainer != null && !SMILTimeParser.identifies(value))
 			{
 				var str:String = (value as String);
 				var identifier:String = null;
