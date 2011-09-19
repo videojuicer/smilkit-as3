@@ -484,7 +484,7 @@ package org.smilkit.dom.smil
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onMediaDurationEnd, this, "onMediaDurationEnd");
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
 			this.ownerSMILDocument.scheduler.removeWaitUntil(this.onActiveDurationEnd, this, "onActiveDurationEnd");
-		
+			
 			this.display();
 			
 			var children:INodeList = this.timeDescendants;
@@ -1009,8 +1009,7 @@ package org.smilkit.dom.smil
 			if (this.gatherNextInterval() && this.currentBeginInterval != null && this.currentBeginInterval.resolved)
 			{
 				// TODO: fix this so that it activates correctly
-				
-				var waitTime:Number = this.currentBeginInterval.offset + (this.ownerDocument as SMILDocument).offset;
+				var waitTime:Number = (this.currentBeginInterval.offset + (this.ownerDocument as SMILDocument).offset);
 				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onIntervalStart, this, "onIntervalStart (yet again)");
 				
 				// setup timer if we need to wait (and were not meant to play)

@@ -22,8 +22,6 @@ package org.smilkit.dom
 		public override function set parentNode(value:INode):void
 		{
 			super.parentNode = value;
-			
-			this.ancestorChanged((value as ParentNode));
 		}
 		
 		public override function get childNodes():INodeList
@@ -194,6 +192,8 @@ package org.smilkit.dom
 			
 			(this._ownerDocument as Document).insertedNode(this, newInternal, false);
 			
+			(newChild as ParentNode).ancestorChanged(this);
+			
 			// sent out changed event
 			return newChild;
 		}
@@ -351,7 +351,6 @@ package org.smilkit.dom
 					updateChildren = true;
 				}
 			}
-			
 			
 			if(updateChildren)
 			{

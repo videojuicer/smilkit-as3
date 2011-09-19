@@ -18,6 +18,11 @@ package org.smilkit.dom.smil
 		public static var INDEFINITE:int = -103;
 		public static var NEGATIVE_INDEFINITE:int = -104;
 		
+		public static const TIME_MILLISECOND:int = 1;
+		public static const TIME_SECOND:int = (Time.TIME_MILLISECOND * 1000);
+		public static const TIME_MINUTE:int = (Time.TIME_SECOND * 60);
+		public static const TIME_HOUR:int = (Time.TIME_MINUTE * 60);
+		
 		protected var _resolved:Boolean = false;
 		protected var _begin:Boolean = false;
 		

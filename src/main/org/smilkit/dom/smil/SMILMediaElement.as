@@ -366,8 +366,6 @@ package org.smilkit.dom.smil
 		{
 			super.ancestorChanged(newAncestor);
 			
-			SMILKit.logger.error("AncestorChanged: "+newAncestor);
-			
 			// ancestor was removed, so were now an orphan?
 			if (newAncestor == null)
 			{
@@ -456,8 +454,17 @@ package org.smilkit.dom.smil
 				this._handler = null;
 			}
 			
-			this._handler = SMILKit.createElementHandlerFor(this);
-			this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
+			if (!this.orphaned)
+			{
+				this._handler = SMILKit.createElementHandlerFor(this);
+				this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
+				
+				SMILKit.logger.debug("SMILMediaElement is not orphaned created new handler ...");
+			}
+			else
+			{
+				SMILKit.logger.debug("SMILMediaElement is orphaned skipping handler creation ...");
+			}
 			
 			if (this._handler != null)
 			{

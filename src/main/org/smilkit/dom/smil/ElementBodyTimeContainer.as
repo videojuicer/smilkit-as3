@@ -6,20 +6,23 @@ package org.smilkit.dom.smil
 	
 	public class ElementBodyTimeContainer extends ElementSequentialTimeContainer
 	{
-		protected var _coldBoot:Boolean = false;
+		protected var _intervalsLaunched:Boolean = false;
 		
 		public function ElementBodyTimeContainer(owner:IDocument, name:String)
 		{
 			super(owner, name);
 			
 			this.addEventListener(MutationEvent.DOM_SUBTREE_MODIFIED, this.onDOMBodySubtreeModified, false);
-			
-			this._coldBoot = true;
+		}
+		
+		public function get intervalsLaunched():Boolean
+		{
+			return this._intervalsLaunched;
 		}
 
 		public override function get isPlaying():Boolean
 		{
-			return true; // this.ownerSMILDocument.scheduler.running;
+			return true;
 		}
 		
 		public override function get parentTimeContainer():ElementTimeContainer
@@ -57,6 +60,8 @@ package org.smilkit.dom.smil
 			this.resetElementState();
 			
 			this.startup();
+			
+			this._intervalsLaunched = true;
 		}
 	}
 }

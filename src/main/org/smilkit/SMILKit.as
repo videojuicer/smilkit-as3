@@ -10,6 +10,7 @@ package org.smilkit
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.SMILReferenceHandler;
 	import org.smilkit.parsers.BostonDOMParser;
+	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
@@ -27,9 +28,11 @@ package org.smilkit
 	 */
 	public class SMILKit
 	{
-		private static var __version:String = "0.4.1";
-		private static var __handlers:Hashtable = new Hashtable();
-		private static var __applicationLog:ApplicationLog = new ApplicationLog("smilkit-as3");
+		private static const __version:String = "0.4.1";
+		private static const __handlers:Hashtable = new Hashtable();
+		private static const __applicationLog:ApplicationLog = new ApplicationLog("smilkit-as3");
+		
+		public static const ACTIVATION_NUDGE:int = 1; // SharedTimer.DELAY;
 		
 		/**
 		 * Retrieve's the current SMILKit version.

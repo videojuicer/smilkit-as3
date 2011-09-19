@@ -113,19 +113,23 @@ package org.smilkit.dom.smil
 			var timeDescendants:INodeList = this.timeDescendants;
 			var gathered:Boolean = false;
 			
-			for (var i:int = 0; i < timeDescendants.length; i++)
+			// no point doing this when were a fresh document a everything will startup correctly
+			if (this.ownerSMILDocument.bodyContainer != null && this.ownerSMILDocument.bodyContainer.intervalsLaunched)
 			{
-				var element:ElementTimeContainer = (timeDescendants.item(i) as ElementTimeContainer);
-				
-				if (gathered)
+				for (var i:int = 0; i < timeDescendants.length; i++)
 				{
-					element.startup();
-				}
-				else
-				{
-					if (element == child)
+					var element:ElementTimeContainer = (timeDescendants.item(i) as ElementTimeContainer);
+					
+					if (gathered)
 					{
-						gathered = true;
+						element.startup();
+					}
+					else
+					{
+						if (element == child)
+						{
+							gathered = true;
+						}
 					}
 				}
 			}
