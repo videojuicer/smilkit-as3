@@ -56,11 +56,21 @@ package org.smilkit.time
 		
 		public static function every(seconds:Number, callback:Function):void
 		{
+			if (seconds == 0)
+			{
+				return;
+			}
+			
 			return SharedTimer.instance.every(seconds, callback);
 		}
 		
 		public static function removeEvery(seconds:Number, callback:Function):void
 		{
+			if (seconds == 0)
+			{
+				return;
+			}
+			
 			return SharedTimer.instance.removeEvery(seconds, callback);
 		}
 	}
