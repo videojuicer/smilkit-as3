@@ -44,12 +44,18 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.util.NumberHelper;
 	
 	public class RTMPVideoHandler extends SMILKitHandler
 	{
+		public static const INITIAL_BUFFER_TIME:int = 2;
+		public static const REDUCED_BUFFER_TIME:int = 4;
+		public static const EXPANDED_BUFFER_TIME:int = 30;
+		
 		protected var _netConnection:NetConnection;
 		protected var _netStream:NetStream;
 		protected var _video:Video;
@@ -61,6 +67,9 @@ package org.smilkit.handler
 		protected var _resumed:Boolean = false;
 		protected var _waiting:Boolean = false;
 		protected var _waitingForMetaRefresh:Boolean = false;
+		protected var _stopping:Boolean = false;
+		
+		protected var _droppedFrames:uint = 0;
 		
 		protected var _playOptions:NetStreamPlayOptions;
 		
@@ -370,7 +379,8 @@ package org.smilkit.handler
 		
 		protected function onConnectionNetStatusEvent(e:NetStatusEvent):void
 		{
-			SMILKit.logger.debug("NetConnection NetStatusEvent: "+e.info.code+" "+e.info.description, e);
+			SMILKit.logger.debug("NetConnection->NetStatusEvent: "+e.info.code+" "+e.info.description, e);
+			
 			switch (e.info.code)
 			{
 				case "NetConnection.Connect.Failed":
@@ -386,6 +396,8 @@ package org.smilkit.handler
 				case "NetConnection.Connect.Success":
 					SMILKit.logger.debug("NetConnection to "+this.videoHandlerState.fmsURL.hostname+" successful, creating NetStream", this);
 				
+					this._netConnection.call("checkBandwidth", null);
+					
 					this._netStream = new NetStream(this._netConnection);
 					
 					this._netStream.addEventListener(AsyncErrorEvent.ASYNC_ERROR, this.onAsyncErrorEvent);
@@ -394,29 +406,22 @@ package org.smilkit.handler
 
 					this._netStream.checkPolicyFile = true;
 					this._netStream.client = this;
-					
-					
+
 					this._video = new Video();
 					this._video.smoothing = true;
 					this._video.deblocking = 1;
 					
 					this._canvas.addChild(this._video);
-					
-					if (this.viewportObjectPool != null)
-					{
-						(this.element.ownerDocument as SMILDocument).scheduler.addEventListener(HeartbeatEvent.RUNNING_OFFSET_CHANGED, this.onHeartbeatRunning);
-					}
-					
+
 					if (this._attachVideoDisplayDelayed)
 					{
 						this.attachVideoDisplay();
 					}
 					
-					this._netStream.bufferTime = 3;
+					this._netStream.bufferTime = RTMPVideoHandler.INITIAL_BUFFER_TIME;
 					
 					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
-					
-					
+
 					this.resize();
 					this.resetVolume();
 					
@@ -424,9 +429,17 @@ package org.smilkit.handler
 			}
 		}
 		
+		public function onBWCheck(... rest):Number
+		{
+			return 0;
+		}
+		
 		public function onBWDone(... rest):void
 		{
-			SMILKit.logger.debug("Bandwidth received on NetConnection from Flash Media Server", this);	
+			if (rest.length > 0)
+			{
+				SMILKit.logger.debug("Bandwidth received on NetConnection from Flash Media Server, result: "+rest[0]+"Kbps with a latency of: "+rest[3]+"ms.", this);
+			}
 		}
 		
 		protected function onConnectionIOErrorEvent(e:IOErrorEvent):void
@@ -445,6 +458,21 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
+		protected function checkCondition():void
+		{
+			var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
+			var recentCount:uint = this._netStream.currentFPS;
+			
+			SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+this._netStream.currentFPS+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
+			
+			if (recentDrops > (recentCount / 2))
+			{
+				SMILKit.logger.warn("WARNING: RTMP stream dropped too many frames ....");
+			}
+			
+			this._droppedFrames = this._netStream.info.droppedFrames;
+		}
+		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
 		{
 			SMILKit.logger.debug("NetStatusEvent: "+e.info.code+" "+e.info.description, e);
@@ -452,16 +480,21 @@ package org.smilkit.handler
 			switch (e.info.code)
 			{
 				case "NetStream.Buffer.Full":
-					//this.resize();
+					if (this._netStream.bufferTime != RTMPVideoHandler.EXPANDED_BUFFER_TIME)
+					{
+						this._netStream.bufferTime = RTMPVideoHandler.EXPANDED_BUFFER_TIME;
+					}
 					
 					if (this._waiting && this._metadata != null && !this._waitingForMetaRefresh)
 					{
 						this._waiting = false;
-						
+
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					}
 					break;
 				case "NetStream.Buffer.Empty":
+					this._netStream.bufferTime = RTMPVideoHandler.REDUCED_BUFFER_TIME;
+					
 					if(this._resumed)
 					{
 						this._waiting = true;
@@ -472,6 +505,14 @@ package org.smilkit.handler
 						SMILKit.logger.debug("Ignored NetStream.Buffer.Empty event as this handler is not currently playing", this);
 					}
 					break;
+				case "NetStream.Buffer.Flush":
+					if (this._stopping)
+					{
+						this._stopping = false;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+					}
+					break;
 				case "NetStream.Failed":
 				case "NetStream.Play.Failed":
 				case "NetStream.Play.NoSupportedTrackFound":
@@ -480,16 +521,25 @@ package org.smilkit.handler
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
-				case "NetStream.Unpublish.Success":
 				case "NetStream.Play.Stop":
+					this._stopping = false;
+					break;
+				case "NetStream.Unpublish.Success":
 					// playback has finished, important for live events (so we can continue)
 					this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					break;
+				case "NetStream.Play.Start":
+					//this._netStream.bufferTime = RTMPVideoHandler.EXPANDED_BUFFER_TIME;
+					break;
 				case "NetStream.Pause.Notify":
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
+					
+					SharedTimer.removeEvery(5, this.checkCondition);
 					break;
 				case "NetStream.Unpause.Notify":
+					SharedTimer.every(5, this.checkCondition);
+					
 					if (!this._waitingForMetaRefresh)
 					{
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
@@ -540,7 +590,14 @@ package org.smilkit.handler
 
 		public function onPlayStatus(info:Object):void
 		{
-			// ignore
+			SMILKit.logger.debug("RTMP->onPlayStatus -> "+info);
+			
+			switch (info)
+			{
+				case "NetStream.Play.Complete":
+					
+					break;
+			}
 		}
 		
 		public function onMetaData(info:Object):void
@@ -601,17 +658,6 @@ package org.smilkit.handler
 			// playback has finished, important for live events (so we can continue)
 			this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
-		}
-		
-		protected function onHeartbeatRunning(e:HeartbeatEvent):void
-		{
-			if (this._netStream == null)
-			{
-				return;
-			}
-			
-			// here we need to look at the FPS of the Video and see if it drops
-			// as per; http://help.adobe.com/en_US/FlashMediaServer/3.5_Deving/WS5b3ccc516d4fbf351e63e3d11a0773d56e-7fea.html#WSEC11E19A-4AAC-41cc-96A3-7C93D4593F19
 		}
 		
 		public static function toHandlerMap():HandlerMap

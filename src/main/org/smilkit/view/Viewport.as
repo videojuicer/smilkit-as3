@@ -1040,5 +1040,17 @@ package org.smilkit.view
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_SECURITY_ERROR));
 		}
+		
+		public function dispose():void
+		{
+			if (this.loadScheduler != null)
+			{
+				this.loadScheduler.stop();
+			}
+			
+			this.destroyHandlers();
+			
+			Platform.garbageCollection();
+		}
 	}
 }

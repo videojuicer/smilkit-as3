@@ -51,6 +51,7 @@ package org.smilkit.handler
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.utilkit.util.Platform;
 	import org.utilkit.util.UrlUtil;
 
 	
@@ -118,8 +119,6 @@ package org.smilkit.handler
 		public function SMILReferenceHandler(element:IElement)
 		{
 			super(element);
-			
-			//(this.element.ownerDocument as SMILDocument).viewportObjectPool.viewport.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onExternalViewportPlaybackStateChanged);
 			
 			this.createNestedViewport();
 			
@@ -222,6 +221,11 @@ package org.smilkit.handler
 		
 		protected function createNestedViewport():void
 		{
+			if (this._nestedViewport != null)
+			{
+				this.destroyNestedViewport();
+			}
+			
 			this._nestedViewport = new NestedViewport();
 			
 			this._nestedViewport.addEventListener(ViewportEvent.READY, this.onInternalViewportReady);
@@ -247,7 +251,12 @@ package org.smilkit.handler
 			this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
 			this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
 			
+			this._nestedViewport.pause();
+			this._nestedViewport.dispose();
+			
 			this._nestedViewport = null;
+			
+			Platform.garbageCollection();
 		}
 		
 		public override function load():void
