@@ -255,8 +255,6 @@ package org.smilkit.handler
 			this._nestedViewport.dispose();
 			
 			this._nestedViewport = null;
-			
-			Platform.garbageCollection();
 		}
 		
 		public override function load():void

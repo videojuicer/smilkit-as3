@@ -595,7 +595,7 @@ package org.smilkit.handler
 			switch (info)
 			{
 				case "NetStream.Play.Complete":
-					
+					this._stopping = true;
 					break;
 			}
 		}
