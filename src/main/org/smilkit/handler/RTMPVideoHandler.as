@@ -460,17 +460,20 @@ package org.smilkit.handler
 		
 		protected function checkCondition():void
 		{
-			var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
-			var recentCount:uint = this._netStream.currentFPS;
-			
-			SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+this._netStream.currentFPS+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
-			
-			if (recentDrops > (recentCount / 2))
+			if(this._netStream != null && this._netStream.info != null)
 			{
-				SMILKit.logger.warn("WARNING: RTMP stream dropped too many frames ....");
+				var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
+				var recentCount:uint = this._netStream.currentFPS;
+				
+				SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+this._netStream.currentFPS+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
+				
+				if (recentDrops > (recentCount / 2))
+				{
+					SMILKit.logger.warn("WARNING: RTMP stream dropped too many frames ....");
+				}
+				
+				this._droppedFrames = this._netStream.info.droppedFrames;	
 			}
-			
-			this._droppedFrames = this._netStream.info.droppedFrames;
 		}
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
