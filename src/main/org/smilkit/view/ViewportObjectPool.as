@@ -39,7 +39,7 @@ package org.smilkit.view
 		/**
 		 *  An instance of RenderTree responsible for checking the viewports play position and for controlling the display 
 		 */	
-		protected var _renderTree:HandlerController;
+		protected var _handlerController:HandlerController;
 		
 		public function ViewportObjectPool(viewport:Viewport, document:SMILDocument)
 		{
@@ -61,7 +61,7 @@ package org.smilkit.view
 		
 		public function get renderTree():HandlerController
 		{
-			return this._renderTree;
+			return this._handlerController;
 		}
 		
 		public function reset():void
@@ -70,7 +70,7 @@ package org.smilkit.view
 			this._document.viewportObjectPool = this;
 
 			// make the first render tree!
-			this._renderTree = new HandlerController(this);
+			this._handlerController = new HandlerController(this);
 			
 			// create render tree to drawingboard
 			// drawingboard is always around, and renderTree is constantly destroyed

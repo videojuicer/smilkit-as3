@@ -35,7 +35,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.SharedTimer;
@@ -336,7 +336,7 @@ package org.smilkit.render
 						SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
 						
 						this._waitingForSync = true;				
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
+						this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_SYNC, null));
 					}
 					
 					if(handler.completedResolving || handler.completedLoading)
@@ -465,7 +465,7 @@ package org.smilkit.render
 						
 						this.syncHandlersToViewportState();
 						
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+						this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
 					}
 					else
 					{
@@ -532,7 +532,7 @@ package org.smilkit.render
 		protected function onHandlerStopNotify(e:HandlerEvent):void
 		{
 			SMILKit.logger.debug("Got STOP_NOTIFY from "+e.handler+". About to request out-of-band heartbeat tick.", this);
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_STOPPED, e.handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_STOPPED, e.handler));
 		}
 		
 		/**
@@ -859,7 +859,7 @@ package org.smilkit.render
 			this._activeMediaElements.push(element);
 			
 			handler.addedToRenderTree(this);
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_ADDED, handler));
 		}
 		protected function removeTimingNodeHandlerFromActiveList(timingNode:SMILTimeInstance):void
 		{
@@ -893,14 +893,14 @@ package org.smilkit.render
 			
 			handler.removedFromRenderTree(this);
 			// remove from canvas
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_REMOVED, handler));
 			
 		}
 		protected function timingNodeModifiedOnActiveList(timingNode:SMILTimeInstance):void
 		{
 			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
 			var handler:SMILKitHandler = element.handler;
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_MODIFIED, handler));
 		}
 		
 		/**
@@ -946,7 +946,7 @@ package org.smilkit.render
 					if(!this._waitingForSync)
 					{
 						SMILKit.logger.debug("Load wait cycle completed. RenderTree now READY.", this);
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+						this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
 					}
 					else
 					{
@@ -963,7 +963,7 @@ package org.smilkit.render
 					// Set the waitingForData flag and dispatch the relevant event.
 					this._waitingForData = true;				
 					// we have nothing on our plate, so we are ready!
-					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
+					this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_DATA, null));
 				}
 				SMILKit.logger.debug("Load wait cycle waiting for "+this._waitingForDataHandlerList.length+" handlers to dispatch LOAD_READY. ("+this._waitingForDataHandlerList.join(", ")+")", this);
 			}

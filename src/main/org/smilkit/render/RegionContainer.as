@@ -45,7 +45,7 @@ package org.smilkit.render
 		protected var _region:SMILRegionElement;
 		protected var _matrix:Rectangle;
 		protected var _children:Vector.<SMILKitHandler>;
-		protected var _renderTree:HandlerController;
+		protected var _handlerController:HandlerController;
 
 		// Link context for managing click actions
 		protected var _linkContextElement:Element;
@@ -93,12 +93,12 @@ package org.smilkit.render
 		
 		public function get renderTree():HandlerController
 		{
-			return this._renderTree;
+			return this._handlerController;
 		}
 		
 		public function set renderTree(r:HandlerController):void
 		{
-			this._renderTree = r;
+			this._handlerController = r;
 		}
 		
 		public override function get width():Number

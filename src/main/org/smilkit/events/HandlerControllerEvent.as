@@ -28,7 +28,7 @@ package org.smilkit.events
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.handler.SMILKitHandler;
 
-	public class RenderTreeEvent extends Event
+	public class HandlerControllerEvent extends Event
 	{
 		public static var ELEMENT_REMOVED:String = "renderTreeElementRemoved";
 		public static var ELEMENT_ADDED:String = "renderTreeElementAdded";
@@ -42,7 +42,7 @@ package org.smilkit.events
 		
 		protected var _handler:SMILKitHandler;
 		
-		public function RenderTreeEvent(type:String, element:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
+		public function HandlerControllerEvent(type:String, element:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
 			

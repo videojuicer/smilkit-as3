@@ -40,7 +40,7 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
@@ -834,10 +834,10 @@ package org.smilkit.view
 
 				// Trash old event listeners just in case
 				this.document.loadables.removeEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
-				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
-				this.renderTree.removeEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
-				this.renderTree.removeEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
-				this.renderTree.removeEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
+				this.renderTree.removeEventListener(HandlerControllerEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+				this.renderTree.removeEventListener(HandlerControllerEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
+				this.renderTree.removeEventListener(HandlerControllerEvent.READY, this.onRenderTreeReady);
+				this.renderTree.removeEventListener(HandlerControllerEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 				// Detach instances from this viewport
 				this.renderTree.detach();
 				
@@ -865,10 +865,10 @@ package org.smilkit.view
 			this.document.addEventListener(SMILMutationEvent.DOM_TIMEGRAPH_MODIFIED, this.onTimingGraphRebuild, false);
 			this.document.loadables.addEventListener(ProgressEvent.PROGRESS, this.onDocumentProgress);
 		
-			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
-			this.renderTree.addEventListener(RenderTreeEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
-			this.renderTree.addEventListener(RenderTreeEvent.READY, this.onRenderTreeReady);
-			this.renderTree.addEventListener(RenderTreeEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
+			this.renderTree.addEventListener(HandlerControllerEvent.WAITING_FOR_DATA, this.onRenderTreeWaitingForData);
+			this.renderTree.addEventListener(HandlerControllerEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
+			this.renderTree.addEventListener(HandlerControllerEvent.READY, this.onRenderTreeReady);
+			this.renderTree.addEventListener(HandlerControllerEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
@@ -965,7 +965,7 @@ package org.smilkit.view
 			this.document.scheduler.seek(offset);
 		}
 		
-		protected function onRenderTreeWaitingForData(event:RenderTreeEvent):void
+		protected function onRenderTreeWaitingForData(event:HandlerControllerEvent):void
 		{
 			SMILKit.logger.info("Waiting for more data to load.", this);
 			this._waitingForRenderTree = true;
@@ -976,7 +976,7 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
-		protected function onRenderTreeWaitingForSync(event:RenderTreeEvent):void
+		protected function onRenderTreeWaitingForSync(event:HandlerControllerEvent):void
 		{
 			SMILKit.logger.info("Waiting for sync before playback can resume.", this);
 			this._waitingForRenderTree = true;
@@ -987,7 +987,7 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 		}
 		
-		protected function onRenderTreeReady(event:RenderTreeEvent):void
+		protected function onRenderTreeReady(event:HandlerControllerEvent):void
 		{
 			SMILKit.logger.info("Ready to play.", this);
 			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
@@ -1006,7 +1006,7 @@ package org.smilkit.view
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
-		protected function onRenderTreeElementStopped(event:RenderTreeEvent):void
+		protected function onRenderTreeElementStopped(event:HandlerControllerEvent):void
 		{
 			SMILKit.logger.debug("Render tree got complete/stopped event from "+event.handler+", about to perform out-of-band heartbeat pulse", this);
 			
