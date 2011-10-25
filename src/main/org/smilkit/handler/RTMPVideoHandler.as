@@ -134,6 +134,11 @@ package org.smilkit.handler
 			return this._metadata.syncPoints;
 		}
 		
+		public override function get syncable():Boolean
+		{
+			return false;
+		}
+		
 		public override function get spatial():Boolean
 		{
 			return true;
