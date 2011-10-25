@@ -33,9 +33,9 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
+	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.SharedTimer;
@@ -70,8 +70,9 @@ package org.smilkit.render
 		protected var _waitingForSync:Boolean = false;
 		
 		protected var _performOffsetSyncOnNextResume:Boolean = false;
-		
 		protected var _performOffsetSyncAfterUpdate:Boolean = false;
+		
+		protected var _useSyncCycles:Boolean = false;
 		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
@@ -154,6 +155,11 @@ package org.smilkit.render
 		public function get hasDocumentAttached():Boolean
 		{
 			return (this.document != null);
+		}
+		
+		public function get useSyncCycles():Boolean
+		{
+			return this._useSyncCycles;
 		}
 		
 		/** 
@@ -745,7 +751,7 @@ package org.smilkit.render
 				}*/
 				
 				// Action the update changes
-				if(actionableChanges)
+				if (actionableChanges)
 				{
 					SMILKit.logger.debug("RenderTree.updateAt("+offset+"): actioning changes. "+addedTimingNodes.length+" added, "+removedTimingNodes.length+" removed, "+modifiedTimingNodes.length+" modified.", this);
 					
@@ -795,6 +801,22 @@ package org.smilkit.render
 				{
 					SMILKit.logger.debug("RenderTree update at " + offset + "ms garbage collected " + orphanCount + " dead handlers", this);
 				}
+				
+				var syncableCount:uint = 0;
+				
+				for (var s:uint = 0; s < this._activeMediaElements.length; s++)
+				{
+					var mediaElement:SMILMediaElement = (this._activeMediaElements[s]);
+					
+					if (mediaElement.handler != null && mediaElement.handler.syncable)
+					{
+						syncableCount += 1;
+					}
+				}
+				
+				this._useSyncCycles = (syncableCount > 1);
+				
+				SMILKit.logger.warn("Sync cycles disabled, HandlerController will not sync assets together.");
 				
 				// UPDATE COMPLETE
 				// Perform the sync if we flagged up that one is needed
