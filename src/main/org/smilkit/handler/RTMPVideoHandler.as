@@ -509,13 +509,13 @@ package org.smilkit.handler
 					
 					this._waitingForFrames = true;
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 				}
 				else
 				{
 					if (this._waitingForFrames)
 					{
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 					}
 					
 					this._waitingForFrames = false;
