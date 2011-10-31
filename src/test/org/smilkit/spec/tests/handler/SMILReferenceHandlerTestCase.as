@@ -83,30 +83,19 @@ package org.smilkit.spec.tests.handler
 		public function documentContentInjectedAfterLoad():void
 		{
 			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_REFERENCE_SMIL_XML;
-			
-			var asyncViewportRefreshHandler:Function = Async.asyncHandler(
-				this, 
-				this.async_documentContentInjectedAfterLoad_viewportRefreshComplete, 
-				25000, 
-				this.async_documentContentInjectedAfterLoad_viewportRefreshTimeout
+		
+			// Wait for the viewport to signal ready
+			var asyncViewportReadyHandler:Function = Async.asyncHandler(
+				this,
+				this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportReady,
+				25000,
+				this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportWaitTimeout
 			);
-			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncViewportRefreshHandler);
-			this._viewport.refresh();
-			
+			this._viewport.addEventListener(ViewportEvent.READY, asyncViewportReadyHandler)
+			// Play the viewport
+			this._viewport.resume();
 		}
-			protected function async_documentContentInjectedAfterLoad_viewportRefreshComplete(e:ViewportEvent, passthru:Object):void
-			{
-				// Wait for the viewport to signal ready
-				var asyncViewportReadyHandler:Function = Async.asyncHandler(
-					this,
-					this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportReady,
-					25000,
-					this.async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportWaitTimeout
-				);
-				this._viewport.addEventListener(ViewportEvent.READY, asyncViewportReadyHandler)
-				// Play the viewport
-				this._viewport.resume();
-			}
+
 				protected function async_documentContentInjectedAfterLoad_viewportRefreshComplete_viewportReady(e:ViewportEvent, passthru:Object):void
 				{
 					// Assert that the ref tag contains at least one video tag
@@ -129,10 +118,6 @@ package org.smilkit.spec.tests.handler
 				{
 					Assert.fail("Timed out waiting for viewport to signal ready");
 				}
-			protected function async_documentContentInjectedAfterLoad_viewportRefreshTimeout(passthru:Object):void
-			{
-				Assert.fail("Timed out refreshing viewport");
-			}
 		
 		[Test(async,description="Ensures that the handler's content is invalidated when the handler is removed from the rendertree")]
 		public function invalidatedWhenRemovedFromRenderTree():void

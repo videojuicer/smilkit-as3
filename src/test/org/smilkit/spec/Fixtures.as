@@ -72,7 +72,7 @@ package org.smilkit.spec
 			"<video id=\"video_http\" src=\"http://assets.videojuicer.net/smilkit/bcf93ccc-7e18-11df-a68c-1231390c28d1.mp4\" dur=\"10s\">"+
 			"<param name=\"filesize\" value=\"1000\"/>"+
 			"</video>" +
-			"<video id=\"video_rtmp\" src=\"rtmp://media.smilkit.org/demo.mp4\" dur=\"60s\" region=\"root\" />" +
+			"<ref id=\"video_rtmp\" src=\"http://assets-fms.staging.videojuicer.net/demo/d07fc2a4-a21b-11de-a4ab-123139025d32.mp4.smil\" dur=\"60s\" region=\"root\" />" +
 			"</seq></body></smil>";
 		
 		public static var BASIC_UNRESOLVED_SMIL_XML:String = "<?xml version=\"1.0\"?><smil>" +

@@ -80,7 +80,7 @@ package org.smilkit.spec.tests.parsers
 			
 			Assert.assertNotNull(reference);
 			
-			var async:Function = Async.asyncHandler(this, this.onDOMNodeInserted, 5000, { ref: reference }, this.onDOMNodeInsertedTimeout);
+			//var async:Function = Async.asyncHandler(this, this.onDOMNodeInserted, 15000, { ref: reference }, this.onDOMNodeInsertedTimeout);
 		}
 		
 		protected function onDOMNodeInserted(e:BostonDOMParserEvent, passThru:Object):void

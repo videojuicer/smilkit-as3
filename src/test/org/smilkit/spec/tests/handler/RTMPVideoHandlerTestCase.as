@@ -28,7 +28,7 @@ package org.smilkit.spec.tests.handler
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
-	import org.smilkit.handler.RTMPVideoHandler;
+	import org.smilkit.handler.SMILReferenceHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -39,7 +39,7 @@ package org.smilkit.spec.tests.handler
 	{
 		protected var _document:ISMILDocument;
 		protected var _rtmpElement:ISMILMediaElement;
-		protected var _rtmpVideoHandler:RTMPVideoHandler;
+		protected var _rtmpVideoHandler:SMILReferenceHandler;
 
 		[Before]
 		public function setUp():void
@@ -50,7 +50,7 @@ package org.smilkit.spec.tests.handler
 			SMILKit.defaults();
 			
 			this._rtmpElement = this._document.getElementById("video_rtmp") as ISMILMediaElement;
-			this._rtmpVideoHandler = (SMILKit.createElementHandlerFor(this._rtmpElement) as RTMPVideoHandler);
+			this._rtmpVideoHandler = (SMILKit.createElementHandlerFor(this._rtmpElement) as SMILReferenceHandler);
 		}
 		
 		[After]
@@ -64,7 +64,7 @@ package org.smilkit.spec.tests.handler
 		[Test(async,descriptions="Tests resolving an RTMP video")]
 		public function ableToResolveVideo():void
 		{
-			var asyncResolveCheck:Function = Async.asyncHandler(this, this.onHandlerResolved, 5000, this.onHandlerResolveTimeout);
+			var asyncResolveCheck:Function = Async.asyncHandler(this, this.onHandlerResolved, 25000, this.onHandlerResolveTimeout);
 			
 			this._rtmpVideoHandler.addEventListener(HandlerEvent.DURATION_RESOLVED, asyncResolveCheck);
 			this._rtmpVideoHandler.load();
