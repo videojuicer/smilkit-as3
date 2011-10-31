@@ -495,6 +495,21 @@ package org.smilkit.handler
 						this._waiting = false;
 
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+						
+						// dispatch some events for resume + seek
+						if (this._resumeOnBufferFull)
+						{
+							this._resumeOnBufferFull = false;
+							
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+						}
+						
+						if (this._seekOnBufferFull)
+						{
+							this._seekOnBufferFull = false;
+							
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+						}
 					}
 					break;
 				case "NetStream.Buffer.Empty":
@@ -517,6 +532,10 @@ package org.smilkit.handler
 						
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
+					else
+					{
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					}
 					break;
 				case "NetStream.Failed":
 				case "NetStream.Play.Failed":
@@ -527,7 +546,7 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
 				case "NetStream.Play.Stop":
-					this._stopping = false;
+					this._stopping = true;
 					break;
 				case "NetStream.Unpublish.Success":
 					// playback has finished, important for live events (so we can continue)
@@ -547,7 +566,11 @@ package org.smilkit.handler
 					
 					if (!this._waitingForMetaRefresh)
 					{
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+						this._resumeOnBufferFull = true;
+						
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+						
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					}
 					break;
 				case "NetStream.Seek.Failed":
@@ -562,10 +585,18 @@ package org.smilkit.handler
 						this._netStream.pause();
 					}
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+					this._seekOnBufferFull = true;
+					
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 					break;
 			}
 		}
+		
+		
+		protected var _resumeOnBufferFull:Boolean = false;
+		protected var _seekOnBufferFull:Boolean = false;
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
@@ -627,7 +658,7 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				
-				this.pause();
+				//this.pause();
 			}
 			
 			SMILKit.logger.info("Metadata recieved: "+this._metadata.toString());
