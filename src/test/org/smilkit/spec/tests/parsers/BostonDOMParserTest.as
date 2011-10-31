@@ -35,6 +35,7 @@ package org.smilkit.spec.tests.parsers
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.parsers.BostonDOMParserEvent;
+	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
@@ -48,7 +49,6 @@ package org.smilkit.spec.tests.parsers
 		public function setUp():void
 		{
 			_parser = new BostonDOMParser();
-			
 		}
 		
 		[After]
@@ -60,27 +60,15 @@ package org.smilkit.spec.tests.parsers
 		[Test(async, description="Tests that the parser can return a document")]
 		public function returnsSMILDocument():void
 		{
-			var asyncSMILDocument:Function = Async.asyncHandler(this, handleSMILDocument, 5000, null, this.handleSMILDocumentTimeOut);
-			var urlRequest:URLRequest = new URLRequest("http://sixty.im/demo.smil");
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(Event.COMPLETE, asyncSMILDocument, false, 0, true);
-			urlLoader.load(urlRequest);
+			var document:IDocument = this._parser.parse(Fixtures.BASIC_SMIL_XML) as IDocument;
+			
+			Assert.assertTrue(document is SMILDocument);
 		}
 		
 		[Test(async, description="Tests that the document can collapse and flatten reference documents correctly")]
 		public function referencesAreFlat():void
 		{
-			var asyncSMILDocument:Function = Async.asyncHandler(this, handleReferenceDocument, 5000, null, this.handleSMILDocumentTimeOut);
-			var urlRequest:URLRequest = new URLRequest("http://sixty.im/ref.smil");
-			var urlLoader:URLLoader = new URLLoader();
-			urlLoader.addEventListener(Event.COMPLETE, asyncSMILDocument, false, 0, true);
-			urlLoader.load(urlRequest);
-		}
-		
-		protected function handleReferenceDocument(e:Event, passThru:Object):void
-		{
-			var loader:URLLoader = e.target as URLLoader;
-			var document:IDocument = this._parser.parse(loader.data.toString()) as IDocument;
+			var document:IDocument = this._parser.parse(Fixtures.BASIC_REFERENCE_SMIL_XML) as IDocument;
 			
 			Assert.assertTrue(document is SMILDocument);
 			
@@ -93,9 +81,6 @@ package org.smilkit.spec.tests.parsers
 			Assert.assertNotNull(reference);
 			
 			var async:Function = Async.asyncHandler(this, this.onDOMNodeInserted, 5000, { ref: reference }, this.onDOMNodeInsertedTimeout);
-			
-			//reference.parser.addEventListener(BostonDOMParserEvent.PARSER_COMPLETE, async);
-			//reference.addEventListener(MutationEvent.DOM_NODE_INSERTED, async, false);
 		}
 		
 		protected function onDOMNodeInserted(e:BostonDOMParserEvent, passThru:Object):void
@@ -115,19 +100,6 @@ package org.smilkit.spec.tests.parsers
 		protected function onDOMNodeInsertedTimeout(passThru:Object):void
 		{
 			Assert.fail("Timeout reached whilst waiting for reference parser to complete");
-		}
-		
-		protected function handleSMILDocument(event:Event, passThroughData:Object):void
-		{
-			var loader:URLLoader = event.target as URLLoader;
-			var document:IDocument = _parser.parse(loader.data.toString()) as IDocument;
-			
-			Assert.assertTrue(document is SMILDocument);
-		}
-		
-		protected function handleSMILDocumentTimeOut(passThroughData:Object):void
-		{
-			Assert.fail( "Timeout reached before viewport refreshed: BostonDOMParserTest:SMILDocument");
 		}
 	}
 }

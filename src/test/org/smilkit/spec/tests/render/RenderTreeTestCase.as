@@ -57,7 +57,7 @@ package org.smilkit.spec.tests.render
 			var asyncElementsCheck:Function = Async.asyncHandler(this, this.handleHasElements, 2000, null, this.handleHasElementsTimeOut);
 			
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncElementsCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_SMIL_XML;
 		}		
 			protected function handleHasElements(e:ViewportEvent, passThru:Object):void
 			{
@@ -69,7 +69,7 @@ package org.smilkit.spec.tests.render
 				
 				var resolveTimeElement:SMILTimeInstance = renderElements[0];
 
-				Assert.assertEquals("video_http", resolveTimeElement.element.id);
+				Assert.assertEquals("content", resolveTimeElement.element.id);
 			}
 			protected function handleHasElementsTimeOut(passThroughData:Object):void
 			{
@@ -82,7 +82,7 @@ package org.smilkit.spec.tests.render
 			var asyncLastChangeOffSetCheck:Function = Async.asyncHandler(this, this.handleHasLastChangeOffSet, 5000, null, this.handleHasLastChangeOffSetTimeOut);
 			
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncLastChangeOffSetCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_SMIL_XML;
 		}
 		
 		protected function handleHasLastChangeOffSet(event:ViewportEvent, passThroughData:Object):void
@@ -103,7 +103,7 @@ package org.smilkit.spec.tests.render
 			var asyncNextOffSetCheck:Function = Async.asyncHandler(this, this.handleHasNextChangeOffSet, 5000, null, this.handleHasNextChangeOffSetTimeOut);
 			
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncNextOffSetCheck, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_SMIL_XML;
 		}
 		
 		protected function handleHasNextChangeOffSet(event:ViewportEvent, passThroughData:Object):void
