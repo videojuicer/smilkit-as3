@@ -156,6 +156,11 @@ package org.smilkit.handler
 			return (this._netStream.time * 1000);
 		}
 		
+		public override function get resumed():Boolean
+		{
+			return this._resumed;
+		}
+		
 		public override function get handlerState():HandlerState
 		{
 			return new VideoHandlerState(this.element.src, 0, this._netConnection, this._netStream, this._video, this._canvas);	

@@ -176,6 +176,11 @@ package org.smilkit.handler
 			return new VideoHandlerState(source, 0, this._netConnection, this._netStream, this._video, this._canvas);	
 		}
 		
+		public override function get resumed():Boolean
+		{
+			return this._resumed;
+		}
+		
 		public function get videoHandlerState():VideoHandlerState
 		{
 			return (this.handlerState as VideoHandlerState);
@@ -184,6 +189,11 @@ package org.smilkit.handler
 		public override function load():void
 		{
 			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> load");
+			
+			if (this._metadata != null)
+			{
+				SMILKit.logger.debug("Metadata already loaded for RTMPHandler.");
+			}
 			
 			this._playOptions = new NetStreamPlayOptions();
 									
@@ -201,6 +211,20 @@ package org.smilkit.handler
 			
 			this._waiting = true;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+		}
+		
+		public override function wait(handlers:Vector.<SMILKitHandler>):void
+		{
+			var selfWaiting:Boolean = (handlers.length == 1 && handlers[0] == this);
+			
+			if (selfWaiting)
+			{
+				this.unwait();
+			}
+			else
+			{
+				super.wait(handlers);
+			}
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
@@ -463,19 +487,42 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
+		protected var _waitingForFrames:Boolean = false;
+		
 		protected function checkCondition():void
 		{
-			var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
-			var recentCount:uint = this._netStream.currentFPS;
-			
-			SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+this._netStream.currentFPS+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
-			
-			if (recentDrops > (recentCount / 2))
+			if (this._netStream != null)
 			{
-				SMILKit.logger.warn("WARNING: RTMP stream dropped too many frames ....");
+				var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
+				var recentCount:uint = this._netStream.currentFPS;
+				
+				SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+recentCount+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
+				
+				if (recentDrops > (recentCount / 2))
+				{
+					SMILKit.logger.warn("WARNING: RTMP stream dropped more than half of the frames: "+recentDrops+", target: "+recentCount);
+				}
+				
+				if (recentCount == 0)
+				{
+					SMILKit.logger.warn("WARNING: RTMP stream is not playing any frames.");
+					
+					this._waitingForFrames = true;
+					
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+				}
+				else
+				{
+					if (this._waitingForFrames)
+					{
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					}
+					
+					this._waitingForFrames = false;
+				}
+				
+				this._droppedFrames = this._netStream.info.droppedFrames;
 			}
-			
-			this._droppedFrames = this._netStream.info.droppedFrames;
 		}
 		
 		protected function onNetStatusEvent(e:NetStatusEvent):void
@@ -490,11 +537,14 @@ package org.smilkit.handler
 						this._netStream.bufferTime = RTMPVideoHandler.EXPANDED_BUFFER_TIME;
 					}
 					
-					if (this._waiting && this._metadata != null && !this._waitingForMetaRefresh)
+					if (this._metadata != null)
 					{
-						this._waiting = false;
+						if (this._waiting)
+						{
+							this._waiting = false;
 
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+						}
 						
 						// dispatch some events for resume + seek
 						if (this._resumeOnBufferFull)
@@ -534,7 +584,7 @@ package org.smilkit.handler
 					}
 					else
 					{
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					}
 					break;
 				case "NetStream.Failed":
@@ -567,8 +617,9 @@ package org.smilkit.handler
 					if (!this._waitingForMetaRefresh)
 					{
 						this._resumeOnBufferFull = true;
+						this._waiting = true;
 						
-						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 						
 						//this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					}
@@ -586,10 +637,11 @@ package org.smilkit.handler
 					}
 					
 					this._seekOnBufferFull = true;
+					this._waiting = true;
 					
-					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					
-					//this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this)); 
 					break;
 			}
 		}
@@ -658,7 +710,7 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				
-				//this.pause();
+				this.pause();
 			}
 			
 			SMILKit.logger.info("Metadata recieved: "+this._metadata.toString());

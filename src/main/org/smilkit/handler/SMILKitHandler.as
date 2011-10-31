@@ -67,6 +67,8 @@ package org.smilkit.handler
 		
 		protected var _hasSetImplicitMediaDuration:Boolean = false;
 		
+		protected var _baseResumed:Boolean = false;
+		
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
@@ -224,9 +226,30 @@ package org.smilkit.handler
 			return this._region;
 		}
 		
+		public function get resumed():Boolean
+		{
+			return this._baseResumed;
+		}
+		
 		public function load():void
 		{
 			
+		}
+		
+		public function wait(handlers:Vector.<SMILKitHandler>):void
+		{
+			if (this.resumed)
+			{
+				this.pause();
+			}
+		}
+		
+		public function unwait():void
+		{
+			if (this.resumed)
+			{
+				this.resume();
+			}
 		}
 		
 		protected function resolveInitialLoadableProperties():void
@@ -272,7 +295,7 @@ package org.smilkit.handler
 		 */
 		public function pause():void
 		{
-			
+			this._baseResumed = false;
 		}
 		
 		/**
@@ -284,7 +307,7 @@ package org.smilkit.handler
 		 */
 		public function resume():void
 		{
-			
+			this._baseResumed = true;
 		}
 		
 		/**
