@@ -158,11 +158,6 @@ package org.smilkit.render
 			return (this.document != null);
 		}
 		
-		public function get useSyncCycles():Boolean
-		{
-			return this._useSyncCycles;
-		}
-		
 		/** 
 		* Higher-order accessor for all the RenderTree's internal wait links and other asynchronous machinery. 
 		* @return True if the RenderTree is not waiting for any operations to complete before playback can continue.
@@ -269,6 +264,24 @@ package org.smilkit.render
 		}
 		
 		/**
+		 * Runs an offset sync operation on all handlers in the <code>HandlerController</code> instance.
+		 * 
+		 * 1) Simple seek, in a simple seek we seek the active handlers to the specified time, and adjust the DOM clock
+		 * to match the times to handlers were able to seek too. With a simple seek, the handler starts to seek to the requested
+		 * time and then the <code>HandlerController</code> matches the DOM clock to the handlers current position (after the seek).
+		 * 
+		 * 2) Complex seek, the DOM clock is adjusted to the requested time and all the handlers are seeked to match the DOM
+		 * clock, we wait for all the handlers to match up to the desired time. During a complex seek, the handler is told to
+		 * seek to the specified time, if it cannot seek without loading more, the handler enters its own wait cycle, freezes
+		 * the display and begins to playback silently until the desired time is met. The indiviual handlers are responsible for
+		 * completing the seek task given to them and must only dispatch SEEK_NOTIFY upon completion. 
+		 * 
+		 * When the handlers are first seeked, they are placed into the sync wait list and removed when the handler has finished
+		 * seeking to the desired time (with the SEEK_NOTIFY event). When all handlers have been removed from the sync wait list,
+		 * the <code>HandlerController</code> exits the sync cycle.
+		 * 
+		 */
+		/**
 		* Starts an offset sync operation on all handlers in the <code>RenderTree</code> instance.
 		*
 		* An offset sync operation provides synchronised playback after a seek operation. Due to oddities with 
@@ -313,9 +326,38 @@ package org.smilkit.render
 			if(this._waitingForSync)
 			{
 				SMILKit.logger.debug("Asked to start a sync operation, but one is already in progress. Cancelling existing sync operation.", this);
+				
 				this.cancelOffsetSync();
 			}
 			
+			// reset sync lists
+			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+			
+			var seekables:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
+			
+			for (var s:uint = 0; s < this.elements.length; s++)
+			{
+				if (this.elements[s].mediaElement.handler.seekable)
+				{
+					seekables.push(this.elements[s]);
+				}
+			}
+			
+			var strict:Boolean = (seekables.length > 1);
+			var offset:Number = this._objectPool.viewport.offset;
+			
+			for (var i:uint = 0; i < seekables.length; i++)
+			{
+				var time:SMILTimeInstance = seekables[i];
+				var handler:SMILKitHandler = time.mediaElement.handler;
+				var target:uint = Math.max(0, ((offset - time.begin.resolvedOffset) * 1000));
+				
+				handler.seek(target, strict);
+				
+				this._offsetSyncHandlerList.push(handler);
+			}
+			
+			/*
 			if (!this.useSyncCycles)
 			{
 				// we adjust the DOM timer to reflect the seek result (rather than syncing the asset to the DOM timer)
@@ -367,7 +409,7 @@ package org.smilkit.render
 						
 						if(handler.completedResolving || handler.completedLoading)
 						{
-							handler.enterSyncState();
+							handler.enterFrozenState();
 							
 							this.execSyncHandlerForViewportOffset(handler);
 						}
@@ -383,10 +425,12 @@ package org.smilkit.render
 					SMILKit.logger.debug("No handlers require sync at this time.", this);
 				}
 			}
+			*/
 		}
 		
 		protected function execSyncHandlerForViewportOffset(handler:SMILKitHandler):void
 		{
+			/*
 			if(this._offsetSyncHandlerList != null)
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
@@ -397,11 +441,11 @@ package org.smilkit.render
 					if(handler.seekable)
 					{						
 						// Perform sync
-						var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
+						var nearestSyncPoint:Number = handler.findNearestCuePoint(offset);
 						var destinationOffset:Number;
 						if(nearestSyncPoint <= offset){
 							destinationOffset = nearestSyncPoint;
-							SMILKit.logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms (selected from "+handler.syncPoints.length+" syncpoints: "+handler.syncPoints.join(", ")+") with a target offset of "+offset+"ms. completedResolving: "+handler.completedResolving+", completedLoading"+ handler.completedLoading, this);
+							SMILKit.logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms (selected from "+handler.cuePoints.length+" syncpoints: "+handler.cuePoints.join(", ")+") with a target offset of "+offset+"ms. completedResolving: "+handler.completedResolving+", completedLoading"+ handler.completedLoading, this);
 						}
 						else
 						{
@@ -425,6 +469,7 @@ package org.smilkit.render
 					SMILKit.logger.debug("Asked to begin a deferred sync for a handler, but the handler could not be found on the sync wait list.", this);
 				}
 			}
+			*/
 		}
 		
 		/**
@@ -510,9 +555,9 @@ package org.smilkit.render
 		* Called when any handler on the RenderTree resolves its own intrinsic properties.
 		* Used to initiate sync for any assets that are starting from cold (unloaded or unready) when added to the RenderTree.
 		*/
-		protected function onHandlerDurationResolved(event:HandlerEvent):void
+		protected function onHandlerDurationResolved(e:HandlerEvent):void
 		{
-			var waitHandler:SMILKitHandler = event.handler;
+			var waitHandler:SMILKitHandler = e.handler;
 			
 			this.execSyncHandlerForViewportOffset(waitHandler);
 		}
@@ -527,10 +572,34 @@ package org.smilkit.render
 		/**
 		* Called when any of the RenderTree's handlers completes an asynchronous seek event.
 		*/
-		protected function onHandlerSeekNotify(event:HandlerEvent):void
+		protected function onHandlerSeekNotify(e:HandlerEvent):void
 		{
-			this.onHandlerSeekResult(event);
+			if (this._offsetSyncHandlerList != null)
+			{
+				var handler:SMILKitHandler = e.handler;
+				var index:int = this._offsetSyncHandlerList.indexOf(handler);
+				
+				if (this._offsetSyncHandlerList.length == 1)
+				{
+					SMILKit.logger.error("Handler seek result retrieved as '"+e.handler.currentOffset+"' and not using strict cycles, forcing the DOM clock to match the handlers offset.");
+					
+					// only one handler, match the clock to the handler
+					this.document.scheduler.seek(handler.currentOffset);
+				}
+				
+				// remove the handler from the list
+				this._offsetSyncHandlerList.splice(index, 1);
+				
+				// if list now is zero, dispatch ready!
+				if (this._offsetSyncHandlerList.length == 0)
+				{
+					this.syncHandlersToViewportState();
+					
+					this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
+				}
+			}
 			
+			/*
 			if(this._offsetSyncHandlerList != null)
 			{
 				var waitHandler:SMILKitHandler = event.handler;
@@ -556,23 +625,14 @@ package org.smilkit.render
 					}
 				}
 			}
+			*/
 		}
-		
-		protected function onHandlerSeekResult(e:HandlerEvent):void
-		{
-			if (!this.useSyncCycles)
-			{
-				SMILKit.logger.error("Handler seek result retrieved as '"+e.handler.currentOffset+"' and not using sync cycles, forcing the clock to match the handlers offset.");
-				
-				// sync the DOM clock
-				this.document.scheduler.seek(e.handler.currentOffset);
-			}
-		}
-		
+
 		protected function onHandlerStopNotify(e:HandlerEvent):void
 		{
 			SMILKit.logger.debug("Got STOP_NOTIFY from "+e.handler+". About to request out-of-band heartbeat tick.", this);
-			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_STOPPED, e.handler));
+			
+			//this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_STOPPED, e.handler));
 		}
 		
 		/**
@@ -585,13 +645,16 @@ package org.smilkit.render
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
 				
-				handler.leaveSyncState();
+				handler.leaveFrozenState();
 				
 				if (index >= 0)
 				{
 					SMILKit.logger.debug("Handler removed from RenderTree's sync wait list", handler);
+					
 					this._offsetSyncHandlerList.splice(index, 1);
-					this._offsetSyncOffsetList.splice(index, 1);
+					
+					//this._offsetSyncOffsetList.splice(index, 1);
+					
 					this.checkSyncOperation();
 				}
 			}
@@ -1073,7 +1136,7 @@ package org.smilkit.render
 			
 			if (this.viewport.offset > 0)
 			{
-				this.syncHandlersToViewportOffset();
+				//this.syncHandlersToViewportOffset();
 			}
 		}
 		

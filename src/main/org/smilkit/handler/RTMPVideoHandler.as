@@ -124,19 +124,14 @@ package org.smilkit.handler
 			return false;
 		}
 		
-		public override function get syncPoints():Vector.<int>
+		public override function get cuePoints():Vector.<int>
 		{
 			if (this._metadata == null)
 			{
-				return super.syncPoints;
+				return super.cuePoints;
 			}
 			
 			return this._metadata.syncPoints;
-		}
-		
-		public override function get syncable():Boolean
-		{
-			return false;
 		}
 		
 		public override function get spatial():Boolean
@@ -208,6 +203,8 @@ package org.smilkit.handler
 			this._startedLoading = true;
 			
 			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
+			
+			this.leaveFrozenState();
 			
 			this._waiting = true;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
@@ -308,12 +305,19 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function seek(seekTo:Number):void
+		public override function seek(target:Number, strict:Boolean):void
+		{
+			super.seek(target, strict);
+			
+			this.internalSeek(target);
+		}
+		
+		protected function internalSeek(target:Number):void
 		{
 			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> seek");
 			
-			var seconds:Number = (seekTo / 1000);
-			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			var seconds:Number = (target / 1000);
+			SMILKit.logger.debug("Executing internal seek to "+target+"ms ("+seconds+"s)", this);
 			
 			if(this._netStream != null)
 			{
@@ -580,6 +584,8 @@ package org.smilkit.handler
 					{
 						this._stopping = false;
 						
+						this.enterFrozenState();
+						
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
 					else
@@ -636,11 +642,14 @@ package org.smilkit.handler
 						this._netStream.pause();
 					}
 					
-					this._seekOnBufferFull = true;
-					this._waiting = true;
-					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
-					
+					if (!this._stopping && this._seekingTo)
+					{
+						this._seekOnBufferFull = true;
+						this._waiting = true;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					}
+
 					//this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this)); 
 					break;
 			}
@@ -697,7 +706,9 @@ package org.smilkit.handler
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
-					this.seek(0);
+					
+					// TODO: do an internal seek back to ground zero
+					this.internalSeek(0);
 					this.pause();
 				}
 			}
@@ -741,7 +752,7 @@ package org.smilkit.handler
 		/**
 		 * Callback routine, not really close!!!!!!!
 		 */
-		public function close():void
+		protected function close():void
 		{
 			// playback has finished, important for live events (so we can continue)
 			this.pause(); // Throw handler into paused state - we do not have a special "stopped" state

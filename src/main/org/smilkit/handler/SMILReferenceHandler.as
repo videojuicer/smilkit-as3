@@ -162,11 +162,6 @@ package org.smilkit.handler
 			return true;
 		}
 		
-		public override function get syncable():Boolean
-		{
-			return false;
-		}
-		
 		public override function get currentOffset():int
 		{
 			if (this.isViewportSMILReady)
@@ -329,7 +324,7 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function seek(seekTo:Number):void
+		public override function seek(seekTo:Number, strict:Boolean):void
 		{
 			if (this.isViewportSMILReady)
 			{
