@@ -495,7 +495,7 @@ package org.smilkit.handler
 		
 		protected function checkCondition():void
 		{
-			if (this._netStream != null)
+			if (this._netStream != null && this._netStream.info != null)
 			{
 				var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
 				var recentCount:uint = this._netStream.currentFPS;

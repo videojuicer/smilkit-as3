@@ -489,7 +489,10 @@ package org.smilkit.view
 				throw new IllegalOperationError("Unable to navigate to null location.");
 			}
 
+			SMILKit.logger.debug("Pausing playback before refresh", this);
 			this.pause();
+
+			// TODO flush display objects
 			
 			if(this.location.indexOf("data:") == 0)
 			{
@@ -872,10 +875,9 @@ package org.smilkit.view
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
-			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 			
-			// send a playback offset changed event
+			// send a playback offset changed event so that addons can reset their UIs
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			
 			// tidy up

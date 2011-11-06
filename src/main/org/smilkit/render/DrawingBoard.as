@@ -72,7 +72,16 @@ package org.smilkit.render
 		 */
 		public function set renderTree(value:HandlerController):void
 		{
+			// Detach old renderTree listeners
+			if(this._handlerController != null)
+			{
+				this.ownerDocument.displayStack.removeEventListener(DisplayStackEvent.ELEMENT_ADDED, this.onDisplayStackElementAdded);
+				this.ownerDocument.displayStack.removeEventListener(DisplayStackEvent.ELEMENT_REMOVED, this.onDisplayStackElementRemoved);	
+			}
+
+			// Go ahead with setting value
 			this._handlerController = value;
+
 			this.reset();
 		}
 		
@@ -418,11 +427,13 @@ package org.smilkit.render
 		
 		protected function onDisplayStackElementAdded(e:DisplayStackEvent):void
 		{
+			SMILKit.logger.debug("Redrawing (element added to display stack)", this);
 			this.draw();
 		}
 		
 		protected function onDisplayStackElementRemoved(e:DisplayStackEvent):void
 		{
+			SMILKit.logger.debug("Redrawing (element removed from display stack)", this);
 			this.reset();
 			this.draw();
 		}
