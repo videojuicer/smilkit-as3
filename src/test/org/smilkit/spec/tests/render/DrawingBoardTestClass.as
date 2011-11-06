@@ -32,6 +32,7 @@ package org.smilkit.spec.tests.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.Viewport;
 
 	public class DrawingBoardTestClass
@@ -55,7 +56,7 @@ package org.smilkit.spec.tests.render
 		{
 			var asyncHasRenderTree:Function = Async.asyncHandler(this, handleHasRenderTree, 10000, null, handleHasRenderTreeTimeOut);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncHasRenderTree, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_SMIL_XML;
 		}
 	    
 		protected function handleHasRenderTree(event:ViewportEvent, passThroughData:Object):void
@@ -76,7 +77,7 @@ package org.smilkit.spec.tests.render
 		{
 			var asyncHasCanvas:Function = Async.asyncHandler(this, handleHasCanvas, 10000, null, handleHasCanvasTimeOut);
 			this._viewport.addEventListener(ViewportEvent.REFRESH_COMPLETE, asyncHasCanvas, false, 0, true);
-			this._viewport.location = "http://sixty.im/demo.smil";	
+			this._viewport.location = "data:text/plain;charset=utf-8,"+Fixtures.BASIC_SMIL_XML;
 		}
 		
 		protected function handleHasCanvas(event:ViewportEvent, passThroughData:Object):void

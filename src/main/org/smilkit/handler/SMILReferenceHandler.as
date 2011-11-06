@@ -251,6 +251,12 @@ package org.smilkit.handler
 			this._nestedViewport.removeEventListener(ViewportEvent.REFRESH_COMPLETE, this.onInternalViewportRefreshComplete);
 			this._nestedViewport.removeEventListener(ProgressEvent.PROGRESS, this.onNestedViewportLoadablesProgress);
 			
+			if (this._nestedViewport.document != null)
+			{
+				this._nestedViewport.document.scheduler.removeEventListener(HeartbeatEvent.RESUMED, this.onDOMSchedulerResumed);
+				this._nestedViewport.document.scheduler.removeEventListener(HeartbeatEvent.PAUSED, this.onDOMSchedulerPaused);
+			}
+				
 			this._nestedViewport.pause();
 			this._nestedViewport.dispose();
 			
@@ -275,6 +281,20 @@ package org.smilkit.handler
 			}
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+		}
+		
+		public override function wait(handlers:Vector.<SMILKitHandler>):void
+		{
+			var selfWaiting:Boolean = (handlers.length == 1 && handlers[0] == this);
+			
+			if (selfWaiting)
+			{
+				this.unwait();
+			}
+			else
+			{
+				super.wait(handlers);
+			}
 		}
 		
 		public override function resume():void
@@ -304,7 +324,7 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function seek(seekTo:Number):void
+		public override function seek(seekTo:Number, strict:Boolean):void
 		{
 			if (this.isViewportSMILReady)
 			{
@@ -446,6 +466,9 @@ package org.smilkit.handler
 			this._nestedViewport.document.removeEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMCurrentIntervalsModified, false);
 			this._nestedViewport.document.addEventListener(SMILMutationEvent.DOM_CURRENT_INTERVAL_MODIFIED, this.onDOMCurrentIntervalsModified, false);
 			
+			this._nestedViewport.document.scheduler.addEventListener(HeartbeatEvent.RESUMED, this.onDOMSchedulerResumed);
+			this._nestedViewport.document.scheduler.addEventListener(HeartbeatEvent.PAUSED, this.onDOMSchedulerPaused);
+			
 			if (this._resuming)
 			{				
 				this._invalidateOnNextResume = false;
@@ -473,6 +496,16 @@ package org.smilkit.handler
 			}
 		}
 		
+		protected function onDOMSchedulerResumed(e:HeartbeatEvent):void
+		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+		}
+		
+		protected function onDOMSchedulerPaused(e:HeartbeatEvent):void
+		{
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
+		}
+		
 		protected function onInternalViewportReady(e:ViewportEvent):void
 		{
 			this.resize();
@@ -489,17 +522,17 @@ package org.smilkit.handler
 		{			
 			if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+				//this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 			}
 			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PAUSED)
 			{
-				this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
+				//this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 			}
 		}
 		
 		protected function onInternalViewportDocumentMutated(e:ViewportEvent):void
 		{
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+			//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 		
 		protected function onInternalViewportLoaderIOError(e:ViewportEvent):void

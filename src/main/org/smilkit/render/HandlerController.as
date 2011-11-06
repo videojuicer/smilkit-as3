@@ -31,11 +31,12 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
+	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.events.RenderTreeEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.SharedTimer;
@@ -70,8 +71,9 @@ package org.smilkit.render
 		protected var _waitingForSync:Boolean = false;
 		
 		protected var _performOffsetSyncOnNextResume:Boolean = false;
-		
 		protected var _performOffsetSyncAfterUpdate:Boolean = false;
+		
+		protected var _useSyncCycles:Boolean = false;
 		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
@@ -225,9 +227,9 @@ package org.smilkit.render
 		 */
 		public function syncHandlersToViewportState():void
 		{
-			if (this.document.scheduler.running)
+			if (this.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
-				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is running - resuming "+this.elements.length+" assets.", this);
+				SMILKit.logger.debug("Syncing handlers to viewport state: viewport is running - resuming "+this.elements.length+" assets.", this);
 				// Sync everything to a running state by resuming playback.
 				for (var i:int = 0; i < this.elements.length; i++)
 				{
@@ -247,7 +249,7 @@ package org.smilkit.render
 			}
 			else
 			{
-				SMILKit.logger.debug("Syncing handlers to viewport state: heartbeat is paused - pausing "+this.elements.length+" non-syncing assets.", this);
+				SMILKit.logger.debug("Syncing handlers to viewport state: viewport is paused - pausing "+this.elements.length+" non-syncing assets.", this);
 				// Sync to a paused heartbeat state by pausing everything EXCEPT handlers that are waiting for sync.
 				for (var j:int = 0; j < this.elements.length; j++)
 				{
@@ -261,6 +263,24 @@ package org.smilkit.render
 			}
 		}
 		
+		/**
+		 * Runs an offset sync operation on all handlers in the <code>HandlerController</code> instance.
+		 * 
+		 * 1) Simple seek, in a simple seek we seek the active handlers to the specified time, and adjust the DOM clock
+		 * to match the times to handlers were able to seek too. With a simple seek, the handler starts to seek to the requested
+		 * time and then the <code>HandlerController</code> matches the DOM clock to the handlers current position (after the seek).
+		 * 
+		 * 2) Complex seek, the DOM clock is adjusted to the requested time and all the handlers are seeked to match the DOM
+		 * clock, we wait for all the handlers to match up to the desired time. During a complex seek, the handler is told to
+		 * seek to the specified time, if it cannot seek without loading more, the handler enters its own wait cycle, freezes
+		 * the display and begins to playback silently until the desired time is met. The indiviual handlers are responsible for
+		 * completing the seek task given to them and must only dispatch SEEK_NOTIFY upon completion. 
+		 * 
+		 * When the handlers are first seeked, they are placed into the sync wait list and removed when the handler has finished
+		 * seeking to the desired time (with the SEEK_NOTIFY event). When all handlers have been removed from the sync wait list,
+		 * the <code>HandlerController</code> exits the sync cycle.
+		 * 
+		 */
 		/**
 		* Starts an offset sync operation on all handlers in the <code>RenderTree</code> instance.
 		*
@@ -306,60 +326,111 @@ package org.smilkit.render
 			if(this._waitingForSync)
 			{
 				SMILKit.logger.debug("Asked to start a sync operation, but one is already in progress. Cancelling existing sync operation.", this);
+				
 				this.cancelOffsetSync();
 			}
 			
-			
-			SMILKit.logger.debug("Beginning sync operation...", this);
-			
+			// reset sync lists
 			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
-			this._offsetSyncOffsetList = new Vector.<uint>();
 			
-			// Loop over all handlers
-			for (var i:int = 0; i < this.elements.length; i++)
+			var seekables:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
+			
+			for (var s:uint = 0; s < this.elements.length; s++)
 			{
-				var node:SMILTimeInstance = this.elements[i];
-				var handler:SMILKitHandler = (node.mediaElement.handler as SMILKitHandler);
-				
-				if(handler.seekable)
+				if (this.elements[s].mediaElement.handler.seekable)
 				{
-					// Calculate the target offset for this handler
-					// TODO include clip-begin into the equation
-					var offset:uint = Math.max(0, this._objectPool.viewport.offset - node.begin.resolvedOffset) * 1000;
-					
-					// Push the handler onto the sync wait list
-					this._offsetSyncHandlerList.push(handler);
-					this._offsetSyncOffsetList.push(offset);
-					
-					if (!this._waitingForSync)
-					{
-						SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
-						
-						this._waitingForSync = true;				
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_SYNC, null));
-					}
-					
-					if(handler.completedResolving || handler.completedLoading)
-					{
-						handler.enterSyncState();
-						
-						this.execSyncHandlerForViewportOffset(handler);
-					}
-					else
-					{
-						SMILKit.logger.debug("Sync cycle encountered an unloaded or unresolved handler. Deferring sync on this handler until it has resolved itself.", this);
-					}
+					seekables.push(this.elements[s]);
 				}
 			}
 			
-			if (this._offsetSyncHandlerList.length == 0)
+			var strict:Boolean = (seekables.length > 1);
+			var offset:Number = this._objectPool.viewport.offset;
+			
+			for (var i:uint = 0; i < seekables.length; i++)
 			{
-				SMILKit.logger.debug("No handlers require sync at this time.", this);
+				var time:SMILTimeInstance = seekables[i];
+				var handler:SMILKitHandler = time.mediaElement.handler;
+				var target:uint = Math.max(0, ((offset - time.begin.resolvedOffset) * 1000));
+				
+				handler.seek(target, strict);
+				
+				this._offsetSyncHandlerList.push(handler);
 			}
+			
+			/*
+			if (!this.useSyncCycles)
+			{
+				// we adjust the DOM timer to reflect the seek result (rather than syncing the asset to the DOM timer)
+				for (var k:int = 0; k < this.elements.length; k++)
+				{
+					var mediaElement:SMILMediaElement = this.elements[k].mediaElement;
+					
+					if (mediaElement.handler != null && mediaElement.handler.seekable)
+					{
+						var mediaElementTarget:uint = Math.max(0, this._objectPool.viewport.offset - this.elements[k].begin.resolvedOffset) * 1000;
+						
+						SMILKit.logger.error("Seeking handler without sync cycles to '"+mediaElementTarget+"' ...");
+						
+						mediaElement.handler.seek(mediaElementTarget);
+						break;
+					}
+				}
+			}
+			else
+			{
+				SMILKit.logger.debug("Beginning sync operation...", this);
+				
+				this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+				this._offsetSyncOffsetList = new Vector.<uint>();
+				
+				// Loop over all handlers
+				for (var i:int = 0; i < this.elements.length; i++)
+				{
+					var node:SMILTimeInstance = this.elements[i];
+					var handler:SMILKitHandler = (node.mediaElement.handler as SMILKitHandler);
+					
+					if(handler.seekable)
+					{
+						// Calculate the target offset for this handler
+						// TODO include clip-begin into the equation
+						var offset:uint = Math.max(0, this._objectPool.viewport.offset - node.begin.resolvedOffset) * 1000;
+						
+						// Push the handler onto the sync wait list
+						this._offsetSyncHandlerList.push(handler);
+						this._offsetSyncOffsetList.push(offset);
+						
+						if (!this._waitingForSync)
+						{
+							SMILKit.logger.debug("Waiting for sync on "+this._offsetSyncHandlerList.length+" handlers.", this);
+							
+							this._waitingForSync = true;				
+							this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_SYNC, null));
+						}
+						
+						if(handler.completedResolving || handler.completedLoading)
+						{
+							handler.enterFrozenState();
+							
+							this.execSyncHandlerForViewportOffset(handler);
+						}
+						else
+						{
+							SMILKit.logger.debug("Sync cycle encountered an unloaded or unresolved handler. Deferring sync on this handler until it has resolved itself.", this);
+						}
+					}
+				}
+				
+				if (this._offsetSyncHandlerList.length == 0)
+				{
+					SMILKit.logger.debug("No handlers require sync at this time.", this);
+				}
+			}
+			*/
 		}
 		
 		protected function execSyncHandlerForViewportOffset(handler:SMILKitHandler):void
 		{
+			/*
 			if(this._offsetSyncHandlerList != null)
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
@@ -370,11 +441,11 @@ package org.smilkit.render
 					if(handler.seekable)
 					{						
 						// Perform sync
-						var nearestSyncPoint:Number = handler.findNearestSyncPoint(offset);
+						var nearestSyncPoint:Number = handler.findNearestCuePoint(offset);
 						var destinationOffset:Number;
 						if(nearestSyncPoint <= offset){
 							destinationOffset = nearestSyncPoint;
-							SMILKit.logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms (selected from "+handler.syncPoints.length+" syncpoints: "+handler.syncPoints.join(", ")+") with a target offset of "+offset+"ms. completedResolving: "+handler.completedResolving+", completedLoading"+ handler.completedLoading, this);
+							SMILKit.logger.debug("Syncing a handler using known syncpoints. Seeking handler to "+destinationOffset+"ms (selected from "+handler.cuePoints.length+" syncpoints: "+handler.cuePoints.join(", ")+") with a target offset of "+offset+"ms. completedResolving: "+handler.completedResolving+", completedLoading"+ handler.completedLoading, this);
 						}
 						else
 						{
@@ -398,6 +469,7 @@ package org.smilkit.render
 					SMILKit.logger.debug("Asked to begin a deferred sync for a handler, but the handler could not be found on the sync wait list.", this);
 				}
 			}
+			*/
 		}
 		
 		/**
@@ -465,7 +537,7 @@ package org.smilkit.render
 						
 						this.syncHandlersToViewportState();
 						
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+						this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
 					}
 					else
 					{
@@ -483,9 +555,9 @@ package org.smilkit.render
 		* Called when any handler on the RenderTree resolves its own intrinsic properties.
 		* Used to initiate sync for any assets that are starting from cold (unloaded or unready) when added to the RenderTree.
 		*/
-		protected function onHandlerDurationResolved(event:HandlerEvent):void
+		protected function onHandlerDurationResolved(e:HandlerEvent):void
 		{
-			var waitHandler:SMILKitHandler = event.handler;
+			var waitHandler:SMILKitHandler = e.handler;
 			
 			this.execSyncHandlerForViewportOffset(waitHandler);
 		}
@@ -500,8 +572,34 @@ package org.smilkit.render
 		/**
 		* Called when any of the RenderTree's handlers completes an asynchronous seek event.
 		*/
-		protected function onHandlerSeekNotify(event:HandlerEvent):void
+		protected function onHandlerSeekNotify(e:HandlerEvent):void
 		{
+			if (this._offsetSyncHandlerList != null)
+			{
+				var handler:SMILKitHandler = e.handler;
+				var index:int = this._offsetSyncHandlerList.indexOf(handler);
+				
+				if (this._offsetSyncHandlerList.length == 1)
+				{
+					SMILKit.logger.error("Handler seek result retrieved as '"+e.handler.currentOffset+"' and not using strict cycles, forcing the DOM clock to match the handlers offset.");
+					
+					// only one handler, match the clock to the handler
+					this.document.scheduler.seek(handler.currentOffset);
+				}
+				
+				// remove the handler from the list
+				this._offsetSyncHandlerList.splice(index, 1);
+				
+				// if list now is zero, dispatch ready!
+				if (this._offsetSyncHandlerList.length == 0)
+				{
+					this.syncHandlersToViewportState();
+					
+					this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
+				}
+			}
+			
+			/*
 			if(this._offsetSyncHandlerList != null)
 			{
 				var waitHandler:SMILKitHandler = event.handler;
@@ -527,12 +625,14 @@ package org.smilkit.render
 					}
 				}
 			}
+			*/
 		}
-		
+
 		protected function onHandlerStopNotify(e:HandlerEvent):void
 		{
 			SMILKit.logger.debug("Got STOP_NOTIFY from "+e.handler+". About to request out-of-band heartbeat tick.", this);
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_STOPPED, e.handler));
+			
+			//this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_STOPPED, e.handler));
 		}
 		
 		/**
@@ -545,13 +645,16 @@ package org.smilkit.render
 			{
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
 				
-				handler.leaveSyncState();
+				handler.leaveFrozenState();
 				
 				if (index >= 0)
 				{
 					SMILKit.logger.debug("Handler removed from RenderTree's sync wait list", handler);
+					
 					this._offsetSyncHandlerList.splice(index, 1);
-					this._offsetSyncOffsetList.splice(index, 1);
+					
+					//this._offsetSyncOffsetList.splice(index, 1);
+					
 					this.checkSyncOperation();
 				}
 			}
@@ -745,7 +848,7 @@ package org.smilkit.render
 				}*/
 				
 				// Action the update changes
-				if(actionableChanges)
+				if (actionableChanges)
 				{
 					SMILKit.logger.debug("RenderTree.updateAt("+offset+"): actioning changes. "+addedTimingNodes.length+" added, "+removedTimingNodes.length+" removed, "+modifiedTimingNodes.length+" modified.", this);
 					
@@ -795,6 +898,22 @@ package org.smilkit.render
 				{
 					SMILKit.logger.debug("RenderTree update at " + offset + "ms garbage collected " + orphanCount + " dead handlers", this);
 				}
+				
+				var syncableCount:uint = 0;
+				
+				for (var s:uint = 0; s < this.elements.length; s++)
+				{
+					var mediaElement:SMILMediaElement = (this.elements[s].mediaElement);
+					
+					if (mediaElement.handler != null && mediaElement.handler.seekable)
+					{
+						syncableCount += 1;
+					}
+				}
+				
+				this._useSyncCycles = (syncableCount > 1);
+				
+				SMILKit.logger.warn("Sync cycles disabled, HandlerController will not sync assets together.");
 				
 				// UPDATE COMPLETE
 				// Perform the sync if we flagged up that one is needed
@@ -859,7 +978,7 @@ package org.smilkit.render
 			this._activeMediaElements.push(element);
 			
 			handler.addedToRenderTree(this);
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_ADDED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_ADDED, handler));
 		}
 		protected function removeTimingNodeHandlerFromActiveList(timingNode:SMILTimeInstance):void
 		{
@@ -893,14 +1012,14 @@ package org.smilkit.render
 			
 			handler.removedFromRenderTree(this);
 			// remove from canvas
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_REMOVED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_REMOVED, handler));
 			
 		}
 		protected function timingNodeModifiedOnActiveList(timingNode:SMILTimeInstance):void
 		{
 			var element:SMILMediaElement = (timingNode.element as SMILMediaElement);
 			var handler:SMILKitHandler = element.handler;
-			this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.ELEMENT_MODIFIED, handler));
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.ELEMENT_MODIFIED, handler));
 		}
 		
 		/**
@@ -917,6 +1036,8 @@ package org.smilkit.render
 				this._waitingForDataHandlerList.push(e.handler);
 			}
 			
+			this.waitHandlers();
+			
 			this.checkLoadState();
 		}
 		
@@ -928,6 +1049,36 @@ package org.smilkit.render
 			SMILKit.logger.debug("Handler dispatched LOAD_READY, checking load wait cycle status.", this);
 			// remove from waiting list
 			this.removeHandlerFromWaitingForDataList(e.handler);
+		}
+		
+		protected function waitHandlers():void
+		{
+			SMILKit.logger.debug("Calling wait on all handlers in the HandlerController, with "+this._waitingForDataHandlerList.length+" handlers in the list.");
+			
+			for (var i:int = 0; i < this.elements.length; i++)
+			{
+				var handler:SMILKitHandler = this.elements[i].mediaElement.handler;
+				
+				if (handler != null)
+				{
+					handler.wait(this._waitingForDataHandlerList);
+				}
+			}
+		}
+		
+		protected function unwaitHandlers():void
+		{
+			SMILKit.logger.debug("Calling unwait on all handlers in the HandlerController");
+			
+			for (var i:int = 0; i < this.elements.length; i++)
+			{
+				var handler:SMILKitHandler = this.elements[i].mediaElement.handler;
+				
+				if (handler != null)
+				{
+					handler.unwait();
+				}
+			}
 		}
 		
 		/**
@@ -946,7 +1097,10 @@ package org.smilkit.render
 					if(!this._waitingForSync)
 					{
 						SMILKit.logger.debug("Load wait cycle completed. RenderTree now READY.", this);
-						this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.READY, null));
+						
+						this.unwaitHandlers();
+						
+						this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
 					}
 					else
 					{
@@ -963,7 +1117,7 @@ package org.smilkit.render
 					// Set the waitingForData flag and dispatch the relevant event.
 					this._waitingForData = true;				
 					// we have nothing on our plate, so we are ready!
-					this.dispatchEvent(new RenderTreeEvent(RenderTreeEvent.WAITING_FOR_DATA, null));
+					this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_DATA, null));
 				}
 				SMILKit.logger.debug("Load wait cycle waiting for "+this._waitingForDataHandlerList.length+" handlers to dispatch LOAD_READY. ("+this._waitingForDataHandlerList.join(", ")+")", this);
 			}
@@ -982,7 +1136,7 @@ package org.smilkit.render
 			
 			if (this.viewport.offset > 0)
 			{
-				this.syncHandlersToViewportOffset();
+				//this.syncHandlersToViewportOffset();
 			}
 		}
 		

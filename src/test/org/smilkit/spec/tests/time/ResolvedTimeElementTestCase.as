@@ -54,9 +54,9 @@ package org.smilkit.spec.tests.time
 		public function isPopulated():void
 		{
 			// test has a start
-			Assert.assertEquals(0, resolvedTimeElement.begin);
+			Assert.assertEquals(0, resolvedTimeElement.begin.resolvedOffset);
 			// test has an end
-			Assert.assertEquals(10, resolvedTimeElement.end);
+			Assert.assertEquals(10, resolvedTimeElement.end.resolvedOffset);
 			// test reports active true
 			Assert.assertTrue(resolvedTimeElement.activeAt(1));
 			// test reports active false

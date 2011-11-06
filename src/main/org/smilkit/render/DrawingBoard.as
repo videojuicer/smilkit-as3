@@ -36,14 +36,14 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.display.DisplayStackEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.events.RenderTreeEvent;
+	import org.smilkit.events.HandlerControllerEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	
 	public class DrawingBoard extends Sprite
 	{
-		protected var _renderTree:HandlerController;
+		protected var _handlerController:HandlerController;
 		protected var _canvas:Sprite;
 		protected var _elements:Vector.<ElementTimeContainer>;
 		protected var _regions:Vector.<RegionContainer>;
@@ -63,7 +63,7 @@ package org.smilkit.render
 		 */
 		public function get renderTree():HandlerController
 		{
-			return this._renderTree;
+			return this._handlerController;
 		}
 		
 		/**
@@ -73,14 +73,15 @@ package org.smilkit.render
 		public function set renderTree(value:HandlerController):void
 		{
 			// Detach old renderTree listeners
-			if(this._renderTree != null)
+			if(this._handlerController != null)
 			{
 				this.ownerDocument.displayStack.removeEventListener(DisplayStackEvent.ELEMENT_ADDED, this.onDisplayStackElementAdded);
 				this.ownerDocument.displayStack.removeEventListener(DisplayStackEvent.ELEMENT_REMOVED, this.onDisplayStackElementRemoved);	
 			}
 
 			// Go ahead with setting value
-			this._renderTree = value;
+			this._handlerController = value;
+
 			this.reset();
 		}
 		
@@ -184,7 +185,7 @@ package org.smilkit.render
 									
 									// place the element on to the region it belongs too
 									region.regionContainer.addAssetChild(handler);
-									region.regionContainer.renderTree = this._renderTree;
+									region.regionContainer.renderTree = this._handlerController;
 									
 									if(handler.spatial)
 									{
@@ -349,16 +350,10 @@ package org.smilkit.render
 			this._elements = new Vector.<ElementTimeContainer>();
 			this._canvas = new Sprite();
 			
-			if (this._renderTree != null)
+			if (this._handlerController != null)
 			{
 				this.ownerDocument.displayStack.addEventListener(DisplayStackEvent.ELEMENT_ADDED, this.onDisplayStackElementAdded);
 				this.ownerDocument.displayStack.addEventListener(DisplayStackEvent.ELEMENT_REMOVED, this.onDisplayStackElementRemoved);
-				//this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_MODIFIED, this.onRenderTreeElementModified);
-				//this._renderTree.addEventListener(RenderTreeEvent.ELEMENT_REPLACED, this.onRenderTreeElementReplaced);
-	
-				//this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.PAUSED, this.onHeartbeatPaused);
-				//this._renderTree.document.viewportObjectPool.viewport.heartbeat.addEventListener(HeartbeatEvent.RESUMED, this.onHeartbeatResumed);
-				//this.ownerDocument.displayStack.addEventListener(RenderTree
 			}
 			
 			this._canvas.graphics.clear();
@@ -443,13 +438,13 @@ package org.smilkit.render
 			this.draw();
 		}
 		
-		protected function onRenderTreeElementModified(e:RenderTreeEvent):void
+		protected function onRenderTreeElementModified(e:HandlerControllerEvent):void
 		{
 			this.reset();
 			this.draw();
 		}
 		
-		protected function onRenderTreeElementReplaced(e:RenderTreeEvent):void
+		protected function onRenderTreeElementReplaced(e:HandlerControllerEvent):void
 		{
 			this.reset();
 			this.draw();

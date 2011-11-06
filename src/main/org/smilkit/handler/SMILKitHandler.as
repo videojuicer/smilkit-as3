@@ -67,6 +67,13 @@ package org.smilkit.handler
 		
 		protected var _hasSetImplicitMediaDuration:Boolean = false;
 		
+		protected var _baseResumed:Boolean = false;
+		
+		protected var _seekingTo:Boolean = false;
+		protected var _seekingToTarget:Number = 0;
+		
+		protected var _frozen:Boolean = false;
+		
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
@@ -75,7 +82,7 @@ package org.smilkit.handler
 			this._handlerId = SMILKitHandler.__idCounter;
 			this.resolveInitialLoadableProperties();
 		}
-		
+
 		public function get handlerId():int
 		{
 			return this._handlerId;
@@ -146,14 +153,9 @@ package org.smilkit.handler
 			return false;
 		}
 		
-		public function get syncPoints():Vector.<int>
+		public function get cuePoints():Vector.<int>
 		{
 			return new Vector.<int>();
-		}
-		
-		public function get syncable():Boolean
-		{
-			return (this.syncPoints != null && this.syncPoints.length > 0);
 		}
 		
 		public function get preloadable():Boolean
@@ -224,9 +226,40 @@ package org.smilkit.handler
 			return this._region;
 		}
 		
+		public function get resumed():Boolean
+		{
+			return this._baseResumed;
+		}
+		
+		public function get seekingTo():Boolean
+		{
+			return this._seekingTo;
+		}
+		
+		public function get seekingToTarget():Number
+		{
+			return this._seekingToTarget;
+		}
+		
 		public function load():void
 		{
 			
+		}
+		
+		public function wait(handlers:Vector.<SMILKitHandler>):void
+		{
+			if (this.resumed)
+			{
+				this.pause();
+			}
+		}
+		
+		public function unwait():void
+		{
+			if (this.resumed)
+			{
+				this.resume();
+			}
 		}
 		
 		protected function resolveInitialLoadableProperties():void
@@ -272,7 +305,7 @@ package org.smilkit.handler
 		 */
 		public function pause():void
 		{
-			
+			this._baseResumed = false;
 		}
 		
 		/**
@@ -284,9 +317,9 @@ package org.smilkit.handler
 		 */
 		public function resume():void
 		{
-			
+			this._baseResumed = true;
 		}
-		
+
 		/**
 		 * Seeks the handler instance to the specified offset, as a seek does not usually happen
 		 * on a stream straight away a <code>HandlerEvent.SEEK_NOTIFY</code> is dispatched once
@@ -307,12 +340,33 @@ package org.smilkit.handler
 		 * @see org.smilkit.event.HandlerEvent.SEEK_INVALIDTIME
 		 * @see org.smilkit.event.HandlerEvent.SEEK_FAILED
 		 */
-		public function seek(seekTo:Number):void
+		public function seek(target:Number, strict:Boolean):void
 		{
-			if (this.seekable)
+			if (!this.seekable)
 			{
 				throw new IllegalOperationError("Unable to seek on a un-seekable SMILKitHandler.");
 			}
+			else
+			{
+				if (strict)
+				{
+					this.onSeekTo(target);
+				}
+			}
+		}
+		
+		protected function onSeekTo(target:Number):void
+		{
+			this._seekingToTarget = target;
+			
+			this._seekingTo = true;
+		}
+		
+		protected function onSeekToCompleted():void
+		{
+			this._seekingTo = false;
+			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 		}
 		
 		/**
@@ -320,22 +374,22 @@ package org.smilkit.handler
 		 * <code>syncTolerance</code> value to determine if a sync point should be choosen before or after
 		 * the offset. 
 		 */
-		public function findNearestSyncPoint(offset:Number):Number
+		public function findNearestCuePoint(offset:Number):Number
 		{
-			if (this.syncable)
+			if (this.cuePoints.length > 0)
 			{
 				var beforeSyncPoint:Number = 0;
 				var afterSyncPoint:Number = Number.POSITIVE_INFINITY;
 				
-				for (var i:int = 0; i < this.syncPoints.length; i++)
+				for (var i:int = 0; i < this.cuePoints.length; i++)
 				{
-					if (this.syncPoints[i] <= offset && this.syncPoints[i] > beforeSyncPoint)
+					if (this.cuePoints[i] <= offset && this.cuePoints[i] > beforeSyncPoint)
 					{
-						beforeSyncPoint = this.syncPoints[i];
+						beforeSyncPoint = this.cuePoints[i];
 					}
-					else if (this.syncPoints[i] >= offset && this.syncPoints[i] < afterSyncPoint)
+					else if (this.cuePoints[i] >= offset && this.cuePoints[i] < afterSyncPoint)
 					{
-						afterSyncPoint = this.syncPoints[i];
+						afterSyncPoint = this.cuePoints[i];
 					}
 				}
 				
@@ -645,13 +699,27 @@ package org.smilkit.handler
 			}
 		}
 		
-		public function enterSyncState():void
+		public function get frozen():Boolean
+		{
+			return this._frozen;
+		}
+		
+		public function enterFrozenState():void
 		{
 			var parent:Sprite = (this.displayObject as Sprite);
 			
 			if (this.innerDisplayObject != null && parent.contains(this.innerDisplayObject))
 			{
-				SMILKit.logger.debug("Handler "+this.handlerId+" entering sync state");
+				if (this.frozen)
+				{
+					SMILKit.logger.debug("Handler "+this.handlerId+" already frozen, re-freezing handler state");
+				}
+				else
+				{
+					SMILKit.logger.debug("Handler "+this.handlerId+" entering a into a frozen state");
+				}
+
+				this._frozen = true;
 				
 				parent.graphics.clear();
 				
@@ -663,15 +731,17 @@ package org.smilkit.handler
 			}
 		}
 		
-		public function leaveSyncState():void
+		public function leaveFrozenState():void
 		{
 			var parent:Sprite = (this.displayObject as Sprite);
 			
-			if (this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
+			if (this.frozen && this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
 			{
-				SMILKit.logger.debug("Handler "+this.handlerId+" leaving sync state");
+				SMILKit.logger.debug("Handler "+this.handlerId+" melting and leaving frozen state");
 
 				parent.graphics.clear();
+				
+				this._frozen = false;
 				
 				parent.addChild(this.innerDisplayObject);
 			}

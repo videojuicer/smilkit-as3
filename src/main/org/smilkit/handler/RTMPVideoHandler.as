@@ -124,11 +124,11 @@ package org.smilkit.handler
 			return false;
 		}
 		
-		public override function get syncPoints():Vector.<int>
+		public override function get cuePoints():Vector.<int>
 		{
 			if (this._metadata == null)
 			{
-				return super.syncPoints;
+				return super.cuePoints;
 			}
 			
 			return this._metadata.syncPoints;
@@ -171,6 +171,11 @@ package org.smilkit.handler
 			return new VideoHandlerState(source, 0, this._netConnection, this._netStream, this._video, this._canvas);	
 		}
 		
+		public override function get resumed():Boolean
+		{
+			return this._resumed;
+		}
+		
 		public function get videoHandlerState():VideoHandlerState
 		{
 			return (this.handlerState as VideoHandlerState);
@@ -179,6 +184,11 @@ package org.smilkit.handler
 		public override function load():void
 		{
 			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> load");
+			
+			if (this._metadata != null)
+			{
+				SMILKit.logger.debug("Metadata already loaded for RTMPHandler.");
+			}
 			
 			this._playOptions = new NetStreamPlayOptions();
 									
@@ -194,8 +204,24 @@ package org.smilkit.handler
 			
 			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
 			
+			this.leaveFrozenState();
+			
 			this._waiting = true;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+		}
+		
+		public override function wait(handlers:Vector.<SMILKitHandler>):void
+		{
+			var selfWaiting:Boolean = (handlers.length == 1 && handlers[0] == this);
+			
+			if (selfWaiting)
+			{
+				this.unwait();
+			}
+			else
+			{
+				super.wait(handlers);
+			}
 		}
 		
 		public override function merge(handlerState:HandlerState):Boolean
@@ -279,12 +305,19 @@ package org.smilkit.handler
 			}
 		}
 		
-		public override function seek(seekTo:Number):void
+		public override function seek(target:Number, strict:Boolean):void
+		{
+			super.seek(target, strict);
+			
+			this.internalSeek(target);
+		}
+		
+		protected function internalSeek(target:Number):void
 		{
 			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> seek");
 			
-			var seconds:Number = (seekTo / 1000);
-			SMILKit.logger.debug("Executing internal seek to "+seekTo+"ms ("+seconds+"s)", this);
+			var seconds:Number = (target / 1000);
+			SMILKit.logger.debug("Executing internal seek to "+target+"ms ("+seconds+"s)", this);
 			
 			if(this._netStream != null)
 			{
@@ -458,21 +491,41 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 		}
 		
+		protected var _waitingForFrames:Boolean = false;
+		
 		protected function checkCondition():void
 		{
-			if(this._netStream != null && this._netStream.info != null)
+			if (this._netStream != null && this._netStream.info != null)
 			{
 				var recentDrops:uint = (this._netStream.info.droppedFrames - this._droppedFrames);
 				var recentCount:uint = this._netStream.currentFPS;
 				
-				SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+this._netStream.currentFPS+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
+				SMILKit.logger.debug("RTMP.checkCondition -> FPS: "+recentCount+", recent dropped frames: "+recentDrops+", total dropped: "+this._netStream.info.droppedFrames+", buffer length: "+this._netStream.bufferLength+" filling at: "+NumberHelper.toHumanReadableString(this._netStream.info.maxBytesPerSecond / 1024)+"Kbps, playing at: "+NumberHelper.toHumanReadableString(this._netStream.info.playbackBytesPerSecond / 1024)+"Kbps, video rate at: "+NumberHelper.toHumanReadableString(this._netStream.info.videoBytesPerSecond / 1024)+"Kbps");
 				
 				if (recentDrops > (recentCount / 2))
 				{
-					SMILKit.logger.warn("WARNING: RTMP stream dropped too many frames ....");
+					SMILKit.logger.warn("WARNING: RTMP stream dropped more than half of the frames: "+recentDrops+", target: "+recentCount);
 				}
 				
-				this._droppedFrames = this._netStream.info.droppedFrames;	
+				if (recentCount == 0)
+				{
+					SMILKit.logger.warn("WARNING: RTMP stream is not playing any frames.");
+					
+					this._waitingForFrames = true;
+					
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+				}
+				else
+				{
+					if (this._waitingForFrames)
+					{
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+					}
+					
+					this._waitingForFrames = false;
+				}
+				
+				this._droppedFrames = this._netStream.info.droppedFrames;
 			}
 		}
 		
@@ -488,11 +541,29 @@ package org.smilkit.handler
 						this._netStream.bufferTime = RTMPVideoHandler.EXPANDED_BUFFER_TIME;
 					}
 					
-					if (this._waiting && this._metadata != null && !this._waitingForMetaRefresh)
+					if (this._metadata != null)
 					{
-						this._waiting = false;
+						if (this._waiting)
+						{
+							this._waiting = false;
 
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+						}
+						
+						// dispatch some events for resume + seek
+						if (this._resumeOnBufferFull)
+						{
+							this._resumeOnBufferFull = false;
+							
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+						}
+						
+						if (this._seekOnBufferFull)
+						{
+							this._seekOnBufferFull = false;
+							
+							this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+						}
 					}
 					break;
 				case "NetStream.Buffer.Empty":
@@ -513,7 +584,13 @@ package org.smilkit.handler
 					{
 						this._stopping = false;
 						
+						this.enterFrozenState();
+						
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+					}
+					else
+					{
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 					}
 					break;
 				case "NetStream.Failed":
@@ -525,7 +602,7 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_FAILED, this));
 					break;
 				case "NetStream.Play.Stop":
-					this._stopping = false;
+					this._stopping = true;
 					break;
 				case "NetStream.Unpublish.Success":
 					// playback has finished, important for live events (so we can continue)
@@ -545,7 +622,12 @@ package org.smilkit.handler
 					
 					if (!this._waitingForMetaRefresh)
 					{
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+						this._resumeOnBufferFull = true;
+						this._waiting = true;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+						
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					}
 					break;
 				case "NetStream.Seek.Failed":
@@ -560,10 +642,22 @@ package org.smilkit.handler
 						this._netStream.pause();
 					}
 					
-					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+					if (!this._stopping && this._seekingTo)
+					{
+						this._seekOnBufferFull = true;
+						this._waiting = true;
+						
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
+					}
+
+					//this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this)); 
 					break;
 			}
 		}
+		
+		
+		protected var _resumeOnBufferFull:Boolean = false;
+		protected var _seekOnBufferFull:Boolean = false;
 		
 		protected function onIOErrorEvent(e:IOErrorEvent):void
 		{
@@ -612,7 +706,9 @@ package org.smilkit.handler
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
-					this.seek(0);
+					
+					// TODO: do an internal seek back to ground zero
+					this.internalSeek(0);
 					this.pause();
 				}
 			}
@@ -656,7 +752,7 @@ package org.smilkit.handler
 		/**
 		 * Callback routine, not really close!!!!!!!
 		 */
-		public function close():void
+		protected function close():void
 		{
 			// playback has finished, important for live events (so we can continue)
 			this.pause(); // Throw handler into paused state - we do not have a special "stopped" state

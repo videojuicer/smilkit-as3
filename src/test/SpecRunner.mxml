@@ -24,8 +24,6 @@
 				// testRunner.runWithFlexUnit4Runner(currentRunTestSuite(), "smilkit-as3");
 
 				
-				
-				
 				if (this.parameters.hasOwnProperty("class"))
 				{
 					var paramClass:String = this.parameters["class"];

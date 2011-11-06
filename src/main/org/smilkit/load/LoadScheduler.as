@@ -334,7 +334,7 @@ package org.smilkit.load {
 		protected function opportunisticWorkerForHandler(handler:SMILKitHandler):Worker 
 		{
 			if(this._justInTimeWorker.hasHandler(handler)) return null;
-			if((handler.resolvable) && (handler.element != null) && !(handler.element as ElementTimeContainer).hasDuration())
+			if((handler.resolvable && !handler.completedResolving) && (handler.element != null) && !(handler.element as ElementTimeContainer).hasDuration())
 			{
 				return this._resolveWorker;
 			}

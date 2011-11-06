@@ -116,11 +116,11 @@ package org.smilkit.handler
 			return true;
 		}
 		
-		public override function get syncPoints():Vector.<int>
+		public override function get cuePoints():Vector.<int>
 		{
 			if (this._metadata == null)
 			{
-				return super.syncPoints;
+				return super.cuePoints;
 			}
 			
 			return this._metadata.syncPoints;
@@ -154,6 +154,11 @@ package org.smilkit.handler
 			}
 			
 			return (this._netStream.time * 1000);
+		}
+		
+		public override function get resumed():Boolean
+		{
+			return this._resumed;
 		}
 		
 		public override function get handlerState():HandlerState
@@ -213,7 +218,7 @@ package org.smilkit.handler
 			if (this.completedLoading)
 			{
 				SMILKit.logger.debug("HTTPVideoHandler "+this.handlerId+" moved to JIT worker. Will reset play head before calling super", this);
-				this.seek(0);
+				this.seek(0, true);
 				// were ready since load has finished!
 			}
 			super.movedToJustInTimeWorkList();
@@ -263,20 +268,25 @@ package org.smilkit.handler
 		* 
 		* @see org.smilkit.handler.HTTPVideoHandler.onHeartbeatTick
 		*/
-		public override function seek(seekTo:Number):void
+		public override function seek(target:Number, strict:Boolean):void
 		{
-			if(this.readyToPlayAt(seekTo))
+			super.seek(target, strict);
+			
+			if (strict)
 			{
-				// We're able to seek to that point. Execute the seek right away.
-				this.execSeek(seekTo);
+				SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+				
+				this.enterFrozenState();
+				
+				this._queuedSeek = true;
+				this._queuedSeekTarget = this.seekingToTarget;
 			}
 			else
 			{
-				// Stash the seek until we're able to do it.
-				SMILKit.logger.debug("Seek to "+seekTo+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+				//if(this.readyToPlayAt(target))
 				
-				this._queuedSeek = true;
-				this._queuedSeekTarget = seekTo;
+				// We're able to seek to that point. Execute the seek right away.
+				this.execSeek(target);
 			}
 		}
 		
@@ -615,6 +625,13 @@ package org.smilkit.handler
 					this._netStream.pause();
 				}
 				
+				if (this.seekingToTarget)
+				{
+					this.onSeekToCompleted();
+					
+					this.leaveFrozenState();
+				}
+				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 				
 				return true;
@@ -668,12 +685,12 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
-				SMILKit.logger.info("Metadata encountered (with "+this.syncPoints.length+" syncPoints): "+this._metadata.toString()+" Source: "+this.element.src);
+				SMILKit.logger.info("Metadata encountered (with "+this.cuePoints.length+" syncPoints): "+this._metadata.toString()+" Source: "+this.element.src);
 				if(!this._resumed)
 				{
 					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
 					
-					this.seek(0);
+					this.seek(0, true);
 					this.pause();
 				}
 			}
