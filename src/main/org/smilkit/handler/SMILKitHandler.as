@@ -564,6 +564,7 @@ package org.smilkit.handler
 		 */
 		public function addedToDrawingRegion(region:SMILRegionElement):void
 		{
+			SMILKit.logger.debug("Added to display region "+region, this);
 			this._region = region;
 		}
 		
@@ -572,6 +573,7 @@ package org.smilkit.handler
 		 */
 		public function removedFromDrawingRegion(region:SMILRegionElement):void
 		{
+			SMILKit.logger.debug("Removed from display region "+region, this);
 			this._region = null;
 		}
 		
@@ -628,6 +630,8 @@ package org.smilkit.handler
 			}
 		}
 		
+		protected var _resizeDeferredWithoutRegion:Boolean = false;
+
 		/**
 		 * Resizes the handler display object to fit inside the parent region. Uses a generic
 		 * formula to resize the display object to fit inside the parent region as much as
@@ -649,13 +653,24 @@ package org.smilkit.handler
 					
 					if (this.displayObject != null)
 					{
+						SMILKit.logger.debug("Handler resize calculated. x:"+matrix.x+" y:"+matrix.y+" w:"+matrix.width+" h:"+matrix.height, this);
+
 						this.displayObject.width = matrix.width;
 						this.displayObject.height = matrix.height;
 						
 						this.displayObject.x = matrix.x;
 						this.displayObject.y = matrix.y;
+
+						SMILKit.logger.debug("Handler resize executed, result: x:"+this.displayObject.x+" y:"+this.displayObject.y+" w:"+this.displayObject.width+" h:"+this.displayObject.height, this);
+
+						this._resizeDeferredWithoutRegion = false;
 					}
 				}
+			}
+			else
+			{
+				SMILKit.logger.warn("Handler attempted to resize without an attached region", this);
+				this._resizeDeferredWithoutRegion = true;
 			}
 		}
 		

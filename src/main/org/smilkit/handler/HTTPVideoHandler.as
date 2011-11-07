@@ -38,10 +38,12 @@ package org.smilkit.handler
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
+
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
@@ -206,6 +208,7 @@ package org.smilkit.handler
 				SharedTimer.subscribe(this.onHeartbeatTick);
 			}
 			
+			this._video.attachNetStream(this._netStream);
 			this._canvas.addChild(this._video);
 			
 			this.drawClickShield(this._video);
@@ -518,22 +521,26 @@ package org.smilkit.handler
 		}
 		
 		public override function resize():void
-		{
+		{			
 			super.resize();
-		
-			this.drawClickShield(this._video);
+			
+			if(this._video != null)
+			{
+				this.drawClickShield(this._video);
+			}
 		}
 		
 		public override function addedToRenderTree(r:HandlerController):void
 		{
 			if (this._video == null)
 			{
+				SMILKit.logger.warn("Added to handler controller, deferring display attachment", this);
 				this._attachVideoDisplayDelayed = true;
 			}
 			else
 			{
-				this._attachVideoDisplayDelayed = false;
-				
+				SMILKit.logger.debug("Added to handler controller, performing display attachment now", this);
+				this._attachVideoDisplayDelayed = false;				
 				this.attachVideoDisplay();
 			}
 		}
@@ -542,24 +549,30 @@ package org.smilkit.handler
 		{
 			SMILKit.logger.error("ATTACHING VIDEO DISPLAY UNIT RIGHT NOW -->");
 			
-			this._video.attachNetStream(this._netStream as NetStream);
+			if(this._canvas.contains(this._video))
+			{
+				this._canvas.removeChild(this._video);
+			}
+			this._canvas.addChild(this._video);
+			//this._video.attachNetStream(this._netStream as NetStream);
 			this._attachVideoDisplayDelayed = false;
 			
 			this.resize();
 		}
 		
-		protected function clearVideoDisplay():void
-		{
-			if (this._video != null)
-			{
-				this._video.attachNetStream(null);
-				this._video.clear();
-			}
-		}
+		//protected function clearVideoDisplay():void
+		//{
+		//	if (this._video != null && this._canvas.contains(this._video))
+		//	{
+		//		this._canvas.removeChild(this._video);
+		//		//this._video.attachNetStream(null);
+		//		//this._video.clear();
+		//	}
+		//}
 		
 		public override function removedFromRenderTree(r:HandlerController):void
 		{
-			this.clearVideoDisplay();
+			//this.clearVideoDisplay();
 			
 			this._attachVideoDisplayDelayed = false;
 		}
@@ -700,11 +713,7 @@ package org.smilkit.handler
 			}
 
 			this.resolved(this._metadata.duration);
-			
-			if (this._attachVideoDisplayDelayed)
-			{
-				this.attachVideoDisplay();
-			}
+			this.attachVideoDisplay();
 		}
 		
 		public static function toHandlerMap():HandlerMap
