@@ -289,10 +289,12 @@ package org.smilkit.handler
 			
 			if (selfWaiting)
 			{
+				SMILKit.logger.debug("<zen>Handler ignoring wait call as it would only be waiting for itself</zen>", this);
 				this.unwait();
 			}
 			else
 			{
+				SMILKit.logger.debug("Handler entering wait cycle as there are other handlers waiting: "+handlers.join(","), this);
 				super.wait(handlers);
 			}
 		}
@@ -326,6 +328,8 @@ package org.smilkit.handler
 		
 		public override function seek(seekTo:Number, strict:Boolean):void
 		{
+			SMILKit.logger.error("REFERENCE HANDLER SEEKING ("+this.isViewportSMILReady+")", this);
+
 			if (this.isViewportSMILReady)
 			{
 				this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);

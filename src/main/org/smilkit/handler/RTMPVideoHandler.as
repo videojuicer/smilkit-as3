@@ -68,6 +68,7 @@ package org.smilkit.handler
 		protected var _waiting:Boolean = false;
 		protected var _waitingForMetaRefresh:Boolean = false;
 		protected var _stopping:Boolean = false;
+		protected var _isLive:Boolean = false;
 		
 		protected var _droppedFrames:uint = 0;
 		
@@ -116,7 +117,7 @@ package org.smilkit.handler
 		
 		public override function get seekable():Boolean
 		{
-			return true;
+			return !this._isLive;
 		}
 		
 		public override function get preloadable():Boolean
@@ -216,10 +217,12 @@ package org.smilkit.handler
 			
 			if (selfWaiting)
 			{
+				SMILKit.logger.debug("<zen>Handler ignoring wait call as it would only be waiting for itself</zen>", this);
 				this.unwait();
 			}
 			else
 			{
+				SMILKit.logger.debug("Handler entering wait cycle as there are other handlers waiting: "+handlers.join(","), this);
 				super.wait(handlers);
 			}
 		}
@@ -279,7 +282,7 @@ package org.smilkit.handler
 		{
 			SMILKit.logger.debug("RTMP -> "+this.handlerState.src+" -> resume");
 			
-			if (this._netStream != null)
+			if (this._netStream != null && !this._resumed)
 			{
 				SMILKit.logger.debug("Resuming playback.", this);
 
@@ -307,9 +310,17 @@ package org.smilkit.handler
 		
 		public override function seek(target:Number, strict:Boolean):void
 		{
+			SMILKit.logger.error("RTMP HANDLER SEEKING", this);
+
 			super.seek(target, strict);
 			
 			this.internalSeek(target);
+		}
+
+		protected function clearSeekTo():void
+		{
+			SMILKit.logger.debug("Handler clearing seek job", this);
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 		}
 		
 		protected function internalSeek(target:Number):void
@@ -543,13 +554,10 @@ package org.smilkit.handler
 					
 					if (this._metadata != null)
 					{
-						if (this._waiting)
-						{
-							this._waiting = false;
-
-							this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
-						}
-						
+						// Clear wait
+						this._waiting = false;
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
+												
 						// dispatch some events for resume + seek
 						if (this._resumeOnBufferFull)
 						{
@@ -734,10 +742,17 @@ package org.smilkit.handler
 				
 				// were a live stream, so were ready!
 				this._waiting = false;
+				if(!this._isLive)
+				{
+					// Transitioning to live state, set flag and issue a SEEK_NOTIFY to clear any outstanding seek jobs
+					this._isLive = true;
+					this.clearSeekTo();		
+				}
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 			}
 			else
 			{
+				this._isLive = false;
 				this.resolved(this._metadata.duration);
 			}
 			

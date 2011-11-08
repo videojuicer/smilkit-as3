@@ -73,7 +73,8 @@ package org.smilkit.handler
 		protected var _seekingToTarget:Number = 0;
 		
 		protected var _frozen:Boolean = false;
-		
+		protected var _waitCommitted:Boolean = false;
+
 		public function SMILKitHandler(element:IElement)
 		{
 			this._element = element;
@@ -245,21 +246,23 @@ package org.smilkit.handler
 		{
 			
 		}
-		
+
 		public function wait(handlers:Vector.<SMILKitHandler>):void
 		{
 			if (this.resumed)
 			{
 				this.pause();
 			}
+			this._waitCommitted = true;
 		}
 		
 		public function unwait():void
 		{
-			if (this.resumed)
+			if (this.resumed && this._waitCommitted)
 			{
 				this.resume();
 			}
+			this._waitCommitted = false;
 		}
 		
 		protected function resolveInitialLoadableProperties():void
@@ -762,6 +765,11 @@ package org.smilkit.handler
 			}
 		}
 		
+		public override function toString():String
+		{
+			return super.toString()+"[id: "+this.handlerId+"]";
+		}
+
 		/**
 		 * Returns a <code>HandlerMap</code> which can be used to match and register against
 		 * this handler instance.

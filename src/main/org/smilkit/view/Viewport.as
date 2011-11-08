@@ -991,10 +991,10 @@ package org.smilkit.view
 		
 		protected function onRenderTreeReady(event:HandlerControllerEvent):void
 		{
-			SMILKit.logger.info("Ready to play.", this);
 			// If the state is PLAYBACK_PLAYING, then we need to execute the deferred state change now.
 			if(this._waitingForRenderTree)
 			{
+				SMILKit.logger.info("Ready to play.", this);
 				this._waitingForRenderTree = false;
 				
 				if(this._playbackState == Viewport.PLAYBACK_PLAYING)
