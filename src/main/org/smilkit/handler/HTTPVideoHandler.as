@@ -275,6 +275,8 @@ package org.smilkit.handler
 		{
 			super.seek(target, strict);
 			
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_WAITING, this));
+
 			if (strict)
 			{
 				SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
@@ -641,7 +643,6 @@ package org.smilkit.handler
 				if (this.seekingToTarget)
 				{
 					this.onSeekToCompleted();
-					
 					this.leaveFrozenState();
 				}
 				

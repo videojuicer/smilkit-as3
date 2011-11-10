@@ -71,8 +71,12 @@ package org.smilkit.render
 		
 		protected var _useSyncCycles:Boolean = false;
 
-		protected var _wasWaitingForData:Boolean = false;
-		protected var _wasWaitingForSync:Boolean = false;
+		protected var _waitCycleFirstRun:Boolean = true;
+		protected var _waitingForData:Boolean = false;
+		protected var _waitingForSync:Boolean = false;
+		// A handler with a seek result to which the scheduler will be locked
+		// when a sync cycle exits (simple seek mode)
+		protected var _simpleSyncLockHandler:SMILKitHandler;
 		
 		/**
 		 * Accepts references to the parent viewport and the timegraph which that parent viewport creates
@@ -328,9 +332,6 @@ package org.smilkit.render
 				this.cancelOffsetSync();
 			}
 			
-			// reset sync lists
-			this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
-			
 			var seekables:Vector.<SMILTimeInstance> = new Vector.<SMILTimeInstance>();
 			
 			for (var s:uint = 0; s < this.elements.length; s++)
@@ -341,6 +342,8 @@ package org.smilkit.render
 				}
 			}
 			
+			var listWasEmpty:Boolean = !this.waitingForSync();
+
 			var strict:Boolean = (seekables.length > 1);
 			var offset:Number = this._objectPool.viewport.offset;
 
@@ -350,14 +353,7 @@ package org.smilkit.render
 				var handler:SMILKitHandler = time.mediaElement.handler;
 				var target:uint = Math.max(0, ((offset - time.begin.resolvedOffset) * 1000));
 				
-				handler.seek(target, strict);
-				
-				this._offsetSyncHandlerList.push(handler);
-			}
-
-			if(seekables.length > 0 && !this.waitingForSync())
-			{
-				this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_SYNC, null));
+				handler.seek(target, strict);				
 			}
 		}
 		
@@ -390,6 +386,71 @@ package org.smilkit.render
 			this.syncHandlersToViewportOffset();
 		}
 		
+		protected function onHandlerSeekWaiting(e:HandlerEvent):void
+		{
+			SMILKit.logger.debug("Handler "+e.handler+" dispatched SEEK_WAITING.", this);
+
+			// For state comparison		
+			var listWasEmpty:Boolean = (!this.waitingForSync());
+
+
+			if(this._offsetSyncHandlerList == null)
+			{
+				this._offsetSyncHandlerList = new Vector.<SMILKitHandler>();
+			}
+
+			if (this._offsetSyncHandlerList.indexOf(e.handler) == -1)
+			{
+				this._offsetSyncHandlerList.push(e.handler);
+			}
+
+			// Deal with simple sync (single-handler syncing)
+			// The state of the wait list at any single point in time cannot be taken
+			// as an indicator of simple sync suitability, as the list may have contained
+			// other handlers that have since finished syncing - checking that the list is
+			// 1 item in length infers only that the list contains the last waiting handler,
+			// not the only waiting handler.
+			//
+			// Therefore to gauge suitability for simple sync mode we need to ensure that 
+			// the handler list never grows beyond one item in length and that it always
+			// contains the same item - any breach of those conditions should clear
+			// the scheduler lock.
+			//
+			// To follow: we'll check here for list changes as handlers enter a sync state.
+			// We'll track the current candidate for scheduler correction as 
+			// _simpleSyncLockHandler. If the list breaches the conditions for simple sync,
+			// we'll set the _simpleSyncLockHandler to null.
+			// 
+			// When the sync cycle exits, we'll check _simpleSyncLockHandler and if it
+			// contains a handler pointer, we'll nudge the document scheduler appropriately.
+
+			// Check the list state against the lock
+			if(this._simpleSyncLockHandler && this._offsetSyncHandlerList.length >= 1 && this._offsetSyncHandlerList[0] == e.handler)
+			{
+				// Change detected
+				SMILKit.logger.warn("Simple sync conditions breached - received SEEK_WAITING from "+e.handler+" when prepared to lock scheduler with "+this._simpleSyncLockHandler+" - clearing scheduler lock", this);
+				this._simpleSyncLockHandler = null;
+			}
+			else if(listWasEmpty && this._offsetSyncHandlerList.length == 1 && this.document.timeGraph.mediaElements.length <= 1)
+			{
+				SMILKit.logger.debug("Entering simple sync state with a single handler "+e.handler+", flagging this handler for scheduler lock when the sync loop exits.", this);
+				this._simpleSyncLockHandler = e.handler;
+			}
+
+			this.waitHandlers();
+
+			if (listWasEmpty && this.waitingForSync())
+			{
+				SMILKit.logger.debug("Entering sync wait cycle.", this);
+				this._waitingForSync = true;
+				this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_SYNC, null));
+			}
+			else
+			{
+				SMILKit.logger.debug("Continuing existing sync wait cycle", this);
+			}
+		}
+
 		/**
 		* Called when any of the RenderTree's handlers completes an asynchronous seek event.
 		*/
@@ -400,16 +461,17 @@ package org.smilkit.render
 				var handler:SMILKitHandler = e.handler;
 				var index:int = this._offsetSyncHandlerList.indexOf(handler);
 				
-				if (this._offsetSyncHandlerList.length == 1)
+				if(index >= 0)
 				{
-					SMILKit.logger.error("Handler seek result retrieved as '"+e.handler.currentOffset+"' and not using strict cycles, forcing the DOM clock to match the handlers offset.");
-					
-					// only one handler, match the clock to the handler
-					this.document.scheduler.seek(handler.currentOffset);
+					// remove the handler from the list
+					SMILKit.logger.warn("Received SEEK_NOTIFY from syncing handler "+handler+", removing from sync wait list", this);
+					this._offsetSyncHandlerList.splice(index, 1);		
+				}
+				else
+				{
+					SMILKit.logger.warn("Received SEEK_NOTIFY from handler "+handler+", but handler was not in the sync wait list", this);
 				}
 				
-				// remove the handler from the list
-				this._offsetSyncHandlerList.splice(index, 1);	
 				
 				this.exitWaitCycleIfReady();
 			}
@@ -576,65 +638,6 @@ package org.smilkit.render
 					// doesnt exist on any list so must of been dropped off the active time graph
 					removedTimingNodes.push(node);
 				}
-
-					
-					
-					// Have you ever looked at your console output and thought mournfully to yourself that it doesn't have enough ridiculously in-depth analysis of every RenderTree update?
-					// WE THINK THE SAME.
-					// Uncomment the lines below to fill your console with ludicrous amounts of RenderTree update diff debug!
-					// Logger.debug("RenderTree update ("+offset+"ms) "+(i+1)+"/"+timingNodes.length+" processing node with begin: "+time.begin+" and end: "+time.end, this);
-										
-
-					/*
-				if (time.begin != Time.UNRESOLVED && time.begin > offset && (time.begin < this._lastChangeOffset || this._lastChangeOffset == -1) && time.begin < this.nextChangeOffset)
-				{
-				this._nextChangeOffset = time.begin;
-				}
-				
-					// remove non active, existing elements
-					if (!activeNow && alreadyExists)
-					{
-						this._lastChangeOffset = offset;
-						actionableChanges = true;
-						removedTimingNodes.push(time);
-					}
-					// add active, non existant elements
-					else if (activeNow)
-					{						
-						element.updateRenderState();
-						
-						if (element.renderState != ElementTestContainer.RENDER_STATE_HIDDEN)
-						{
-							// only add to the canvas, when the element hasnt existed before
-							if (!alreadyExists)
-							{
-								this._lastChangeOffset = offset;
-								actionableChanges = true;
-								addedTimingNodes.push(time);
-								// If the element is being introduced at a non-zero internal offset we'll schedule a sync to run at the end of 
-								// the update operation. Sync operations are only scheduled upon handler addition to the render tree if the 
-								// viewport is currently playing.
-								// Also only schedule a sync operation if the asset is added at a non-zero timestamp
-								if(!syncAfterUpdate && handler.seekable && time.begin != offset)
-								{
-									syncAfterUpdate = true;
-								}
-							}
-							else
-							{
-								// already exists
-								var previousTime:SMILTimeInstance = this._activeTimingNodes[previousIndex];
-								if (time === previousTime && time != previousTime)
-								{
-									this._lastChangeOffset = offset;
-									actionableChanges = true;
-									modifiedTimingNodes.push(time);
-								}
-							}
-						}
-					}
-					
-				}*/
 				
 				// Action the update changes
 				if (actionableChanges)
@@ -757,6 +760,7 @@ package org.smilkit.render
 			handler.addEventListener(HandlerEvent.LOAD_READY, this.onHandlerLoadReady);
 			handler.addEventListener(HandlerEvent.LOAD_COMPLETED, this.onHandlerLoadReady);
 			handler.addEventListener(HandlerEvent.LOAD_CANCELLED, this.onHandlerLoadReady);
+			handler.addEventListener(HandlerEvent.SEEK_WAITING, this.onHandlerSeekWaiting);
 			handler.addEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 			handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
@@ -781,6 +785,7 @@ package org.smilkit.render
 				handler.removeEventListener(HandlerEvent.LOAD_COMPLETED, this.onHandlerLoadReady);
 				handler.removeEventListener(HandlerEvent.LOAD_CANCELLED, this.onHandlerLoadReady);
 				handler.removeEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
+				handler.removeEventListener(HandlerEvent.SEEK_WAITING, this.onHandlerSeekWaiting);
 				handler.removeEventListener(HandlerEvent.SEEK_NOTIFY, this.onHandlerSeekNotify);
 				handler.removeEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 				handler.removeEventListener(HandlerEvent.SELF_MODIFIED, this.onHandlerSelfModified);
@@ -830,7 +835,12 @@ package org.smilkit.render
 			if (listWasEmpty && this.waitingForData())
 			{
 				SMILKit.logger.debug("Entering load wait cycle.", this);
+				this._waitingForData = true;
 				this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.WAITING_FOR_DATA, null));
+			}
+			else
+			{
+				SMILKit.logger.debug("Continuing existing load wait cycle", this);
 			}
 		}
 		
@@ -889,11 +899,15 @@ package org.smilkit.render
 			if(!this.waitingForData() && !this.waitingForSync())
 			{
 				// Lists are clear...
-				if(this._wasWaitingForData || this._wasWaitingForSync)
+				if(this._waitCycleFirstRun || this._waitingForData || this._waitingForSync)
 				{
-					// and this is a change in state...
+					// and this is a change in state, or a first run
 					SMILKit.logger.debug("Exiting wait state as load and sync cycles have both completed.", this);
 					this.exitWaitCycle();
+				}
+				else
+				{
+					SMILKit.logger.debug("Refusing to exit wait cycle as we appear to have already exited.", this);
 				}
 			}
 			else if(this.waitingForData())
@@ -908,14 +922,31 @@ package org.smilkit.render
 			}
 
 			// Stow previous results
-			this._wasWaitingForData = this.waitingForData();
-			this._wasWaitingForSync = this.waitingForSync();
+			this._waitCycleFirstRun = false;
+			this._waitingForData = this.waitingForData();
+			this._waitingForSync = this.waitingForSync();
 		}
 
 		protected function exitWaitCycle():void
 		{
 			// Called ONLY when both sync and load cycles have exited
 			this.unwaitHandlers();
+
+			if(this._simpleSyncLockHandler)
+			{
+				// Calculate offset
+				var h:SMILKitHandler = this._simpleSyncLockHandler;
+				var internalOffset:Number = h.currentOffset;
+				var baseOffset:Number = (h.element.begin.first.resolved)? h.element.begin.first.resolvedOffset : 0;
+				var resultOffset:Number = internalOffset+baseOffset;
+
+				SMILKit.logger.debug("Exiting wait cycle with scheduler lock on "+h+", executing scheduler lock to "+resultOffset+" (internal "+internalOffset+" with base "+baseOffset+")", this);
+
+				this.document.scheduler.seek(resultOffset);
+
+				this._simpleSyncLockHandler = null;
+			}
+
 			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.READY, null));
 			this.syncHandlersToViewportState();
 		}
@@ -957,7 +988,7 @@ package org.smilkit.render
 		
 		protected function onHeartbeatTick(duration:Number, offset:Number):void
 		{
-			this.exitWaitCycleIfReady();
+			// this.exitWaitCycleIfReady(); - this should not be necessary. The handlers should be abiding by the event contract of dispatching SEEK_NOTIFY and LOAD_READY at the appropriate times to trigger wait exits or wait continuations if appropriate.
 		}
 		
 		/**
@@ -1003,6 +1034,11 @@ package org.smilkit.render
 		protected function onViewportAudioVolumeChanged(e:ViewportEvent):void
 		{
 			this.syncHandlersToViewportState();
+		}
+
+		public override function toString():String
+		{
+			return super.toString()+"(on viewport "+(this.viewport ? this.viewport : "none")+")";
 		}
 	}
 }

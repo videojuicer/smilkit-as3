@@ -31,6 +31,7 @@ package org.smilkit.events
 	{
 		public static var SEEK_FAILED:String = "handlerSeekFailed";
 		public static var SEEK_INVALID:String = "handlerSeekInvalid";
+		public static var SEEK_WAITING:String = "handlerSeekWaiting";
 		public static var SEEK_NOTIFY:String = "handlerSeekNotify";
 		public static var SEEK_RESULT:String = "handlerSeekResult";
 		

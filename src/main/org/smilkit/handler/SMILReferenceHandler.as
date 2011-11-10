@@ -328,19 +328,29 @@ package org.smilkit.handler
 		
 		public override function seek(seekTo:Number, strict:Boolean):void
 		{
-			SMILKit.logger.error("REFERENCE HANDLER SEEKING ("+this.isViewportSMILReady+")", this);
-
-			if (this.isViewportSMILReady)
+			if (this.isViewportSMILReady && this._nestedViewport.playing)
 			{
-				this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);
-				
-				//this._resuming = true;
-
-				this._nestedViewport.seek(seekTo);
-				this._nestedViewport.commitSeek();
-				
-				//this._nestedViewport.resume();
+				SMILKit.logger.debug("Reference handler seeking right away as smil is available and internal viewport is playing", this);
+				this.internalSeek(seekTo);
 			}
+			else
+			{
+				SMILKit.logger.debug("Reference handler deferring seek until viewport begins playback", this);
+				this.onSeekTo(seekTo);
+			}
+		}
+
+		protected function internalSeek(seekTo:Number):void
+		{
+			// Begin the seek wait
+			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_WAITING, this));
+
+			// Wait on the offset change to throw out the SEEK_WAITING
+			this._nestedViewport.addEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);
+
+			// Throw the seek to the nested VP
+			this._nestedViewport.seek(seekTo);
+			this._nestedViewport.commitSeek();
 		}
 		
 		public override function setVolume(volume:uint):void
@@ -452,7 +462,7 @@ package org.smilkit.handler
 		{
 			this._nestedViewport.removeEventListener(ViewportEvent.PLAYBACK_OFFSET_CHANGED, this.onNestedViewportOffsetChanged);
 			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
+			this.onSeekToCompleted();
 			
 			if (this._resuming)
 			{
@@ -526,7 +536,12 @@ package org.smilkit.handler
 		{			
 			if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
-				//this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+				if(this._seekingTo)
+				{
+					this._seekingTo = false;
+					SMILKit.logger.debug("Reference handler's viewport started playing, executing deferred seek", this);
+					this.internalSeek(this._seekingToTarget);
+				}
 			}
 			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PAUSED)
 			{
