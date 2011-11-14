@@ -799,14 +799,17 @@ package org.smilkit.view
 			{
 				var mediaElements:Vector.<SMILTimeInstance> = this.document.timeGraph.mediaElements;
 				
-				for (var i:uint = 0; i < mediaElements.length; i++)
+				if (mediaElements != null)
 				{
-					var mediaElement:SMILMediaElement = (mediaElements[i].element as SMILMediaElement);
-					
-					if (mediaElement != null && mediaElement.handler != null)
+					for (var i:uint = 0; i < mediaElements.length; i++)
 					{
-						mediaElement.handler.pause();
-						mediaElement.handler.destroy();
+						var mediaElement:SMILMediaElement = (mediaElements[i].element as SMILMediaElement);
+						
+						if (mediaElement != null && mediaElement.handler != null)
+						{
+							mediaElement.handler.pause();
+							mediaElement.handler.destroy();
+						}
 					}
 				}
 			}
