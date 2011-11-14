@@ -215,8 +215,11 @@ package org.smilkit.dom
 			
 			(this._ownerDocument as Document).insertedNode(this, newInternal, false);
 			
-			(newChild as ParentNode).ancestorChanged(this);
-			
+			if (newChild is ParentNode)
+			{
+				(newChild as ParentNode).ancestorChanged(this);
+			}
+				
 			// sent out changed event
 			return newChild;
 		}
