@@ -229,7 +229,7 @@ package org.smilkit.dom.smil.time
 		
 		public function waitUntil(offset:Number, callback:Function, element:ElementTimeContainer = null, friendlyName:String = null):Boolean
 		{
-			if (offset >= this.offset)
+			if ((offset * 1000) >= this.offset)
 			{
 				var callbacks:Vector.<Function> = null;
 				

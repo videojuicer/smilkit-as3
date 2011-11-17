@@ -665,7 +665,7 @@ package org.smilkit.dom.smil
 			{
 				tempBegin = this.beginList.getTimeGreaterThan(beginAfter);
 				
-				if (tempBegin == null)
+				if (tempBegin == null || tempBegin.resolvedOffset == Time.INDEFINITE)
 				{
 					this.setCurrentInterval(null, null);
 					
@@ -1033,7 +1033,7 @@ package org.smilkit.dom.smil
 			{
 				// TODO: fix this so that it activates correctly
 				var waitTime:Number = (this.currentBeginInterval.offset + (this.ownerDocument as SMILDocument).offset);
-				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onIntervalStart, this, "onIntervalStart (yet again)");
+				var waiting:Boolean = this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onIntervalStart, this, "onIntervalStart");
 				
 				// setup timer if we need to wait (and were not meant to play)
 				if (!waiting && (this.parentTimeContainer as ElementTimeContainer).isPlaying)
