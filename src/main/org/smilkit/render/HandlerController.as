@@ -581,7 +581,7 @@ package org.smilkit.render
 							// over our current list and see how long we could wait before doing another update
 							if (time.end.resolvedOffset > this._nextChangeOffset)
 							{
-								this._nextChangeOffset = time.end.resolvedOffset;
+								this._nextChangeOffset = time.element.currentEndInterval.resolvedOffset;
 							}
 							
 							// hidden things skip the render tree and dont playback
@@ -858,6 +858,8 @@ package org.smilkit.render
 		{
 			SMILKit.logger.debug("Calling wait on all handlers in the HandlerController, with "+this._waitingForDataHandlerList.length+" handlers in the list.");
 			
+			this.update();
+			
 			for (var i:int = 0; i < this.elements.length; i++)
 			{
 				var handler:SMILKitHandler = this.elements[i].mediaElement.handler;
@@ -1009,8 +1011,14 @@ package org.smilkit.render
 			{
 				case Viewport.PLAYBACK_SEEKING:
 					this.cancelOffsetSync();
+					
 					SMILKit.logger.debug("Scheduling a new sync wait cycle to begin on the next Viewport state change to PLAYBACK_PLAYING", this);
 					this._performOffsetSyncOnNextResume = true;
+					
+					// invalidate active cache
+					this._lastChangeOffset = -1;
+					this._nextChangeOffset = -1;
+					
 					break;
 				case Viewport.PLAYBACK_PLAYING:
 					if (this._performOffsetSyncOnNextResume)

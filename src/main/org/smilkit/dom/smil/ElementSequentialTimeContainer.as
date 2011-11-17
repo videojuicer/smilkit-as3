@@ -125,6 +125,11 @@ package org.smilkit.dom.smil
 					return Time.UNRESOLVED;
 				}
 				
+				if (child.currentEndInterval.indefinite)
+				{
+					return Time.INDEFINITE;
+				}
+
 				duration = child.currentEndInterval.resolvedOffset;
 			}
 			

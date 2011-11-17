@@ -461,7 +461,6 @@ package org.smilkit.dom.smil
 		public override function seekElement(seekTo:Number):void
 		{
 			super.seekElement(seekTo);
-			// this._handler.seek(seekTo);
 		}
 		
 		private function updateHandler():void

@@ -277,6 +277,11 @@ package org.smilkit.handler
 			
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_WAITING, this));
 
+			if (this._netStream != null)
+			{
+				this._netStream.resume();
+			}
+
 			if (strict)
 			{
 				SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
@@ -300,12 +305,12 @@ package org.smilkit.handler
 		*/
 		protected function execSeek(seekTo:Number):void
 		{
-			// Cancel queued seek
-			this._queuedSeek = false;
-			
-			//if (!this._seeking || this._seekingTarget != seekTo)
-			//{
-				this._netStream.resume();
+			if (this._netStream != null)
+			{
+				// Cancel queued seek
+				this._queuedSeek = false;
+				
+				
 				
 				// Execute seek
 				var seconds:Number = (seekTo / 1000);
@@ -316,7 +321,12 @@ package org.smilkit.handler
 				this._seekingTarget = seekTo;
 				
 				this._netStream.seek(seconds);
-			//}
+			}
+			else
+			{
+				this._seeking = true;
+				this._seekingTarget = seekTo;
+			}
 		}
 		
 		/*
@@ -643,8 +653,9 @@ package org.smilkit.handler
 				if (this.seekingToTarget)
 				{
 					this.onSeekToCompleted();
-					this.leaveFrozenState();
 				}
+				
+				this.leaveFrozenState();
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 				

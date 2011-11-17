@@ -442,13 +442,16 @@ package org.smilkit.dom.smil
 			else
 			{
 				// were not playing, should we be?
-				if ((this.currentBeginInterval != null && this.currentEndInterval != null) && (!this.currentBeginInterval.isGreaterThan(now) && !this.currentEndInterval.isGreaterThan(now)))
+				if ((this.currentBeginInterval != null && this.currentEndInterval != null) && (!this.currentBeginInterval.isGreaterThan(now) && this.currentEndInterval.isGreaterThan(now)))
 				{
 					// the seek time is in the middle of our intervals so we should activate
-					//this.gatherNextInterval(this.currentBeginInterval);
+					this.activate();
+				}
+				else
+				{
+					this.deactivate();
 				}
 				
-				this.startup();
 			}
 			
 			if (seekChildren)
@@ -485,8 +488,11 @@ package org.smilkit.dom.smil
 		{
 			this._implicitMediaDuration = time;
 			
-			this.resetElementState();
-			this.startup();
+			if (!this.durationResolved)
+			{
+				this.resetElementState();
+				this.startup();
+			}
 		}
 		
 		/**
