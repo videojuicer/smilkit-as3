@@ -73,6 +73,7 @@ package org.smilkit.handler
 		protected var _seekingToTarget:Number = 0;
 		
 		protected var _frozen:Boolean = false;
+		
 		protected var _waitCommitted:Boolean = false;
 
 		public function SMILKitHandler(element:IElement)
@@ -739,6 +740,8 @@ package org.smilkit.handler
 
 				this._frozen = true;
 				
+				this.setVolume(0);
+				
 				parent.graphics.clear();
 				
 				parent.graphics.beginBitmapFill(this.bitmapSnapshot, new Matrix(), false, true);
@@ -757,6 +760,8 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Handler "+this.handlerId+" melting and leaving frozen state");
 
+				this.setVolume(this.viewportObjectPool.viewport.volume);
+				
 				parent.graphics.clear();
 				
 				this._frozen = false;
