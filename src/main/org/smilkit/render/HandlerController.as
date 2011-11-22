@@ -247,7 +247,11 @@ package org.smilkit.render
 						node.mediaElement.handler.resume();
 					}
 					
-					node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
+					// reset the volume when were not using sync cycles (otherwise the handler will always be muted)
+					if (!this._useSyncCycles)
+					{
+						node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
+					}
 				}
 			}
 			else
@@ -353,7 +357,7 @@ package org.smilkit.render
 				var handler:SMILKitHandler = time.mediaElement.handler;
 				var target:uint = Math.max(0, ((offset - time.begin.resolvedOffset) * 1000));
 				
-				handler.seek(target, strict);				
+				handler.seek(target, strict);
 			}
 		}
 		

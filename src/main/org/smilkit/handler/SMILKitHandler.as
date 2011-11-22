@@ -250,6 +250,8 @@ package org.smilkit.handler
 
 		public function wait(handlers:Vector.<SMILKitHandler>):void
 		{
+			this.enterFrozenState();
+			
 			if (this.resumed)
 			{
 				this.pause();
@@ -259,6 +261,8 @@ package org.smilkit.handler
 		
 		public function unwait():void
 		{
+			this.leaveFrozenState();
+			
 			if (this.resumed && this._waitCommitted)
 			{
 				this.resume();
@@ -756,7 +760,7 @@ package org.smilkit.handler
 		{
 			var parent:Sprite = (this.displayObject as Sprite);
 			
-			if (this.frozen && this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
+			if (this.frozen && this.innerDisplayObject != null)
 			{
 				SMILKit.logger.debug("Handler "+this.handlerId+" melting and leaving frozen state");
 
@@ -766,7 +770,10 @@ package org.smilkit.handler
 				
 				this._frozen = false;
 				
-				parent.addChild(this.innerDisplayObject);
+				if (!parent.contains(this.innerDisplayObject))
+				{
+					parent.addChild(this.innerDisplayObject);
+				}
 			}
 		}
 		

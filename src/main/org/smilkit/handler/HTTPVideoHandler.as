@@ -177,12 +177,7 @@ package org.smilkit.handler
 			this._netConnection.connect(null);
 			
 			this._soundTransformer = new SoundTransform(0.2, 0);
-			
-			if(this._volume)
-			{
-				this.setVolume(this._volume);
-			}
-			
+
 			this._netStream = new NetStream(this._netConnection);
 			
 			this._netStream.addEventListener(NetStatusEvent.NET_STATUS, this.onNetStatusEvent);
@@ -193,6 +188,8 @@ package org.smilkit.handler
 			this._netStream.client = this;
 			this._netStream.bufferTime = 5;
 			this._netStream.soundTransform = this._soundTransformer;
+			
+			this.setVolume(0);
 			
 			this._netStream.play(this.element.src);
 			
@@ -619,6 +616,8 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 					break;
 				case "NetStream.Unpause.Notify":
+					//this.setVolume(this.viewportObjectPool.viewport.volume);
+					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					break;
 				case "NetStream.Seek.Failed":
@@ -655,7 +654,7 @@ package org.smilkit.handler
 					this.onSeekToCompleted();
 				}
 				
-				this.leaveFrozenState();
+				//this.leaveFrozenState();
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 				
