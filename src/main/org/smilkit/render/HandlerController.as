@@ -256,9 +256,13 @@ package org.smilkit.render
 					
 					// reset the volume when were not using sync cycles (otherwise the handler will always be muted)
 					//if (!this._useSyncCycles)
-					//{
-						//node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
+					
+					if (!this.waitingForSync() && !this.waitingForData())
+					{
 						node.mediaElement.handler.leaveFrozenState();
+					}
+						//node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
+						
 					//}
 				}
 			}

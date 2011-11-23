@@ -607,8 +607,6 @@ package org.smilkit.handler
 					{
 						this._stopping = false;
 						
-						this.enterFrozenState();
-						
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
 					else
