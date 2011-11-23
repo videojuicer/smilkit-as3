@@ -43,7 +43,6 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
-
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
@@ -284,7 +283,7 @@ package org.smilkit.handler
 				SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
 				
 				this.enterFrozenState();
-				
+
 				this._queuedSeek = true;
 				this._queuedSeekTarget = this.seekingToTarget;
 			}
@@ -306,8 +305,6 @@ package org.smilkit.handler
 			{
 				// Cancel queued seek
 				this._queuedSeek = false;
-				
-				
 				
 				// Execute seek
 				var seconds:Number = (seekTo / 1000);
@@ -640,7 +637,7 @@ package org.smilkit.handler
 		
 		protected function seekComplete():Boolean
 		{
-			if (NumberHelper.withinTolerance((this._seekingTarget / 1000), this._netStream.time, 2.0))
+			if (NumberHelper.withinTolerance((this._seekingTarget / 1000), this._netStream.time, 5.0))
 			{
 				this._seeking = false;
 				
@@ -654,7 +651,7 @@ package org.smilkit.handler
 					this.onSeekToCompleted();
 				}
 				
-				//this.leaveFrozenState();
+				this.leaveFrozenState();
 				
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_NOTIFY, this));
 				

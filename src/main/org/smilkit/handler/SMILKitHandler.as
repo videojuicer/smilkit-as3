@@ -72,7 +72,7 @@ package org.smilkit.handler
 		protected var _seekingTo:Boolean = false;
 		protected var _seekingToTarget:Number = 0;
 		
-		protected var _frozen:Boolean = false;
+		protected var _frozen:Boolean = true;
 		
 		protected var _waitCommitted:Boolean = false;
 
@@ -731,28 +731,30 @@ package org.smilkit.handler
 		{
 			var parent:Sprite = (this.displayObject as Sprite);
 			
-			if (this.innerDisplayObject != null && parent.contains(this.innerDisplayObject))
+			if (this.frozen)
 			{
-				if (this.frozen)
-				{
-					SMILKit.logger.debug("Handler "+this.handlerId+" already frozen, re-freezing handler state");
-				}
-				else
-				{
-					SMILKit.logger.debug("Handler "+this.handlerId+" entering a into a frozen state");
-				}
-
-				this._frozen = true;
-				
-				this.setVolume(0);
-				
+				SMILKit.logger.debug("Handler "+this.handlerId+" already frozen, re-freezing handler state");
+			}
+			else
+			{
+				SMILKit.logger.debug("Handler "+this.handlerId+" entering a into a frozen state");
+			}
+			
+			this._frozen = true;
+			
+			this.setVolume(0);
+			
+			if (this.innerDisplayObject != null)
+			{
 				parent.graphics.clear();
-				
 				parent.graphics.beginBitmapFill(this.bitmapSnapshot, new Matrix(), false, true);
 				parent.graphics.drawRect(0, 0, this.innerDisplayObject.width, this.innerDisplayObject.height);
 				parent.graphics.endFill();
 				
-				parent.removeChild(this.innerDisplayObject);
+				if (parent.contains(this.innerDisplayObject))
+				{
+					parent.removeChild(this.innerDisplayObject);
+				}
 			}
 		}
 		
@@ -760,20 +762,17 @@ package org.smilkit.handler
 		{
 			var parent:Sprite = (this.displayObject as Sprite);
 			
-			if (this.frozen && this.innerDisplayObject != null)
-			{
-				SMILKit.logger.debug("Handler "+this.handlerId+" melting and leaving frozen state");
+			SMILKit.logger.debug("Handler "+this.handlerId+" melting and leaving frozen state");
 
-				this.setVolume(this.viewportObjectPool.viewport.volume);
-				
-				parent.graphics.clear();
-				
-				this._frozen = false;
-				
-				if (!parent.contains(this.innerDisplayObject))
-				{
-					parent.addChild(this.innerDisplayObject);
-				}
+			this.setVolume(this.viewportObjectPool.viewport.volume);
+			
+			parent.graphics.clear();
+			
+			this._frozen = false;
+			
+			if (this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
+			{
+				parent.addChild(this.innerDisplayObject);
 			}
 		}
 		

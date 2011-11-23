@@ -968,6 +968,9 @@ package org.smilkit.view
 			
 			this.document.scheduler.pause();
 			this.document.scheduler.seek(offset);
+			
+			// update the ui so we know we have seeked
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
 		protected function onRenderTreeWaitingForData(event:HandlerControllerEvent):void

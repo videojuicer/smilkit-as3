@@ -232,6 +232,13 @@ package org.smilkit.render
 		{
 			if (this.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
 			{
+				if (this.waitingForSync() || this.waitingForData())
+				{
+					SMILKit.logger.error("Asked to sync handlers to Viewport state, but assets are currently syncing.", this);
+					
+					return;
+				}
+				
 				SMILKit.logger.debug("Syncing handlers to viewport state: viewport is running - resuming "+this.elements.length+" assets.", this);
 				// Sync everything to a running state by resuming playback.
 				for (var i:int = 0; i < this.elements.length; i++)
@@ -248,10 +255,11 @@ package org.smilkit.render
 					}
 					
 					// reset the volume when were not using sync cycles (otherwise the handler will always be muted)
-					if (!this._useSyncCycles)
-					{
-						node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
-					}
+					//if (!this._useSyncCycles)
+					//{
+						//node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
+						node.mediaElement.handler.leaveFrozenState();
+					//}
 				}
 			}
 			else

@@ -322,6 +322,9 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("RTMP video handler issuing seek immediately", this);
 				super.seek(target, strict);
+				
+				// enter frozen state
+				
 				this.internalSeek(target);	
 			}
 		}
@@ -668,6 +671,8 @@ package org.smilkit.handler
 					{
 						this._netStream.pause();
 					}
+					
+					// leave frozen state
 					
 					if (!this._stopping && this._seekingTo)
 					{
