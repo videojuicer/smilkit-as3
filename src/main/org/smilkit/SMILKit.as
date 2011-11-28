@@ -25,6 +25,7 @@ package org.smilkit
 {
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.DocumentType;
+	import org.smilkit.handler.HTTPAudioHandler;
 	import org.smilkit.handler.HTTPVideoHandler;
 	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.ImageHandler;
@@ -134,6 +135,7 @@ package org.smilkit
 			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.HTTPAudioHandler, HTTPAudioHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
 		}
 		

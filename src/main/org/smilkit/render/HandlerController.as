@@ -255,15 +255,7 @@ package org.smilkit.render
 					}
 					
 					// reset the volume when were not using sync cycles (otherwise the handler will always be muted)
-					//if (!this._useSyncCycles)
-					
-					if (!this.waitingForSync() && !this.waitingForData())
-					{
-						node.mediaElement.handler.leaveFrozenState();
-					}
-						//node.mediaElement.handler.setVolume(this._objectPool.viewport.volume);
-						
-					//}
+					node.mediaElement.handler.leaveFrozenState();
 				}
 			}
 			else
@@ -1057,7 +1049,17 @@ package org.smilkit.render
 		
 		protected function onViewportAudioVolumeChanged(e:ViewportEvent):void
 		{
-			this.syncHandlersToViewportState();
+			SMILKit.logger.debug("Syncing handlers to viewport state: viewport is running - resuming "+this.elements.length+" assets.", this);
+			
+			var volume:uint = this.viewport.volume;
+			
+			// Sync everything to the Viewports volume
+			for (var i:int = 0; i < this.elements.length; i++)
+			{
+				var node:SMILTimeInstance = this.elements[i];
+				
+				node.mediaElement.handler.setVolume(volume);
+			}
 		}
 
 		public override function toString():String

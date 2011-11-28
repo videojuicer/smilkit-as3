@@ -154,6 +154,11 @@ package org.smilkit.handler
 			return (this._canvas as DisplayObject);
 		}
 		
+		public override function get innerDisplayObject():DisplayObject
+		{
+			return (this._video as DisplayObject);
+		}
+		
 		public override function get currentOffset():int
 		{
 			if (this._netStream == null)
@@ -209,7 +214,7 @@ package org.smilkit.handler
 			
 			this._netConnection.connect(this.videoHandlerState.fmsURL.instanceHostname);
 			
-			this.leaveFrozenState();
+			//this.leaveFrozenState();
 			
 			this.loadWait();
 		}
@@ -418,11 +423,25 @@ package org.smilkit.handler
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
 		
+		public override function leaveFrozenState():void
+		{
+			super.leaveFrozenState();
+			
+			this.attachVideoDisplay();
+		}
+		
 		protected function attachVideoDisplay():void
 		{
 			this.resetVolume();
 			
-			this._video.attachNetStream(this._netStream as NetStream);
+			if (this._netStream != null)
+			{
+				this._canvas.graphics.beginFill(0xEEEEEE, 0.8);
+				this._canvas.graphics.drawRect(10, 10, this.width - 20, this.height - 20);
+				this._canvas.graphics.endFill();
+				
+				this._video.attachNetStream(this._netStream as NetStream);
+			}
 		}
 		
 		protected function clearVideoDisplay():void
@@ -481,7 +500,7 @@ package org.smilkit.handler
 					this._video.smoothing = true;
 					this._video.deblocking = 1;
 					
-					this._canvas.addChild(this._video);
+					//this._canvas.addChild(this._video);
 
 					if (this._attachVideoDisplayDelayed)
 					{
@@ -607,7 +626,7 @@ package org.smilkit.handler
 					{
 						this._stopping = false;
 						
-						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+						//this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
 					else
 					{
@@ -784,11 +803,11 @@ package org.smilkit.handler
 		/**
 		 * Callback routine, not really close!!!!!!!
 		 */
-		protected function close():void
+		public function close():void
 		{
 			// playback has finished, important for live events (so we can continue)
-			this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+			//this.pause(); // Throw handler into paused state - we do not have a special "stopped" state
+			//this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 		}
 		
 		public static function toHandlerMap():HandlerMap

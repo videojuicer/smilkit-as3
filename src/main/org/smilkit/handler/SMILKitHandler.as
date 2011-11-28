@@ -744,7 +744,7 @@ package org.smilkit.handler
 			
 			this.setVolume(0);
 			
-			if (this.innerDisplayObject != null)
+			if (parent != null && this.innerDisplayObject != null)
 			{
 				parent.graphics.clear();
 				parent.graphics.beginBitmapFill(this.bitmapSnapshot, new Matrix(), false, true);
@@ -766,13 +766,21 @@ package org.smilkit.handler
 
 			this.setVolume(this.viewportObjectPool.viewport.volume);
 			
-			parent.graphics.clear();
-			
 			this._frozen = false;
 			
-			if (this.innerDisplayObject != null && !parent.contains(this.innerDisplayObject))
+			if (parent != null)
 			{
-				parent.addChild(this.innerDisplayObject);
+				parent.graphics.clear();
+				
+				if (this.innerDisplayObject != null)
+				{
+					if (parent.contains(this.innerDisplayObject))
+					{
+						parent.removeChild(this.innerDisplayObject);
+					}
+					
+					parent.addChild(this.innerDisplayObject);
+				}
 			}
 		}
 		
