@@ -436,10 +436,6 @@ package org.smilkit.handler
 			
 			if (this._netStream != null)
 			{
-				this._canvas.graphics.beginFill(0xEEEEEE, 0.8);
-				this._canvas.graphics.drawRect(10, 10, this.width - 20, this.height - 20);
-				this._canvas.graphics.endFill();
-				
 				this._video.attachNetStream(this._netStream as NetStream);
 			}
 		}
