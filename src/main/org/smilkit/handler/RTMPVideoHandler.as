@@ -614,11 +614,11 @@ package org.smilkit.handler
 					}
 					break;
 				case "NetStream.Buffer.Flush":
-					if (this._stopping)
+					if (NumberHelper.withinTolerance(this.currentOffset, this.duration, 600))
 					{
 						this._stopping = false;
 						
-						//this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
+						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
 					else
 					{
