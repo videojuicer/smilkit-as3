@@ -391,7 +391,7 @@ package org.smilkit.handler
 			
 			if (this._video != null)
 			{
-				this.attachVideoDisplay();
+				//this.attachVideoDisplay();
 				
 				this.drawClickShield(this._video);
 			}
@@ -457,7 +457,7 @@ package org.smilkit.handler
 		
 		public override function removedFromRenderTree(r:HandlerController):void
 		{
-			this.clearVideoDisplay();
+			//this.clearVideoDisplay();
 			
 			this._attachVideoDisplayDelayed = false;
 		}
@@ -496,18 +496,14 @@ package org.smilkit.handler
 					this._video.smoothing = true;
 					this._video.deblocking = 1;
 					
-					//this._canvas.addChild(this._video);
+					this._canvas.addChild(this._video);
 
-					if (this._attachVideoDisplayDelayed)
-					{
-						this.attachVideoDisplay();
-					}
-					
+					this.attachVideoDisplay();
+
 					this._netStream.bufferTime = RTMPVideoHandler.INITIAL_BUFFER_TIME;
 					
 					this._netStream.play(this.videoHandlerState.fmsURL.streamNameWithParameters);
 
-					this.resize();
 					this.resetVolume();
 					
 					break;
@@ -758,6 +754,8 @@ package org.smilkit.handler
 				this._metadata.update(info);
 			}
 			
+			this.resize();
+			
 			if (this.viewportObjectPool != null && this.viewportObjectPool.viewport != null && this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED) //if(!this._resumed)
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
@@ -791,6 +789,8 @@ package org.smilkit.handler
 			if (this._waitingForMetaRefresh)
 			{
 				this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
+				
+				this.leaveFrozenState();
 				
 				this._waitingForMetaRefresh = false;
 			}
