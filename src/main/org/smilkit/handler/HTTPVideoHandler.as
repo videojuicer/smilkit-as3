@@ -271,28 +271,35 @@ package org.smilkit.handler
 		{
 			super.seek(target, strict);
 			
-			this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_WAITING, this));
-
-			if (this._netStream != null)
+			if (this._metadata == null)
 			{
-				this._netStream.resume();
-			}
-
-			if (strict)
-			{
-				SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
-				
-				this.enterFrozenState();
-
-				this._queuedSeek = true;
-				this._queuedSeekTarget = this.seekingToTarget;
+				this.onSeekTo(target);
 			}
 			else
 			{
-				//if(this.readyToPlayAt(target))
+				this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_WAITING, this));
 				
-				// We're able to seek to that point. Execute the seek right away.
-				this.execSeek(target);
+				if (this._netStream != null)
+				{
+					this._netStream.resume();
+				}
+				
+				if (strict)
+				{
+					SMILKit.logger.debug("Seek to "+target+"ms requested, but not able to seek to that offset. Queueing seek until offset becomes available.");
+					
+					this.enterFrozenState();
+					
+					this._queuedSeek = true;
+					this._queuedSeekTarget = this.seekingToTarget;
+				}
+				else
+				{
+					//if(this.readyToPlayAt(target))
+					
+					// We're able to seek to that point. Execute the seek right away.
+					this.execSeek(target);
+				}
 			}
 		}
 		
@@ -706,12 +713,17 @@ package org.smilkit.handler
 			if (this._metadata == null)
 			{
 				this._metadata = new Metadata(info);
+				
 				SMILKit.logger.info("Metadata encountered (with "+this.cuePoints.length+" syncPoints): "+this._metadata.toString()+" Source: "+this.element.src);
+				
 				if(!this._resumed)
 				{
-					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to 0 offset and leave paused.", this);
+					var deferredSeekTarget:Number = (this._seekingTo) ? this._seekingToTarget : 0;
 					
-					this.seek(0, true);
+					SMILKit.logger.error("Found initial metadata while loading/paused. About to reset netstream object to "+deferredSeekTarget+" offset and leave paused.", this);
+					
+					this.seek(deferredSeekTarget, true);
+					
 					this.pause();
 				}
 			}

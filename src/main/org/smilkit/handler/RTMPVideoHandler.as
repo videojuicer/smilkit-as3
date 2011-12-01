@@ -617,6 +617,7 @@ package org.smilkit.handler
 					if (NumberHelper.withinTolerance(this.currentOffset, this.duration, 600))
 					{
 						this._stopping = false;
+						this._resumed = false;
 						
 						this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 					}
@@ -742,7 +743,7 @@ package org.smilkit.handler
 				
 				if(!this._resumed)
 				{
-					var deferredSeekTarget:Number = (this._seekingTo)? this._seekingToTarget : 0;
+					var deferredSeekTarget:Number = (this._seekingTo) ? this._seekingToTarget : 0;
 
 					SMILKit.logger.debug("Found initial metadata while loading/paused. Executing seek to "+deferredSeekTarget+".", this);
 					

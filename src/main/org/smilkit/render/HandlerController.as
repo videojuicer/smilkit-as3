@@ -361,6 +361,8 @@ package org.smilkit.render
 				var handler:SMILKitHandler = time.mediaElement.handler;
 				var target:uint = Math.max(0, ((offset - time.begin.resolvedOffset) * 1000));
 				
+				SMILKit.logger.error("Syncing handler to viewport offset, telling handler "+handler.handlerId+" to seek to: "+target+"ms");
+				
 				handler.seek(target, strict);
 			}
 		}
