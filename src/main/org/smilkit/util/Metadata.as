@@ -34,7 +34,7 @@ package org.smilkit.util
 		protected var _syncPoints:Vector.<int> = new Vector.<int>();
 		
 		protected var _updated:Boolean = false;
-		
+
 		public function Metadata(info:Object)
 		{
 			this._internalInfo = info;

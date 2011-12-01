@@ -132,9 +132,12 @@ package org.smilkit
 		public static function defaultHandlers():void
 		{
 			SMILKit.registerHandler(org.smilkit.handler.SMILReferenceHandler, SMILReferenceHandler.toHandlerMap());
+			
 			SMILKit.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
-			SMILKit.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
+			
 			SMILKit.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
+			SMILKit.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
+			
 			SMILKit.registerHandler(org.smilkit.handler.HTTPAudioHandler, HTTPAudioHandler.toHandlerMap());
 			SMILKit.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
 		}

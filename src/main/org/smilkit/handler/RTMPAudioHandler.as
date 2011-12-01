@@ -27,6 +27,7 @@ package org.smilkit.handler
 	import flash.net.Responder;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
 	
 	public class RTMPAudioHandler extends RTMPVideoHandler
@@ -36,11 +37,6 @@ package org.smilkit.handler
 		public function RTMPAudioHandler(element:IElement)
 		{
 			super(element);
-		}
-		
-		public override function get fileSizeWillResolve():Boolean
-		{
-			return false;
 		}
 		
 		public override function get width():uint
@@ -75,7 +71,23 @@ package org.smilkit.handler
 		{
 			SMILKit.logger.debug("Received RTMP audio stream length: "+length);
 			
-			this.resolved(length * 1000);
+			var duration:Number = (length * 1000);
+			
+			this._metadata = new Metadata({
+				"audiochannels": 0,
+				"audiosamplerate": 0,
+				"audiodelay": 0,
+				"audiocodecid": 0,
+				"canseektoend": 0,
+				"seekpoints": 0,
+				"duration": duration,
+				"videoframerate": 0,
+				"height": 0,
+				"videocodecid": 0,
+				"width": 0
+			});
+			
+			this.resolved(duration);
 		}
 		
 		protected function onGetStreamLengthStatus(info:Object):void
