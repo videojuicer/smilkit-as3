@@ -896,9 +896,16 @@ package org.smilkit.dom.smil
 			
 			if (this._activeDuration != null && this._activeDuration.resolved && !this._activeDuration.indefinite)
 			{
-				waitTime = this._activeDuration.offset + this.ownerSMILDocument.offset;
+				waitTime = this._activeDuration.offset + this.currentBeginInterval.resolvedOffset;
 				
 				this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onActiveDurationEnd, this, "onActiveDurationEnd");
+				
+				if (waitTime < this.ownerSMILDocument.offset)
+				{
+					this.deactivate();
+					
+					return;
+				}
 			}
 			
 			var simpleDurationTime:Time = this.computeSimpleDurationTime();
@@ -907,9 +914,16 @@ package org.smilkit.dom.smil
 			{
 				if (this._activeDuration == null || this._activeDuration.indefinite || !this._activeDuration.resolved || this._activeDuration.isGreaterThan(simpleDurationTime))
 				{
-					waitTime = simpleDurationTime.offset + this.ownerSMILDocument.offset;
+					waitTime = simpleDurationTime.offset + this.currentBeginInterval.resolvedOffset;
 					
 					this.ownerSMILDocument.scheduler.waitUntil(waitTime, this.onSimpleDurationEnd, this, "onSimpleDurationEnd");
+					
+					if (waitTime < this.ownerSMILDocument.offset)
+					{
+						this.deactivate();
+						
+						return;
+					}
 				}
 			}
 			

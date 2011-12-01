@@ -53,7 +53,7 @@ package org.smilkit.handler
 	public class RTMPVideoHandler extends SMILKitHandler
 	{
 		public static const INITIAL_BUFFER_TIME:int = 2;
-		public static const REDUCED_BUFFER_TIME:int = 4;
+		public static const REDUCED_BUFFER_TIME:int = 3;
 		public static const EXPANDED_BUFFER_TIME:int = 30;
 		
 		protected var _netConnection:NetConnection;
@@ -602,8 +602,6 @@ package org.smilkit.handler
 					}
 					break;
 				case "NetStream.Buffer.Empty":
-					this._netStream.bufferTime = RTMPVideoHandler.REDUCED_BUFFER_TIME;
-					
 					if(this._resumed)
 					{
 						this.loadWait();
@@ -614,6 +612,8 @@ package org.smilkit.handler
 					}
 					break;
 				case "NetStream.Buffer.Flush":
+					this._netStream.bufferTime = RTMPVideoHandler.REDUCED_BUFFER_TIME;
+					
 					if (NumberHelper.withinTolerance(this.currentOffset, this.duration, 600))
 					{
 						this._stopping = false;
@@ -676,6 +676,8 @@ package org.smilkit.handler
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.SEEK_INVALID, this));
 					break;
 				case "NetStream.Seek.Notify":
+					this._netStream.bufferTime = RTMPVideoHandler.REDUCED_BUFFER_TIME;
+					
 					if (!this._resumed)
 					{
 						this._netStream.pause();
