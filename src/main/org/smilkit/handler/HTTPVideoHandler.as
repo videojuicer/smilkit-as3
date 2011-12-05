@@ -738,7 +738,7 @@ package org.smilkit.handler
 		
 		public static function toHandlerMap():HandlerMap
 		{
-			return new HandlerMap(['http'], { 'video/flv': [ '.flv', '.f4v' ], 'video/mpeg': [ '.mp4', '.f4v' ] });
+			return new HandlerMap(['http'], { 'video/flv': [ '.flv', '.f4v', '.f4m' ], 'video/mpeg': [ '.mp4', '.f4v' ] });
 		}
 	}
 }

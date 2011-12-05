@@ -329,8 +329,7 @@ package org.smilkit.handler
 				super.seek(target, strict);
 				
 				// enter frozen state
-				
-				this.internalSeek(target);	
+				this.internalSeek(target);
 			}
 		}
 
@@ -649,7 +648,7 @@ package org.smilkit.handler
 					break;
 				case "NetStream.Play.Start":
 					//this._netStream.bufferTime = RTMPVideoHandler.EXPANDED_BUFFER_TIME;
-					if (this._readyOnPlayStart)
+					if (this._readyOnPlayStart && !this._seekingTo)
 					{
 						// Seeking emits a Seek.Notify->Play.Start: no Buffer.Full event.
 						this._readyOnPlayStart = false;
@@ -745,11 +744,11 @@ package org.smilkit.handler
 				{
 					var deferredSeekTarget:Number = (this._seekingTo) ? this._seekingToTarget : 0;
 
-					SMILKit.logger.debug("Found initial metadata while loading/paused. Executing seek to "+deferredSeekTarget+".", this);
+					SMILKit.logger.debug("Found initial metadata while loading/paused. About to reset netstream object to "+deferredSeekTarget+" offset and leave paused.", this);
 					
 					// TODO: do an internal seek back to ground zero
 					this.internalSeek(deferredSeekTarget);
-					this.pause();
+					//this.pause();
 				}
 			}
 			else
