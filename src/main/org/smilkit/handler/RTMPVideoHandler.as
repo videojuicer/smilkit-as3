@@ -680,7 +680,7 @@ package org.smilkit.handler
 					
 					if (!this._resumed)
 					{
-						this._netStream.pause();
+						//this._netStream.pause();
 					}
 					
 					// leave frozen state
