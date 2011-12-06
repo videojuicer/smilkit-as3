@@ -808,6 +808,11 @@ package org.smilkit.handler
 			//this.dispatchEvent(new HandlerEvent(HandlerEvent.STOP_NOTIFY, this));
 		}
 		
+		public function onLastSecond():void
+		{
+			
+		}
+		
 		public static function toHandlerMap():HandlerMap
 		{
 			return new HandlerMap([ 'rtmp', 'rtmpt', 'rtmps', 'rtmpe' ], { 'video/flv': [ '.flv', '.f4v', '*' ], 'video/mpeg': [ '.mp4', '.f4v' ] });
