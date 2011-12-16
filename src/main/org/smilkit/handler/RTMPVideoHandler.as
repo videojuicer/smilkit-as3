@@ -658,6 +658,8 @@ package org.smilkit.handler
 				case "NetStream.Pause.Notify":
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 					
+					this._netStream.bufferTime = RTMPVideoHandler.INITIAL_BUFFER_TIME;
+					
 					SharedTimer.removeEvery(5, this.checkCondition);
 					break;
 				case "NetStream.Unpause.Notify":
