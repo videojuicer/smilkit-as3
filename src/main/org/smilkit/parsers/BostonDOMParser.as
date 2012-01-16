@@ -34,10 +34,12 @@ package org.smilkit.parsers
 	import org.smilkit.dom.DocumentType;
 	import org.smilkit.dom.Element;
 	import org.smilkit.dom.smil.SMILDocument;
+	import org.smilkit.util.Benchmarks;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.UrlUtil;
 
 	public class BostonDOMParser extends EventDispatcher
@@ -60,11 +62,15 @@ package org.smilkit.parsers
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onLoaderIOError);
 			this._loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onLoaderSecurityError);
 			
+			Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			this._loader.load(new URLRequest(UrlUtil.addCacheBlocking(systemID)));
 		}
 
 		protected function onLoaderComplete(e:Event):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			this.dispatchEvent(e.clone());
 			
 			this.parse(this._loader.data);
@@ -72,16 +78,22 @@ package org.smilkit.parsers
 		
 		protected function onLoaderIOError(e:IOErrorEvent):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			this.dispatchEvent(e.clone());
 		}
 		
 		protected function onLoaderSecurityError(e:SecurityErrorEvent):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			this.dispatchEvent(e.clone());
 		}
 		
 		public function parse(document:String, parent:INode = null):INode
 		{
+			Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_PARSE);
+			
 			var xml:XML = new XML(document);
 			var root:XML = xml;
 			
@@ -93,6 +105,8 @@ package org.smilkit.parsers
 			}
 
 			this.parseNode(this._initialParent, root);
+			
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_PARSE);
 			
 			this.dispatchEvent(new BostonDOMParserEvent(BostonDOMParserEvent.PARSER_COMPLETE, this._initialParent));
 			

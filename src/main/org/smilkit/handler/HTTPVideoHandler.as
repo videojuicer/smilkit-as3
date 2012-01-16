@@ -44,8 +44,10 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.time.SharedTimer;
+	import org.smilkit.util.Benchmarks;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.NumberHelper;
 	
 	public class HTTPVideoHandler extends SMILKitHandler
@@ -240,6 +242,9 @@ package org.smilkit.handler
 			{
 				SMILKit.logger.debug("Resuming playback.", this);
 				this._resumed = true;
+				
+				Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_HTTP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_RESUME);
+				
 				this._netStream.resume();
 			}
 		}
@@ -621,6 +626,8 @@ package org.smilkit.handler
 					break;
 				case "NetStream.Unpause.Notify":
 					//this.setVolume(this.viewportObjectPool.viewport.volume);
+					
+					Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_HTTP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_RESUME);
 					
 					this.dispatchEvent(new HandlerEvent(HandlerEvent.RESUME_NOTIFY, this));
 					break;

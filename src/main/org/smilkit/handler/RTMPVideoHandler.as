@@ -45,9 +45,11 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.time.SharedTimer;
+	import org.smilkit.util.Benchmarks;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.NumberHelper;
 	
 	public class RTMPVideoHandler extends SMILKitHandler
@@ -297,6 +299,8 @@ package org.smilkit.handler
 				this._resumed = true;
 				this._waitingForMetaRefresh = true;
 				
+				Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_RTMP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_RESUME);
+				
 				this._netStream.resume();
 			}
 		}
@@ -412,12 +416,16 @@ package org.smilkit.handler
 
 		protected function loadReady():void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_RTMP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_REQUEST);
+			
 			this._waiting = false;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_READY, this));
 		}
 
 		protected function loadWait():void
 		{
+			Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_RTMP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_REQUEST);
+			
 			this._waiting = true;
 			this.dispatchEvent(new HandlerEvent(HandlerEvent.LOAD_WAITING, this));
 		}
@@ -664,6 +672,8 @@ package org.smilkit.handler
 					break;
 				case "NetStream.Unpause.Notify":
 					SharedTimer.every(5, this.checkCondition);
+					
+					Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_RTMP, Benchmarks.ORIGIN_VIDEO, Benchmarks.ACTION_RESUME);
 					
 					if (!this._waitingForMetaRefresh)
 					{

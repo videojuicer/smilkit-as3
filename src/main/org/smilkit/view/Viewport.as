@@ -39,13 +39,15 @@ package org.smilkit.view
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
-	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.HandlerControllerEvent;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.util.Benchmarks;
 	import org.smilkit.w3c.dom.INodeList;
+	import org.utilkit.logger.Benchmark;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.util.Platform;
 
@@ -529,6 +531,8 @@ package org.smilkit.view
 			this._loader.addEventListener(IOErrorEvent.IO_ERROR, this.onRefreshWithRemoteURIIOError);
 			this._loader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, this.onRefreshWithRemoteURISecurityError);
 			this._loader.addEventListener(Event.COMPLETE, this.onRefreshWithRemoteURIComplete);
+			
+			Benchmark.begin(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
 			
 			this._loader.load(request);
 		}
@@ -1031,12 +1035,16 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURIComplete(e:Event):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			SMILKit.logger.benchmark("Finished loading remote document, about to refresh viewport objects.", this);
 			this.refreshObjectPoolWithLoadedData(e.target.data);
 		}
 		
 		private function onRefreshWithRemoteURIIOError(e:IOErrorEvent):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			SMILKit.logger.fatal("Could not load remote document because of an IO Error.", this);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_IOERROR));
@@ -1044,6 +1052,8 @@ package org.smilkit.view
 		
 		private function onRefreshWithRemoteURISecurityError(e:SecurityErrorEvent):void
 		{
+			Benchmark.finish(Benchmarks.ORIGIN_SMILKIT, Benchmarks.ORIGIN_SMIL, Benchmarks.ACTION_REQUEST);
+			
 			SMILKit.logger.fatal("Could not load remote document because of a Security Error.", this);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_SECURITY_ERROR));

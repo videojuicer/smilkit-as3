@@ -93,6 +93,7 @@
     <classEntry path="org.smilkit.dom.smil.expressions.SMILVariableExpressionParser"/>
     <classEntry path="org.smilkit.spec.tests.dom.smil.expressions.SMILVariablesExpressionParserTestCase"/>
     <classEntry path="org.smilkit.handler.HTTPAudioHandler"/>
+    <classEntry path="org.smilkit.util.Benchmarks"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
