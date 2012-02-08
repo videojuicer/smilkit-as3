@@ -43,6 +43,7 @@ package org.smilkit.view
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.load.LoadScheduler;
+	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.util.Benchmarks;
@@ -862,7 +863,20 @@ package org.smilkit.view
 			SMILKit.logger.benchmark("Parsing XML Document into SMILKit's DOM ...");
 			
 			// parse dom
-			var document:SMILDocument = (SMILKit.loadSMILDocument(data) as SMILDocument);
+			var document:SMILDocument = null;
+			
+			try
+			{
+				document = (SMILKit.loadSMILDocument(data) as SMILDocument);
+			}
+			catch (e:Error)
+			{
+				SMILKit.logger.error("Failed parsing SMIL: "+e.message);
+				
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.SMIL_PARSE_FAILED));
+				
+				return;
+			}
 			
 			SMILKit.logger.benchmark("Finished parsing XML Document into DOM");
 			
@@ -879,6 +893,9 @@ package org.smilkit.view
 			this.renderTree.addEventListener(HandlerControllerEvent.WAITING_FOR_SYNC, this.onRenderTreeWaitingForSync);
 			this.renderTree.addEventListener(HandlerControllerEvent.READY, this.onRenderTreeReady);
 			this.renderTree.addEventListener(HandlerControllerEvent.ELEMENT_STOPPED, this.onRenderTreeElementStopped);
+			
+			this.renderTree.addEventListener(HandlerControllerEvent.HANDLER_LOAD_FAILED, this.onHandlerLoadFailed);
+			this.renderTree.addEventListener(HandlerControllerEvent.HANDLER_LOAD_UNAUTHORISED, this.onHandlerLoadUnauthorised);
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
@@ -1057,6 +1074,16 @@ package org.smilkit.view
 			SMILKit.logger.fatal("Could not load remote document because of a Security Error.", this);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_SECURITY_ERROR));
+		}
+		
+		private function onHandlerLoadFailed(e:HandlerControllerEvent):void
+		{
+			this.dispatchEvent(e.clone());
+		}
+		
+		private function onHandlerLoadUnauthorised(e:HandlerControllerEvent):void
+		{
+			this.dispatchEvent(e.clone());
 		}
 		
 		public function dispose():void

@@ -55,6 +55,8 @@ package org.smilkit.events
 		public static var LOADER_SECURITY_ERROR:String = "viewportLoaderSecurityError";
 		public static var LOADER_IOERROR:String = "viewportLoaderIOError";
 		
+		public static var SMIL_PARSE_FAILED:String = "viewportSMILParseFailed";
+		
 		public function ViewportEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);

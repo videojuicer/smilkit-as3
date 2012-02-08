@@ -396,6 +396,16 @@ package org.smilkit.render
 			this.syncHandlersToViewportOffset();
 		}
 		
+		protected function onHandlerLoadFailed(e:HandlerEvent):void
+		{
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.HANDLER_LOAD_FAILED, e.handler));
+		}
+		
+		protected function onHandlerLoadUnauthorised(e:HandlerEvent):void
+		{
+			this.dispatchEvent(new HandlerControllerEvent(HandlerControllerEvent.HANDLER_LOAD_UNAUTHORISED, e.handler));
+		}
+		
 		protected function onHandlerSeekWaiting(e:HandlerEvent):void
 		{
 			SMILKit.logger.debug("Handler "+e.handler+" dispatched SEEK_WAITING.", this);
@@ -775,6 +785,8 @@ package org.smilkit.render
 			handler.addEventListener(HandlerEvent.STOP_NOTIFY, this.onHandlerStopNotify);
 			handler.addEventListener(HandlerEvent.DURATION_RESOLVED, this.onHandlerDurationResolved);
 			handler.addEventListener(HandlerEvent.SELF_MODIFIED, this.onHandlerSelfModified);
+			handler.addEventListener(HandlerEvent.LOAD_FAILED, this.onHandlerLoadFailed);
+			handler.addEventListener(HandlerEvent.LOAD_UNAUTHORISED, this.onHandlerLoadUnauthorised);
 			
 			this._activeTimingNodes.push(timingNode);
 			this._activeMediaElements.push(element);

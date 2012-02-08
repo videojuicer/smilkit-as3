@@ -40,6 +40,9 @@ package org.smilkit.events
 		public static var WAITING_FOR_DATA:String = "renderTreeWaitingForData";
 		public static var WAITING_FOR_SYNC:String = "renderTreeWaitingForSync";
 		
+		public static var HANDLER_LOAD_FAILED:String = "renderTreeHandlerLoadFailed";
+		public static var HANDLER_LOAD_UNAUTHORISED:String = "renderTreeHandlerLoadUnauthorised";
+		
 		protected var _handler:SMILKitHandler;
 		
 		public function HandlerControllerEvent(type:String, element:SMILKitHandler, bubbles:Boolean=false, cancelable:Boolean=false)
@@ -52,6 +55,11 @@ package org.smilkit.events
 		public function get handler():SMILKitHandler
 		{
 			return this._handler;
+		}
+		
+		public override function clone():Event
+		{
+			return new HandlerControllerEvent(this.type, this.handler, this.bubbles, this.cancelable);
 		}
 	}
 }

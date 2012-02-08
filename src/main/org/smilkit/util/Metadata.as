@@ -168,7 +168,7 @@ package org.smilkit.util
 		{
 			switch (this.videoCodecId)
 			{
-				case "avc1":
+				case "avc1": case 7:
 					return "H.264";
 			}
 			
