@@ -16,16 +16,4 @@
 		<nature>com.adobe.flexbuilder.project.flexlibnature</nature>
 		<nature>com.adobe.flexbuilder.project.actionscriptnature</nature>
 	</natures>
-	<linkedResources>
-		<link>
-			<name>[source path] OSMF</name>
-			<type>2</type>
-			<location>C:/Users/sixones/Projects/OSMF/framework/OSMF</location>
-		</link>
-		<link>
-			<name>[source path] src</name>
-			<type>2</type>
-			<location>C:/Users/sixones/Projects/Videojuicer/smilkit-osmf/src</location>
-		</link>
-	</linkedResources>
 </projectDescription>

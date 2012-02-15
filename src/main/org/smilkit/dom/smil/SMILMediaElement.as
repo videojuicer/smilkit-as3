@@ -31,6 +31,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.ParentNode;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;
@@ -478,7 +479,7 @@ package org.smilkit.dom.smil
 			
 			if (!this.orphaned)
 			{
-				this._handler = SMILKit.createElementHandlerFor(this);
+				this._handler = HandlerMap.createElementHandlerFor(this);
 				this._handlerState = ElementTimeContainer.PLAYBACK_STATE_PAUSED;
 				
 				SMILKit.logger.debug("SMILMediaElement is not orphaned created new handler ...");

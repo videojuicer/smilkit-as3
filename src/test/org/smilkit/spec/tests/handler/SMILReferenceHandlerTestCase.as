@@ -31,6 +31,7 @@ package org.smilkit.spec.tests.handler
 	import org.smilkit.dom.smil.SMILRefElement;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.RTMPVideoHandler;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.handler.SMILReferenceHandler;
@@ -65,7 +66,7 @@ package org.smilkit.spec.tests.handler
 		{
 			this._document = null;
 			this._viewport = null;
-			SMILKit.removeHandlers();
+			HandlerMap.removeHandlers();
 		}
 		
 		[Test(description="Tests to ensure that the reference handler is instantiated against the reference element")]
@@ -74,7 +75,7 @@ package org.smilkit.spec.tests.handler
 			var refElement:ISMILMediaElement = this._document.getElementById("reference_tag") as ISMILMediaElement;
 			Assert.assertNotNull(refElement);
 			
-			var handler:Class = SMILKit.findHandlerClassFor(refElement);
+			var handler:Class = HandlerMap.findHandlerClassFor(refElement);
 			Assert.assertNotNull(handler);			
 			Assert.assertStrictlyEquals(handler, org.smilkit.handler.SMILReferenceHandler);
 		}

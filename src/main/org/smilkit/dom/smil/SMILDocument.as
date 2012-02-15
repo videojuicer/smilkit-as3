@@ -24,16 +24,18 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.display.SMILDocumentDisplayStack;
+	import org.smilkit.dom.DocumentType;
 	import org.smilkit.dom.smil.SMILDocumentLoadables;
+	import org.smilkit.dom.smil.display.SMILDocumentDisplayStack;
 	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;
 	import org.smilkit.dom.smil.time.SMILTimeGraph;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.dom.smil.time.SMILTimeScheduler;
-	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.events.HeartbeatEvent;
+	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.view.ViewportObjectPool;
+	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.utilkit.util.Environment;
 	import org.utilkit.util.Platform;
@@ -220,6 +222,17 @@ package org.smilkit.dom.smil
 			//this._mutationEvents = mutation;
 		}
 		
-		
+		/**
+		 * Create's a new SMIL 3.0 DOM <code>Document</code>.
+		 * 
+		 * @return The generated <code>IDocument</code>.
+		 * 
+		 * @see org.smilkit.dom.Document
+		 * @see org.smilkit.w3c.dom.IDocument
+		 */
+		public static function createSMILDocument():IDocument
+		{
+			return new SMILDocument(new DocumentType(null, "smil", "-//W3C//DTD SMIL 3.0 Language//EN", "http://www.w3.org/2008/SMIL30/SMIL30Language.dtd"));
+		}
 	}
 }

@@ -37,7 +37,7 @@ package org.smilkit.parsers
 		protected var _type:int = Time.SMIL_TIME_OFFSET;
 		protected var _timeString:String = null;
 		
-		public function SMILTimeParser(parentNode:INode, timeString:String = null)
+		public function SMILTimeParser(parentNode:INode = null, timeString:String = null)
 		{
 			this._parentNode = parentNode;
 			

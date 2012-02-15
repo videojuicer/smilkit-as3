@@ -128,17 +128,8 @@ package org.smilkit.view
 	[Event(name="viewportAudioVolumeChanged", type="org.smilkit.events.ViewportEvent")]
 	
 
-	public class Viewport extends Sprite
-	{
-		public static var PLAYBACK_PLAYING:String = "playbackPlaying";
-		public static var PLAYBACK_PAUSED:String = "playbackPaused";
-		public static var PLAYBACK_SEEKING:String = "playbackSeeking";
-		
-		public static var SEEK_UNCOMMITTED:String = "seekTransient";
-		public static var SEEK_COMMITTED:String = "seekCommitted";
-		
-		public static var VOLUME_MAX:uint = 100;
-		
+	public class Viewport extends BaseViewport
+	{	
 		/**
 		 *  An instance of ViewportObjectPool responsible for the active documents object pool.
 		 */		
@@ -149,63 +140,26 @@ package org.smilkit.view
 		 */	
 		protected var _drawingBoard:DrawingBoard;
 		
-		protected var _currentIndex:int = -1;
-		protected var _history:Vector.<String>;
-		protected var _autoRefresh:Boolean = true;
-		
-		/**
-		* The current playback state for this Viewport instance.
-		*/
-		protected var _playbackState:String;
-		
-		/**
-		* The previous playback state for this Viewport instance. Toggle methods use this to store a state to which the viewport should be restored.
-		*/
-		protected var _previousPlaybackState:String;
-		
-		/**
-		* The offset last seeked to when in PLAYBACK_SEEKING state. Switching to a state other than PLAYBACK_SEEKING will reset this variable.
-		*/
-		protected var _previousUncommittedSeekOffset:int = -1;
-		
-		/**
-		*  The current audio output volume.
-		*/
-		protected var _volume:uint = 75;
-		
-		/**
-		* The volume to which audio should be restored when unmuting. If null, <code>Viewport.VOLUME_MAX</code> will be used.
-		*/
-		protected var _unmuteRestoreVolume:uint;		
-		
 		/**
 		* A flag used to note that an asynchronous operation is in progress on the rendertree, and that playback should be deferred
 		* until this operation is complete.
 		*/
 		protected var _waitingForRenderTree:Boolean = false;
 		
-		/**
-		 * Flags stored when the document's loader progress is updated
-		 */
-		protected var _bytesLoaded:int = 0;
-		protected var _bytesTotal:int = 0;
-		
 		protected var _loader:URLLoader = null;
 		
 		public function Viewport()
 		{
-			this._history = new Vector.<String>();
+			super();
 
 			this._drawingBoard = new DrawingBoard();
 			this.addChild(this._drawingBoard);
-			
-			this.pause();
 		}
 		
 		/**
 		 * The current offset for the current <code>Document</code>.
 		 */
-		public function get offset():Number
+		public override function get offset():Number
 		{
 			if (this.document == null)
 			{
@@ -213,14 +167,6 @@ package org.smilkit.view
 			}
 			
 			return this.document.offset;
-		}
-		
-		/**
-		 * Indicates whether the <code>Viewport</code> is playing or not.
-		 */
-		public function get playing():Boolean
-		{
-			return this.playbackState == Viewport.PLAYBACK_PLAYING;
 		}
 		
 		/**
@@ -275,116 +221,6 @@ package org.smilkit.view
 			return this._drawingBoard;
 		}
 		
-		public function get bytesLoaded():int
-		{
-			return this._bytesLoaded;
-		}
-		
-		public function get bytesTotal():int
-		{
-			return this._bytesTotal;
-		}
-
-		public function get history():Vector.<String>
-		{
-			return this._history;
-		}
-		
-		/**
-		 * The current location for the <code>Viewport</code>, a URL pointing to the
-		 * active SMIL document. 
-		 */
-		public function get location():String
-		{
-			if (this._currentIndex == -1)
-			{
-				return null;
-			}
-			
-			return this._history[this._currentIndex];
-		}
-		
-		/**
-		 * Sets the URL location for the <code>Viewport</code> location, will auto load the requested
-		 * location unless <code>autoRefresh</code> is set to false. The location may be set as a regular
-		 * URL, or as a W3C data URI with the utf-8 character set. Data URIs may optionally be base64-encoded.
-		 * 
-		 * If <code>autoRefresh</code> is set to false, you must call <code>refresh</code> after setting the
-		 * location in order to load the new document.
-		 *
-		 * @see org.smilkit.view.Viewport.autoRefresh
-		 * @see org.smilkit.view.Viewport.refresh
-		 */
-		public function set location(location:String):void
-		{			
-			if (location == this.location)
-			{
-				SMILKit.logger.debug("Location re-set to existing value ("+location+" -> "+this.location+"), about to refresh", this);
-				this.refresh(); return;
-			}
-			
-			if (this._loader != null)
-			{
-				// a loader exists, and were trying to load something new, so lets kill the old one
-				if (this._history.length > 0 && this._history.length >= this._currentIndex)
-				{
-					this._history.splice(this._currentIndex, 1);
-					this._currentIndex = this._history.length;
-				}
-			}
-			
-			var i:int = this._history.indexOf(location);
-			
-			if (this._history.length > 0 && (this._currentIndex < (this._history.length - 1)))
-			{
-				this._history = this._history.slice(08, this._currentIndex + 1);
-			}
-			
-			this._history.push(location);
-			this._currentIndex = this._history.length-1;
-			
-			if (this.autoRefresh)
-			{
-				this.refresh();
-			}
-		}
-		
-		/**
-		 * Indicates the auto refresh state, if auto refresh is enabled and if the
-		 * <code>location</code> of the <code>Viewport</code> is changed the <code>Viewport</code>
-		 * will automatically load the requested SMIL document.
-		 */
-		public function get autoRefresh():Boolean
-		{
-			return this._autoRefresh;
-		}
-		
-		/**
-		 * Sets the auto refresh state, if auto refresh is enabled and if the
-		 * <code>location</code> of the <code>Viewport</code> is changed the <code>Viewport</code>
-		 * will automatically load the requested SMIL document.
-		 */
-		public function set autoRefresh(autoRefresh:Boolean):void
-		{
-			this._autoRefresh = autoRefresh;
-		}
-		
-		/**
-		* Public getter for the internal <code>_playbackState</code> variable.
-		*
-		* Note that the playbackState is not indicative of the <code>Viewport</code>'s *readiness*. For example,
-		* if more data needs to be loaded during playback, <code>playbackState</code> will still return <code>Viewport.PLAYBACK_PLAYING</code>
-		* even though the playhead itself is currently held awaiting more data. Use <code>waiting</code> or <code>ready</code> to determine if
-		* the <code>Viewport</code> is currently waiting on any internal actions to complete before resuming.
-		*
-		* @see org.smilkit.view.Viewport.waiting
-		* @see org.smilkit.view.Viewport.ready
-		*/
-		public function get playbackState():String
-		{
-			return this._playbackState;
-		}
-		
 		/**
 		* Indicates whether the <code>Viewport</code> is waiting for any kind of asynchronous operation to complete
 		* before playback can begin.
@@ -392,6 +228,16 @@ package org.smilkit.view
 		public function get waiting():Boolean
 		{
 			return this._waitingForRenderTree;
+		}
+		
+		public override function get duration():Number
+		{
+			if (this.document != null)
+			{
+				return this.document.duration;
+			}
+			
+			return 0;
 		}
 		
 		/**
@@ -403,57 +249,12 @@ package org.smilkit.view
 			return !this.waiting;
 		}
 		
-		/**
-		* Sets the audio volume for this <code>Viewport</code> instance. 
-		* Accepts a <code>uint</code> between 0 and 100, with 0 being muted and 100 being maximum volume.
-		*/
-		public function set volume(volume:uint):void
-		{
-			this.setVolume(volume);
-		}
-		
-		/**
-		* Returns the viewport's current volume level as a uint between 0 and 100, with 0 being muted
-		* and 100 being maximum volume.
-		*/
-		public function get volume():uint
-		{
-			return this._volume;
-		}	
-		
-		/**
-		* Returns the value to which volume will be set when unmute() is next called. This is the value
-		* last set by a call to setVolume with the setRestorePoint argument given as true, or the max
-		* volume level if no restore point has been set.
-		*/
-		public function get unmuteRestoreVolume():uint
-		{
-			return (this._unmuteRestoreVolume)? this._unmuteRestoreVolume : Viewport.VOLUME_MAX;
-		}	
-		
-		/** 
-		* Public getter for the current mute toggle state for this <code>Viewport</code> instance.
-		* @return A <code>Boolean</code>, true if the viewport is currently muted.
-		*/
-		public function get muted():Boolean
-		{
-			return (this.volume <= 0);
-		}
-		
-		/**
-		* <code>Rectangle</code> that specifies the points at which the <code>Viewport</code> is drawn, the x + y params
-		* of <code>Rectangle</code> are ignored.
-		*/
-		public function get boundingRect():Rectangle
+		public override function get boundingRect():Rectangle
 		{
 			return this.drawingBoard.boundingRect;
 		}
-		
-		/**
-		* Sets the bounding <code>Rectangle</code> that specifies the points at which the Viewport is drawn
-		* too, the x + y params of <code>Rectangle</code> are ignored.
-		*/
-		public function set boundingRect(rect:Rectangle):void
+
+		public override function set boundingRect(rect:Rectangle):void
 		{
 			this.drawingBoard.boundingRect = rect;
 		}
@@ -485,12 +286,23 @@ package org.smilkit.view
 		 * and auto-refresh is enabled this method is automatically called. Otherwise the next
 		 * time the refresh method is called the new location is used.
 		 */
-		public function refresh():void
+		public override function refresh():void
 		{
 			if (this.location == null || this.location == "")
 			{
 				throw new IllegalOperationError("Unable to navigate to null location.");
 			}
+			
+			if (this._loader != null)
+			{
+				// a loader exists, and were trying to load something new, so lets kill the old one
+				if (this._history.length > 0 && this._history.length >= this._currentIndex)
+				{
+					this._history.splice(this._currentIndex, 1);
+					this._currentIndex = this._history.length;
+				}
+			}
+			
 
 			SMILKit.logger.debug("Pausing playback before refresh", this);
 			this.pause();
@@ -556,7 +368,7 @@ package org.smilkit.view
 		* Pulls a piece of metadata from the document by the given key.
 		* The metadata must be in a <meta /> tag with the appropriate name key.
 		*/
-		public function getDocumentMeta(key:String):String
+		public override function getDocumentMeta(key:String):String
 		{
 			if(this.document != null)
 			{
@@ -578,185 +390,7 @@ package org.smilkit.view
 				//}
 			}
 			return null;
-		}
-		
-		/**
-		 * Moves one step back in the history list and sets the location to the old url.
-		 */
-		public function back():Boolean
-		{
-			if (this._currentIndex > 0)
-			{
-				this._currentIndex--;
-				
-				if (this.autoRefresh)
-				{
-					this.refresh();
-				}
-			}
-	
-			
-			return false;
-		}
-		
-		/**
-		 * Moves one step forward in the history list and sets the location to the new url.
-		 */
-		public function forward():Boolean
-		{
-			if (this._currentIndex < (this._history.length - 1))
-			{
-				this._currentIndex++;
-				
-				if (this.autoRefresh)
-				{
-					this.refresh();
-				}
-			}
-			
-			return false;
-		}
-		
-		/**
-		* Begins or resumes playback from the current playhead position.
-		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
-		*/
-		public function resume():Boolean
-		{
-			return this.setPlaybackState(Viewport.PLAYBACK_PLAYING);
-		}
-		
-		/**
-		* Pauses playback at the current playhead position.
-		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
-		*/		
-		public function pause():Boolean
-		{
-			return this.setPlaybackState(Viewport.PLAYBACK_PAUSED);
-		}
-		
-		/**
-		* Performs a seek to the given offset within the document. Calling this method throws the viewport instance into
-		* a "seeking" playback state, during which certain special behaviours apply - in particular, while in this state the
-		* viewport will not do any just-in-time loading of assets.
-		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
-		*/
-		public function seek(offset:uint):Boolean
-		{
-			return this.setPlaybackState(Viewport.PLAYBACK_SEEKING, offset);
-		}
-		
-		/**
-		* Reverts the viewport from a seeking state back to the previously-active playback state. You should call commitSeek()
-		* after any sequence of seek(offset) calls. For instance when implementing a basic drag and drop slider UI for seeking,
-		* you would call seek(offset) each time the user moves the play head during a drag operation and commitSeek() when the user
-		* releases the playhead.
-		* @return A <code>Boolean</code> value. True if the playback state changed successfully, false otherwise..
-		*/
-		public function commitSeek():Boolean
-		{
-			SMILKit.logger.info("Seek operation committed. Reverting to previous playback state at offset: "+this.offset, this);
-			if(this._playbackState == Viewport.PLAYBACK_SEEKING)
-			{
-				this.loadScheduler.start();
-				this.revertPlaybackState();
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		/**
-		* Alters the playback state of the viewport instance to the given value.
-		* If the playback state already matches the given value, nothing happens and false is returned.
-		* If the given value is a new playback state, the playback state is set and a state change event is dispatched. True will be returned.
-		* There is a special case for registering a state change while the viewport's state is PLAYBACK_SEEKING. In this state, a state change will 
-		* be registered if *either* the newState or offset arguments differ from the last call.
-		*/
-		public function setPlaybackState(newState:String, offset:uint=0):Boolean
-		{
-			if(newState != this._playbackState)
-			{
-				SMILKit.logger.info("Playback state set to to "+newState+".", this);
-				// Register a basic state change
-				this._previousPlaybackState = this._playbackState;
-				this._playbackState = newState;
-				
-				switch(this._playbackState)
-				{
-					case Viewport.PLAYBACK_PLAYING:
-						this._previousUncommittedSeekOffset = -1;
-						this.onPlaybackStateChangedToPlaying();
-						break;
-					case Viewport.PLAYBACK_PAUSED:
-						this._previousUncommittedSeekOffset = -1;
-						this.onPlaybackStateChangedToPaused();
-						break;
-					case Viewport.PLAYBACK_SEEKING:
-						this._previousUncommittedSeekOffset = offset;
-						this.onPlaybackStateChangedToSeekingWithOffset(offset);
-						break;
-				}
-				
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
-				
-				return true;
-			}
-			else if(newState == Viewport.PLAYBACK_SEEKING && this._previousUncommittedSeekOffset != offset)
-			{
-				SMILKit.logger.info("Playback state set to "+newState+" (offset: "+offset+").", this);
-				// Register a special case for changing offset while seeking
-				this._previousUncommittedSeekOffset = offset;
-				this.onPlaybackStateChangedToSeekingWithOffset(offset);
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
-				return true;
-			}
-			else
-			{
-				return false;
-			}
-		}
-		
-		/**
-		* Reverts the playback state to the value stored during the last successful changePlaybackState call.
-		*/
-		public function revertPlaybackState():void
-		{
-			SMILKit.logger.debug("About to revert playback state to "+this._previousPlaybackState+".", this);	
-			this.setPlaybackState(this._previousPlaybackState);
-		}
-		
-		/**
-		* Mutes all audio output from this viewport instance, saving the current volume level as a restore
-		* point.
-		*
-		* @params setRestorePoint A <code>Boolean</code> specifying whether the current volume level should be used as a restore point when unmuting.
-		*/
-		public function mute(setRestorePoint:Boolean=false):Boolean
-		{
-			return this.setVolume(0, setRestorePoint);
-		}
-		
-		/**
-		* Returns the <code>Viewport</code> from a muted state, returning the volume level to the last volume restore point, or to the maximum volume
-		* if no restore point has been set.
-		*/
-		public function unmute():Boolean
-		{
-			return this.setVolume(this.unmuteRestoreVolume);
-		}
-		
-		/**
-		* Toggles the <code>Viewport</code> between a muted and unmuted state.
-		* 
-		* @params setRestorePoint A <code>Boolean</code> specifying whether the current volume level should be used as a restore point when unmuting.
-		*/
-		public function toggleMute(setRestorePoint:Boolean=false):Boolean
-		{
-			return (this.muted)? this.unmute() : this.mute(setRestorePoint);
-		}
+		}	
 		
 		/**
 		* Sets the <code>Viewport</code>'s volume level, and dispatches a volume changed event if the given newVolume parameter differs from the current
@@ -765,10 +399,10 @@ package org.smilkit.view
 		* @param newVolume A <code>uint</code> between 0 and 100 indicating the new desired volume level
 		* @param setRestorePoint A <code>Boolean</code> specifying whether the new volume level should be set as a restore point for the next unmute operation.
 		*/
-		public function setVolume(newVolume:uint, setRestorePoint:Boolean=false):Boolean
+		public override function setVolume(newVolume:uint, setRestorePoint:Boolean=false):Boolean
 		{
 			// Constrain value
-			newVolume = Math.max(0, Math.min(Viewport.VOLUME_MAX, newVolume));
+			newVolume = Math.max(0, Math.min(BaseViewport.VOLUME_MAX, newVolume));
 			
 			// Skip if not changed
 			if(newVolume != this.volume)
@@ -867,7 +501,8 @@ package org.smilkit.view
 			
 			try
 			{
-				document = (SMILKit.loadSMILDocument(data) as SMILDocument);
+				var parser:BostonDOMParser = new BostonDOMParser();
+				document = parser.parse(data) as SMILDocument;
 			}
 			catch (e:Error)
 			{
@@ -933,7 +568,7 @@ package org.smilkit.view
 			}
 		}
 		
-		protected function onPlaybackStateChangedToPlaying():void
+		protected override function onPlaybackStateChangedToPlaying():void
 		{
 			// If the viewport is not ready, then this operation is deferred until it becomes ready.
 			// See onRenderTreeReady for the deferred dispatch to this method.
@@ -959,7 +594,19 @@ package org.smilkit.view
 			}	
 		}
 		
-		protected function onPlaybackStateChangedToPaused():void
+		public override function commitSeek():Boolean
+		{
+			if (this._playbackState == BaseViewport.PLAYBACK_SEEKING)
+			{
+				this.loadScheduler.start();
+				
+				return super.commitSeek();
+			}
+			
+			return false;
+		}
+		
+		protected override function onPlaybackStateChangedToPaused():void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_PAUSED.", this);
 			
@@ -970,7 +617,7 @@ package org.smilkit.view
 			}
 		}
 		
-		protected function onPlaybackStateChangedToStopped():void
+		protected override function onPlaybackStateChangedToStopped():void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_STOPPED.", this);
 			
@@ -979,7 +626,7 @@ package org.smilkit.view
 			this.document.scheduler.pause();
 		}
 		
-		protected function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
+		protected override function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
 			SMILKit.logger.info("Completed changing playback state to PLAYBACK_SEEKING with offset: "+offset+".", this);
 			this.loadScheduler.stop();
@@ -1024,7 +671,7 @@ package org.smilkit.view
 				SMILKit.logger.info("Ready to play.", this);
 				this._waitingForRenderTree = false;
 				
-				if(this._playbackState == Viewport.PLAYBACK_PLAYING)
+				if(this._playbackState == BaseViewport.PLAYBACK_PLAYING)
 				{
 					SMILKit.logger.info("Playback was deferred because the Viewport was waiting for another operation to complete. Resuming playback now.", this);
 					
@@ -1086,7 +733,7 @@ package org.smilkit.view
 			this.dispatchEvent(e.clone());
 		}
 		
-		public function dispose():void
+		public override function dispose():void
 		{
 			if (this.loadScheduler != null)
 			{
@@ -1095,7 +742,7 @@ package org.smilkit.view
 			
 			this.destroyHandlers();
 			
-			Platform.garbageCollection();
+			super.dispose();
 		}
 	}
 }

@@ -24,11 +24,14 @@
 package org.smilkit.handler
 {
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
+	import org.utilkit.collection.Hashtable;
 	import org.utilkit.parser.URLParser;
 	import org.utilkit.util.ObjectUtil;
 
 	public class HandlerMap
 	{
+		private static const __handlers:Hashtable = new Hashtable();
+		
 		protected var _protocols:Array;
 		protected var _mimeMap:Object;
 		protected var _urlRegex:RegExp;
@@ -129,6 +132,122 @@ package org.smilkit.handler
 			}
 			
 			return false;
+		}
+		
+		/**
+		 * Register the default set of SMILKit handlers
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
+		public static function defaultHandlers():void
+		{
+			HandlerMap.registerHandler(org.smilkit.handler.SMILReferenceHandler, SMILReferenceHandler.toHandlerMap());
+			
+			HandlerMap.registerHandler(org.smilkit.handler.ImageHandler, ImageHandler.toHandlerMap());
+			
+			HandlerMap.registerHandler(org.smilkit.handler.RTMPVideoHandler, RTMPVideoHandler.toHandlerMap());
+			HandlerMap.registerHandler(org.smilkit.handler.RTMPAudioHandler, RTMPAudioHandler.toHandlerMap());
+			
+			HandlerMap.registerHandler(org.smilkit.handler.HTTPAudioHandler, HTTPAudioHandler.toHandlerMap());
+			HandlerMap.registerHandler(org.smilkit.handler.HTTPVideoHandler, HTTPVideoHandler.toHandlerMap());
+		}
+		
+		/**
+		 * Register the specified <code>Handler</code> class with the <code>HandlerMap</code>, handlers are registered
+		 * on the global SMILKit scope.
+		 * 
+		 * @param handlerClass The <code>Handler</code> class reference to register the map.
+		 * @param handlerMap A <code>HandlerMap</code> instance used for matching against the handler.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
+		public static function registerHandler(handlerClass:Class, handlerMap:HandlerMap):void
+		{
+			HandlerMap.__handlers.setItem(handlerMap, handlerClass);
+		}
+		
+		/**
+		 * Finds a <code>Handler</code> class for the specified <code>ISMILMediaElement</code>, loops over
+		 * the registered handlers to find a match through the <code>HandlerMap</code>.
+		 * 
+		 * @param element The <code>ISMILMediaElement</code> instance to find a handler for.
+		 *
+		 * @return The matching <code>Handler</code> class, or null if not found.
+		 */
+		public static function findHandlerClassFor(element:ISMILMediaElement):Class
+		{
+			for (var i:int = (HandlerMap.__handlers.length-1); i >= 0; i--)
+			{
+				var handler:HandlerMap = HandlerMap.__handlers.getKeyAt(i) as HandlerMap;
+				
+				if (handler.match(element))
+				{
+					return HandlerMap.__handlers.getItemAt(i) as Class;
+				}
+			}
+			
+			return null;
+		}
+		
+		/**
+		 * Create a <code>SMILKitHandler</code> instance for the specified <code>ISMILMediaElement</code>
+		 * object.
+		 * 
+		 * @param element The <code>ISMILMediaElement</code> to find a matching hander for.
+		 * 
+		 * @return <code>SMILKitHandler</code> instance.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
+		public static function createElementHandlerFor(element:ISMILMediaElement):SMILKitHandler
+		{
+			var klass:Class = HandlerMap.findHandlerClassFor(element);
+			
+			if (klass != null)
+			{
+				var handler:SMILKitHandler = new klass(element);
+				
+				return handler;
+			}
+			
+			return null;
+		}
+		
+		/**
+		 * Remove the specified registered handler.
+		 *
+		 * @param handlerClass The <code>Class</code> to find the registered handlers to remove.
+		 * @param handlerMap A <code>HandlerMap</code> instance to match against, if not specified will remove all handlers that match on the handlerClass.
+		 *
+		 * @see org.smilkit.handler.Handler
+		 * @see org.smilkit.handler.HandlerMap
+		 */
+		public static function removeHandlers(handlerClass:Class = null, handlerMap:HandlerMap = null):void
+		{
+			if (handlerClass == null)
+			{
+				// clear all
+				HandlerMap.__handlers.removeAll();
+			}
+			else
+			{
+				for (var i:int = HandlerMap.__handlers.length; i > 0; i--)
+				{
+					var hClass:Class = HandlerMap.__handlers.getItemAt(i) as Class;
+					var hMap:HandlerMap = HandlerMap.__handlers.getKeyAt(i) as HandlerMap;
+					
+					if (handlerClass == hClass)
+					{
+						if (handlerMap == null || hMap == handlerMap)
+						{
+							HandlerMap.__handlers.removeItemAt(i);
+						}	
+					}
+				}
+			}
 		}
 	}
 }

@@ -28,6 +28,7 @@ package org.smilkit.spec.tests.handler
 	import org.flexunit.async.Async;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.HandlerEvent;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.SMILReferenceHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
@@ -50,7 +51,7 @@ package org.smilkit.spec.tests.handler
 			SMILKit.defaults();
 			
 			this._rtmpElement = this._document.getElementById("video_rtmp") as ISMILMediaElement;
-			this._rtmpVideoHandler = (SMILKit.createElementHandlerFor(this._rtmpElement) as SMILReferenceHandler);
+			this._rtmpVideoHandler = (HandlerMap.createElementHandlerFor(this._rtmpElement) as SMILReferenceHandler);
 		}
 		
 		[After]
@@ -58,7 +59,7 @@ package org.smilkit.spec.tests.handler
 		{
 			this._document = null;
 			
-			SMILKit.removeHandlers();
+			HandlerMap.removeHandlers();
 		}
 		
 		[Test(async,descriptions="Tests resolving an RTMP video")]

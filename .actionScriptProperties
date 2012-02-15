@@ -1,11 +1,9 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <actionScriptProperties analytics="false" mainApplicationPath="smilkit-as3.as" projectUUID="ee05f95a-107d-42e8-ad0d-be529723d77e" version="10">
-  <compiler additionalCompilerArguments="-locale en_US -define=CONFIG::LOGGING,true -define=CONFIG::FLASH_10_1,true -define=CONFIG::MOCK,false -define=CONFIG::PLATFORM,true" autoRSLOrdering="true" copyDependentFiles="false" flex3CompatMode="true" flexSDK="Flex 4.5" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="true" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src/main" strict="true" targetPlayerVersion="0.0.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
+  <compiler additionalCompilerArguments="-locale en_US -define=CONFIG::USE_SMILKIT,false -define=CONFIG::USE_OSMF,true" autoRSLOrdering="true" copyDependentFiles="false" flex3CompatMode="true" fteInMXComponents="false" generateAccessible="false" htmlExpressInstall="true" htmlGenerate="false" htmlHistoryManagement="false" htmlPlayerVersionCheck="true" includeNetmonSwc="true" outputFolderPath="bin" removeUnusedRSL="true" sourceFolderPath="src/main" strict="true" targetPlayerVersion="10.1.0" useApolloConfig="false" useDebugRSLSwfs="true" verifyDigests="true" warn="true">
     <compilerSourcePath>
       <compilerSourcePathEntry kind="1" linkType="1" path="src/test"/>
       <compilerSourcePathEntry kind="1" linkType="1" path="src/example"/>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/Users/sixones/Projects/Videojuicer/smilkit-osmf/src"/>
-      <compilerSourcePathEntry kind="1" linkType="1" path="C:/Users/sixones/Projects/OSMF/framework/OSMF"/>
     </compilerSourcePath>
     <libraryPath defaultLinkType="0">
       <libraryPathEntry kind="1" linkType="1" path="libs"/>

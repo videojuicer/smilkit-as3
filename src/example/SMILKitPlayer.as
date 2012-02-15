@@ -33,21 +33,21 @@ package
 	import flash.events.Event;
 	import flash.geom.Rectangle;
 	import flash.media.Video;
-	import flash.ui.ContextMenu;
-	import flash.ui.ContextMenuItem;
 	import flash.system.Capabilities;
 	import flash.system.System;
+	import flash.ui.ContextMenu;
+	import flash.ui.ContextMenuItem;
 	
 	import org.osmf.display.ScaleMode;
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.BaseViewport;
 	import org.utilkit.logger.Logger;
 	
 	public class SMILKitPlayer extends Sprite
 	{
-		protected var _viewport:Viewport;
+		protected var _viewport:BaseViewport;
 		
 		public function SMILKitPlayer()
 		{
@@ -124,31 +124,31 @@ package
 		
 		protected function onSeek25MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.duration / 4);
+			this._viewport.seek(this._viewport.duration / 4);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek50MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.duration / 2);
+			this._viewport.seek(this._viewport.duration / 2);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek75MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek((this._viewport.document.duration / 4) * 3);
+			this._viewport.seek((this._viewport.duration / 4) * 3);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onSeek100MenuItem(e:ContextMenuEvent):void
 		{
-			this._viewport.seek(this._viewport.document.duration);
+			this._viewport.seek(this._viewport.duration);
 			this._viewport.commitSeek();
 		}
 		
 		protected function onRefreshComplete(e:ViewportEvent):void
 		{
-			this.addChild(this._viewport.drawingBoard);
+			this.addChild(this._viewport);
 			
 			this._viewport.resume();
 		}

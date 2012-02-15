@@ -29,13 +29,14 @@ package org.smilkit.spec.tests.handler
 	import flexunit.framework.Assert;
 	
 	import org.smilkit.SMILKit;
+	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.handler.HTTPVideoHandler;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILMediaElement;
-	import org.smilkit.dom.smil.SMILMediaElement;
 
 	public class HandlerTestCase
 	{		
@@ -55,7 +56,7 @@ package org.smilkit.spec.tests.handler
 		{
 			this._document = null;
 			
-			SMILKit.removeHandlers();
+			HandlerMap.removeHandlers();
 		}
 		
 		[Test(description="Tests finding a default handler")]
@@ -65,7 +66,7 @@ package org.smilkit.spec.tests.handler
 			
 			Assert.assertNotNull(httpElement);
 			
-			var httpHandler:Class = SMILKit.findHandlerClassFor(httpElement);
+			var httpHandler:Class = HandlerMap.findHandlerClassFor(httpElement);
 			
 			Assert.assertNotNull(httpHandler);
 			
@@ -79,7 +80,7 @@ package org.smilkit.spec.tests.handler
 			
 			Assert.assertNotNull(httpElement);
 			
-			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			var httpHandler:SMILKitHandler = HandlerMap.createElementHandlerFor(httpElement);
 			
 			Assert.assertNotNull(httpHandler);
 			
@@ -96,7 +97,7 @@ package org.smilkit.spec.tests.handler
 			
 			Assert.assertNotNull(httpElement);
 			
-			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			var httpHandler:SMILKitHandler = HandlerMap.createElementHandlerFor(httpElement);
 			
 			Assert.assertNotNull(httpHandler);
 			
@@ -110,7 +111,7 @@ package org.smilkit.spec.tests.handler
 			
 			Assert.assertNotNull(httpElement);
 			
-			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			var httpHandler:SMILKitHandler = HandlerMap.createElementHandlerFor(httpElement);
 			
 			Assert.assertNotNull(httpHandler);
 			
@@ -126,7 +127,7 @@ package org.smilkit.spec.tests.handler
 		public function intrinsicFileSizeResolvedFromParams():void
 		{
 			var httpElement:SMILMediaElement = this._document.getElementById("video_http") as SMILMediaElement;
-			var httpHandler:SMILKitHandler = SMILKit.createElementHandlerFor(httpElement);
+			var httpHandler:SMILKitHandler = HandlerMap.createElementHandlerFor(httpElement);
 			Assert.assertEquals(1000, httpElement.bytesTotal);
 		}
 	}

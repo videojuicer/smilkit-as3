@@ -30,6 +30,7 @@ package org.smilkit.spec.tests.handler
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.HTTPVideoHandler;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
@@ -51,7 +52,7 @@ package org.smilkit.spec.tests.handler
 			SMILKit.defaults();
 			
 			this._httpElement = this._document.getElementById("video_http") as ISMILMediaElement;
-			this._httpVideoHandler = (SMILKit.createElementHandlerFor(this._httpElement) as HTTPVideoHandler);
+			this._httpVideoHandler = (HandlerMap.createElementHandlerFor(this._httpElement) as HTTPVideoHandler);
 		}
 		
 		[After]
@@ -59,7 +60,7 @@ package org.smilkit.spec.tests.handler
 		{
 			this._document = null;
 			
-			SMILKit.removeHandlers();
+			HandlerMap.removeHandlers();
 		}
 		
 		[Test(async,descriptions="Tests resolving a HTTP video")]

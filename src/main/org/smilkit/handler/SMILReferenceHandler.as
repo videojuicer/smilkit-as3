@@ -46,6 +46,7 @@ package org.smilkit.handler
 	import org.smilkit.parsers.BostonDOMParserEvent;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.util.MathHelper;
+	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.NestedViewport;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
@@ -534,7 +535,7 @@ package org.smilkit.handler
 		
 		protected function onInternalViewportPlaybackStateChanged(e:ViewportEvent):void
 		{			
-			if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			if (this._nestedViewport.playbackState == BaseViewport.PLAYBACK_PLAYING)
 			{
 				if(this._seekingTo)
 				{
@@ -543,7 +544,7 @@ package org.smilkit.handler
 					this.internalSeek(this._seekingToTarget);
 				}
 			}
-			else if (this._nestedViewport.playbackState == Viewport.PLAYBACK_PAUSED)
+			else if (this._nestedViewport.playbackState == BaseViewport.PLAYBACK_PAUSED)
 			{
 				//this.dispatchEvent(new HandlerEvent(HandlerEvent.PAUSE_NOTIFY, this));
 			}

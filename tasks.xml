@@ -32,13 +32,19 @@
         <compc output="${target.path}/${smilkit.target}"  
             as3="true" benchmark="${build.verbose}" debug="${build.debug}" incremental="false" fork="false"
             keep-generated-actionscript="${build.debug}" link-report="${report.path}/link-report.xml"
-            locale="en_US" optimize="${build.optimise}" target-player="10.0.0" warnings="true">
+            locale="en_US" optimize="${build.optimise}" target-player="10.1.0" warnings="true">
             
             <define name="BUILD::DEBUG" value="${build.debug}" />
             <define name="BUILD::SSL" value="${build.ssl}" />
+            <define name="CONFIG::USE_SMILKIT" value="true" />
+            <define name="CONFIG::USE_OSMF" value="true" />
             
             <source-path path-element="${smilkit.src.main}" />
             <include-sources dir="${smilkit.src.main}" includes="*" />
+
+            <library-path dir="${smilkit.libs}" append="true">
+                <include name="OSMF.swc" />
+            </library-path>
             
             <library-path dir="${target.path}" append="true">
 				<include name="utilkit-as3.swc" />

@@ -47,6 +47,7 @@ package org.smilkit.handler
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.util.Benchmarks;
 	import org.smilkit.util.Metadata;
+	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
 	import org.utilkit.logger.Benchmark;
@@ -770,7 +771,7 @@ package org.smilkit.handler
 			
 			this.resize();
 			
-			if (this.viewportObjectPool != null && this.viewportObjectPool.viewport != null && this.viewportObjectPool.viewport.playbackState == Viewport.PLAYBACK_PAUSED) //if(!this._resumed)
+			if (this.viewportObjectPool != null && this.viewportObjectPool.viewport != null && this.viewportObjectPool.viewport.playbackState == BaseViewport.PLAYBACK_PAUSED) //if(!this._resumed)
 			{
 				SMILKit.logger.debug("Encountered metadata while loading or paused. About to pause netstream object.", this);
 				

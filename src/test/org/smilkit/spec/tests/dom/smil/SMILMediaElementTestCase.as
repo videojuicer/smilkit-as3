@@ -29,6 +29,7 @@ package org.smilkit.spec.tests.dom.smil
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
+	import org.smilkit.handler.HandlerMap;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.Viewport;
@@ -53,7 +54,7 @@ package org.smilkit.spec.tests.dom.smil
 		public function tearDown():void
 		{
 			this._document = null;
-			SMILKit.removeHandlers();
+			HandlerMap.removeHandlers();
 		}
 
 		[Test(description="Tests that a media element in a ref with multiple base tags uses the correct one")]

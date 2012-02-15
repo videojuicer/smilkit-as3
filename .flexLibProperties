@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <flexLibProperties includeAllClasses="true" useMultiPlatformConfig="false" version="3">
   <includeClasses>
-    <classEntry path="org.osmf.smil.loader.AudioNetLoader"/>
     <classEntry path="org.smilkit.dom.CharacterData"/>
     <classEntry path="org.smilkit.dom.EnclosingAttr"/>
     <classEntry path="org.smilkit.dom.Text"/>
@@ -68,7 +67,6 @@
     <classEntry path="org.smilkit.util.MathHelper"/>
     <classEntry path="org.smilkit.util.Metadata"/>
     <classEntry path="org.smilkit.view.NestedViewport"/>
-    <classEntry path="org.smilkit.view.OSMFSMILDocument"/>
     <classEntry path="org.smilkit.view.OSMFViewport"/>
     <classEntry path="org.smilkit.view.Viewport"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
@@ -95,6 +93,7 @@
     <classEntry path="org.smilkit.spec.tests.handler.RTMPVideoHandlerTestCase"/>
     <classEntry path="org.smilkit.spec.tests.parsers.SMILTimeParserTestCase"/>
     <classEntry path="org.smilkit.spec.tests.view.ViewportTestCase"/>
+    <classEntry path="org.smilkit.view.BaseViewport"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

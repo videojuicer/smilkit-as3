@@ -3,10 +3,9 @@ package org.smilkit.view
 	import flash.events.ProgressEvent;
 	import flash.geom.Rectangle;
 	
-	import flashx.textLayout.elements.BreakElement;
-	
 	import org.osmf.containers.MediaContainer;
 	import org.osmf.events.BufferEvent;
+	import org.osmf.events.DisplayObjectEvent;
 	import org.osmf.events.LoadEvent;
 	import org.osmf.events.MediaErrorEvent;
 	import org.osmf.events.MediaPlayerCapabilityChangeEvent;
@@ -26,13 +25,11 @@ package org.smilkit.view
 	import org.osmf.smil.model.SMILDocument;
 	import org.osmf.traits.LoadState;
 	import org.osmf.traits.PlayState;
-	import org.osmf.utils.OSMFSettings;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.events.ViewportEvent;
 
-	public class OSMFViewport extends Viewport
+	public class OSMFViewport extends BaseViewport
 	{
 		private var _mediaPlayer:MediaPlayer = null;
 		private var _mediaFactory:MediaFactory = null;
@@ -44,10 +41,12 @@ package org.smilkit.view
 		
 		public function OSMFViewport()
 		{
-			OSMFSettings.enableStageVideo = false;
+			super();
 			
 			this._uiMetadata = new LayoutMetadata();
 			this._uiMetadata.scaleMode = ScaleMode.LETTERBOX;
+			//this._uiMetadata.percentWidth = 100;
+			//this._uiMetadata.percentHeight = 100;
 			
 			this._uiComponent = new MediaContainer(null, this._uiMetadata);
 			this._uiComponent.backgroundColor = 0xFFFFFFF;
@@ -58,6 +57,9 @@ package org.smilkit.view
 			this._mediaPlayer.autoPlay = false;
 			
 			this._mediaPlayer.addEventListener(MediaErrorEvent.MEDIA_ERROR, this.onMediaError);
+			
+			this._mediaPlayer.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, this.onDisplayObjectChanged);
+			this._mediaPlayer.addEventListener(DisplayObjectEvent.MEDIA_SIZE_CHANGE, this.onMediaSizeChanged);
 			
 			this._mediaPlayer.addEventListener(MediaPlayerCapabilityChangeEvent.CAN_PLAY_CHANGE, this.onPlayChanged);
 			this._mediaPlayer.addEventListener(MediaPlayerCapabilityChangeEvent.CAN_LOAD_CHANGE, this.onLoadChanged);
@@ -80,8 +82,6 @@ package org.smilkit.view
 			this._mediaFactory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
 			
 			this.addChild(this._uiComponent);
-			
-			super();
 		}
 		
 		public override function get boundingRect():Rectangle
@@ -104,6 +104,11 @@ package org.smilkit.view
 			return this._mediaPlayer.currentTime;
 		}
 		
+		public override function get duration():Number
+		{
+			return this._mediaPlayer.duration * 1000;
+		}
+		
 		public override function getDocumentMeta(key:String):String
 		{
 			var metadata:Metadata = this._mediaElement.resource.getMetadataValue("org.smilkit") as Metadata;
@@ -114,11 +119,6 @@ package org.smilkit.view
 			}
 			
 			return null;
-		}
-		
-		public override function get document():org.smilkit.dom.smil.SMILDocument
-		{
-			return new OSMFSMILDocument(this._mediaPlayer);
 		}
 		
 		public override function refresh():void
@@ -143,7 +143,7 @@ package org.smilkit.view
 		
 		public override function setVolume(volume:uint, setRestorePoint:Boolean = false):Boolean
 		{
-			volume = Math.max(0, Math.min(Viewport.VOLUME_MAX, volume));
+			volume = Math.max(0, Math.min(BaseViewport.VOLUME_MAX, volume));
 			
 			if (this.volume != volume)
 			{
@@ -186,7 +186,7 @@ package org.smilkit.view
 				
 				this._uiComponent.layout(this._uiSize.width, this._uiSize.height, true);
 				
-				this._uiComponent.graphics.beginFill(0xFFFFFF, 1.0);
+				this._uiComponent.graphics.beginFill(0xFFFFFF, 0.0);
 				this._uiComponent.graphics.drawRect(0, 0, this._uiSize.width, this._uiSize.height);
 				this._uiComponent.graphics.endFill();
 			}
@@ -202,7 +202,7 @@ package org.smilkit.view
 		
 		protected override function onPlaybackStateChangedToPaused():void
 		{
-			if (this._mediaPlayer.canPause && this._mediaPlayer.playing)
+			if (this._mediaPlayer != null && this._mediaPlayer.canPause && this._mediaPlayer.playing)
 			{
 				this._mediaPlayer.pause();
 			}
@@ -223,9 +223,25 @@ package org.smilkit.view
 			SMILKit.logger.error("onMediaError: "+e.error.detail+" "+e.error.message);
 		}
 		
+		protected function onDisplayObjectChanged(e:DisplayObjectEvent):void
+		{
+			SMILKit.logger.error("onDisplayObjectChanged: ");
+			
+			this.updateUISize();
+		}
+		
+		protected function onMediaSizeChanged(e:DisplayObjectEvent):void
+		{
+			SMILKit.logger.error("onMediaSizeChanged: ");
+			
+			this.updateUISize();
+		}
+		
 		protected function onPlayChanged(e:MediaPlayerCapabilityChangeEvent):void
 		{
 			SMILKit.logger.error("onPlayChanged: "+e.type);
+			
+			this.updateUISize();
 		}
 		
 		protected function onLoadChanged(e:MediaPlayerCapabilityChangeEvent):void
@@ -241,14 +257,12 @@ package org.smilkit.view
 			{
 				case PlayState.PAUSED:
 				case PlayState.STOPPED:
-					this._playbackState = Viewport.PLAYBACK_PAUSED;
+					this._playbackState = BaseViewport.PLAYBACK_PAUSED;
 					break;
 				case PlayState.PLAYING:
-					this._playbackState = Viewport.PLAYBACK_PLAYING;
+					this._playbackState = BaseViewport.PLAYBACK_PLAYING;
 					break;
 			}
-			
-			this.updateUISize();
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
 		}
@@ -260,7 +274,7 @@ package org.smilkit.view
 		
 		protected function onTimeChanged(e:TimeEvent):void
 		{
-			this.updateUISize();
+			//this.updateUISize();
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}

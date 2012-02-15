@@ -31,6 +31,7 @@ package org.smilkit.spec.tests.view
 	import org.flexunit.async.Async;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.Viewport;
 
 	public class ViewportTestCase
@@ -124,7 +125,7 @@ package org.smilkit.spec.tests.view
 			this._viewportWithDocument.mute();
 			Assert.assertEquals(0, this._lastVolumeValue);
 			this._viewportWithDocument.unmute();
-			Assert.assertEquals(Viewport.VOLUME_MAX, this._lastVolumeValue);
+			Assert.assertEquals(BaseViewport.VOLUME_MAX, this._lastVolumeValue);
 		}
 		
 		[Test(description="Tests the mute and unmute methods to ensure that unmuting with a restore point sets the volume to the value of that restore point")]
@@ -141,36 +142,36 @@ package org.smilkit.spec.tests.view
 		[Test(description="Tests that the viewport is instantiated in a paused state")]
 		public function instantiatesInPausedState():void
 		{
-			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
 		}
 		
 		[Test(description="Tests the resume() and pause() methods to ensure that the playback state is properly changed.")]
 		public function resumeBeginsPlaybackAndPauseStopsPlayback():void
 		{
 			Assert.assertTrue(this._viewportWithDocument.resume());
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
 			
 			Assert.assertFalse(this._viewportWithDocument.resume());
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
 			
 			Assert.assertTrue(this._viewportWithDocument.pause());
-			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PAUSED, this._viewportStateLastDispatch);
 		}
 		
 		[Test(description="Tests the seek(offset) method to ensure that it throws the viewport into PLAYBACK_SEEKING state and that it registers a new offset as a state change")]
 		public function seekChangesStateAndRegistersANewOffsetAsANewState():void
 		{
-			Assert.assertEquals(Viewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PAUSED, this._viewportWithDocument.playbackState);
 			Assert.assertTrue(this._viewportWithDocument.seek(1));
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
 			Assert.assertFalse(this._viewportWithDocument.seek(1));
 			Assert.assertTrue(this._viewportWithDocument.seek(2));
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
 		}
 		
 
@@ -183,11 +184,11 @@ package org.smilkit.spec.tests.view
 
 			// Committing a seek while in seek state reverts the state to the previously-active state
 			Assert.assertTrue(this._viewportWithDocument.seek(1));
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_SEEKING, this._viewportStateLastDispatch);
 			Assert.assertTrue(this._viewportWithDocument.commitSeek());
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
-			Assert.assertEquals(Viewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportWithDocument.playbackState);
+			Assert.assertEquals(BaseViewport.PLAYBACK_PLAYING, this._viewportStateLastDispatch);
 		}
 		
 		

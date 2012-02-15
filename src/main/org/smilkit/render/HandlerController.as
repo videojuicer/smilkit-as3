@@ -40,6 +40,7 @@ package org.smilkit.render
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.SharedTimer;
+	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.utilkit.util.NumberHelper;
@@ -230,7 +231,7 @@ package org.smilkit.render
 		 */
 		public function syncHandlersToViewportState():void
 		{
-			if (this.viewport.playbackState == Viewport.PLAYBACK_PLAYING)
+			if (this.viewport.playbackState == BaseViewport.PLAYBACK_PLAYING)
 			{
 				if (this.waitingForSync() || this.waitingForData())
 				{
@@ -1031,7 +1032,7 @@ package org.smilkit.render
 			
 			switch (this._objectPool.viewport.playbackState)
 			{
-				case Viewport.PLAYBACK_SEEKING:
+				case BaseViewport.PLAYBACK_SEEKING:
 					this.cancelOffsetSync();
 					
 					SMILKit.logger.debug("Scheduling a new sync wait cycle to begin on the next Viewport state change to PLAYBACK_PLAYING", this);
@@ -1042,7 +1043,7 @@ package org.smilkit.render
 					this._nextChangeOffset = -1;
 					
 					break;
-				case Viewport.PLAYBACK_PLAYING:
+				case BaseViewport.PLAYBACK_PLAYING:
 					if (this._performOffsetSyncOnNextResume)
 					{
 						SMILKit.logger.debug("About to run a scheduled sync wait cycle.", this);
@@ -1051,7 +1052,7 @@ package org.smilkit.render
 					}
 					this._performOffsetSyncAfterUpdate = true;
 					break;
-				case Viewport.PLAYBACK_PAUSED:
+				case BaseViewport.PLAYBACK_PAUSED:
 					if(this._performOffsetSyncOnNextResume)
 					{
 						SMILKit.logger.debug("Running interim quick sync cycle, leaving full cycle until next Viewport state change to PLAYBACK_PLAYING");
