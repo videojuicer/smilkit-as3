@@ -37,10 +37,8 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayTransitions;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
-	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
@@ -48,7 +46,6 @@ package org.smilkit.handler
 	import org.smilkit.util.Benchmarks;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.BaseViewport;
-	import org.smilkit.view.Viewport;
 	import org.smilkit.w3c.dom.IElement;
 	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.NumberHelper;

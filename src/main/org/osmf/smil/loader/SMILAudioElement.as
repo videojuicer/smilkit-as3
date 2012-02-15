@@ -1,13 +1,8 @@
 package org.osmf.smil.loader
 {
-	import flash.net.NetConnection;
-	import flash.net.NetStream;
-	import flash.net.Responder;
-	
 	import org.osmf.elements.AudioElement;
 	import org.osmf.media.URLResource;
 	import org.osmf.net.NetStreamLoadTrait;
-	import org.osmf.net.NetStreamTimeTrait;
 	import org.osmf.traits.LoadTrait;
 	import org.osmf.traits.LoaderBase;
 	import org.osmf.traits.MediaTraitType;

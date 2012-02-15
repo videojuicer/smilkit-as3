@@ -34,9 +34,8 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.dom.smil.display.DisplayStackEvent;
-	import org.smilkit.dom.smil.time.SMILTimeInstance;
-	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.HandlerControllerEvent;
+	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;

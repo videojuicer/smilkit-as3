@@ -23,13 +23,8 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.dom.smil
 {
-	import org.smilkit.dom.Node;
-	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.IDocument;
-	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILElement;
-	import org.smilkit.dom.smil.SMILDocumentLoadables;
-	import org.smilkit.dom.smil.FileSize;
+	import org.smilkit.w3c.dom.INode;
 	
 	public class ElementLoadableContainer extends SMILElement
 	{

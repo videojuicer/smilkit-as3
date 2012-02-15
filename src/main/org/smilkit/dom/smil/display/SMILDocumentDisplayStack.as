@@ -27,10 +27,7 @@ package org.smilkit.dom.smil.display
 	import flash.events.IEventDispatcher;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.ElementTime;
 	import org.smilkit.dom.smil.ElementTimeContainer;
-	import org.smilkit.events.HandlerControllerEvent;
-	import org.smilkit.handler.SMILKitHandler;
 	
 	public class SMILDocumentDisplayStack extends EventDispatcher
 	{

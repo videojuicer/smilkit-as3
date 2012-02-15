@@ -21,8 +21,6 @@
 *****************************************************/
 package org.osmf.smil.loader
 {
-	import __AS3__.vec.Vector;
-	
 	import flash.events.ErrorEvent;
 	import flash.events.Event;
 	import flash.events.IOErrorEvent;
@@ -34,7 +32,6 @@ package org.osmf.smil.loader
 	import org.osmf.events.MediaError;
 	import org.osmf.events.MediaErrorEvent;
 	import org.osmf.events.MediaFactoryEvent;
-	import org.osmf.logging.Logger;
 	import org.osmf.media.DefaultMediaFactory;
 	import org.osmf.media.MediaElement;
 	import org.osmf.media.MediaFactory;

@@ -30,11 +30,8 @@ package org.smilkit.dom.smil.time
 	import org.smilkit.dom.smil.SMILMediaElement;
 	import org.smilkit.dom.smil.Time;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
-	import org.smilkit.events.HeartbeatEvent;
-	import org.smilkit.time.SharedTimer;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
-	import org.utilkit.collection.Hashtable;
 	import org.utilkit.util.Platform;
 
 	public class SMILTimeGraph

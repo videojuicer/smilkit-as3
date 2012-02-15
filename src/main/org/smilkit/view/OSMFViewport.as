@@ -22,10 +22,8 @@ package org.smilkit.view
 	import org.osmf.media.URLResource;
 	import org.osmf.metadata.Metadata;
 	import org.osmf.smil.SMILPluginInfo;
-	import org.osmf.smil.model.SMILDocument;
 	import org.osmf.traits.LoadState;
 	import org.osmf.traits.PlayState;
-	
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
 

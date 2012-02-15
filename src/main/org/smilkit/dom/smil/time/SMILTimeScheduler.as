@@ -24,7 +24,6 @@
 package org.smilkit.dom.smil.time
 {
 	import flash.events.EventDispatcher;
-	import flash.events.TimerEvent;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementBodyTimeContainer;

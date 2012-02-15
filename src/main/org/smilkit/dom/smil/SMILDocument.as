@@ -25,7 +25,6 @@ package org.smilkit.dom.smil
 {
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.DocumentType;
-	import org.smilkit.dom.smil.SMILDocumentLoadables;
 	import org.smilkit.dom.smil.display.SMILDocumentDisplayStack;
 	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.expressions.SMILDocumentVariables;

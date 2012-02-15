@@ -21,7 +21,7 @@
 *****************************************************/
 package org.osmf.smil.model
 {
-	import __AS3__.vec.Vector;
+	
 	
 	/**
 	 * Enumeration of different SMIL element types.

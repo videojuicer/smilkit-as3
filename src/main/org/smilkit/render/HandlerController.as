@@ -24,14 +24,12 @@
 package org.smilkit.render
 {
 	import flash.events.EventDispatcher;
-	import flash.events.TimerEvent;
 	
 	import org.smilkit.SMILKit;
 	import org.smilkit.dom.smil.ElementTestContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.dom.smil.SMILMediaElement;
-	import org.smilkit.dom.smil.TimeList;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeInstance;
 	import org.smilkit.events.HandlerControllerEvent;
@@ -43,7 +41,6 @@ package org.smilkit.render
 	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.Viewport;
 	import org.smilkit.view.ViewportObjectPool;
-	import org.utilkit.util.NumberHelper;
 	
 	/**
 	 * Class responsible for checking the viewports play position and for requesting the display of certain DOM elements

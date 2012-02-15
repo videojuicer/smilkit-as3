@@ -29,16 +29,12 @@ package org.smilkit.handler
 	import flash.events.IOErrorEvent;
 	import flash.events.NetStatusEvent;
 	import flash.events.SecurityErrorEvent;
-	import flash.events.TimerEvent;
 	import flash.media.SoundTransform;
 	import flash.media.Video;
 	import flash.net.NetConnection;
 	import flash.net.NetStream;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.ElementTimeContainer;
-	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;

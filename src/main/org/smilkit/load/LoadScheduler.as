@@ -32,8 +32,6 @@ package org.smilkit.load {
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.handler.SMILKitHandler;
-	import org.smilkit.render.HandlerController;
-	import org.smilkit.view.ViewportObjectPool;
 	
 	/***
 	 * An instance of LoadScheduler listens to both the TimingGraph and RenderTree objects for

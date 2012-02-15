@@ -25,12 +25,10 @@ package org.smilkit.dom.smil
 {
 	import flash.errors.IllegalOperationError;
 	
-	import org.smilkit.SMILKit;
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
-	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementExclusiveTimeContainer;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;

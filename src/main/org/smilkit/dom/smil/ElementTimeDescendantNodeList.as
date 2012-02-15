@@ -24,7 +24,6 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.w3c.dom.INode;
-	import org.smilkit.w3c.dom.smil.IElementTimeContainer;
 	
 	public class ElementTimeDescendantNodeList extends ElementTimeNodeList
 	{

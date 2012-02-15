@@ -23,14 +23,10 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.dom.smil
 {
-	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.SMILDocument;
-	import org.smilkit.dom.smil.ElementLoadableContainer;
-	import org.smilkit.dom.smil.FileSize;
-	
-	import flash.events.Event;
 	import flash.events.EventDispatcher;
 	import flash.events.ProgressEvent;
+	
+	import org.smilkit.SMILKit;
 	
 	public class SMILDocumentLoadables extends EventDispatcher
 	{

@@ -23,7 +23,6 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.dom.smil
 {
-	import org.smilkit.dom.events.MutationEvent;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.IElement;

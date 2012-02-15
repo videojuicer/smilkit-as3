@@ -21,8 +21,6 @@
 *****************************************************/
 package org.osmf.smil
 {
-	import __AS3__.vec.Vector;
-	
 	import org.osmf.media.MediaElement;
 	import org.osmf.media.MediaFactory;
 	import org.osmf.media.MediaFactoryItem;

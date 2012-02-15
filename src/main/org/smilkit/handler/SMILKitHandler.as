@@ -32,7 +32,6 @@ package org.smilkit.handler
 	import flash.geom.Rectangle;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.ElementLoadableContainer;
 	import org.smilkit.dom.smil.ElementTimeContainer;
 	import org.smilkit.dom.smil.FileSize;
 	import org.smilkit.dom.smil.SMILDocument;

@@ -21,8 +21,6 @@
 *****************************************************/
 package org.osmf.smil.model
 {
-	import __AS3__.vec.Vector;
-	
 	import org.osmf.utils.OSMFStrings;
 
 	/**
