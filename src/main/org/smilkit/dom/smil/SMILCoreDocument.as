@@ -27,6 +27,7 @@ package org.smilkit.dom.smil
 	
 	import org.smilkit.dom.Document;
 	import org.smilkit.dom.events.MutationEvent;
+	import org.smilkit.time.Times;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IDocumentType;
 	import org.smilkit.w3c.dom.INodeList;
@@ -127,7 +128,7 @@ package org.smilkit.dom.smil
 				return this._elementBodyContainer.duration;
 			}
 			
-			return Time.UNRESOLVED;
+			return Times.UNRESOLVED;
 		}
 		
 		public function get durationResolved():Boolean

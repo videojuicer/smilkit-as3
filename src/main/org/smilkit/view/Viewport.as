@@ -725,12 +725,12 @@ package org.smilkit.view
 		
 		private function onHandlerLoadFailed(e:HandlerControllerEvent):void
 		{
-			this.dispatchEvent(e.clone());
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_FAILED));
 		}
 		
 		private function onHandlerLoadUnauthorised(e:HandlerControllerEvent):void
 		{
-			this.dispatchEvent(e.clone());
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_UNAUTHORISED));
 		}
 		
 		public override function dispose():void

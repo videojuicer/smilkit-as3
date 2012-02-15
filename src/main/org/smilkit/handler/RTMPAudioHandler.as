@@ -30,6 +30,7 @@ package org.smilkit.handler
 	import org.smilkit.util.Metadata;
 	import org.smilkit.w3c.dom.IElement;
 	
+	[ExcludeClass]
 	public class RTMPAudioHandler extends RTMPVideoHandler
 	{
 		protected var _lengthRequested:Boolean = false;

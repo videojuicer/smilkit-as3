@@ -23,6 +23,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.dom.smil
 {
+	import org.smilkit.time.Times;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;
@@ -80,7 +81,7 @@ package org.smilkit.dom.smil
 		{
 			var duration:Number = super.duration;
 			
-			if (this.hasChildNodes() && ((duration == Time.MEDIA) && !this.hasDuration()))
+			if (this.hasChildNodes() && ((duration == Times.MEDIA) && !this.hasDuration()))
 			{
 				var childDuration:Number = 0;
 				
@@ -104,7 +105,7 @@ package org.smilkit.dom.smil
 					return childDuration;
 				}
 				
-				return Time.UNRESOLVED;
+				return Times.UNRESOLVED;
 			}
 			
 			return duration;

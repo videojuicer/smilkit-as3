@@ -94,6 +94,7 @@
     <classEntry path="org.smilkit.spec.tests.parsers.SMILTimeParserTestCase"/>
     <classEntry path="org.smilkit.spec.tests.view.ViewportTestCase"/>
     <classEntry path="org.smilkit.view.BaseViewport"/>
+    <classEntry path="org.smilkit.time.Times"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

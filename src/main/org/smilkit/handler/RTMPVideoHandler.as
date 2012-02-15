@@ -37,12 +37,12 @@ package org.smilkit.handler
 	import flash.net.NetStreamPlayTransitions;
 	
 	import org.smilkit.SMILKit;
-	import org.smilkit.dom.smil.Time;
 	import org.smilkit.events.HandlerEvent;
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.handler.state.VideoHandlerState;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.time.SharedTimer;
+	import org.smilkit.time.Times;
 	import org.smilkit.util.Benchmarks;
 	import org.smilkit.util.Metadata;
 	import org.smilkit.view.BaseViewport;
@@ -50,6 +50,7 @@ package org.smilkit.handler
 	import org.utilkit.logger.Benchmark;
 	import org.utilkit.util.NumberHelper;
 	
+	[ExcludeClass]
 	public class RTMPVideoHandler extends SMILKitHandler
 	{
 		public static const INITIAL_BUFFER_TIME:int = 2;
@@ -779,7 +780,7 @@ package org.smilkit.handler
 			
 			if (isNaN(this._metadata.duration) || this._metadata.duration <= 0)
 			{
-				this.resolved(Time.INDEFINITE);
+				this.resolved(Times.INDEFINITE);
 				
 				SMILKit.logger.debug("Resolved duration as indefinite, must be handling live stream ....");
 				

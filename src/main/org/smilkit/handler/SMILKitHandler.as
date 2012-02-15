@@ -42,6 +42,7 @@ package org.smilkit.handler
 	import org.smilkit.handler.state.HandlerState;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.render.RegionContainer;
+	import org.smilkit.time.Times;
 	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.ViewportObjectPool;
 	import org.smilkit.w3c.dom.IElement;
@@ -60,7 +61,7 @@ package org.smilkit.handler
 		protected var _shield:Sprite;
 		
 		protected var _currentOffset:int;
-		protected var _duration:int = Time.UNRESOLVED;
+		protected var _duration:int = Times.UNRESOLVED;
 		
 		protected var _region:SMILRegionElement = null;
 		
@@ -616,15 +617,14 @@ package org.smilkit.handler
 				this._completedResolving = true;
 				
 				// here we update the dom
-				if (this.element != null && (this.element.duration == Time.MEDIA || this.element.duration == 0))
+				if (this.element != null && (this.element.duration == Times.MEDIA || this.element.duration == 0))
 				{
-					if (resolvedDuration == Time.INDEFINITE)
+					if (resolvedDuration == Times.INDEFINITE)
 					{
 						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, "indefinite");
 						
 						this._hasSetImplicitMediaDuration = true;
 					}
-					
 					else
 					{
 						(this.element as SMILMediaElement).implicitMediaDuration = new Time((this.element as ElementTimeContainer), false, this._duration.toString() + "ms");

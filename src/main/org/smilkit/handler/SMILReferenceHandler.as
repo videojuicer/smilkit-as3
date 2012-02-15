@@ -38,6 +38,7 @@ package org.smilkit.handler
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.time.Times;
 	import org.smilkit.view.BaseViewport;
 	import org.smilkit.view.NestedViewport;
 	import org.smilkit.w3c.dom.IElement;
@@ -163,14 +164,14 @@ package org.smilkit.handler
 		
 		public override function get completedResolving():Boolean
 		{
-			var duration:Number = Time.MEDIA;
+			var duration:Number = Times.MEDIA;
 			
 			if (this.isViewportSMILReady)
 			{
 				duration = this.nestedViewport.document.duration;
 			}
 			
-			return (duration != Time.UNRESOLVED && duration != Time.MEDIA);
+			return (duration != Times.UNRESOLVED && duration != Times.MEDIA);
 		}
 		
 		public override function get completedLoading():Boolean
@@ -582,7 +583,7 @@ package org.smilkit.handler
 			}
 			else
 			{
-				this.resolved(Time.INDEFINITE);
+				this.resolved(Times.INDEFINITE);
 			}
 		}
 		

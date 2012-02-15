@@ -144,7 +144,7 @@ package org.smilkit.dom.smil
 					var node:SMILTimeInstance = this.viewportObjectPool.timingGraph.elements[i];
 					var active:Boolean = node.activeAt(offset);
 					
-					//if (node.begin != Time.UNRESOLVED && node.begin > offset && (node.begin < this._safeOffsetMin || this._safeOffsetMin == 0) && node.begin < this._safeOffsetMax)
+					//if (node.begin != Times.UNRESOLVED && node.begin > offset && (node.begin < this._safeOffsetMin || this._safeOffsetMin == 0) && node.begin < this._safeOffsetMax)
 					//{
 					//	this._safeOffsetMax = node.begin;
 					//}

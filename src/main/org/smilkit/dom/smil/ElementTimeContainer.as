@@ -28,6 +28,7 @@ package org.smilkit.dom.smil
 	import org.smilkit.dom.smil.events.SMILEventStack;
 	import org.smilkit.dom.smil.events.SMILMutationEvent;
 	import org.smilkit.dom.smil.time.SMILTimeHelper;
+	import org.smilkit.time.Times;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.INodeList;
@@ -55,8 +56,8 @@ package org.smilkit.dom.smil
 		
 		protected var _activeDuration:Time = null;
 		
-		protected var _activatedAt:Number = Time.UNRESOLVED;
-		protected var _deactivatedAt:Number = Time.UNRESOLVED;
+		protected var _activatedAt:Number = Times.UNRESOLVED;
+		protected var _deactivatedAt:Number = Times.UNRESOLVED;
 		
 		protected var _beginDependencies:Vector.<ElementTimeContainer>;
 		protected var _endDependencies:Vector.<ElementTimeContainer>;
@@ -179,7 +180,7 @@ package org.smilkit.dom.smil
 		public function get duration():Number
 		{		
 			// we havent decided on a duration yet so we use the smil default
-			return Time.MEDIA;
+			return Times.MEDIA;
 			
 			/*if (this._durationParser == null)
 			{
@@ -208,7 +209,7 @@ package org.smilkit.dom.smil
 		{
             if (this.hasAttribute("dur"))
 			{
-				return (this.duration != Time.UNRESOLVED);
+				return (this.duration != Times.UNRESOLVED);
 			}
 			
 			return false;
@@ -501,8 +502,8 @@ package org.smilkit.dom.smil
 			this._isPlaying = false;
 			this._waitingParentActivation = false;
 			
-			this._activatedAt = Time.UNRESOLVED;
-			this._deactivatedAt = Time.UNRESOLVED;
+			this._activatedAt = Times.UNRESOLVED;
+			this._deactivatedAt = Times.UNRESOLVED;
 			
 			this._currentBeginInterval = null;
 			this._currentEndInterval = null;
@@ -669,7 +670,7 @@ package org.smilkit.dom.smil
 			{
 				tempBegin = this.beginList.getTimeGreaterThan(beginAfter);
 				
-				if (tempBegin == null || tempBegin.resolvedOffset == Time.INDEFINITE)
+				if (tempBegin == null || tempBegin.resolvedOffset == Times.INDEFINITE)
 				{
 					this.setCurrentInterval(null, null);
 					

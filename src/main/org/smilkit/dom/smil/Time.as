@@ -24,6 +24,7 @@
 package org.smilkit.dom.smil
 {
 	import org.smilkit.dom.smil.expressions.SMILExpressionParser;
+	import org.smilkit.time.Times;
 	import org.smilkit.w3c.dom.INode;
 	import org.smilkit.w3c.dom.smil.ITime;
 	
@@ -36,28 +37,18 @@ package org.smilkit.dom.smil
 		public static var SMIL_TIME_WALLCLOCK:int = 4;
 		public static var SMIL_TIME_MEDIA_MARKER:int = 5;
 		
-		public static var UNRESOLVED:int = -101;
-		public static var MEDIA:int = -102;
-		public static var INDEFINITE:int = -103;
-		public static var NEGATIVE_INDEFINITE:int = -104;
-		
-		public static const TIME_MILLISECOND:int = 1;
-		public static const TIME_SECOND:int = (Time.TIME_MILLISECOND * 1000);
-		public static const TIME_MINUTE:int = (Time.TIME_SECOND * 60);
-		public static const TIME_HOUR:int = (Time.TIME_MINUTE * 60);
-		
 		protected var _resolved:Boolean = false;
 		protected var _begin:Boolean = false;
 		
 		protected var _baseBegin:Boolean = false;
 		protected var _baseElement:INode = null;
 		
-		protected var _offset:Number = Time.UNRESOLVED;
+		protected var _offset:Number = Times.UNRESOLVED;
 		protected var _event:String;
 		protected var _marker:String;
 		protected var _type:int = Time.SMIL_TIME_SYNC_BASED;
 		
-		protected var _parentOffset:Number = Time.UNRESOLVED;
+		protected var _parentOffset:Number = Times.UNRESOLVED;
 		
 		/** NON-DOM:
 		* Determines whether this time should be considered resolved if the baseElement contains no duration attribute. This flag is used to 
@@ -82,17 +73,17 @@ package org.smilkit.dom.smil
 		
 		public function get indefinite():Boolean
 		{
-			return (this._offset == Time.INDEFINITE);
+			return (this._offset == Times.INDEFINITE);
 		}
 		
 		public function get negativeIndefinite():Boolean
 		{
-			return (this._offset == Time.NEGATIVE_INDEFINITE);
+			return (this._offset == Times.NEGATIVE_INDEFINITE);
 		}
 		
 		public function get resolved():Boolean
 		{
-			return !(this._offset == Time.UNRESOLVED);
+			return !(this._offset == Times.UNRESOLVED);
 		}
 
 		/**
@@ -102,7 +93,7 @@ package org.smilkit.dom.smil
 		{
 			var syncbaseOffset:Number = this.implicitSyncbaseOffset;
 
-			if (this._element != null && (this._parentOffset == Time.UNRESOLVED || this._parentOffset == Time.INDEFINITE))
+			if (this._element != null && (this._parentOffset == Times.UNRESOLVED || this._parentOffset == Times.INDEFINITE))
 			{
 				var parentContainer:ElementTimeContainer = (this._element.parentTimeContainer as ElementTimeContainer);
 				
@@ -113,11 +104,11 @@ package org.smilkit.dom.smil
 				}
 			}
 			
-			if (this._parentOffset == Time.INDEFINITE)
+			if (this._parentOffset == Times.INDEFINITE)
 			{
-				return Time.INDEFINITE;
+				return Times.INDEFINITE;
 			}
-			else if (this._parentOffset != Time.UNRESOLVED && this._parentOffset != Time.MEDIA)
+			else if (this._parentOffset != Times.UNRESOLVED && this._parentOffset != Times.MEDIA)
 			{
 				//trace(this.element+"parentOffset: "+this._parentOffset+" syncbaseOffset: "+syncbaseOffset);
 				
@@ -152,15 +143,15 @@ package org.smilkit.dom.smil
 		{
 			if (this.resolved)
 			{
-				if (this.indefinite || this._offset == Time.INDEFINITE)
+				if (this.indefinite || this._offset == Times.INDEFINITE)
 				{
-					return Time.INDEFINITE;
+					return Times.INDEFINITE;
 				}
 				
 				return this._offset;
 			}
 			
-			return Time.UNRESOLVED;
+			return Times.UNRESOLVED;
 		}
 		
 		public function get timeType():uint
@@ -233,7 +224,7 @@ package org.smilkit.dom.smil
 				return false;
 			}
 			
-			if (this.indefinite || this.resolvedOffset == Time.INDEFINITE)
+			if (this.indefinite || this.resolvedOffset == Times.INDEFINITE)
 			{
 				return true;
 			}
@@ -290,27 +281,27 @@ package org.smilkit.dom.smil
 		{
 			if (this._timeString == null || this._timeString == "")
 			{
-				this._offset = Time.UNRESOLVED;
+				this._offset = Times.UNRESOLVED;
 				this._resolved = false;
 			}
 			else if (this._timeString == "unresolved")
 			{
-				this._offset = Time.UNRESOLVED;
+				this._offset = Times.UNRESOLVED;
 				this._resolved = false;
 			}
 			else if (this._timeString == "indefinite")
 			{
-				this._offset = Time.INDEFINITE;
+				this._offset = Times.INDEFINITE;
 				this._resolved = true;
 			}
 			else if (this._timeString == "nindefinite")
 			{
-				this._offset = Time.NEGATIVE_INDEFINITE;
+				this._offset = Times.NEGATIVE_INDEFINITE;
 				this._resolved = false;
 			}
 			else if (this._timeString == "media")
 			{
-				this._offset = Time.MEDIA;
+				this._offset = Times.MEDIA;
 				this._resolved = true;
 			}
 			else
@@ -327,7 +318,7 @@ package org.smilkit.dom.smil
 					
 					// look up if event has finished, else indefinite
 					
-					this._offset = Time.INDEFINITE;
+					this._offset = Times.INDEFINITE;
 					
 					this._resolved = false;
 				}
@@ -345,7 +336,7 @@ package org.smilkit.dom.smil
 				else if (expressionParser.indefinite)
 				{
 					this._type = Time.SMIL_TIME_INDEFINITE;
-					this._offset = Time.INDEFINITE;
+					this._offset = Times.INDEFINITE;
 					
 					this._resolved = true;
 				}
@@ -415,37 +406,37 @@ package org.smilkit.dom.smil
 //				}
 //			}
 //			
-//			//this._type = ElementTime.timeAttributeToTimeType(Time.INDEFINITE.toString(), (this.baseElement as IElementTimeContainer), this.baseBegin);
+//			//this._type = ElementTimes.timeAttributeToTimeType(Times.INDEFINITE.toString(), (this.baseElement as IElementTimeContainer), this.baseBegin);
 //			
 //			// resolve the time
 //			switch (this.timeType)
 //			{
-//				case Time.SMIL_TIME_WALLCLOCK:
+//				case Times.SMIL_TIME_WALLCLOCK:
 //					break;
-//				case Time.SMIL_TIME_OFFSET:
-//				case Time.SMIL_TIME_SYNC_BASED:
+//				case Times.SMIL_TIME_OFFSET:
+//				case Times.SMIL_TIME_SYNC_BASED:
 //					this.resolveSyncBased();
 //					break;
-//				case Time.SMIL_TIME_EVENT_BASED:
+//				case Times.SMIL_TIME_EVENT_BASED:
 //					
 //					break;
-//				case Time.SMIL_TIME_MEDIA_MARKER:
+//				case Times.SMIL_TIME_MEDIA_MARKER:
 //					break;
-//				case Time.SMIL_TIME_INDEFINITE:
-//					this._resolvedOffset = Time.INDEFINITE;
+//				case Times.SMIL_TIME_INDEFINITE:
+//					this._resolvedOffset = Times.INDEFINITE;
 //					this._resolved = true;
 //					break;
 //
 //			}
 //			
-//			if (this._resolvedOffset == Time.UNRESOLVED || this._resolvedOffset == Time.MEDIA)
+//			if (this._resolvedOffset == Times.UNRESOLVED || this._resolvedOffset == Times.MEDIA)
 //			{
 //				this._resolved = false;
 //			}
 //			
 //			if (!this._resolved)
 //			{
-//				this._resolvedOffset = Time.UNRESOLVED;
+//				this._resolvedOffset = Times.UNRESOLVED;
 //			}
 //			
 //			//SMILKit.logger.info("Resolve complete: "+this.resolved+" begin: "+this.baseBegin+" offset: "+this.resolvedOffset+" element: "+this.baseElement.nodeName);
@@ -493,7 +484,7 @@ package org.smilkit.dom.smil
 //				this.resolveParallelSyncBased(parent as IElementParallelTimeContainer);
 //			}
 //			
-//			if (this._resolvedOffset != Time.UNRESOLVED && this._resolvedOffset != Time.INDEFINITE)
+//			if (this._resolvedOffset != Times.UNRESOLVED && this._resolvedOffset != Times.INDEFINITE)
 //			{
 //				if (this.baseBegin)
 //				{
@@ -532,8 +523,8 @@ package org.smilkit.dom.smil
 //				
 //					var beginTime:ITime = parentBegin.current;
 //					
-//					this._resolvedOffset = beginTime.resolvedOffset;
-//					this._resolved = beginTime.resolved;
+//					this._resolvedOffset = beginTimes.resolvedOffset;
+//					this._resolved = beginTimes.resolved;
 //					
 //					//Logger.debug("BEGIN time for a "+this._baseElement.nodeName+" tag in a parallel sync block. "+this._resolvedOffset+" ("+(this._resolved ? "resolved" : "unresolved")+")", this);
 //				}
@@ -647,9 +638,9 @@ package org.smilkit.dom.smil
 //				var dur:Number = baseElementTimeContainer.duration;
 //				var beginOffset:Number = baseElementTimeContainer.begin.first.resolvedOffset;
 //				
-//				if (beginOffset == Time.UNRESOLVED || beginOffset == Time.MEDIA)
+//				if (beginOffset == Times.UNRESOLVED || beginOffset == Times.MEDIA)
 //				{
-//					this._resolvedOffset = Time.UNRESOLVED;
+//					this._resolvedOffset = Times.UNRESOLVED;
 //					this._resolved = false;
 //				}
 //				else

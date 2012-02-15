@@ -93,7 +93,7 @@ package org.smilkit.dom.smil.time
 		
 		public function activePairAt(offset:Number):Object
 		{
-//			var pair:Object = { begin: 0, end: Time.UNRESOLVED };
+//			var pair:Object = { begin: 0, end: Times.UNRESOLVED };
 //			
 //			for (var i:uint = 0; i < this.begin.length; i++)
 //			{
@@ -108,7 +108,7 @@ package org.smilkit.dom.smil.time
 //					{
 //						var end:Number = this.end[i];
 //						
-//						if (offset <= end || Time.UNRESOLVED == end == Time.INDEFINITE)
+//						if (offset <= end || Times.UNRESOLVED == end == Times.INDEFINITE)
 //						{
 //							pair.end = end;
 //							
@@ -136,7 +136,7 @@ package org.smilkit.dom.smil.time
 //					{
 //						var end:Number = this.end[i];
 //						
-//						if (offset <= end || Time.UNRESOLVED == end == Time.INDEFINITE)
+//						if (offset <= end || Times.UNRESOLVED == end == Times.INDEFINITE)
 //						{
 //							return true;
 //						}
@@ -151,12 +151,12 @@ package org.smilkit.dom.smil.time
 			return ((now.isGreaterThan(this.begin) || now.isEqualTo(this.begin)) && this.end.isGreaterThan(now));
 			
 			/*
-			if (this._begin == Time.UNRESOLVED)
+			if (this._begin == Times.UNRESOLVED)
 			{
 				return false;
 			}
 			
-			return (offset >= this._begin && (this._end == Time.UNRESOLVED || this._end == Time.INDEFINITE || offset <= this._end));
+			return (offset >= this._begin && (this._end == Times.UNRESOLVED || this._end == Times.INDEFINITE || offset <= this._end));
 			*/
 		}
 	}

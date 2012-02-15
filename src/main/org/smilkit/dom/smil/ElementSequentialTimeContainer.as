@@ -23,6 +23,7 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.dom.smil
 {
+	import org.smilkit.time.Times;
 	import org.smilkit.w3c.dom.IDocument;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementSequentialTimeContainer;
@@ -59,7 +60,7 @@ package org.smilkit.dom.smil
 		
 		public override function get duration():Number
 		{
-			var duration:Number = Time.UNRESOLVED;
+			var duration:Number = Times.UNRESOLVED;
 			
 			if (this._currentEndInterval != null)
 			{
@@ -67,7 +68,7 @@ package org.smilkit.dom.smil
 				{
 					if (this._currentEndInterval.indefinite)
 					{
-						duration = Time.INDEFINITE;	
+						duration = Times.INDEFINITE;	
 					}
 					else
 					{
@@ -122,12 +123,12 @@ package org.smilkit.dom.smil
 				
 				if (child.currentEndInterval == null || !child.currentEndInterval.resolved)
 				{
-					return Time.UNRESOLVED;
+					return Times.UNRESOLVED;
 				}
 				
 				if (child.currentEndInterval.indefinite)
 				{
-					return Time.INDEFINITE;
+					return Times.INDEFINITE;
 				}
 
 				duration = child.currentEndInterval.resolvedOffset;
@@ -180,7 +181,7 @@ package org.smilkit.dom.smil
 			{
 				var element:ElementTimeContainer = (timeDescendants.item(i) as ElementTimeContainer);
 				
-				var resolvedEndOffset:int = Time.UNRESOLVED;
+				var resolvedEndOffset:int = Times.UNRESOLVED;
 				
 				if (element.currentEndInterval != null)
 				{

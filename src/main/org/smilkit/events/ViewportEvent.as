@@ -57,6 +57,9 @@ package org.smilkit.events
 		
 		public static var SMIL_PARSE_FAILED:String = "viewportSMILParseFailed";
 		
+		public static var HANDLER_LOAD_FAILED:String = "renderTreeHandlerLoadFailed";
+		public static var HANDLER_LOAD_UNAUTHORISED:String = "renderTreeHandlerLoadUnauthorised";
+		
 		public function ViewportEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);

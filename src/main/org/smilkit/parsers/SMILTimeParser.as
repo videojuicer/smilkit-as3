@@ -24,6 +24,7 @@
 package org.smilkit.parsers
 {
 	import org.smilkit.dom.smil.Time;
+	import org.smilkit.time.Times;
 	import org.smilkit.w3c.dom.INode;
 
 	/**
@@ -108,7 +109,7 @@ package org.smilkit.parsers
 			
 			if (this._timeString == null || this._timeString == "")
 			{
-				this._milliseconds = Time.UNRESOLVED;
+				this._milliseconds = Times.UNRESOLVED;
 				this._type = Time.SMIL_TIME_OFFSET;
 			}
 			// parse clock values
