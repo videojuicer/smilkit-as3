@@ -264,6 +264,16 @@ package org.smilkit.view
 		protected function onLoadChanged(e:MediaPlayerCapabilityChangeEvent):void
 		{
 			SMILKit.logger.error("onLoadChanged: "+e.type);
+			
+			if (e.enabled)
+			{
+				var metadata:Metadata = this._mediaElement.resource.getMetadataValue("org.smilkit") as Metadata;
+				
+				if (metadata != null)
+				{
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.META_REFRESH));
+				}
+			}
 		}
 		
 		protected function onPlayStateChanged(e:PlayEvent):void

@@ -539,8 +539,10 @@ package org.smilkit.view
 			
 			// Shout out REFRESH DONE LOL
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.META_REFRESH));
+
 			// send a playback offset changed event so that addons can reset their UIs
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			

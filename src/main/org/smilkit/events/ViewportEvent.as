@@ -61,6 +61,8 @@ package org.smilkit.events
 		public static var HANDLER_LOAD_UNAUTHORISED:String = "renderTreeHandlerLoadUnauthorised";
 		public static var HANDLER_LOAD_TIMEOUT:String = "renderTreeHandlerLoadTimeout";
 		
+		public static var META_REFRESH:String = "viewportMetaRefresh";
+		
 		public function ViewportEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{
 			super(type, bubbles, cancelable);
