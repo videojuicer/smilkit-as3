@@ -36,6 +36,8 @@ package org.osmf.smil.model
 		public function SMILMediaElement(type:String)
 		{
 			super(type);
+			
+			this._params = new Vector.<SMILAttribute>();
 		}
 
 		/**
@@ -115,11 +117,41 @@ package org.osmf.smil.model
 			_region = value;
 		}
 		
+		public function get params():Vector.<SMILAttribute>
+		{
+			return _params;
+		}
+		
+		public function addParam(name:String, value:String):void
+		{
+			var param:SMILAttribute = new SMILAttribute();
+			param.name = name;
+			param.value = value;
+			
+			this.params.push(param);
+		}
+		
+		public function getParamByName(name:String):SMILAttribute
+		{
+			for (var i:uint = 0; i < this.params.length; i++)
+			{
+				var param:SMILAttribute = this.params[i];
+				
+				if (param.name == name)
+				{
+					return param;
+				}
+			}
+			
+			return null;
+		}
+		
 		private var _src:String;
 		private var _bitrate:Number;
 		private var _duration:Number;
 		private var _clipBegin:Number;
 		private var _clipEnd:Number;
 		private var _region:String;
+		private var _params:Vector.<SMILAttribute>;
 	}
 }

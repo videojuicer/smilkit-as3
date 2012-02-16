@@ -59,6 +59,7 @@ package org.smilkit.events
 		
 		public static var HANDLER_LOAD_FAILED:String = "renderTreeHandlerLoadFailed";
 		public static var HANDLER_LOAD_UNAUTHORISED:String = "renderTreeHandlerLoadUnauthorised";
+		public static var HANDLER_LOAD_TIMEOUT:String = "renderTreeHandlerLoadTimeout";
 		
 		public function ViewportEvent(type:String, bubbles:Boolean=false, cancelable:Boolean=false)
 		{

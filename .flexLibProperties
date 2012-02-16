@@ -95,6 +95,8 @@
     <classEntry path="org.smilkit.spec.tests.view.ViewportTestCase"/>
     <classEntry path="org.smilkit.view.BaseViewport"/>
     <classEntry path="org.smilkit.time.Times"/>
+    <classEntry path="org.osmf.smil.model.SMILAttribute"/>
+    <classEntry path="org.smilkit.spec.tests.view.OSMFViewportTest"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

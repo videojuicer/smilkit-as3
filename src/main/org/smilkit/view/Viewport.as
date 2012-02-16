@@ -281,6 +281,11 @@ package org.smilkit.view
 			this.drawingBoard.boundingDisplayParent = parent;
 		}
 		
+		public override function get type():String
+		{
+			return SMILKit.VIEWPORT_SMILKIT;
+		}
+		
 		/**
 		 * Refreshs the contents of the <code>Viewport</code> based on the current <code>Viewport.location</code>, if the location is updated
 		 * and auto-refresh is enabled this method is automatically called. Otherwise the next

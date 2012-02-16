@@ -47,6 +47,9 @@ package org.smilkit
 		
 		public static const ACTIVATION_NUDGE:int = 1; // SharedTimer.DELAY;
 		
+		public static const VIEWPORT_SMILKIT:String = "SMILKit";
+		public static const VIEWPORT_OSMF:String = "OSMF";
+		
 		/**
 		 * Retrieve's the current SMILKit version.
 		 */
@@ -67,12 +70,23 @@ package org.smilkit
 		 * 
 		 * @see org.smilkit.view.Viewport
 		 */
-		public static function createEmptyViewport():BaseViewport
+		public static function createEmptyViewport(prefer:String = SMILKit.VIEWPORT_OSMF):BaseViewport
 		{
 			var viewport:BaseViewport = null;
 			
 			CONFIG::USE_OSMF { viewport = new OSMFViewport(); };
-			CONFIG::USE_SMILKIT { viewport = new Viewport(); };
+			
+			if (viewport == null || prefer == SMILKit.VIEWPORT_SMILKIT)
+			{
+				if (viewport != null)
+				{
+					viewport.dispose();
+				}
+				
+				CONFIG::USE_SMILKIT { viewport = new Viewport(); };
+			}
+			
+			SMILKit.logger.debug("Using '"+viewport.type+"' as the viewport rendering and playback engine.");
 			
 			return viewport;
 		}

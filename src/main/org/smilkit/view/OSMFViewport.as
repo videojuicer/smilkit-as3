@@ -7,6 +7,8 @@ package org.smilkit.view
 	import org.osmf.events.BufferEvent;
 	import org.osmf.events.DisplayObjectEvent;
 	import org.osmf.events.LoadEvent;
+	import org.osmf.events.MediaError;
+	import org.osmf.events.MediaErrorCodes;
 	import org.osmf.events.MediaErrorEvent;
 	import org.osmf.events.MediaPlayerCapabilityChangeEvent;
 	import org.osmf.events.PlayEvent;
@@ -43,12 +45,10 @@ package org.smilkit.view
 			
 			this._uiMetadata = new LayoutMetadata();
 			this._uiMetadata.scaleMode = ScaleMode.LETTERBOX;
-			//this._uiMetadata.percentWidth = 100;
-			//this._uiMetadata.percentHeight = 100;
 			
 			this._uiComponent = new MediaContainer(null, this._uiMetadata);
 			this._uiComponent.backgroundColor = 0xFFFFFFF;
-			this._uiComponent.backgroundAlpha = 1;
+			this._uiComponent.backgroundAlpha = 0;
 			
 			this._mediaPlayer = new MediaPlayer();
 			
@@ -105,6 +105,11 @@ package org.smilkit.view
 		public override function get duration():Number
 		{
 			return this._mediaPlayer.duration * 1000;
+		}
+		
+		public override function get type():String
+		{
+			return SMILKit.VIEWPORT_OSMF;
 		}
 		
 		public override function getDocumentMeta(key:String):String
@@ -182,11 +187,10 @@ package org.smilkit.view
 			{
 				this._uiComponent.graphics.clear();
 				
-				this._uiComponent.layout(this._uiSize.width, this._uiSize.height, true);
+				this._uiComponent.layoutMetadata.width = this._uiSize.width;
+				this._uiComponent.layoutMetadata.height = this._uiSize.height;
 				
-				this._uiComponent.graphics.beginFill(0xFFFFFF, 0.0);
-				this._uiComponent.graphics.drawRect(0, 0, this._uiSize.width, this._uiSize.height);
-				this._uiComponent.graphics.endFill();
+				this._uiComponent.layout(this._uiSize.width, this._uiSize.height, true);
 			}
 		}
 		
@@ -218,7 +222,22 @@ package org.smilkit.view
 		
 		protected function onMediaError(e:MediaErrorEvent):void
 		{
-			SMILKit.logger.error("onMediaError: "+e.error.detail+" "+e.error.message);
+			SMILKit.logger.error("onMediaError: "+e.error.errorID+" -> " +e.error.detail+" "+e.error.message);
+			
+			switch (e.error.errorID)
+			{
+				case MediaErrorCodes.NETCONNECTION_REJECTED:
+				case MediaErrorCodes.SECURITY_ERROR:
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_UNAUTHORISED));
+					break;
+				case MediaErrorCodes.NETCONNECTION_TIMEOUT:
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_TIMEOUT));
+					break;
+				case MediaErrorCodes.NETSTREAM_STREAM_NOT_FOUND:
+				default:
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_FAILED));
+					break;
+			}
 		}
 		
 		protected function onDisplayObjectChanged(e:DisplayObjectEvent):void
@@ -272,8 +291,6 @@ package org.smilkit.view
 		
 		protected function onTimeChanged(e:TimeEvent):void
 		{
-			//this.updateUISize();
-			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
@@ -298,7 +315,25 @@ package org.smilkit.view
 		
 		protected function onBytesTotalChanged(e:LoadEvent):void
 		{
-			this._bytesTotal = e.bytes;
+			var bytes:Number = e.bytes;
+			
+			// retrieve bytesTotal from the SMILDocument
+			var metadata:Metadata = this._mediaElement.resource.getMetadataValue("org.smilkit.sizes") as Metadata;
+			
+			if (metadata != null)
+			{
+				bytes = 0;
+				
+				for (var i:uint = 0; i < metadata.keys.length; i++)
+				{
+					var key:String = metadata.keys[i];
+					var size:Number = parseFloat(metadata.getValue(key));
+					
+					bytes += size;
+				}
+			}
+			
+			this._bytesTotal = bytes;
 			
 			this.dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, this._bytesLoaded, this._bytesTotal));
 		}

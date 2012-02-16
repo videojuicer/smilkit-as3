@@ -244,6 +244,11 @@ package org.smilkit.view
 			return (this.volume <= 0);
 		}
 		
+		public function get type():String
+		{
+			return null;
+		}
+		
 		public function refresh():void
 		{
 			
@@ -437,6 +442,8 @@ package org.smilkit.view
 		
 		public function dispose():void
 		{
+			this.pause();
+			
 			Platform.garbageCollection();
 		}
 		

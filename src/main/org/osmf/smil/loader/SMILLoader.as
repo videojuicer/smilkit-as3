@@ -46,6 +46,7 @@ package org.osmf.smil.loader
 	import org.osmf.traits.LoaderBase;
 	import org.osmf.utils.URL;
 	import org.smilkit.SMILKit;
+	import org.utilkit.parser.DataURIParser;
 
 	/**
 	 * The SMILLoader class will load a SMIL (Synchronized 
@@ -101,8 +102,13 @@ package org.osmf.smil.loader
 				
 				SMILKit.logger.debug("canHandleResource -> "+urlResource.url);
 				
-				canHandle =  (url.path.search(/\.smi$|\.smil$/i) != -1);
-			}		
+				canHandle = (url.path.search(/\.smi$|\.smil$/i) != -1);
+				
+				if (!canHandle)
+				{
+					canHandle = (url.rawUrl.search(/^data\:application\/smil/i) != -1);
+				}
+			}
 			
 			SMILKit.logger.debug("canHandleResource -> "+canHandle.toString());
 			
@@ -116,48 +122,63 @@ package org.osmf.smil.loader
 		{			
 			updateLoadTrait(loadTrait, LoadState.LOADING);
 
-			var urlLoader:URLLoader = new URLLoader(new URLRequest(URLResource(loadTrait.resource).url));
-			setupListeners();
+			var url:String = URLResource(loadTrait.resource).url;
 			
-			function setupListeners(add:Boolean=true):void
+			if (url.search(/^data\:application\/smil/i) != -1)
 			{
-				if (add)
+				var dataParser:DataURIParser = new DataURIParser(url);
+				var smilParser:SMILParser = this.createParser();
+				
+				var document:SMILDocument = smilParser.parse(dataParser.data);
+				
+				this.finishLoad(loadTrait, document);
+			}
+			else
+			{
+				var urlLoader:URLLoader = new URLLoader(new URLRequest(url));
+				
+				setupListeners();
+				
+				function setupListeners(add:Boolean=true):void
 				{
-					urlLoader.addEventListener(Event.COMPLETE, onComplete);
-					urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onError);
-					urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+					if (add)
+					{
+						urlLoader.addEventListener(Event.COMPLETE, onComplete);
+						urlLoader.addEventListener(IOErrorEvent.IO_ERROR, onError);
+						urlLoader.addEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+					}
+					else
+					{
+						urlLoader.removeEventListener(Event.COMPLETE, onComplete);
+						urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onError);
+						urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+					}
 				}
-				else
+				
+				function onError(event:ErrorEvent):void
 				{
-					urlLoader.removeEventListener(Event.COMPLETE, onComplete);
-					urlLoader.removeEventListener(IOErrorEvent.IO_ERROR, onError);
-					urlLoader.removeEventListener(SecurityErrorEvent.SECURITY_ERROR, onError);
+					setupListeners(false);
+					updateLoadTrait(loadTrait, LoadState.LOAD_ERROR); 	
+					loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false, new MediaError(0, event.text)));
+				}			
+	
+				function onComplete(event:Event):void
+				{	
+					setupListeners(false);
+					
+					try
+					{
+						var parser:SMILParser = createParser();
+						var smilDocument:SMILDocument = parser.parse(event.target.data);
+						finishLoad(loadTrait, smilDocument);
+					}
+					catch (parseError:Error)
+					{					
+						updateLoadTrait(loadTrait, LoadState.LOAD_ERROR);
+						loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false, new MediaError(parseError.errorID, parseError.message)));
+					}
 				}
 			}
-			
-			function onError(event:ErrorEvent):void
-			{
-				setupListeners(false);
-				updateLoadTrait(loadTrait, LoadState.LOAD_ERROR); 	
-				loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false, new MediaError(0, event.text)));
-			}			
-
-			function onComplete(event:Event):void
-			{	
-				setupListeners(false);
-				
-				try
-				{
-					var parser:SMILParser = createParser();
-					var smilDocument:SMILDocument = parser.parse(event.target.data);
-					finishLoad(loadTrait, smilDocument);
-				}
-				catch (parseError:Error)
-				{					
-					updateLoadTrait(loadTrait, LoadState.LOAD_ERROR);
-					loadTrait.dispatchEvent(new MediaErrorEvent(MediaErrorEvent.MEDIA_ERROR, false, false, new MediaError(parseError.errorID, parseError.message)));
-				}
-			}	
 		}
 		
 		/**

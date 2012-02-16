@@ -208,6 +208,16 @@ package org.osmf.smil.parser
 				{
 					element.region = node.@[ATTRIB_REGION];
 				}
+				
+				for (var i:uint = 0; i < node.children().length(); i++)
+				{
+					var el:XML = node.children()[i];
+					
+					if (el.localName() == "param")
+					{
+						element.addParam(el.@[ATTRIB_NAME], el.@[ATTRIB_VALUE]);
+					}
+				}
 			}
 			
 			return element;
@@ -295,6 +305,7 @@ package org.osmf.smil.parser
 		private static const ATTRIB_NAME:String = "name";
 		private static const ATTRIB_CONTENT:String = "content";
 		private static const ATTRIB_BACKGROUND_COLOR:String = "backgroundColor";
+		private static const ATTRIB_VALUE:String = "value";
 		
 		// Error messages
 		private static const INVALID_FILE_MISSING_BODY_TAG:String = "Invalid SMIL file: <body> tag is missing.";
