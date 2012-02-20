@@ -36,7 +36,7 @@
             
             <define name="BUILD::DEBUG" value="${build.debug}" />
             <define name="BUILD::SSL" value="${build.ssl}" />
-            <define name="CONFIG::USE_SMILKIT" value="true" />
+            <define name="CONFIG::USE_SMILKIT" value="false" />
             <define name="CONFIG::USE_OSMF" value="true" />
             
             <source-path path-element="${smilkit.src.main}" />
