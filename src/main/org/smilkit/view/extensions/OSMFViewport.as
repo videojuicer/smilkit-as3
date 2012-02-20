@@ -28,7 +28,6 @@ package org.smilkit.view.extensions
 	import org.osmf.traits.PlayState;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.BaseViewport;
 
 	public class OSMFViewport extends BaseViewport
