@@ -32,12 +32,12 @@ package org.smilkit.spec.tests.view
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.BaseViewport;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 
 	public class ViewportTestCase
 	{		
-		protected var _viewport:Viewport;
-		protected var _viewportWithDocument:Viewport;
+		protected var _viewport:SMILViewport;
+		protected var _viewportWithDocument:SMILViewport;
 		
 		protected var _viewportStateLastDispatch:String;
 		protected var _muteEventReceived:Boolean;
@@ -50,10 +50,10 @@ package org.smilkit.spec.tests.view
 			this._muteEventReceived = false;
 			this._unmuteEventReceived = false;
 			
-			this._viewport = new Viewport();
+			this._viewport = new SMILViewport();
 			this._viewport.autoRefresh = false;
 			
-			this._viewportWithDocument = new Viewport();
+			this._viewportWithDocument = new SMILViewport();
 			this._viewportWithDocument.addEventListener(ViewportEvent.PLAYBACK_STATE_CHANGED, this.onViewportWithDocumentStateChange);
 			this._viewportWithDocument.addEventListener(ViewportEvent.AUDIO_MUTED, this.onViewportWithDocumentMuted);
 			this._viewportWithDocument.addEventListener(ViewportEvent.AUDIO_UNMUTED, this.onViewportWithDocumentUnMuted);

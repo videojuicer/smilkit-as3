@@ -25,11 +25,12 @@ package org.smilkit.view
 {
 	import org.smilkit.dom.smil.SMILDocument;
 	import org.smilkit.render.HandlerController;
+	import org.smilkit.view.extensions.SMILViewport;
 
 	// TODO: remove completely
 	public dynamic class ViewportObjectPool
 	{
-		protected var _viewport:Viewport;
+		protected var _viewport:SMILViewport;
 		
 		/**
 		 * Holds the DOM - data Representation of the loaded SMIL XML 
@@ -41,7 +42,7 @@ package org.smilkit.view
 		 */	
 		protected var _handlerController:HandlerController;
 		
-		public function ViewportObjectPool(viewport:Viewport, document:SMILDocument)
+		public function ViewportObjectPool(viewport:SMILViewport, document:SMILDocument)
 		{
 			this._viewport = viewport;
 			this._document = document;
@@ -49,7 +50,7 @@ package org.smilkit.view
 			this.reset();
 		}
 		
-		public function get viewport():Viewport
+		public function get viewport():SMILViewport
 		{
 			return this._viewport;
 		}

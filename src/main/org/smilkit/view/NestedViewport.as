@@ -23,7 +23,9 @@
  * ***** END LICENSE BLOCK ***** */
 package org.smilkit.view
 {
-	public class NestedViewport extends Viewport
+	import org.smilkit.view.extensions.SMILViewport;
+
+	public class NestedViewport extends SMILViewport
 	{
 		public function NestedViewport()
 		{

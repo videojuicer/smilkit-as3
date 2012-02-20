@@ -37,7 +37,7 @@ package org.smilkit.spec.tests.handler
 	import org.smilkit.handler.SMILReferenceHandler;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 	import org.smilkit.w3c.dom.smil.ISMILElement;
@@ -46,7 +46,7 @@ package org.smilkit.spec.tests.handler
 	public class SMILReferenceHandlerTestCase
 	{
 		protected var _document:ISMILDocument;
-		protected var _viewport:Viewport;
+		protected var _viewport:SMILViewport;
 		
 		protected var _rtmpElement:ISMILMediaElement;
 
@@ -56,7 +56,7 @@ package org.smilkit.spec.tests.handler
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._document = (parser.parse(Fixtures.BASIC_REFERENCE_SMIL_XML) as ISMILDocument);
 			
-			this._viewport = new Viewport();
+			this._viewport = new SMILViewport();
 			
 			SMILKit.defaults();
 		}

@@ -37,7 +37,7 @@ package org.smilkit.spec.tests.load
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.load.LoadScheduler;
 	import org.smilkit.load.Worker;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.smilkit.events.WorkerEvent;
 	import org.smilkit.events.WorkUnitEvent;
 	import org.smilkit.events.ViewportEvent;
@@ -47,7 +47,7 @@ package org.smilkit.spec.tests.load
 	
 	public class LoadSchedulerTestCase
 	{		
-		protected var _viewport:Viewport;
+		protected var _viewport:SMILViewport;
 		protected var _scheduler:LoadScheduler;
 		protected var _document:ISMILDocument;
 		
@@ -57,7 +57,7 @@ package org.smilkit.spec.tests.load
 			var parser:BostonDOMParser = new BostonDOMParser();
 			this._document = (parser.parse(Fixtures.MP4_VIDEO_SMIL_XML) as ISMILDocument);
 			
-			this._viewport = new Viewport();
+			this._viewport = new SMILViewport();
 			// dont want to actually load
 			this._viewport.autoRefresh = false;
 			//this._scheduler = this._viewport._objectPool.loadScheduler;

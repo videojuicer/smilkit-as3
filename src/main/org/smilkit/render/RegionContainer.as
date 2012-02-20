@@ -36,7 +36,7 @@ package org.smilkit.render
 	import org.smilkit.dom.smil.SMILRegionElement;
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.util.MathHelper;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.utilkit.util.Environment;
 
 	public class RegionContainer extends Sprite
@@ -246,7 +246,7 @@ package org.smilkit.render
 			var context:Element = this.linkContextElement;
 			if(context != null)
 			{
-				var viewport:Viewport;
+				var viewport:SMILViewport;
 				if(this.renderTree != null)
 				{
 					viewport = this.renderTree.viewport;

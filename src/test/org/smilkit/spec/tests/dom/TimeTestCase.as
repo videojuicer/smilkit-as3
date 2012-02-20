@@ -36,7 +36,7 @@ package org.smilkit.spec.tests.dom
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.time.Times;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.smilkit.w3c.dom.IElement;
 	import org.smilkit.w3c.dom.INodeList;
 	import org.smilkit.w3c.dom.smil.IElementParallelTimeContainer;

@@ -21,7 +21,7 @@
  * 	Adam Livesley
  *
  * ***** END LICENSE BLOCK ***** */
-package org.smilkit.view
+package org.smilkit.view.extensions
 {
 	import flash.display.Sprite;
 	import flash.errors.IllegalOperationError;
@@ -51,6 +51,8 @@ package org.smilkit.view
 	import org.utilkit.logger.Benchmark;
 	import org.utilkit.parser.DataURIParser;
 	import org.utilkit.util.Platform;
+	import org.smilkit.view.BaseViewport;
+	import org.smilkit.view.ViewportObjectPool;
 
 	/**
 	 * Dispatched when the <code>Viewport</code> instance has refreshed with a new document.
@@ -128,7 +130,7 @@ package org.smilkit.view
 	[Event(name="viewportAudioVolumeChanged", type="org.smilkit.events.ViewportEvent")]
 	
 
-	public class Viewport extends BaseViewport
+	public class SMILViewport extends BaseViewport
 	{	
 		/**
 		 *  An instance of ViewportObjectPool responsible for the active documents object pool.
@@ -148,7 +150,7 @@ package org.smilkit.view
 		
 		protected var _loader:URLLoader = null;
 		
-		public function Viewport()
+		public function SMILViewport()
 		{
 			super();
 
@@ -541,7 +543,6 @@ package org.smilkit.view
 			SMILKit.logger.info("Refresh completed with "+data.length+" characters of SMIL data.", this);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.META_REFRESH));
 
 			// send a playback offset changed event so that addons can reset their UIs
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));

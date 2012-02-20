@@ -6,7 +6,7 @@ package org.smilkit.spec.tests.view
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.spec.Fixtures;
 	import org.smilkit.view.BaseViewport;
-	import org.smilkit.view.OSMFViewport;
+	import org.smilkit.view.extensions.OSMFViewport;
 
 	public class OSMFViewportTest
 	{

@@ -1,4 +1,4 @@
-package org.smilkit.view
+package org.smilkit.view.extensions
 {
 	import flash.events.ProgressEvent;
 	import flash.geom.Rectangle;
@@ -28,6 +28,8 @@ package org.smilkit.view
 	import org.osmf.traits.PlayState;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.spec.Fixtures;
+	import org.smilkit.view.BaseViewport;
 
 	public class OSMFViewport extends BaseViewport
 	{
@@ -38,6 +40,8 @@ package org.smilkit.view
 		private var _uiMetadata:LayoutMetadata = null;
 		private var _uiComponent:MediaContainer = null;
 		private var _uiSize:Rectangle = null;
+		
+		private var _waitingForRefresh:Boolean = false;
 		
 		public function OSMFViewport()
 		{
@@ -75,6 +79,8 @@ package org.smilkit.view
 			
 			this._mediaPlayer.addEventListener(BufferEvent.BUFFER_TIME_CHANGE, this.onBufferTimeChanged);
 			this._mediaPlayer.addEventListener(BufferEvent.BUFFERING_CHANGE, this.onBufferingChanged);
+			
+			this._mediaPlayer.currentTimeUpdateInterval = 500;
 			
 			this._mediaFactory = new DefaultMediaFactory();
 			this._mediaFactory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
@@ -141,7 +147,10 @@ package org.smilkit.view
 			
 			this.updateUISize();
 			
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			this._waitingForRefresh = true;
+			
+			// send a playback offset changed event so that addons can reset their UIs
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
 		public override function setVolume(volume:uint, setRestorePoint:Boolean = false):Boolean
@@ -217,7 +226,18 @@ package org.smilkit.view
 		
 		protected override function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
+			this._mediaPlayer.pause();
 			this._mediaPlayer.seek((offset / 1000));
+		}
+		
+		public override function commitSeek():Boolean
+		{
+			if (this._playbackState == BaseViewport.PLAYBACK_SEEKING)
+			{
+				return super.commitSeek();
+			}
+			
+			return false;
 		}
 		
 		protected function onMediaError(e:MediaErrorEvent):void
@@ -258,40 +278,24 @@ package org.smilkit.view
 		{
 			SMILKit.logger.error("onPlayChanged: "+e.type);
 			
+			if (this._waitingForRefresh)
+			{
+				this._waitingForRefresh = false;
+				
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+			}
+			
 			this.updateUISize();
 		}
 		
 		protected function onLoadChanged(e:MediaPlayerCapabilityChangeEvent):void
 		{
 			SMILKit.logger.error("onLoadChanged: "+e.type);
-			
-			if (e.enabled)
-			{
-				var metadata:Metadata = this._mediaElement.resource.getMetadataValue("org.smilkit") as Metadata;
-				
-				if (metadata != null)
-				{
-					this.dispatchEvent(new ViewportEvent(ViewportEvent.META_REFRESH));
-				}
-			}
 		}
 		
 		protected function onPlayStateChanged(e:PlayEvent):void
 		{
-			this._previousPlaybackState = this._playbackState;
-			
-			switch (e.playState)
-			{
-				case PlayState.PAUSED:
-				case PlayState.STOPPED:
-					this._playbackState = BaseViewport.PLAYBACK_PAUSED;
-					break;
-				case PlayState.PLAYING:
-					this._playbackState = BaseViewport.PLAYBACK_PLAYING;
-					break;
-			}
-			
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_STATE_CHANGED));
+			// nothing
 		}
 		
 		protected function onSeekChanged(e:SeekEvent):void

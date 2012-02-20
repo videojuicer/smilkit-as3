@@ -39,7 +39,7 @@ package org.smilkit.render
 	import org.smilkit.handler.SMILKitHandler;
 	import org.smilkit.time.SharedTimer;
 	import org.smilkit.view.BaseViewport;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.smilkit.view.ViewportObjectPool;
 	
 	/**
@@ -129,7 +129,7 @@ package org.smilkit.render
 			this.reset();
 		}
 		
-		public function get viewport():Viewport
+		public function get viewport():SMILViewport
 		{
 			return this._objectPool.viewport;
 		}

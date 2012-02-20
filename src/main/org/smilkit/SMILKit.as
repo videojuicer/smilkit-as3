@@ -24,9 +24,9 @@
 package org.smilkit
 {
 	CONFIG::USE_SMILKIT import org.smilkit.handler.HandlerMap;
-	CONFIG::USE_SMILKIT import org.smilkit.view.Viewport;
+	CONFIG::USE_SMILKIT import org.smilkit.view.extensions.SMILViewport;
 	
-	CONFIG::USE_OSMF import org.smilkit.view.OSMFViewport;
+	CONFIG::USE_OSMF import org.smilkit.view.extensions.OSMFViewport;
 	
 	import org.utilkit.logger.ApplicationLog;
 	import org.utilkit.logger.Logger;
@@ -83,7 +83,7 @@ package org.smilkit
 					viewport.dispose();
 				}
 				
-				CONFIG::USE_SMILKIT { viewport = new Viewport(); };
+				CONFIG::USE_SMILKIT { viewport = new SMILViewport(); };
 			}
 			
 			SMILKit.logger.debug("Using '"+viewport.type+"' as the viewport rendering and playback engine.");

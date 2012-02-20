@@ -67,8 +67,8 @@
     <classEntry path="org.smilkit.util.MathHelper"/>
     <classEntry path="org.smilkit.util.Metadata"/>
     <classEntry path="org.smilkit.view.NestedViewport"/>
-    <classEntry path="org.smilkit.view.OSMFViewport"/>
-    <classEntry path="org.smilkit.view.Viewport"/>
+    <classEntry path="org.smilkit.view.extensions.OSMFViewport"/>
+    <classEntry path="org.smilkit.view.extensions.SMILViewport"/>
     <classEntry path="org.smilkit.view.ViewportObjectPool"/>
     <classEntry path="org.smilkit.w3c.dom.events.IDocumentEvent"/>
     <classEntry path="org.smilkit.w3c.dom.events.IEvent"/>

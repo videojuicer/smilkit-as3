@@ -31,7 +31,7 @@ package org.smilkit.spec.tests.dom
 	import org.smilkit.events.HeartbeatEvent;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.time.SharedTimer;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.utilkit.util.NumberHelper;
 
 	public class SMILTimeSchedulerTestCase

@@ -33,16 +33,16 @@ package org.smilkit.spec.tests.render
 	import org.smilkit.render.DrawingBoard;
 	import org.smilkit.render.HandlerController;
 	import org.smilkit.spec.Fixtures;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 
 	public class DrawingBoardTestClass
 	{		
-		protected var _viewport:Viewport;
+		protected var _viewport:SMILViewport;
 		
 		[Before]
 		public function setUp():void
 		{
-			this._viewport = new Viewport();
+			this._viewport = new SMILViewport();
 		}
 		
 		[After]

@@ -35,7 +35,7 @@ package org.smilkit.spec.tests.dom.smil
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.parsers.BostonDOMParser;
 	import org.smilkit.spec.Fixtures;
-	import org.smilkit.view.Viewport;
+	import org.smilkit.view.extensions.SMILViewport;
 	import org.smilkit.w3c.dom.smil.ISMILDocument;
 
 	public class SMILTimeGraphTestCase
