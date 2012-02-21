@@ -79,6 +79,11 @@ package org.osmf.smil.model
 		public static const REFERENCE:String = "ref";
 		
 		/**
+		 * The link type.
+		 */
+		public static const LINK:String = "a";
+		
+		/**
 		 * @private
 		 * 
 		 * Collection of all SMIL types.
@@ -92,6 +97,7 @@ package org.osmf.smil.model
 																			AUDIO,
 																			META,
 																			REGION,
-																			REFERENCE] );
+																			REFERENCE,
+																			LINK ] );
 	}
 }

@@ -21,6 +21,8 @@
 *****************************************************/
 package org.osmf.smil.model
 {
+	import com.hurlant.util.asn1.parser.nulll;
+
 	/**
 	 * This class represents a SMIL media element, such
 	 * as a video element or an image element.
@@ -144,6 +146,31 @@ package org.osmf.smil.model
 			}
 			
 			return null;
+		}
+		
+		public function findLinkParent():SMILLinkElement
+		{
+			var element:SMILLinkElement = null;
+			var parent:SMILElement = this.parent;
+			
+			while (element == null)
+			{
+				if (parent is SMILLinkElement)
+				{
+					element = (parent as SMILLinkElement);
+					
+					break;
+				}
+				
+				if (parent == null)
+				{
+					break;
+				}
+				
+				parent = parent.parent;
+			}
+			
+			return element;
 		}
 		
 		private var _src:String;

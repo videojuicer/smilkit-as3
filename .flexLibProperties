@@ -97,6 +97,9 @@
     <classEntry path="org.smilkit.time.Times"/>
     <classEntry path="org.osmf.smil.model.SMILAttribute"/>
     <classEntry path="org.smilkit.spec.tests.view.OSMFViewportTest"/>
+    <classEntry path="org.osmf.smil.model.SMILLinkElement"/>
+    <classEntry path="org.osmf.smil.loader.VideoNetStreamDisplayObjectTrait"/>
+    <classEntry path="org.osmf.smil.loader.SMILImageElement"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

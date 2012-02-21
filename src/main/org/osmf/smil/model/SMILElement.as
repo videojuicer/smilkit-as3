@@ -23,6 +23,7 @@ package org.osmf.smil.model
 {
 	import __AS3__.vec.Vector;
 	
+	import org.osmf.smil.elements.SMILElement;
 	import org.osmf.utils.OSMFStrings;
 	
 	/**
@@ -50,6 +51,16 @@ package org.osmf.smil.model
 			return _type;
 		}
 		
+		public function get parent():SMILElement
+		{
+			return this._parent;
+		}
+		
+		public function set parent(value:SMILElement):void
+		{
+			this._parent = value;
+		}
+		
 		/**
 		 * Adds a child element.
 		 */
@@ -59,6 +70,9 @@ package org.osmf.smil.model
 			{
 				children = new Vector.<SMILElement>();
 			}
+			
+			// set the parent of the child
+			child.parent = this;
 			
 			children.push(child);
 		}
@@ -95,5 +109,6 @@ package org.osmf.smil.model
 		
 		private var _type:String;
 		private var children:Vector.<SMILElement>;
+		private var _parent:SMILElement;
 	}
 }

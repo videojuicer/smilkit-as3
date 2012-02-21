@@ -21,6 +21,8 @@
 *****************************************************/
 package org.osmf.smil.media
 {
+	import flash.events.Event;
+	import flash.events.MouseEvent;
 	import flash.net.URLRequest;
 	
 	import mx.utils.URLUtil;
@@ -52,10 +54,14 @@ package org.osmf.smil.media
 	import org.osmf.smil.model.SMILDocument;
 	import org.osmf.smil.model.SMILElement;
 	import org.osmf.smil.model.SMILElementType;
+	import org.osmf.smil.model.SMILLinkElement;
 	import org.osmf.smil.model.SMILMediaElement;
 	import org.osmf.smil.model.SMILMetaElement;
 	import org.osmf.smil.model.SMILRegionElement;
+	import org.osmf.traits.DisplayObjectTrait;
+	import org.osmf.traits.LoadTrait;
 	import org.osmf.traits.LoaderBase;
+	import org.osmf.traits.MediaTraitType;
 	import org.smilkit.SMILKit;
 	import org.utilkit.parser.URLParser;
 	import org.utilkit.util.NumberHelper;
@@ -136,6 +142,24 @@ package org.osmf.smil.media
 			return url;
 		}
 		
+		private function createLink(mediaElement:MediaElement, element:SMILMediaElement):void
+		{
+			var linkElement:SMILLinkElement = element.findLinkParent();
+			
+			if (linkElement != null)
+			{
+				if (mediaElement.hasTrait(MediaTraitType.DISPLAY_OBJECT))
+				{
+					var displayTrait:DisplayObjectTrait = (mediaElement.getTrait(MediaTraitType.DISPLAY_OBJECT) as DisplayObjectTrait);
+					
+					displayTrait.displayObject.addEventListener(MouseEvent.CLICK, function(e:Event):void
+					{
+						SMILKit.logger.error("CLICK");
+					});
+				}
+			}
+		}
+		
 		/**
 		 * Recursive function to create a media element and all of it's children.
 		 */
@@ -167,6 +191,20 @@ package org.osmf.smil.media
 				case SMILElementType.SEQUENCE:
 					var serialElement:SerialElement = new SerialElement();
 					mediaElement = serialElement;
+					break;
+				case SMILElementType.LINK:
+					var linkElement:CompositeElement = null;
+					
+					if (parentMediaElement is ParallelElement)
+					{
+						linkElement = new ParallelElement();
+					}
+					else
+					{
+						linkElement = new SerialElement();
+					}
+					
+					mediaElement = linkElement;
 					break;
 				case SMILElementType.VIDEO:
 					var resource:StreamingURLResource = new StreamingURLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src));
@@ -219,6 +257,7 @@ package org.osmf.smil.media
 					
 					SMILKit.logger.debug("Video Created");
 					
+					this.createLink(videoElement, smilElement as SMILMediaElement);
 					this.createMediaMetadataFor(originalResource, smilElement as SMILMediaElement);
 					
 					if (parentMediaElement == null)
@@ -251,6 +290,8 @@ package org.osmf.smil.media
 						SMILKit.logger.debug("Image - Using Region");
 					}
 					
+					this.createLink(imageElement, smilElement as SMILMediaElement);
+					
 					SMILKit.logger.debug("Image Created");
 					
 					this.createMediaMetadataFor(originalResource, smilElement as SMILMediaElement);
@@ -277,7 +318,7 @@ package org.osmf.smil.media
 					SMILKit.logger.debug("Region: "+region.id+" -> "+region.width+"/"+region.height);
 					break;
 				case SMILElementType.REFERENCE:
-					var referenceResource:URLResource = new URLResource((smilElement as SMILMediaElement).src);
+					var referenceResource:URLResource = new URLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src));
 					var referenceElement:MediaElement = factory.createMediaElement(referenceResource);
 					
 					this.createMediaMetadataFor(originalResource, smilElement as SMILMediaElement);

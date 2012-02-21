@@ -26,6 +26,7 @@ package org.osmf.smil.parser
 	import org.osmf.smil.model.SMILDocument;
 	import org.osmf.smil.model.SMILElement;
 	import org.osmf.smil.model.SMILElementType;
+	import org.osmf.smil.model.SMILLinkElement;
 	import org.osmf.smil.model.SMILMediaElement;
 	import org.osmf.smil.model.SMILMetaElement;
 	import org.osmf.smil.model.SMILRegionElement;
@@ -134,6 +135,9 @@ package org.osmf.smil.parser
 								element = parseRegionElement(childNode);
 								
 								doc.addRegion((element as SMILRegionElement));
+								break;
+							case SMILElementType.LINK:
+								element = parseLinkElement(childNode);
 								break;
 						}
 						break;
@@ -245,6 +249,26 @@ package org.osmf.smil.parser
 			return element;
 		}
 		
+		private function parseLinkElement(node:XML):SMILLinkElement
+		{
+			var element:SMILLinkElement;
+			
+			switch (node.nodeKind())
+			{
+				case "element":
+					switch (node.localName())
+					{
+						case SMILElementType.LINK:
+							element = new SMILLinkElement();
+							element.src = node.@[ATTRIB_HREF];
+							break;
+					}
+					break;
+			}
+			
+			return element;
+		}
+		
 		private function parseRegionElement(node:XML):SMILRegionElement
 		{
 			var element:SMILRegionElement;
@@ -306,6 +330,7 @@ package org.osmf.smil.parser
 		private static const ATTRIB_CONTENT:String = "content";
 		private static const ATTRIB_BACKGROUND_COLOR:String = "backgroundColor";
 		private static const ATTRIB_VALUE:String = "value";
+		private static const ATTRIB_HREF:String = "href";
 		
 		// Error messages
 		private static const INVALID_FILE_MISSING_BODY_TAG:String = "Invalid SMIL file: <body> tag is missing.";
