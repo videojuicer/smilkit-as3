@@ -356,6 +356,7 @@ package org.smilkit.view.extensions
 			switch (e.loadState)
 			{
 				case LoadState.LOAD_ERROR:
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.LOADER_IOERROR));
 					break;
 				case LoadState.LOADING:
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
