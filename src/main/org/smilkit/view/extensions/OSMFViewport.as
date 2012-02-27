@@ -225,8 +225,33 @@ package org.smilkit.view.extensions
 		
 		protected override function onPlaybackStateChangedToSeekingWithOffset(offset:uint):void
 		{
+			var target:Number = (offset / 1000);
+			
 			this._mediaPlayer.pause();
-			this._mediaPlayer.seek((offset / 1000));
+			
+			var canSeekToTarget:Boolean = (this._mediaPlayer.canSeek && this._mediaPlayer.canSeekTo(target));
+			
+			if (canSeekToTarget && this._bytesTotal != 0 && this.duration > 0)
+			{
+				// current loaded percentage
+				// target percentage
+				var loaded:Number = ((this.bytesLoaded / this.bytesTotal) * 100);
+				var position:Number = ((offset / this.duration) * 100);
+				
+				if (position < loaded)
+				{
+					canSeekToTarget = true;
+				}
+				else
+				{
+					canSeekToTarget = false;
+				}
+			}
+			
+			if (canSeekToTarget)
+			{
+				this._mediaPlayer.seek(target);
+			}
 		}
 		
 		public override function commitSeek():Boolean
