@@ -342,6 +342,7 @@ package org.smilkit.view.extensions
 			this.pause();
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_COMPLETE));
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
 		protected function onBytesLoadedChanged(e:LoadEvent):void
