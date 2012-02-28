@@ -207,10 +207,10 @@ package org.osmf.smil.media
 					mediaElement = linkElement;
 					break;
 				case SMILElementType.VIDEO:
-					var resource:StreamingURLResource = new StreamingURLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src));
+					var resource:StreamingURLResource = new StreamingURLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src), StreamType.LIVE_OR_RECORDED);
 					resource.mediaType = MediaType.VIDEO;
 					
-					var videoElement:MediaElement = factory.createMediaElement(resource);
+					var videoElement:MediaElement = new VideoElement(resource);
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 					
 					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
@@ -452,7 +452,7 @@ package org.osmf.smil.media
 		{
 			var region:SMILRegionElement = document.getRegionByName(regionId);
 			
-			if (region.id == regionId)
+			if (region != null && region.id == regionId)
 			{
 				var layout:LayoutMetadata = new LayoutMetadata();
 				

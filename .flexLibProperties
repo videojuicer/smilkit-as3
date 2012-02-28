@@ -100,6 +100,7 @@
     <classEntry path="org.osmf.smil.model.SMILLinkElement"/>
     <classEntry path="org.osmf.smil.loader.VideoNetStreamDisplayObjectTrait"/>
     <classEntry path="org.osmf.smil.loader.SMILImageElement"/>
+    <classEntry path="org.osmf.smil.loader.SMILVideoElement"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>

@@ -329,7 +329,10 @@ package org.smilkit.view.extensions
 		
 		protected function onTimeChanged(e:TimeEvent):void
 		{
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
+			if (this._mediaPlayer.playing)
+			{
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
+			}
 		}
 		
 		protected function onDurationChanged(e:TimeEvent):void
