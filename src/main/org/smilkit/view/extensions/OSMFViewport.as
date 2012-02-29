@@ -345,7 +345,6 @@ package org.smilkit.view.extensions
 			this.pause();
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_COMPLETE));
-			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
 		protected function onBytesLoadedChanged(e:LoadEvent):void
@@ -407,13 +406,16 @@ package org.smilkit.view.extensions
 		
 		protected function onBufferingChanged(e:BufferEvent):void
 		{
-			if (e.buffering)
+			if (this._mediaPlayer.playing)
 			{
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
-			}
-			else
-			{
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
+				if (e.buffering)
+				{
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
+				}
+				else
+				{
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
+				}
 			}
 		}
 	}
