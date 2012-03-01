@@ -406,16 +406,13 @@ package org.smilkit.view.extensions
 		
 		protected function onBufferingChanged(e:BufferEvent):void
 		{
-			if (this._mediaPlayer.playing)
+			if (e.buffering && !isNaN(e.bufferTime))
+			{	
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
+			}
+			else
 			{
-				if (e.buffering)
-				{
-					this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
-				}
-				else
-				{
-					this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
-				}
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 			}
 		}
 	}
