@@ -210,7 +210,10 @@ package org.osmf.smil.media
 					var resource:StreamingURLResource = new StreamingURLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src), StreamType.LIVE_OR_RECORDED);
 					resource.mediaType = MediaType.VIDEO;
 					
-					var videoElement:MediaElement = new VideoElement(resource);
+					var videoElement:VideoElement = new VideoElement(resource);
+					videoElement.smoothing = true;
+					videoElement.deblocking = 1;
+					
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 					
 					if (!isNaN(smilVideoElement.clipBegin) && smilVideoElement.clipBegin > 0 &&
@@ -239,7 +242,7 @@ package org.osmf.smil.media
 							}
 							
 							if (tempMediaElement != null && tempMediaElement is VideoElement)
-							{
+							{								
 								(tempMediaElement as VideoElement).defaultDuration = duration;
 							}
 						}
