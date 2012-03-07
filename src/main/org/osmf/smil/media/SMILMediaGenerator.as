@@ -30,6 +30,7 @@ package org.osmf.smil.media
 	import org.osmf.elements.AudioElement;
 	import org.osmf.elements.CompositeElement;
 	import org.osmf.elements.DurationElement;
+	import org.osmf.elements.LightweightVideoElement;
 	import org.osmf.elements.ParallelElement;
 	import org.osmf.elements.ProxyElement;
 	import org.osmf.elements.SerialElement;
@@ -210,9 +211,15 @@ package org.osmf.smil.media
 					var resource:StreamingURLResource = new StreamingURLResource(this.createStandardisedURL((smilElement as SMILMediaElement).src), StreamType.LIVE_OR_RECORDED);
 					resource.mediaType = MediaType.VIDEO;
 					
-					var videoElement:VideoElement = new VideoElement(resource);
-					videoElement.smoothing = true;
-					videoElement.deblocking = 1;
+					var videoElement:MediaElement = factory.createMediaElement(resource); // new VideoElement(resource);
+					
+					if (videoElement is LightweightVideoElement)
+					{
+						var video:LightweightVideoElement = videoElement as LightweightVideoElement;
+						
+						video.smoothing = true;
+						video.deblocking = 1;
+					}
 					
 					var smilVideoElement:SMILMediaElement = smilElement as SMILMediaElement;
 					
