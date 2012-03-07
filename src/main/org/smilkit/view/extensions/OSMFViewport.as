@@ -26,6 +26,7 @@ package org.smilkit.view.extensions
 	import org.osmf.smil.SMILPluginInfo;
 	import org.osmf.traits.LoadState;
 	import org.osmf.traits.PlayState;
+	import org.osmf.utils.OSMFSettings;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
 	import org.smilkit.view.BaseViewport;
@@ -45,6 +46,8 @@ package org.smilkit.view.extensions
 		public function OSMFViewport()
 		{
 			super();
+			
+			OSMFSettings.enableStageVideo = false;
 			
 			this._uiMetadata = new LayoutMetadata();
 			this._uiMetadata.scaleMode = ScaleMode.LETTERBOX;

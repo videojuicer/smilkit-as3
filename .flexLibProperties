@@ -101,6 +101,7 @@
     <classEntry path="org.osmf.smil.loader.VideoNetStreamDisplayObjectTrait"/>
     <classEntry path="org.osmf.smil.loader.SMILImageElement"/>
     <classEntry path="org.osmf.smil.loader.SMILVideoElement"/>
+    <classEntry path="flash.events.StageVideoEvent"/>
   </includeClasses>
   <includeResources/>
   <namespaceManifests/>
