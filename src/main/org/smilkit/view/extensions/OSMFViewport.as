@@ -44,6 +44,7 @@ package org.smilkit.view.extensions
 		private var _uiSize:Rectangle = null;
 		
 		private var _waitingForRefresh:Boolean = false;
+		private var _playState:String = PlayState.PAUSED;
 		
 		public function OSMFViewport()
 		{
@@ -109,6 +110,11 @@ package org.smilkit.view.extensions
 		
 		public override function get offset():Number
 		{
+			if (this._playState == PlayState.STOPPED)
+			{
+				return (this.duration / 1000);
+			}
+			
 			return this._mediaPlayer.currentTime;
 		}
 		
@@ -331,16 +337,29 @@ package org.smilkit.view.extensions
 		
 		protected function onPlayStateChanged(e:PlayEvent):void
 		{
+			this._playState = e.playState;
 			
+			SMILKit.logger.error("onPlayStateChanged: "+e.type+" "+e.playState);
+			
+			if (e.playState == PlayState.STOPPED)
+			{
+				this.pause();
+			}
+			else if (e.playState == PlayState.PLAYING)
+			{
+				this.resume();
+			}
 		}
 		
 		protected function onSeekChanged(e:SeekEvent):void
 		{
-			
+			SMILKit.logger.error("onSeekChanged: "+e.type+" "+e.seeking+" "+e.time);
 		}
 		
 		protected function onTimeChanged(e:TimeEvent):void
 		{
+			SMILKit.logger.error("onTimeChanged: "+this._mediaPlayer.state);
+			
 			if (this._mediaPlayer.playing)
 			{
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));

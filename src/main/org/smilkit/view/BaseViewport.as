@@ -200,7 +200,7 @@ package org.smilkit.view
 		
 		public function set autoPlay(autoPlay:Boolean):void
 		{
-			this._autoPlay = autoRefresh;
+			this._autoPlay = autoPlay;
 		}
 		
 		/**
