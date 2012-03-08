@@ -345,7 +345,7 @@ package org.smilkit.view.extensions
 			
 			SMILKit.logger.error("onPlayStateChanged: "+e.type+" "+e.playState);
 			
-			if (e.playState == PlayState.STOPPED)
+			if (e.playState == PlayState.STOPPED && !this._mediaPlayer.seeking)
 			{
 				this.pause();
 			}
