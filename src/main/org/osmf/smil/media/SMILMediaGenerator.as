@@ -36,8 +36,11 @@ package org.osmf.smil.media
 	import org.osmf.elements.SerialElement;
 	import org.osmf.elements.SoundLoader;
 	import org.osmf.elements.VideoElement;
+	import org.osmf.layout.HorizontalAlign;
 	import org.osmf.layout.LayoutMetadata;
+	import org.osmf.layout.LayoutMode;
 	import org.osmf.layout.ScaleMode;
+	import org.osmf.layout.VerticalAlign;
 	import org.osmf.media.MediaElement;
 	import org.osmf.media.MediaFactory;
 	import org.osmf.media.MediaResourceBase;
@@ -466,6 +469,7 @@ package org.osmf.smil.media
 			{
 				var layout:LayoutMetadata = new LayoutMetadata();
 				
+				layout.verticalAlign = VerticalAlign.MIDDLE;
 				layout.scaleMode = ScaleMode.LETTERBOX;
 				
 				if (region.width != null)
