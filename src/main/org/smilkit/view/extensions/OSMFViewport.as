@@ -112,7 +112,7 @@ package org.smilkit.view.extensions
 		{
 			if (this._playState == PlayState.STOPPED)
 			{
-				return (this.duration / 1000);
+				return 0;
 			}
 			
 			return this._mediaPlayer.currentTime;
