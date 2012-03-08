@@ -288,7 +288,11 @@ package org.smilkit.view.extensions
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_UNAUTHORISED));
 					break;
 				case MediaErrorCodes.NETCONNECTION_TIMEOUT:
-					this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_TIMEOUT));
+					//this.dispatchEvent(new ViewportEvent(ViewportEvent.HANDLER_LOAD_TIMEOUT));
+					if (this.playbackState == BaseViewport.PLAYBACK_PLAYING)
+					{
+						this.pause();
+					}
 					break;
 				case MediaErrorCodes.NETSTREAM_STREAM_NOT_FOUND:
 				default:
