@@ -29,7 +29,9 @@ package org.smilkit.view.extensions
 	import org.osmf.utils.OSMFSettings;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
+	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.BaseViewport;
+	import org.utilkit.util.NumberHelper;
 
 	public class OSMFViewport extends BaseViewport
 	{
@@ -138,6 +140,8 @@ package org.smilkit.view.extensions
 			{
 				this._uiComponent.removeMediaElement(this._mediaPlayer.media);
 			}
+			
+			this.pause();
 			
 			var resource:URLResource = new URLResource(this.location);
 			this._mediaElement = this._mediaFactory.createMediaElement(resource);
@@ -310,6 +314,11 @@ package org.smilkit.view.extensions
 				this._waitingForRefresh = false;
 				
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+				
+				if (this.autoPlay)
+				{
+					this.resume();
+				}
 			}
 			
 			this.updateUISize();
@@ -322,7 +331,7 @@ package org.smilkit.view.extensions
 		
 		protected function onPlayStateChanged(e:PlayEvent):void
 		{
-			// nothing
+			
 		}
 		
 		protected function onSeekChanged(e:SeekEvent):void

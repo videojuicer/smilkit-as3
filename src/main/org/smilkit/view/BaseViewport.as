@@ -54,6 +54,8 @@ package org.smilkit.view
 		protected var _bytesLoaded:int = 0;
 		protected var _bytesTotal:int = 0;
 		
+		protected var _autoPlay:Boolean = false;
+		
 		public function BaseViewport()
 		{
 			super();
@@ -189,6 +191,16 @@ package org.smilkit.view
 		public function set autoRefresh(autoRefresh:Boolean):void
 		{
 			this._autoRefresh = autoRefresh;
+		}
+		
+		public function get autoPlay():Boolean
+		{
+			return this._autoPlay;
+		}
+		
+		public function set autoPlay(autoPlay:Boolean):void
+		{
+			this._autoPlay = autoRefresh;
 		}
 		
 		/**
