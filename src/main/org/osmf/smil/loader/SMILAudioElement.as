@@ -25,9 +25,12 @@ package org.osmf.smil.loader
 			if (netLoadTrait != null)
 			{
 				this.removeTrait(MediaTraitType.TIME);
+				this.removeTrait(MediaTraitType.SEEK);
 				
 				var timeTrait:TimeTrait = new AudioNetStreamTimeTrait(netLoadTrait.connection, netLoadTrait.netStream, this.resource, this.defaultDuration);
+				
 				this.addTrait(MediaTraitType.TIME, timeTrait);
+				this.addTrait(MediaTraitType.SEEK, new AudioNetStreamSeekTrait(timeTrait, netLoadTrait, netLoadTrait.netStream));
 			}
 		}
 	}
