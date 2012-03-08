@@ -409,7 +409,15 @@ package org.smilkit.view.extensions
 				}
 			}
 			
-			this._bytesTotal = bytes;
+			
+			if (bytes > e.bytes)
+			{
+				this._bytesTotal = bytes;
+			}
+			else
+			{
+				this._bytesTotal = e.bytes;
+			}
 			
 			this.dispatchEvent(new ProgressEvent(ProgressEvent.PROGRESS, false, false, this._bytesLoaded, this._bytesTotal));
 		}
