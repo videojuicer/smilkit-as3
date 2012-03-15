@@ -62,6 +62,7 @@ package org.smilkit.view.extensions
 			this._mediaPlayer = new MediaPlayer();
 			
 			this._mediaPlayer.autoPlay = false;
+			this._mediaPlayer.autoRewind = true;
 			
 			this._mediaPlayer.addEventListener(MediaErrorEvent.MEDIA_ERROR, this.onMediaError);
 			
