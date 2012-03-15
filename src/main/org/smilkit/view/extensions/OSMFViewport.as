@@ -112,7 +112,7 @@ package org.smilkit.view.extensions
 		{
 			if (this._playState == PlayState.STOPPED)
 			{
-				return 0;
+				return this._mediaPlayer.duration;
 			}
 			
 			return this._mediaPlayer.currentTime;
@@ -381,6 +381,7 @@ package org.smilkit.view.extensions
 		{
 			this.pause();
 			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_COMPLETE));
 		}
 		
