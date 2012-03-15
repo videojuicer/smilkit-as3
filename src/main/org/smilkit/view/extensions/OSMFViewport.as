@@ -220,6 +220,11 @@ package org.smilkit.view.extensions
 		{
 			if (this._mediaPlayer.canPlay && !this._mediaPlayer.playing)
 			{
+				if (this._playState == PlayState.STOPPED)
+				{
+					this._mediaPlayer.seek(0);
+				}
+				
 				this._mediaPlayer.play();
 			}
 		}
