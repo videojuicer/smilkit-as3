@@ -358,6 +358,8 @@ package org.smilkit.view.extensions
 		protected function onSeekChanged(e:SeekEvent):void
 		{
 			SMILKit.logger.error("onSeekChanged: "+e.type+" "+e.seeking+" "+e.time);
+			
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 		}
 		
 		protected function onTimeChanged(e:TimeEvent):void
