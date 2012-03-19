@@ -23,9 +23,6 @@ package org.osmf.smil.media
 {
 	import flash.events.Event;
 	import flash.events.MouseEvent;
-	import flash.net.URLRequest;
-	
-	import mx.utils.URLUtil;
 	
 	import org.osmf.elements.AudioElement;
 	import org.osmf.elements.CompositeElement;
@@ -36,9 +33,7 @@ package org.osmf.smil.media
 	import org.osmf.elements.SerialElement;
 	import org.osmf.elements.SoundLoader;
 	import org.osmf.elements.VideoElement;
-	import org.osmf.layout.HorizontalAlign;
 	import org.osmf.layout.LayoutMetadata;
-	import org.osmf.layout.LayoutMode;
 	import org.osmf.layout.ScaleMode;
 	import org.osmf.layout.VerticalAlign;
 	import org.osmf.media.MediaElement;
@@ -63,13 +58,11 @@ package org.osmf.smil.media
 	import org.osmf.smil.model.SMILMetaElement;
 	import org.osmf.smil.model.SMILRegionElement;
 	import org.osmf.traits.DisplayObjectTrait;
-	import org.osmf.traits.LoadTrait;
 	import org.osmf.traits.LoaderBase;
 	import org.osmf.traits.MediaTraitType;
 	import org.smilkit.SMILKit;
 	import org.utilkit.parser.URLParser;
 	import org.utilkit.util.NumberHelper;
-	import org.utilkit.util.UrlUtil;
 
 	/**
 	 * A utility class for creating MediaElements from a <code>SMILDocument</code>.

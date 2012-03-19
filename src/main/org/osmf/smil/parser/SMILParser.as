@@ -30,8 +30,8 @@ package org.osmf.smil.parser
 	import org.osmf.smil.model.SMILMediaElement;
 	import org.osmf.smil.model.SMILMetaElement;
 	import org.osmf.smil.model.SMILRegionElement;
-	import org.osmf.utils.TimeUtil;
 	import org.smilkit.SMILKit;
+	import org.utilkit.util.TimeHelper;
 
 	/**
 	 * Parses a SMIL file and creates a document object
@@ -195,17 +195,17 @@ package org.osmf.smil.parser
 				
 				if (node.@[ATTRIB_DURATION] != null)
 				{
-					element.duration = TimeUtil.parseTime(node.@[ATTRIB_DURATION]);
+					element.duration = (TimeHelper.smilTimeToMilliseconds(node.@[ATTRIB_DURATION]) / 1000);
 				}
 				
 				if (node.@[ATTRIB_CLIP_BEGIN] != null)
 				{
-					element.clipBegin = TimeUtil.parseTime(node.@[ATTRIB_CLIP_BEGIN]);
+					element.clipBegin = (TimeHelper.smilTimeToMilliseconds(node.@[ATTRIB_CLIP_BEGIN]) / 1000);
 				}
 				
 				if (node.@[ATTRIB_CLIP_END] != null)
 				{
-					element.clipEnd = TimeUtil.parseTime(node.@[ATTRIB_CLIP_END]);
+					element.clipEnd = (TimeHelper.smilTimeToMilliseconds(node.@[ATTRIB_CLIP_END]) / 1000);
 				}
 				
 				if (node.@[ATTRIB_REGION] != null)
