@@ -358,13 +358,13 @@ package org.smilkit.view.extensions
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
 				}
 				
-				if (this.autoPlay)
-				{
-					this.resume();
-				}
-				else if (this._resumeOnRefresh)
+				if (this._resumeOnRefresh)
 				{
 					this._mediaPlayer.play();
+				}
+				else if (this.autoPlay)
+				{
+					this.resume();
 				}
 			}
 			
