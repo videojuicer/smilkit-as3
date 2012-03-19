@@ -1,7 +1,9 @@
 package org.smilkit.view.extensions
 {
 	import flash.events.ProgressEvent;
+	import flash.events.TimerEvent;
 	import flash.geom.Rectangle;
+	import flash.utils.Timer;
 	
 	import org.osmf.containers.MediaContainer;
 	import org.osmf.events.BufferEvent;
@@ -46,6 +48,8 @@ package org.smilkit.view.extensions
 		private var _waitingForRefresh:Boolean = false;
 		private var _playState:String = PlayState.PAUSED;
 		private var _resumeOnRefresh:Boolean = false;
+		
+		private var _liveTimer:Timer = null;
 		
 		public function OSMFViewport()
 		{
@@ -115,6 +119,11 @@ package org.smilkit.view.extensions
 			if (this._playState == PlayState.STOPPED)
 			{
 				return this._mediaPlayer.duration;
+			}
+			
+			if (this._mediaPlayer.currentTime == 0 && this._liveTimer != null)
+			{
+				return ((this._liveTimer.currentCount * this._liveTimer.delay) / 1000);
 			}
 			
 			return this._mediaPlayer.currentTime;
@@ -373,11 +382,40 @@ package org.smilkit.view.extensions
 			if (e.playState == PlayState.STOPPED && !this._mediaPlayer.seeking)
 			{
 				this.pause();
+				
+				if (this._liveTimer != null && !this._resumeOnRefresh)
+				{
+					this._liveTimer.stop();
+					this._liveTimer = null;
+				}
+			}
+			else if (e.playState == PlayState.PAUSED)
+			{
+				if (this._liveTimer != null)
+				{
+					this._liveTimer.stop();
+				}
 			}
 			else if (e.playState == PlayState.PLAYING)
 			{
 				this.resume();
+				
+				if (this.isLive)
+				{
+					if (this._liveTimer == null)
+					{
+						this._liveTimer = new Timer(500, 0);
+						this._liveTimer.addEventListener(TimerEvent.TIMER, this.onLiveTimerTick);
+					}
+						
+					this._liveTimer.start();
+				}
 			}
+		}
+		
+		protected function onLiveTimerTick(e:TimerEvent):void
+		{
+			this.onTimeChanged(null);
 		}
 		
 		protected function onSeekChanged(e:SeekEvent):void
@@ -389,8 +427,6 @@ package org.smilkit.view.extensions
 		
 		protected function onTimeChanged(e:TimeEvent):void
 		{
-			SMILKit.logger.error("onTimeChanged: "+this._mediaPlayer.state);
-			
 			if (this._mediaPlayer.playing)
 			{
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
