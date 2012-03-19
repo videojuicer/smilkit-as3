@@ -97,7 +97,7 @@ package org.smilkit
 		public static function defaults():void
 		{
 			// load default logger renderers
-			Logger.defaultRenderers();
+			//Logger.defaultRenderers();
 			
 			// load the default smilkit handlers
 			CONFIG::USE_SMILKIT { HandlerMap.defaultHandlers(); }
