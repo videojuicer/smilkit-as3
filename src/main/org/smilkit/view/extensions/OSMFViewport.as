@@ -353,7 +353,10 @@ package org.smilkit.view.extensions
 			{
 				this._waitingForRefresh = false;
 				
-				this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+				if (!this._resumeOnRefresh)
+				{
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.REFRESH_COMPLETE));
+				}
 				
 				if (this.autoPlay)
 				{
