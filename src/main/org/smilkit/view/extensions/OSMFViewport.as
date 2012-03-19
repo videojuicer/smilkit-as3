@@ -141,7 +141,7 @@ package org.smilkit.view.extensions
 		
 		public function get isLive():Boolean
 		{
-			return (!this._mediaPlayer.canSeek && !this._mediaPlayer.isDVRRecording && (this.duration == 0 || isNaN(this.duration)));
+			return false; //(!this._mediaPlayer.canSeek && !this._mediaPlayer.isDVRRecording && (this.duration == 0 || isNaN(this.duration)));
 		}
 		
 		public override function getDocumentMeta(key:String):String
