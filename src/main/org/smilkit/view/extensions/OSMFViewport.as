@@ -45,6 +45,7 @@ package org.smilkit.view.extensions
 		
 		private var _waitingForRefresh:Boolean = false;
 		private var _playState:String = PlayState.PAUSED;
+		private var _resumeOnRefresh:Boolean = false;
 		
 		public function OSMFViewport()
 		{
@@ -127,6 +128,11 @@ package org.smilkit.view.extensions
 		public override function get type():String
 		{
 			return SMILKit.VIEWPORT_OSMF;
+		}
+		
+		public function get isLive():Boolean
+		{
+			return (!this._mediaPlayer.canSeek && !this._mediaPlayer.isDVRRecording && (this.duration == 0 || isNaN(this.duration)));
 		}
 		
 		public override function getDocumentMeta(key:String):String
@@ -225,7 +231,16 @@ package org.smilkit.view.extensions
 					this._mediaPlayer.seek(0);
 				}
 				
-				this._mediaPlayer.play();
+				if (this.isLive)
+				{
+					this.refresh();
+					
+					this._resumeOnRefresh = true;
+				}
+				else
+				{
+					this._mediaPlayer.play();
+				}
 			}
 		}
 		
@@ -334,6 +349,10 @@ package org.smilkit.view.extensions
 				if (this.autoPlay)
 				{
 					this.resume();
+				}
+				else if (this._resumeOnRefresh)
+				{
+					this._mediaPlayer.play();
 				}
 			}
 			
