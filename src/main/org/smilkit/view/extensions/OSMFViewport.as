@@ -243,6 +243,8 @@ package org.smilkit.view.extensions
 				
 				if (this.isVolatile)
 				{
+					this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
+					
 					this.refresh();
 					
 					this._resumeOnRefresh = true;
@@ -362,6 +364,11 @@ package org.smilkit.view.extensions
 				if (this._resumeOnRefresh)
 				{
 					this._mediaPlayer.play();
+					
+					if (this.isVolatile)
+					{
+						this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
+					}
 				}
 				else if (this.autoPlay)
 				{
