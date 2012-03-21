@@ -50,6 +50,7 @@ package org.smilkit.view.extensions
 		private var _resumeOnRefresh:Boolean = false;
 		
 		private var _liveTimer:Timer = null;
+		private var _volatile:Boolean = true;
 		
 		public function OSMFViewport()
 		{
@@ -116,14 +117,14 @@ package org.smilkit.view.extensions
 		
 		public override function get offset():Number
 		{
-			if (this._playState == PlayState.STOPPED)
-			{
-				return this._mediaPlayer.duration;
-			}
-			
 			if (this._mediaPlayer.currentTime == 0 && this._liveTimer != null)
 			{
 				return ((this._liveTimer.currentCount * this._liveTimer.delay) / 1000);
+			}
+			
+			if (this._playState == PlayState.STOPPED)
+			{
+				return this._mediaPlayer.duration;
 			}
 			
 			return this._mediaPlayer.currentTime;
@@ -139,9 +140,9 @@ package org.smilkit.view.extensions
 			return SMILKit.VIEWPORT_OSMF;
 		}
 		
-		public function get isLive():Boolean
+		public function get isVolatile():Boolean
 		{
-			return false; //(!this._mediaPlayer.canSeek && !this._mediaPlayer.isDVRRecording && (this.duration == 0 || isNaN(this.duration)));
+			return this._volatile;
 		}
 		
 		public override function getDocumentMeta(key:String):String
@@ -240,7 +241,7 @@ package org.smilkit.view.extensions
 					this._mediaPlayer.seek(0);
 				}
 				
-				if (this.isLive)
+				if (this.isVolatile)
 				{
 					this.refresh();
 					
@@ -403,7 +404,7 @@ package org.smilkit.view.extensions
 			{
 				this.resume();
 				
-				if (this.isLive)
+				if (this.isVolatile)
 				{
 					if (this._liveTimer == null)
 					{
@@ -432,12 +433,24 @@ package org.smilkit.view.extensions
 		{
 			if (this._mediaPlayer.playing)
 			{
+				if (e != null)
+				{
+					// cant be volatile if were getting a time changed event
+					this._volatile = false;
+				}
+				
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			}
 		}
 		
 		protected function onDurationChanged(e:TimeEvent):void
 		{
+			if (e.time > 0)
+			{
+				// cant be volatile if we got a duration higher than zero
+				this._volatile = false;
+			}
+			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.DOCUMENT_MUTATED));
 		}
 		
