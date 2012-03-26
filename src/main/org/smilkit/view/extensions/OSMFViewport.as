@@ -140,7 +140,7 @@ package org.smilkit.view.extensions
 			return SMILKit.VIEWPORT_OSMF;
 		}
 		
-		public function get isVolatile():Boolean
+		public override function get isVolatile():Boolean
 		{
 			return this._volatile;
 		}
@@ -159,12 +159,15 @@ package org.smilkit.view.extensions
 		
 		public override function refresh():void
 		{
-			if (this._mediaPlayer.media != null)
+			if (this._mediaPlayer.media != null && this._uiComponent.containsMediaElement(this._mediaPlayer.media))
 			{
 				this._uiComponent.removeMediaElement(this._mediaPlayer.media);
 			}
 			
-			this.pause();
+			if (!this._resumeOnRefresh)
+			{
+				this.pause();
+			}
 			
 			var resource:URLResource = new URLResource(this.location);
 			this._mediaElement = this._mediaFactory.createMediaElement(resource);
@@ -245,9 +248,8 @@ package org.smilkit.view.extensions
 				{
 					this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 					
-					this.refresh();
-					
 					this._resumeOnRefresh = true;
+					this.refresh();
 				}
 				else
 				{
@@ -258,7 +260,12 @@ package org.smilkit.view.extensions
 		
 		protected override function onPlaybackStateChangedToPaused():void
 		{
-			if (this._mediaPlayer != null && this._mediaPlayer.canPause && this._mediaPlayer.playing)
+			if (this._mediaPlayer != null && this.isVolatile)
+			{
+				this._resumeOnRefresh = false;
+				this.refresh();
+			}
+			else if (this._mediaPlayer != null && this._mediaPlayer.canPause && this._mediaPlayer.playing)
 			{
 				this._mediaPlayer.pause();
 			}
@@ -397,7 +404,6 @@ package org.smilkit.view.extensions
 				if (this._liveTimer != null && !this._resumeOnRefresh)
 				{
 					this._liveTimer.stop();
-					this._liveTimer = null;
 				}
 			}
 			else if (e.playState == PlayState.PAUSED)
@@ -440,12 +446,6 @@ package org.smilkit.view.extensions
 		{
 			if (this._mediaPlayer.playing)
 			{
-				if (e != null)
-				{
-					// cant be volatile if were getting a time changed event
-					this._volatile = false;
-				}
-				
 				this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
 			}
 		}

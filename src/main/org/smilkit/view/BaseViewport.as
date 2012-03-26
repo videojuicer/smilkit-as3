@@ -219,6 +219,11 @@ package org.smilkit.view
 			return this._playbackState;
 		}
 		
+		public function get isVolatile():Boolean
+		{
+			return false;
+		}
+		
 		/**
 		 * Sets the audio volume for this <code>Viewport</code> instance. 
 		 * Accepts a <code>uint</code> between 0 and 100, with 0 being muted and 100 being maximum volume.
