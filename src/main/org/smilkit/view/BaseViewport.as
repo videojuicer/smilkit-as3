@@ -41,7 +41,7 @@ package org.smilkit.view
 		/**
 		 *  The current audio output volume.
 		 */
-		protected var _volume:uint = 75;
+		protected var _volume:uint = 0;
 		
 		/**
 		 * The volume to which audio should be restored when unmuting. If null, <code>BaseViewport.VOLUME_MAX</code> will be used.
