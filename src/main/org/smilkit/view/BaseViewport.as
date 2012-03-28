@@ -108,6 +108,11 @@ package org.smilkit.view
 		
 		public function get bytesLoaded():int
 		{
+			if (this._bytesTotal == 0)
+			{
+				return 0;
+			}
+			
 			return this._bytesLoaded;
 		}
 		
