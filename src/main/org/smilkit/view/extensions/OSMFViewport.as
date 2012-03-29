@@ -52,6 +52,8 @@ package org.smilkit.view.extensions
 		private var _liveTimer:Timer = null;
 		private var _volatile:Boolean = true;
 		
+		private var _playbackStarted:Boolean = false;
+		
 		public function OSMFViewport()
 		{
 			super();
@@ -145,6 +147,11 @@ package org.smilkit.view.extensions
 			return this._volatile;
 		}
 		
+		public override function get isLive():Boolean
+		{
+			return (this._volatile && this._playbackStarted);
+		}
+		
 		public override function getDocumentMeta(key:String):String
 		{
 			var metadata:Metadata = this._mediaElement.resource.getMetadataValue("org.smilkit") as Metadata;
@@ -168,6 +175,8 @@ package org.smilkit.view.extensions
 			{
 				this.pause();
 			}
+			
+			this._playbackStarted = false;
 			
 			var resource:URLResource = new URLResource(this.location);
 			this._mediaElement = this._mediaFactory.createMediaElement(resource);
@@ -243,6 +252,8 @@ package org.smilkit.view.extensions
 				{
 					this._mediaPlayer.seek(0);
 				}
+				
+				this._playbackStarted = true;
 				
 				if (this.isVolatile)
 				{
