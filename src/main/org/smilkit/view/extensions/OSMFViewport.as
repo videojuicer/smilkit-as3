@@ -9,7 +9,6 @@ package org.smilkit.view.extensions
 	import org.osmf.events.BufferEvent;
 	import org.osmf.events.DisplayObjectEvent;
 	import org.osmf.events.LoadEvent;
-	import org.osmf.events.MediaError;
 	import org.osmf.events.MediaErrorCodes;
 	import org.osmf.events.MediaErrorEvent;
 	import org.osmf.events.MediaPlayerCapabilityChangeEvent;
@@ -26,14 +25,13 @@ package org.smilkit.view.extensions
 	import org.osmf.media.URLResource;
 	import org.osmf.metadata.Metadata;
 	import org.osmf.smil.SMILPluginInfo;
+	import org.osmf.smil.media.SmoothMediaFactory;
 	import org.osmf.traits.LoadState;
 	import org.osmf.traits.PlayState;
 	import org.osmf.utils.OSMFSettings;
 	import org.smilkit.SMILKit;
 	import org.smilkit.events.ViewportEvent;
-	import org.smilkit.util.MathHelper;
 	import org.smilkit.view.BaseViewport;
-	import org.utilkit.util.NumberHelper;
 
 	public class OSMFViewport extends BaseViewport
 	{
@@ -58,7 +56,14 @@ package org.smilkit.view.extensions
 		{
 			super();
 			
+			// http://hbc-slba.com/video/OSMF/framework/OSMF/org/osmf/utils/OSMFSettings.as
 			OSMFSettings.enableStageVideo = false;
+			OSMFSettings.hdsDefaultFragmentsThreshold = 10;
+			OSMFSettings.hdsDVRLiveOffset = 4;
+			OSMFSettings.hdsDVRLiveOffset = 4;
+			OSMFSettings.hdsMinimumBufferTime = 2;
+			OSMFSettings.hdsAdditionalBufferTime = 4;
+			OSMFSettings.hdsMinimumBootstrapRefreshInterval = 10000;
 			
 			this._uiMetadata = new LayoutMetadata();
 			this._uiMetadata.scaleMode = ScaleMode.LETTERBOX;
@@ -96,7 +101,7 @@ package org.smilkit.view.extensions
 			
 			this._mediaPlayer.currentTimeUpdateInterval = 500;
 			
-			this._mediaFactory = new DefaultMediaFactory();
+			this._mediaFactory = new SmoothMediaFactory();
 			this._mediaFactory.loadPlugin(new PluginInfoResource(new SMILPluginInfo()));
 			
 			this.addChild(this._uiComponent);

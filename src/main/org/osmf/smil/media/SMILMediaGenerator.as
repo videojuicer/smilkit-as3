@@ -27,6 +27,7 @@ package org.osmf.smil.media
 	import org.osmf.elements.AudioElement;
 	import org.osmf.elements.CompositeElement;
 	import org.osmf.elements.DurationElement;
+	import org.osmf.elements.F4MElement;
 	import org.osmf.elements.LightweightVideoElement;
 	import org.osmf.elements.ParallelElement;
 	import org.osmf.elements.ProxyElement;
