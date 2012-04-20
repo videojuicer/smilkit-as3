@@ -62,7 +62,7 @@ package org.smilkit.view.extensions
 			OSMFSettings.hdsDVRLiveOffset = 4;
 			OSMFSettings.hdsDVRLiveOffset = 4;
 			OSMFSettings.hdsMinimumBufferTime = 2;
-			OSMFSettings.hdsAdditionalBufferTime = 4;
+			OSMFSettings.hdsAdditionalBufferTime = 2;
 			OSMFSettings.hdsMinimumBootstrapRefreshInterval = 10000;
 			
 			this._uiMetadata = new LayoutMetadata();
