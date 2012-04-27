@@ -74,7 +74,7 @@ package org.smilkit.view.extensions
 			
 			this._mediaPlayer = new MediaPlayer();
 			
-			this._mediaPlayer.autoPlay = false;
+			this._mediaPlayer.autoPlay = this._autoPlay;
 			this._mediaPlayer.autoRewind = false;
 			
 			this._mediaPlayer.addEventListener(MediaErrorEvent.MEDIA_ERROR, this.onMediaError);
@@ -395,7 +395,7 @@ package org.smilkit.view.extensions
 				}
 				else if (this.autoPlay)
 				{
-					this.resume();
+					this._mediaPlayer.autoPlay = this._autoPlay;
 				}
 			}
 			
