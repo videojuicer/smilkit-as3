@@ -320,6 +320,8 @@ package org.smilkit.view.extensions
 			if (canSeekToTarget)
 			{
 				this._mediaPlayer.seek(target);
+				
+				this.dispatchEvent(new ViewportEvent(ViewportEvent.WAITING));
 			}
 		}
 		
@@ -456,6 +458,7 @@ package org.smilkit.view.extensions
 			SMILKit.logger.error("onSeekChanged: "+e.type+" "+e.seeking+" "+e.time);
 			
 			this.dispatchEvent(new ViewportEvent(ViewportEvent.PLAYBACK_OFFSET_CHANGED));
+			this.dispatchEvent(new ViewportEvent(ViewportEvent.READY));
 		}
 		
 		protected function onTimeChanged(e:TimeEvent):void
