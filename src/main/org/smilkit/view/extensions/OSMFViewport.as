@@ -77,6 +77,9 @@ package org.smilkit.view.extensions
 			this._mediaPlayer.autoPlay = this._autoPlay;
 			this._mediaPlayer.autoRewind = false;
 			
+			//this._mediaPlayer.bufferLength = 4;
+			this._mediaPlayer.bufferTime = 5;
+			
 			this._mediaPlayer.addEventListener(MediaErrorEvent.MEDIA_ERROR, this.onMediaError);
 			
 			this._mediaPlayer.addEventListener(DisplayObjectEvent.DISPLAY_OBJECT_CHANGE, this.onDisplayObjectChanged);
